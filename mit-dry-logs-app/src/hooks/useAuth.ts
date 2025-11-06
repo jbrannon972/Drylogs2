@@ -3,7 +3,7 @@
  * Manages authentication state and provides auth methods
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { useNotificationStore } from '../stores/notificationStore';
 import { authService } from '../services/firebase/authService';
@@ -15,26 +15,27 @@ export function useAuth() {
     isAuthenticated,
     isLoading,
     error,
+    initialized,
     setUser,
     setFirebaseUser,
     setLoading,
     setError,
+    setInitialized,
     logout: logoutStore,
   } = useAuthStore();
 
   const { addNotification } = useNotificationStore();
-  const initialized = useRef(false);
 
   // Listen to auth state changes
   useEffect(() => {
-    // Prevent double initialization
-    if (initialized.current) {
-      console.log('🔐 useAuth: Already initialized, skipping');
+    // Prevent double initialization using store flag (persists across remounts)
+    if (initialized) {
+      console.log('🔐 useAuth: Already initialized (store flag), skipping');
       return;
     }
 
     console.log('🔐 useAuth: Initializing auth listener');
-    initialized.current = true;
+    setInitialized(true);
     setLoading(true);
 
     // Add a timeout to prevent infinite loading
@@ -89,7 +90,8 @@ export function useAuth() {
       setLoading(false);
       setError('Failed to initialize authentication');
     }
-  }, [setUser, setFirebaseUser, setLoading, setError]); // Include Zustand setters (stable references)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - only run once, controlled by initialized flag in store
 
   const signIn = async (email: string, password: string) => {
     try {

@@ -12,12 +12,14 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  initialized: boolean; // Prevent double initialization
 
   // Actions
   setUser: (user: User | null) => void;
   setFirebaseUser: (firebaseUser: any | null) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
+  setInitialized: (initialized: boolean) => void;
   logout: () => void;
 }
 
@@ -27,6 +29,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   isLoading: true,
   error: null,
+  initialized: false,
 
   setUser: (user) =>
     set({
@@ -43,6 +46,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setError: (error) =>
     set({ error }),
+
+  setInitialized: (initialized) =>
+    set({ initialized }),
 
   logout: () =>
     set({
