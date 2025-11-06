@@ -1,3 +1,17 @@
+# MIT Dry Logs App
+
+Water damage restoration field application built with React, TypeScript, Vite, and Firebase.
+
+## Features
+- PWA with offline support
+- QR code equipment tracking
+- IICRC S500-2021 compliance
+- Real-time moisture readings
+- Photo documentation with geolocation
+- Digital signatures and work orders
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
