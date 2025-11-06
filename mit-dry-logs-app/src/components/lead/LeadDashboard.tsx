@@ -13,6 +13,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { Job } from '../../types';
+import { toDate } from '../../utils/dateUtils';
 
 export const LeadDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -28,7 +29,7 @@ export const LeadDashboard: React.FC = () => {
 
   const todayJobs = jobs.filter(job => {
     const today = new Date();
-    const jobDate = job.scheduledDate.toDate();
+    const jobDate = toDate(job.scheduledDate);
     return jobDate.toDateString() === today.toDateString();
   });
 

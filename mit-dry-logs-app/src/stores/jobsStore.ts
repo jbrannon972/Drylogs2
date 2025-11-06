@@ -5,6 +5,7 @@
 
 import { create } from 'zustand';
 import { Job, JobFilters, JobStatus } from '../types';
+import { toDate } from '../utils/dateUtils';
 
 interface JobsState {
   jobs: Job[];
@@ -101,7 +102,7 @@ export const useJobsStore = create<JobsState>((set, get) => ({
 
     if (filters.dateRange) {
       filtered = filtered.filter((job) => {
-        const jobDate = job.scheduledDate.toDate();
+        const jobDate = toDate(job.scheduledDate);
         return (
           jobDate >= filters.dateRange!.start &&
           jobDate <= filters.dateRange!.end

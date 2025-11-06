@@ -8,6 +8,7 @@ import { LoadingSpinner } from '../shared/LoadingSpinner';
 import { Calendar, MapPin, Clock, ChevronRight, AlertTriangle } from 'lucide-react';
 import { Job, JobStatus } from '../../types';
 import { format } from 'date-fns';
+import { toDate } from '../../utils/dateUtils';
 
 export const TechDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -162,7 +163,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
             <div className="flex items-center gap-2 text-gray-600 text-sm">
               <Clock className="w-4 h-4" />
               <span>
-                Scheduled: {format(job.scheduledDate.toDate(), 'MMM d, yyyy h:mm a')}
+                Scheduled: {format(toDate(job.scheduledDate), 'MMM d, yyyy h:mm a')}
               </span>
             </div>
           </div>
