@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWorkflowStore } from '../../../stores/workflowStore';
 import { useJobsStore } from '../../../stores/jobsStore';
+import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
 import {
   CheckCircle,
@@ -116,6 +117,7 @@ const DEMO_STEPS: StepConfig[] = [
 export const DemoWorkflow: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { demoStep, setDemoStep, startWorkflow } = useWorkflowStore();
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
@@ -123,12 +125,12 @@ export const DemoWorkflow: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (jobId) {
-      startWorkflow('demo', jobId);
+    if (jobId && user) {
+      startWorkflow('demo', jobId, user.uid);
       const jobData = getJobById(jobId);
       setJob(jobData);
     }
-  }, [jobId, startWorkflow, getJobById]);
+  }, [jobId, user, startWorkflow, getJobById]);
 
   useEffect(() => {
     if (contentRef.current) {

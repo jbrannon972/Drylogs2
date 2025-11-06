@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, CheckCircle, Info } from 'lucide-react';
 import { CheckServiceStep } from '../../../types/workflow';
 import { useWorkflowStore } from '../../../stores/workflowStore';
 import { useJobsStore } from '../../../stores/jobsStore';
+import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
 import { StartVisitStep } from './check-service/StartVisitStep';
 import { EnvironmentalCheckStep } from './check-service/EnvironmentalCheckStep';
@@ -76,6 +77,7 @@ const CHECK_SERVICE_STEPS: StepConfig[] = [
 export const CheckServiceWorkflow: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { checkServiceStep, setCheckServiceStep, startWorkflow } = useWorkflowStore();
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
@@ -83,12 +85,12 @@ export const CheckServiceWorkflow: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (jobId) {
-      startWorkflow('check-service', jobId);
+    if (jobId && user) {
+      startWorkflow('check-service', jobId, user.uid);
       const jobData = getJobById(jobId);
       setJob(jobData);
     }
-  }, [jobId, startWorkflow, getJobById]);
+  }, [jobId, user, startWorkflow, getJobById]);
 
   useEffect(() => {
     if (contentRef.current) {

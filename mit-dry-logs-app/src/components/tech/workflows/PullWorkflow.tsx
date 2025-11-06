@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, CheckCircle, Info } from 'lucide-react';
 import { PullStep } from '../../../types/workflow';
 import { useWorkflowStore } from '../../../stores/workflowStore';
 import { useJobsStore } from '../../../stores/jobsStore';
+import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
 import { StartPullStep } from './pull/StartPullStep';
 import { FinalVerificationStep } from './pull/FinalVerificationStep';
@@ -84,6 +85,7 @@ const PULL_STEPS: StepConfig[] = [
 export const PullWorkflow: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { pullStep, setPullStep, startWorkflow } = useWorkflowStore();
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
@@ -91,12 +93,12 @@ export const PullWorkflow: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (jobId) {
-      startWorkflow('pull', jobId);
+    if (jobId && user) {
+      startWorkflow('pull', jobId, user.uid);
       const jobData = getJobById(jobId);
       setJob(jobData);
     }
-  }, [jobId, startWorkflow, getJobById]);
+  }, [jobId, user, startWorkflow, getJobById]);
 
   useEffect(() => {
     if (contentRef.current) {
