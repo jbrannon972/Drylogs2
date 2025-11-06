@@ -10,6 +10,9 @@ import { TechDashboard } from './components/tech/TechDashboard';
 import { LeadDashboard } from './components/lead/LeadDashboard';
 import { LoadingSpinner } from './components/shared/LoadingSpinner';
 import { InstallWorkflow } from './components/tech/workflows/InstallWorkflow';
+import { DemoWorkflow } from './components/tech/workflows/DemoWorkflow';
+import { CheckServiceWorkflow } from './components/tech/workflows/CheckServiceWorkflow';
+import { PullWorkflow } from './components/tech/workflows/PullWorkflow';
 
 // Debug version identifier
 console.log('🚀 MIT Dry Logs v1.0.1 - Build:', new Date().toISOString());
@@ -70,6 +73,30 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['MIT_TECH']}>
               <InstallWorkflow />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tech/job/:jobId/demo"
+          element={
+            <ProtectedRoute allowedRoles={['MIT_TECH']}>
+              <DemoWorkflow />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tech/job/:jobId/check-service"
+          element={
+            <ProtectedRoute allowedRoles={['MIT_TECH']}>
+              <CheckServiceWorkflow />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tech/job/:jobId/pull"
+          element={
+            <ProtectedRoute allowedRoles={['MIT_TECH']}>
+              <PullWorkflow />
             </ProtectedRoute>
           }
         />

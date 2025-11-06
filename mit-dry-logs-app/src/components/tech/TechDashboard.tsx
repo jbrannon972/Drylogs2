@@ -19,8 +19,20 @@ export const TechDashboard: React.FC = () => {
     ? jobs
     : jobs.filter(job => job.jobStatus === selectedStatus);
 
-  const handleJobClick = (jobId: string) => {
-    navigate(`/tech/job/${jobId}/install`);
+  const handleJobClick = (job: Job) => {
+    // Route to appropriate workflow based on job status
+    const workflowRoutes: Record<JobStatus, string> = {
+      'Pre-Install': 'install',
+      'Install': 'install',
+      'Demo': 'demo',
+      'Check Service': 'check-service',
+      'Pull': 'pull',
+      'Complete': 'install', // fallback
+      'On Hold': 'install', // fallback
+    };
+
+    const workflow = workflowRoutes[job.jobStatus];
+    navigate(`/tech/job/${job.jobId}/${workflow}`);
   };
 
   const statusCounts = {
@@ -88,7 +100,7 @@ export const TechDashboard: React.FC = () => {
           </Card>
         ) : (
           filteredJobs.map((job) => (
-            <JobCard key={job.jobId} job={job} onClick={() => handleJobClick(job.jobId)} />
+            <JobCard key={job.jobId} job={job} onClick={() => handleJobClick(job)} />
           ))
         )}
       </div>
