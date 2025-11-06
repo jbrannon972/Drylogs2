@@ -6,8 +6,23 @@
  */
 
 import { collection, addDoc, setDoc, doc, Timestamp } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from './firebaseNode';  // Use Node.js-compatible Firebase config
 import { User, Job, UserRole, Zone, JobStatus, WaterCategory } from '../types';
+import { comprehensiveJobs } from './comprehensiveSeedData';
+
+// Helper to remove undefined values (Firestore doesn't allow undefined)
+function removeUndefined<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(removeUndefined) as any;
+
+  const cleaned: any = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      cleaned[key] = removeUndefined(value);
+    }
+  }
+  return cleaned;
+}
 
 // Sample Users
 const sampleUsers: User[] = [
@@ -259,18 +274,28 @@ export async function seedDatabase() {
       console.log(`✓ Created user: ${user.displayName} (${user.role})`);
     }
 
-    // Add jobs for tech user
-    console.log('\n📋 Creating jobs...');
+    // Add standard sample jobs for tech user
+    console.log('\n📋 Creating standard sample jobs...');
     const jobs = generateSampleJobs('tech1');
     for (const job of jobs) {
-      const docRef = await addDoc(collection(db, 'jobs'), job);
+      const cleanedJob = removeUndefined(job);
+      const docRef = await addDoc(collection(db, 'jobs'), cleanedJob);
       console.log(`✓ Created job: ${job.customerInfo?.name} - ${job.jobStatus}`);
+    }
+
+    // Add comprehensive workflow-complete jobs
+    console.log('\n📋 Creating comprehensive workflow jobs with complete data...');
+    for (const job of comprehensiveJobs) {
+      const cleanedJob = removeUndefined(job);
+      const docRef = await addDoc(collection(db, 'jobs'), cleanedJob);
+      console.log(`✓ Created comprehensive job: ${job.customerInfo?.name} - ${job.jobStatus} (${job.jobId})`);
     }
 
     console.log('\n✅ Database seeding completed successfully!');
     console.log('\n📊 Summary:');
     console.log(`   Users created: ${sampleUsers.length}`);
-    console.log(`   Jobs created: ${jobs.length}`);
+    console.log(`   Standard jobs created: ${jobs.length}`);
+    console.log(`   Comprehensive jobs created: ${comprehensiveJobs.length}`);
     console.log('\n🔐 Demo Credentials:');
     console.log('   MIT Tech: tech@demo.com / password123');
     console.log('   MIT Lead: lead@demo.com / password123');
@@ -281,8 +306,12 @@ export async function seedDatabase() {
   }
 }
 
-// Run if called directly
-if (require.main === module) {
+// Run if called directly (ES module check)
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const isMain = process.argv[1] === __filename;
+
+if (isMain) {
   seedDatabase()
     .then(() => process.exit(0))
     .catch((error) => {
