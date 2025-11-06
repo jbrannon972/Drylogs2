@@ -5,11 +5,13 @@
 
 import { create } from 'zustand';
 import { InstallStep, DemoStep, CheckServiceStep, PullStep, WorkflowProgress } from '../types/workflow';
+import { jobsService } from '../services/firebase/jobsService';
 
 interface WorkflowState {
   // Current workflow
   currentWorkflow: 'install' | 'demo' | 'check-service' | 'pull' | null;
   currentJobId: string | null;
+  currentUserId: string | null;
 
   // Install workflow
   installStep: InstallStep;
@@ -31,19 +33,21 @@ interface WorkflowState {
   progress: WorkflowProgress | null;
 
   // Actions
-  startWorkflow: (workflow: 'install' | 'demo' | 'check-service' | 'pull', jobId: string) => void;
+  startWorkflow: (workflow: 'install' | 'demo' | 'check-service' | 'pull', jobId: string, userId: string) => Promise<void>;
   setInstallStep: (step: InstallStep) => void;
   setDemoStep: (step: DemoStep) => void;
   setCheckServiceStep: (step: CheckServiceStep) => void;
   setPullStep: (step: PullStep) => void;
-  updateWorkflowData: (workflow: string, data: any) => void;
+  updateWorkflowData: (workflow: string, data: any) => Promise<void>;
   completeWorkflow: () => void;
   resetWorkflow: () => void;
+  saveWorkflowData: () => Promise<void>;
 }
 
 export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   currentWorkflow: null,
   currentJobId: null,
+  currentUserId: null,
   installStep: 'arrival',
   installData: {},
   demoStep: 'clock-in',
@@ -54,7 +58,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   pullData: {},
   progress: null,
 
-  startWorkflow: (workflow, jobId) => {
+  startWorkflow: async (workflow, jobId, userId) => {
     const totalSteps = {
       install: 13,
       demo: 10,
@@ -62,17 +66,55 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       pull: 8,
     }[workflow];
 
-    set({
-      currentWorkflow: workflow,
-      currentJobId: jobId,
-      progress: {
-        currentStep: 1,
-        totalSteps,
-        completedSteps: 0,
-        startedAt: new Date(),
-        lastUpdatedAt: new Date(),
-      },
-    });
+    // Load existing workflow data from the job
+    try {
+      const job = await jobsService.getJobById(jobId);
+      if (job) {
+        const existingWorkflowData = (job as any).workflowData?.[workflow] || {};
+
+        set({
+          currentWorkflow: workflow,
+          currentJobId: jobId,
+          currentUserId: userId,
+          [`${workflow}Data`]: existingWorkflowData,
+          progress: {
+            currentStep: 1,
+            totalSteps,
+            completedSteps: 0,
+            startedAt: new Date(),
+            lastUpdatedAt: new Date(),
+          },
+        } as any);
+      } else {
+        set({
+          currentWorkflow: workflow,
+          currentJobId: jobId,
+          currentUserId: userId,
+          progress: {
+            currentStep: 1,
+            totalSteps,
+            completedSteps: 0,
+            startedAt: new Date(),
+            lastUpdatedAt: new Date(),
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error loading workflow data:', error);
+      // Continue with empty data if load fails
+      set({
+        currentWorkflow: workflow,
+        currentJobId: jobId,
+        currentUserId: userId,
+        progress: {
+          currentStep: 1,
+          totalSteps,
+          completedSteps: 0,
+          startedAt: new Date(),
+          lastUpdatedAt: new Date(),
+        },
+      });
+    }
   },
 
   setInstallStep: (step) => {
@@ -119,22 +161,59 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     });
   },
 
-  updateWorkflowData: (workflow, data) => {
+  updateWorkflowData: async (workflow, data) => {
     const state = get();
     const dataKey = `${workflow}Data` as keyof WorkflowState;
     const currentData = (state[dataKey] || {}) as Record<string, any>;
+    const updatedData = {
+      ...currentData,
+      ...data,
+    };
+
     set({
-      [dataKey]: {
-        ...currentData,
-        ...data,
-      },
+      [dataKey]: updatedData,
     } as any);
+
+    // Auto-save to Firebase
+    await get().saveWorkflowData();
+  },
+
+  saveWorkflowData: async () => {
+    const state = get();
+    const { currentWorkflow, currentJobId, currentUserId } = state;
+
+    if (!currentWorkflow || !currentJobId || !currentUserId) {
+      console.warn('Cannot save workflow data: missing workflow, jobId, or userId');
+      return;
+    }
+
+    try {
+      const dataKey = `${currentWorkflow}Data` as keyof WorkflowState;
+      const workflowData = state[dataKey] as Record<string, any>;
+
+      // Save to job document under workflowData field
+      await jobsService.updateJob(
+        currentJobId,
+        {
+          workflowData: {
+            [currentWorkflow]: workflowData,
+          },
+        } as any,
+        currentUserId
+      );
+
+      console.log(`✅ Workflow data auto-saved for ${currentWorkflow}`);
+    } catch (error) {
+      console.error('Error saving workflow data:', error);
+      // Don't throw - allow workflow to continue even if save fails
+    }
   },
 
   completeWorkflow: () => {
     set({
       currentWorkflow: null,
       currentJobId: null,
+      currentUserId: null,
       progress: null,
       installStep: 'arrival',
       demoStep: 'clock-in',
@@ -147,6 +226,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     set({
       currentWorkflow: null,
       currentJobId: null,
+      currentUserId: null,
       installStep: 'arrival',
       installData: {},
       demoStep: 'clock-in',

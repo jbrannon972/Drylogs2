@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWorkflowStore } from '../../../stores/workflowStore';
 import { useJobsStore } from '../../../stores/jobsStore';
+import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
 import {
   CheckCircle,
@@ -142,6 +143,7 @@ const INSTALL_STEPS: StepConfig[] = [
 export const InstallWorkflow: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { installStep, setInstallStep, startWorkflow, progress } = useWorkflowStore();
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
@@ -149,12 +151,12 @@ export const InstallWorkflow: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (jobId) {
-      startWorkflow('install', jobId);
+    if (jobId && user) {
+      startWorkflow('install', jobId, user.uid);
       const jobData = getJobById(jobId);
       setJob(jobData);
     }
-  }, [jobId, startWorkflow, getJobById]);
+  }, [jobId, user, startWorkflow, getJobById]);
 
   // Auto-scroll to top when step changes
   useEffect(() => {
@@ -184,8 +186,8 @@ export const InstallWorkflow: React.FC = () => {
     setShowStepOverview(false);
   };
 
-  const handleExit = () => {
-    if (confirm('Are you sure you want to exit? Progress will be saved.')) {
+  const handleExit = async () => {
+    if (confirm('Are you sure you want to exit? Your progress has been auto-saved.')) {
       navigate('/tech');
     }
   };
