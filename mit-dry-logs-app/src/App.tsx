@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import { useOfflineSync } from './hooks/useOfflineSync';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { LoginPage } from './components/auth/LoginPage';
+import { SetupPage } from './components/setup/SetupPage';
 import { Layout } from './components/layout/Layout';
 import { TechDashboard } from './components/tech/TechDashboard';
 import { LeadDashboard } from './components/lead/LeadDashboard';
@@ -40,6 +41,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
+        <Route path="/setup" element={<SetupPage />} />
+
         <Route
           path="/login"
           element={
