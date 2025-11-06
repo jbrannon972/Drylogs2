@@ -144,10 +144,11 @@ export const InstallWorkflow: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { installStep, setInstallStep, startWorkflow, progress } = useWorkflowStore();
+  const { installStep, setInstallStep, startWorkflow, progress, saveWorkflowData } = useWorkflowStore();
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
   const [showStepOverview, setShowStepOverview] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -169,9 +170,20 @@ export const InstallWorkflow: React.FC = () => {
   const currentStepConfig = INSTALL_STEPS[currentStepIndex];
   const StepComponent = currentStepConfig?.component;
 
-  const handleNext = () => {
-    if (currentStepIndex < INSTALL_STEPS.length - 1) {
-      setInstallStep(INSTALL_STEPS[currentStepIndex + 1].id);
+  const handleSaveAndContinue = async () => {
+    setIsSaving(true);
+    try {
+      await saveWorkflowData();
+
+      // After successful save, move to next step
+      if (currentStepIndex < INSTALL_STEPS.length - 1) {
+        setInstallStep(INSTALL_STEPS[currentStepIndex + 1].id);
+      }
+    } catch (error) {
+      console.error('Error saving workflow data:', error);
+      alert('Failed to save. Please try again.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -187,7 +199,8 @@ export const InstallWorkflow: React.FC = () => {
   };
 
   const handleExit = async () => {
-    if (confirm('Are you sure you want to exit? Your progress has been auto-saved.')) {
+    const confirmMessage = 'Are you sure you want to exit? Make sure to save your progress first.';
+    if (confirm(confirmMessage)) {
       navigate('/tech');
     }
   };
@@ -254,14 +267,14 @@ export const InstallWorkflow: React.FC = () => {
         {/* NO DUPLICATE HEADER - Just the step content */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           {/* Step Content */}
-          {StepComponent && <StepComponent job={job} onNext={handleNext} />}
+          {StepComponent && <StepComponent job={job} />}
 
           {/* Navigation Buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t">
             <Button
               variant="secondary"
               onClick={handlePrevious}
-              disabled={currentStepIndex === 0}
+              disabled={currentStepIndex === 0 || isSaving}
               className="flex items-center gap-2"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -274,12 +287,21 @@ export const InstallWorkflow: React.FC = () => {
 
             <Button
               variant="primary"
-              onClick={handleNext}
-              disabled={currentStepIndex === INSTALL_STEPS.length - 1}
-              className="flex items-center gap-2"
+              onClick={handleSaveAndContinue}
+              disabled={currentStepIndex === INSTALL_STEPS.length - 1 || isSaving}
+              className="flex items-center gap-2 min-w-[140px]"
             >
-              {currentStepIndex === INSTALL_STEPS.length - 1 ? 'Finish' : 'Continue'}
-              <ChevronRight className="w-4 h-4" />
+              {isSaving ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  {currentStepIndex === INSTALL_STEPS.length - 1 ? 'Save & Finish' : 'Save & Continue'}
+                  <ChevronRight className="w-4 h-4" />
+                </>
+              )}
             </Button>
           </div>
         </div>

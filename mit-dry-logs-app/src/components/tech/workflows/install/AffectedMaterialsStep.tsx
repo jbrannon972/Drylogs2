@@ -7,7 +7,6 @@ import { FloorMaterialType, WallMaterialType, CeilingMaterialType } from '../../
 
 interface AffectedMaterialsStepProps {
   job: any;
-  onNext: () => void;
 }
 
 interface DemoMaterial {
@@ -37,7 +36,7 @@ interface RoomAffectedData {
   demoMaterials?: DemoMaterial[];
 }
 
-export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ job, onNext }) => {
+export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ job }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
   const rooms = installData.rooms || [];
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
@@ -58,22 +57,50 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
   });
 
   // Demo Materials Checklist - These directly feed demolition billing!
+  // ALL start unchecked - tech must manually check what's actually affected
   const getDefaultDemoMaterials = (): DemoMaterial[] => {
-    // Smart defaults based on room type
-    const roomType = currentRoom?.type?.toLowerCase() || '';
     const materials: DemoMaterial[] = [
-      { type: 'Carpet', affected: roomType.includes('bedroom') || roomType.includes('living'), quantity: 0, unit: 'SF' },
-      { type: 'Carpet Pad', affected: roomType.includes('bedroom') || roomType.includes('living'), quantity: 0, unit: 'SF' },
-      { type: 'Baseboard', affected: true, quantity: 0, unit: 'LF' }, // Always assume baseboard
-      { type: 'Drywall', affected: true, quantity: 0, unit: 'LF', drywallHeight: 'up-to-2ft' }, // Common in water damage
+      { type: 'Carpet', affected: false, quantity: 0, unit: 'SF' },
+      { type: 'Carpet Pad', affected: false, quantity: 0, unit: 'SF' },
+      { type: 'Baseboard', affected: false, quantity: 0, unit: 'LF' },
+      { type: 'Drywall', affected: false, quantity: 0, unit: 'LF', drywallHeight: 'up-to-2ft' },
       { type: 'Insulation', affected: false, quantity: 0, unit: 'SF' },
-      { type: 'Hardwood', affected: roomType.includes('dining') || roomType.includes('kitchen'), quantity: 0, unit: 'SF' },
-      { type: 'Tile', affected: roomType.includes('bathroom') || roomType.includes('kitchen'), quantity: 0, unit: 'SF' },
-      { type: 'Cabinetry', affected: roomType.includes('kitchen') || roomType.includes('bathroom'), quantity: 0, unit: 'LF' },
+      { type: 'Hardwood', affected: false, quantity: 0, unit: 'SF' },
+      { type: 'Tile', affected: false, quantity: 0, unit: 'SF' },
+      { type: 'Cabinetry', affected: false, quantity: 0, unit: 'LF' },
       { type: 'Ceiling Drywall', affected: false, quantity: 0, unit: 'SF' },
-      { type: 'Vinyl/Laminate', affected: roomType.includes('laundry') || roomType.includes('basement'), quantity: 0, unit: 'SF' },
+      { type: 'Vinyl/Laminate', affected: false, quantity: 0, unit: 'SF' },
     ];
     return materials;
+  };
+
+  // Get material hints based on room type (for display only, not auto-selection)
+  const getMaterialHints = (roomType: string): string[] => {
+    const type = roomType?.toLowerCase() || '';
+    const hints: string[] = [];
+
+    if (type.includes('bedroom') || type.includes('living')) {
+      hints.push('Carpet', 'Carpet Pad', 'Baseboard');
+    }
+    if (type.includes('bathroom')) {
+      hints.push('Tile', 'Cabinetry', 'Baseboard', 'Drywall');
+    }
+    if (type.includes('kitchen')) {
+      hints.push('Hardwood', 'Tile', 'Cabinetry', 'Baseboard');
+    }
+    if (type.includes('dining')) {
+      hints.push('Hardwood', 'Baseboard');
+    }
+    if (type.includes('laundry') || type.includes('basement')) {
+      hints.push('Vinyl/Laminate', 'Drywall', 'Baseboard');
+    }
+
+    // Common in all water damage
+    if (hints.length === 0) {
+      hints.push('Baseboard', 'Drywall');
+    }
+
+    return hints;
   };
 
   const [demoMaterials, setDemoMaterials] = useState<DemoMaterial[]>(getDefaultDemoMaterials());
@@ -157,26 +184,7 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
   const handleMaterialToggle = (index: number) => {
     const updated = [...demoMaterials];
     updated[index].affected = !updated[index].affected;
-
-    // AUTO-CALCULATE quantity based on room dimensions when toggling ON
-    if (updated[index].affected && updated[index].quantity === 0 && currentRoom) {
-      const material = updated[index];
-
-      // Calculate suggested quantity based on room dimensions
-      if (material.unit === 'SF') {
-        // For square footage materials (carpet, tile, etc.)
-        updated[index].quantity = currentRoom.floorSqFt || 0;
-      } else if (material.unit === 'LF') {
-        if (material.type === 'Baseboard' || material.type === 'Cabinetry') {
-          // Perimeter = 2 * (length + width)
-          updated[index].quantity = 2 * ((currentRoom.length || 0) + (currentRoom.width || 0));
-        } else if (material.type === 'Drywall') {
-          // Assume 2ft high drywall around perimeter
-          updated[index].quantity = 2 * ((currentRoom.length || 0) + (currentRoom.width || 0));
-        }
-      }
-    }
-
+    // NO auto-calculation - tech must enter actual measured quantities
     setDemoMaterials(updated);
   };
 
@@ -399,9 +407,17 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
           <AlertCircle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-0.5" />
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">Materials for Removal (Demo Billing)</h3>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-gray-700 mb-2">
               Check each material that will need to be removed, and enter the quantity. <strong>This data directly feeds demo billing calculations!</strong> Be as accurate as possible.
             </p>
+            {currentRoom && (
+              <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                <p className="text-xs text-blue-900">
+                  <Info className="w-3 h-3 inline mr-1" />
+                  <strong>Common in {currentRoom.type}:</strong> {getMaterialHints(currentRoom.type).join(', ')}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

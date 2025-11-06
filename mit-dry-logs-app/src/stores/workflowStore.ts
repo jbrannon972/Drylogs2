@@ -170,12 +170,11 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       ...data,
     };
 
+    // Only update local state - NO AUTO-SAVE
+    // User must click "Save & Continue" to persist to Firebase
     set({
       [dataKey]: updatedData,
     } as any);
-
-    // Auto-save to Firebase
-    await get().saveWorkflowData();
   },
 
   saveWorkflowData: async () => {
