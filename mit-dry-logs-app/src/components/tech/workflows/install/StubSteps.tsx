@@ -331,14 +331,156 @@ export const CauseOfLossStep: React.FC<StepProps> = ({ job, onNext }) => {
   );
 };
 
-export const AffectedRoomsStep: React.FC<StepProps> = ({ job, onNext }) => (
-  <div>
-    <p className="text-gray-600 mb-4">Document materials affected in each room.</p>
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <p className="text-sm text-gray-600">Affected materials interface coming soon...</p>
+export const AffectedRoomsStep: React.FC<StepProps> = ({ job, onNext }) => {
+  const { installData, updateWorkflowData } = useWorkflowStore();
+  const rooms = installData.rooms || [];
+  const [affectedMaterials, setAffectedMaterials] = useState<Record<string, string[]>>(
+    installData.affectedMaterials || {}
+  );
+
+  const commonMaterials = [
+    'Carpet',
+    'Hardwood Floor',
+    'Laminate Floor',
+    'Tile Floor',
+    'Vinyl Floor',
+    'Drywall',
+    'Baseboards',
+    'Cabinets',
+    'Countertops',
+    'Ceiling',
+    'Insulation',
+    'Pad/Underlayment',
+    'Paint',
+    'Wallpaper',
+    'Wood Trim',
+    'Other',
+  ];
+
+  const toggleMaterial = (roomId: string, material: string) => {
+    const roomMaterials = affectedMaterials[roomId] || [];
+    const newMaterials = roomMaterials.includes(material)
+      ? roomMaterials.filter(m => m !== material)
+      : [...roomMaterials, material];
+
+    const updated = {
+      ...affectedMaterials,
+      [roomId]: newMaterials,
+    };
+
+    setAffectedMaterials(updated);
+    updateWorkflowData('install', { affectedMaterials: updated });
+  };
+
+  const getTotalAffectedMaterials = () => {
+    return Object.values(affectedMaterials).reduce((sum, materials) => sum + materials.length, 0);
+  };
+
+  const getRoomMaterialCount = (roomId: string) => {
+    return (affectedMaterials[roomId] || []).length;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-blue-800 font-medium">
+              Select affected materials for each room
+            </p>
+            <p className="text-xs text-blue-600 mt-1">
+              This helps determine the scope of work and drying strategy
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-blue-900">{getTotalAffectedMaterials()}</p>
+            <p className="text-xs text-blue-600">Total Materials</p>
+          </div>
+        </div>
+      </div>
+
+      {rooms.length === 0 ? (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800">
+            ⚠️ No rooms have been added. Go back to Room Evaluation to add rooms first.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {rooms.map((room: any) => {
+            const roomMaterials = affectedMaterials[room.id] || [];
+            const isComplete = roomMaterials.length > 0;
+
+            return (
+              <div
+                key={room.id}
+                className={`border-2 rounded-lg p-4 ${
+                  isComplete ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{room.name}</h4>
+                    <p className="text-xs text-gray-600">
+                      {room.squareFootage} sq ft • {roomMaterials.length} materials selected
+                    </p>
+                  </div>
+                  {isComplete && (
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {commonMaterials.map((material) => {
+                    const isSelected = roomMaterials.includes(material);
+
+                    return (
+                      <button
+                        key={material}
+                        onClick={() => toggleMaterial(room.id, material)}
+                        className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                          isSelected
+                            ? 'border-entrusted-orange bg-orange-50 text-entrusted-orange'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{material}</span>
+                          {isSelected && (
+                            <CheckCircle className="w-4 h-4" />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {rooms.length > 0 && getTotalAffectedMaterials() === 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800">
+            ⚠️ Please select at least one affected material for each room.
+          </p>
+        </div>
+      )}
+
+      {rooms.length > 0 && getTotalAffectedMaterials() > 0 && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <p className="text-sm text-green-800 font-medium">
+              Affected materials documented ({getTotalAffectedMaterials()} total across {rooms.length} rooms)
+            </p>
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export const EquipmentCalcStep: React.FC<StepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
@@ -371,23 +513,410 @@ export const EquipmentCalcStep: React.FC<StepProps> = ({ job, onNext }) => {
   );
 };
 
-export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => (
-  <div>
-    <p className="text-gray-600 mb-4">Place and scan equipment in designated chambers.</p>
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <p className="text-sm text-gray-600">Equipment placement and scanning coming soon...</p>
-    </div>
-  </div>
-);
+export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
+  const { installData, updateWorkflowData } = useWorkflowStore();
+  const rooms = installData.rooms || [];
+  const equipmentCalc = installData.equipmentCalculation;
+  const [placedEquipment, setPlacedEquipment] = useState<Record<string, any[]>>(
+    installData.placedEquipment || {}
+  );
+  const [currentRoom, setCurrentRoom] = useState<string>('');
+  const [equipmentType, setEquipmentType] = useState<'dehumidifier' | 'air-mover' | 'air-scrubber'>('dehumidifier');
+  const [equipmentId, setEquipmentId] = useState('');
 
-export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => (
-  <div>
-    <p className="text-gray-600 mb-4">Review the mitigation plan with the customer.</p>
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <p className="text-sm text-gray-600">Plan communication interface coming soon...</p>
+  const handleAddEquipment = () => {
+    if (!currentRoom || !equipmentId.trim()) {
+      alert('Please select a room and enter equipment ID');
+      return;
+    }
+
+    const roomEquipment = placedEquipment[currentRoom] || [];
+    const newEquipment = {
+      id: equipmentId,
+      type: equipmentType,
+      placedAt: new Date().toISOString(),
+    };
+
+    const updated = {
+      ...placedEquipment,
+      [currentRoom]: [...roomEquipment, newEquipment],
+    };
+
+    setPlacedEquipment(updated);
+    updateWorkflowData('install', { placedEquipment: updated });
+    setEquipmentId('');
+  };
+
+  const handleRemoveEquipment = (roomId: string, equipmentId: string) => {
+    const roomEquipment = placedEquipment[roomId] || [];
+    const updated = {
+      ...placedEquipment,
+      [roomId]: roomEquipment.filter(e => e.id !== equipmentId),
+    };
+    setPlacedEquipment(updated);
+    updateWorkflowData('install', { placedEquipment: updated });
+  };
+
+  const getTotalPlaced = (type?: string) => {
+    return Object.values(placedEquipment).reduce((sum, items) => {
+      return sum + (type ? items.filter(i => i.type === type).length : items.length);
+    }, 0);
+  };
+
+  const getProgress = () => {
+    const totalRequired = (equipmentCalc?.dehumidifiers?.dehumidifierCount || 0) +
+                         (equipmentCalc?.airMovers?.totalCount || 0) +
+                         (equipmentCalc?.airScrubbers?.count || 0);
+    const totalPlaced = getTotalPlaced();
+    return totalRequired > 0 ? (totalPlaced / totalRequired) * 100 : 0;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 text-white rounded-lg p-6">
+        <h3 className="text-xl font-poppins font-bold mb-2">Equipment Placement</h3>
+        <p className="text-orange-100 text-sm">
+          Track equipment placement according to the IICRC-calculated requirements
+        </p>
+        <div className="mt-4">
+          <div className="flex items-center justify-between text-sm mb-2">
+            <span>Placement Progress</span>
+            <span className="font-bold">{Math.round(getProgress())}%</span>
+          </div>
+          <div className="w-full bg-orange-800 bg-opacity-50 rounded-full h-2">
+            <div
+              className="bg-white h-2 rounded-full transition-all duration-300"
+              style={{ width: `${getProgress()}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {equipmentCalc && (
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold text-blue-900">
+              {getTotalPlaced('dehumidifier')}/{equipmentCalc.dehumidifiers.dehumidifierCount}
+            </p>
+            <p className="text-xs text-gray-600">Dehumidifiers</p>
+          </div>
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold text-green-900">
+              {getTotalPlaced('air-mover')}/{equipmentCalc.airMovers.totalCount}
+            </p>
+            <p className="text-xs text-gray-600">Air Movers</p>
+          </div>
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold text-purple-900">
+              {getTotalPlaced('air-scrubber')}/{equipmentCalc.airScrubbers.count}
+            </p>
+            <p className="text-xs text-gray-600">Air Scrubbers</p>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h4 className="font-semibold text-gray-900 mb-4">Add Equipment</h4>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Room *
+            </label>
+            <select
+              value={currentRoom}
+              onChange={(e) => setCurrentRoom(e.target.value)}
+              className="input-field"
+            >
+              <option value="">Choose a room...</option>
+              {rooms.map((room: any) => (
+                <option key={room.id} value={room.id}>
+                  {room.name} ({room.squareFootage} sq ft)
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Equipment Type *
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {['dehumidifier', 'air-mover', 'air-scrubber'].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setEquipmentType(type as any)}
+                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                    equipmentType === type
+                      ? 'border-entrusted-orange bg-orange-50 text-entrusted-orange'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {type.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Equipment ID / Serial Number *
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={equipmentId}
+                onChange={(e) => setEquipmentId(e.target.value)}
+                placeholder="Enter ID or scan barcode..."
+                className="input-field flex-1"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddEquipment();
+                  }
+                }}
+              />
+              <Button variant="primary" onClick={handleAddEquipment}>
+                Add
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Enter the equipment ID manually or use a barcode scanner
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {rooms.length > 0 && (
+        <div className="space-y-4">
+          <h4 className="font-semibold text-gray-900">Equipment by Room</h4>
+          {rooms.map((room: any) => {
+            const roomEquipment = placedEquipment[room.id] || [];
+
+            return (
+              <div
+                key={room.id}
+                className={`border-2 rounded-lg p-4 ${
+                  roomEquipment.length > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h5 className="font-semibold text-gray-900">{room.name}</h5>
+                    <p className="text-xs text-gray-600">{roomEquipment.length} pieces of equipment</p>
+                  </div>
+                  {roomEquipment.length > 0 && (
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  )}
+                </div>
+
+                {roomEquipment.length > 0 ? (
+                  <div className="space-y-2">
+                    {roomEquipment.map((equipment, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-white rounded border"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{equipment.id}</p>
+                          <p className="text-xs text-gray-600">
+                            {equipment.type.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveEquipment(room.id, equipment.id)}
+                          className="text-red-600 hover:bg-red-50 p-2 rounded"
+                        >
+                          <span className="text-sm">Remove</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">No equipment placed yet</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {getTotalPlaced() === 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800">
+            ⚠️ No equipment has been placed yet. Add equipment using the form above.
+          </p>
+        </div>
+      )}
+
+      {equipmentCalc && getProgress() >= 100 && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <p className="text-sm text-green-800 font-medium">
+              All equipment placed according to IICRC calculations!
+            </p>
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
+
+export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => {
+  const { installData, updateWorkflowData } = useWorkflowStore();
+  const [customerAgreed, setCustomerAgreed] = useState(installData.customerAgreed || false);
+  const [customerNotes, setCustomerNotes] = useState(installData.customerNotes || '');
+  const [customerSignature, setCustomerSignature] = useState(installData.customerSignature || '');
+
+  const rooms = installData.rooms || [];
+  const equipmentCalc = installData.equipmentCalculation;
+
+  const handleAgreementChange = (agreed: boolean) => {
+    setCustomerAgreed(agreed);
+    updateWorkflowData('install', { customerAgreed: agreed });
+  };
+
+  const handleNotesChange = (notes: string) => {
+    setCustomerNotes(notes);
+    updateWorkflowData('install', { customerNotes: notes });
+  };
+
+  const planSummary = {
+    rooms: rooms.length,
+    totalSqFt: rooms.reduce((sum: number, r: any) => sum + parseFloat(r.squareFootage || 0), 0),
+    dehumidifiers: equipmentCalc?.dehumidifiers?.dehumidifierCount || 0,
+    airMovers: equipmentCalc?.airMovers?.totalCount || 0,
+    airScrubbers: equipmentCalc?.airScrubbers?.count || 0,
+    dryingDays: equipmentCalc?.estimatedDryingDays || 0,
+  };
+
+  const customerExpectations = [
+    'Equipment will run 24/7 for optimal drying',
+    'Daily monitoring visits will be conducted',
+    'Do not turn off or unplug equipment',
+    'Keep doors closed to affected areas',
+    'Report any changes or concerns immediately',
+    'Elevated noise levels are normal during drying',
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 text-white rounded-lg p-6">
+        <h3 className="text-xl font-poppins font-bold mb-2">Mitigation Plan Summary</h3>
+        <p className="text-orange-100 text-sm">
+          Review this plan with {job.customerInfo.name} and ensure they understand the process
+        </p>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h4 className="font-semibold text-gray-900 mb-4">Scope of Work</h4>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <p className="text-2xl font-bold text-blue-900">{planSummary.rooms}</p>
+            <p className="text-xs text-gray-600">Affected Rooms</p>
+          </div>
+          <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <p className="text-2xl font-bold text-blue-900">{planSummary.totalSqFt.toFixed(0)}</p>
+            <p className="text-xs text-gray-600">Total Sq Ft</p>
+          </div>
+        </div>
+
+        <h4 className="font-semibold text-gray-900 mb-3">Equipment Being Installed</h4>
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="text-center p-3 bg-green-50 rounded">
+            <p className="text-xl font-bold text-green-900">{planSummary.dehumidifiers}</p>
+            <p className="text-xs text-gray-600">Dehumidifiers</p>
+          </div>
+          <div className="text-center p-3 bg-green-50 rounded">
+            <p className="text-xl font-bold text-green-900">{planSummary.airMovers}</p>
+            <p className="text-xs text-gray-600">Air Movers</p>
+          </div>
+          <div className="text-center p-3 bg-green-50 rounded">
+            <p className="text-xl font-bold text-green-900">{planSummary.airScrubbers}</p>
+            <p className="text-xs text-gray-600">Air Scrubbers</p>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm text-blue-800">
+            <strong>Estimated Drying Time:</strong> {planSummary.dryingDays} days
+          </p>
+          <p className="text-xs text-blue-600 mt-1">
+            Based on IICRC S500 standards and current conditions
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h4 className="font-semibold text-gray-900 mb-3">Customer Expectations</h4>
+        <ul className="space-y-2">
+          {customerExpectations.map((expectation, index) => (
+            <li key={index} className="flex items-start gap-3 text-sm text-gray-700">
+              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span>{expectation}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h4 className="font-semibold text-gray-900 mb-3">Customer Agreement</h4>
+
+        <div className="mb-4">
+          <label className="flex items-center gap-3 cursor-pointer p-4 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange transition-colors">
+            <input
+              type="checkbox"
+              checked={customerAgreed}
+              onChange={(e) => handleAgreementChange(e.target.checked)}
+              className="w-5 h-5 rounded text-entrusted-orange"
+            />
+            <div>
+              <span className="text-sm font-medium text-gray-900 block">
+                Customer understands and agrees to the mitigation plan
+              </span>
+              <span className="text-xs text-gray-600">
+                Equipment placement, drying timeline, and expectations discussed
+              </span>
+            </div>
+          </label>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Customer Questions or Concerns (Optional)
+          </label>
+          <textarea
+            value={customerNotes}
+            onChange={(e) => handleNotesChange(e.target.value)}
+            placeholder="Document any questions, concerns, or special requests from the customer..."
+            className="input-field min-h-[100px]"
+            rows={4}
+          />
+        </div>
+      </div>
+
+      {!customerAgreed && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800">
+            ⚠️ Customer agreement required before proceeding to equipment installation.
+          </p>
+        </div>
+      )}
+
+      {customerAgreed && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <p className="text-sm text-green-800 font-medium">
+              Customer has reviewed and agreed to the mitigation plan
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const FinalPhotosStep: React.FC<StepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
