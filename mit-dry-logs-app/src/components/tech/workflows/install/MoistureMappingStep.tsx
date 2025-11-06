@@ -58,7 +58,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
   const handleReadingPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && user && currentRoom) {
-      const url = await uploadPhoto(file, job.jobId, currentRoom.name, 'moisture-reading', user.uid);
+      const url = await uploadPhoto(file, job.jobId, currentRoom.name, 'assessment', user.uid);
       if (url) setNewReading({ ...newReading, photo: url });
     }
   };
