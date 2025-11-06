@@ -119,8 +119,13 @@ export type RoomType = 'Bedroom' | 'Bathroom' | 'Kitchen' | 'Living Room' | 'Din
 export type AffectedStatus = 'affected' | 'unaffected' | 'partially-affected';
 export type MaterialType = 'Drywall' | 'Flooring' | 'Carpet' | 'Wood Framing' | 'Subfloor' | 'Concrete' | 'Insulation' | 'Tile' | 'Other';
 export type MaterialCondition = 'wet' | 'damp' | 'dry';
-export type ReadingType = 'pre-demo' | 'post-demo' | 'daily-check' | 'final';
+export type ReadingType = 'dry-standard' | 'initial' | 'daily' | 'final';
 export type PhotoStep = 'arrival' | 'assessment' | 'pre-demo' | 'demo' | 'post-demo' | 'daily-check' | 'final';
+
+// New: Specific material subtypes for affected areas
+export type FloorMaterialType = 'carpet' | 'hardwood' | 'tile' | 'vinyl' | 'laminate' | 'concrete' | 'other';
+export type WallMaterialType = 'drywall' | 'plaster' | 'concrete' | 'wood' | 'brick' | 'other';
+export type CeilingMaterialType = 'drywall' | 'plaster' | 'acoustic' | 'wood' | 'other';
 
 export interface RoomDimensions {
   length: number;
@@ -146,17 +151,67 @@ export interface MaterialAffected {
   exposedMaterials: ExposedMaterial[];
 }
 
+// New: Material breakdown for affected areas
+export interface MaterialBreakdown {
+  type: FloorMaterialType | WallMaterialType | CeilingMaterialType;
+  sqFt: number;
+  percentOfSurface: number;
+}
+
+export interface AffectedFloor {
+  totalSqFt: number;
+  affectedSqFt: number;
+  percentAffected: number;
+  materials: Array<{
+    type: FloorMaterialType;
+    sqFt: number;
+  }>;
+}
+
+export interface AffectedWalls {
+  totalSqFt: number;
+  affectedSqFt: number;
+  percentAffected: number;
+  wetHeightAvg: number; // Average height of water line in feet
+  materials: Array<{
+    type: WallMaterialType;
+    sqFt: number;
+  }>;
+}
+
+export interface AffectedCeiling {
+  totalSqFt: number;
+  affectedSqFt: number;
+  percentAffected: number;
+  materials: Array<{
+    type: CeilingMaterialType;
+    sqFt: number;
+  }>;
+}
+
+export interface AffectedAreas {
+  floor: AffectedFloor;
+  walls: AffectedWalls;
+  ceiling: AffectedCeiling;
+  totalSurfaceArea: number; // Sum of all surfaces (floor + walls + ceiling)
+  totalAffectedArea: number; // Sum of all affected areas
+  percentAffected: number; // For determining water class
+}
+
 export interface MoistureReading {
   readingId: string;
   material: MaterialType;
+  location: string; // e.g., "North wall, 3ft height, grid A3"
   moisturePercentage: number;
   temperature: number;
   humidity: number;
   recordedAt: Timestamp;
   readingType: ReadingType;
   technicianId: string;
+  meterType?: string; // e.g., "Tramex MES II"
   photoUrl?: string;
   notes?: string;
+  isDryStandard?: boolean; // True if this is the baseline reading
 }
 
 export interface Photo {
@@ -169,12 +224,23 @@ export interface Photo {
   uploadedBy: string;
 }
 
+// New: Water damage classification for room
+export interface WaterDamageClassification {
+  category: 1 | 2 | 3; // Clean/Gray/Black water
+  class: 1 | 2 | 3 | 4; // Based on % of surfaces affected
+  determinedAt: Timestamp;
+  determinedBy: string;
+  notes?: string;
+}
+
 export interface Room {
   roomId: string;
   roomName: string;
   roomType: RoomType;
   affectedStatus: AffectedStatus;
   dimensions: RoomDimensions;
+  affectedAreas?: AffectedAreas; // NEW: Detailed breakdown of affected materials
+  waterDamageClassification?: WaterDamageClassification; // NEW: Category and Class
   materialsAffected: MaterialAffected[];
   moistureReadings: MoistureReading[];
   photos: Photo[];
@@ -243,13 +309,56 @@ export interface DryingChamber {
   airScrubbers: AirScrubber[];
 }
 
+// NEW: Drying Plan and Goals
+export interface DryingGoals {
+  targetMoisturePercent: Record<string, number>; // By material type
+  estimatedDryingDays: number;
+  monitoringSchedule: 'daily' | 'twice-daily';
+  completionCriteria: string;
+}
+
+export interface EquipmentPlan {
+  calculated: {
+    dehumidifiers: number;
+    airMovers: number;
+    airScrubbers: number;
+    calculationNotes: string;
+  };
+  actual: {
+    dehumidifiers: number;
+    airMovers: number;
+    airScrubbers: number;
+  };
+  variance?: {
+    reason?: string;
+    approvedBy?: string;
+  };
+}
+
+export interface DryingPlan {
+  waterCategory: 1 | 2 | 3;
+  overallClass: 1 | 2 | 3 | 4; // Worst class across all rooms
+  totalAffectedSqFt: number;
+  totalFloorSqFt: number;
+  totalWallSqFt: number;
+  totalCeilingSqFt: number;
+  dryingGoals: DryingGoals;
+  equipmentPlan: EquipmentPlan;
+  createdAt: Timestamp;
+  createdBy: string;
+}
+
 export interface EquipmentCalculations {
   totalAffectedSquareFootage: number;
+  totalCubicFootage: number; // NEW: Required for dehumidifier calc
   estimatedDryingDays: number;
   recommendedDehumidifierCount: number;
   recommendedAirMoverCount: number;
   recommendedAirScrubberCount: number;
+  dehumidifierType?: DehumidifierType; // NEW: Type used for calculation
+  chartFactor?: number; // NEW: IICRC chart factor used
   calculationMethod: string;
+  calculationDetails?: string; // NEW: Show the math
   lastCalculatedAt: Timestamp;
   calculatedBy: string;
   waterClass: WaterClass;
@@ -387,6 +496,7 @@ export interface Job {
   workflowPhases: WorkflowPhases;
   rooms: Room[];
   equipment: JobEquipment;
+  dryingPlan?: DryingPlan; // NEW: Comprehensive drying plan
   safetyChecklist: SafetyChecklist;
   communication: Communication;
   financial: Financial;

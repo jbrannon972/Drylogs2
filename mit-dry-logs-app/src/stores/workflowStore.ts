@@ -56,7 +56,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   startWorkflow: (workflow, jobId) => {
     const totalSteps = {
-      install: 12,
+      install: 14,
       demo: 7,
       'check-service': 5,
       pull: 6,

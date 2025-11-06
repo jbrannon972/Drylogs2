@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useWorkflowStore } from '../../../stores/workflowStore';
 import { useJobsStore } from '../../../stores/jobsStore';
 import { Button } from '../../shared/Button';
-import { Card } from '../../shared/Card';
 import {
   CheckCircle,
   Circle,
@@ -14,23 +13,28 @@ import {
   Ruler,
   Droplets,
   Wind,
-  ClipboardCheck
+  ClipboardCheck,
+  Layers,
+  FileCheck,
+  X
 } from 'lucide-react';
 import { InstallStep } from '../../../types/workflow';
 
 // Import step components
 import { ArrivalStep } from './install/ArrivalStep';
 import { FrontDoorStep } from './install/FrontDoorStep';
-import { RoomEvaluationStep } from './install/RoomEvaluationStep';
+import { RoomDimensionsStep } from './install/RoomDimensionsStep';
+import { WaterClassificationStep } from './install/WaterClassificationStep';
+import { AffectedMaterialsStep } from './install/AffectedMaterialsStep';
+import { MoistureMappingStep } from './install/MoistureMappingStep';
+import { PlanJobStep } from './install/PlanJobStep';
+import { EquipmentCalcStep } from './install/EquipmentCalcStep';
 import {
   PreExistingStep,
   CauseOfLossStep,
-  AffectedRoomsStep,
-  EquipmentCalcStep,
   EquipmentPlaceStep,
   CommunicatePlanStep,
   FinalPhotosStep,
-  ReviewStep,
   CompleteStep,
 } from './install/StubSteps';
 
@@ -72,18 +76,39 @@ const INSTALL_STEPS: StepConfig[] = [
     component: CauseOfLossStep,
   },
   {
-    id: 'room-evaluation',
-    title: 'Room Evaluation',
-    description: 'Room by room assessment',
+    id: 'room-dimensions',
+    title: 'Room Dimensions',
+    description: 'Measure each room (L × W × H)',
     icon: <Ruler className="w-5 h-5" />,
-    component: RoomEvaluationStep,
+    component: RoomDimensionsStep,
   },
   {
-    id: 'affected-rooms',
-    title: 'Affected Rooms',
-    description: 'Document all affected areas',
-    icon: <CheckCircle className="w-5 h-5" />,
-    component: AffectedRoomsStep,
+    id: 'water-classification',
+    title: 'Water Classification',
+    description: 'Determine category & class',
+    icon: <Droplets className="w-5 h-5" />,
+    component: WaterClassificationStep,
+  },
+  {
+    id: 'affected-materials',
+    title: 'Affected Materials',
+    description: 'Document affected SQFT by surface',
+    icon: <Layers className="w-5 h-5" />,
+    component: AffectedMaterialsStep,
+  },
+  {
+    id: 'moisture-mapping',
+    title: 'Moisture Mapping',
+    description: 'Initial moisture readings',
+    icon: <Droplets className="w-5 h-5" />,
+    component: MoistureMappingStep,
+  },
+  {
+    id: 'plan-job',
+    title: 'Plan the Job',
+    description: 'Review totals & set goals',
+    icon: <FileCheck className="w-5 h-5" />,
+    component: PlanJobStep,
   },
   {
     id: 'equipment-calc',
@@ -114,13 +139,6 @@ const INSTALL_STEPS: StepConfig[] = [
     component: FinalPhotosStep,
   },
   {
-    id: 'review',
-    title: 'Review',
-    description: 'Review all data',
-    icon: <ClipboardCheck className="w-5 h-5" />,
-    component: ReviewStep,
-  },
-  {
     id: 'complete',
     title: 'Complete',
     description: 'Finalize and depart',
@@ -135,6 +153,7 @@ export const InstallWorkflow: React.FC = () => {
   const { installStep, setInstallStep, startWorkflow, progress } = useWorkflowStore();
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
+  const [showStepOverview, setShowStepOverview] = useState(false);
 
   useEffect(() => {
     if (jobId) {
@@ -162,6 +181,7 @@ export const InstallWorkflow: React.FC = () => {
 
   const handleStepClick = (stepId: InstallStep) => {
     setInstallStep(stepId);
+    setShowStepOverview(false);
   };
 
   const handleExit = () => {
@@ -171,137 +191,206 @@ export const InstallWorkflow: React.FC = () => {
   };
 
   if (!job || !currentStepConfig) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-entrusted-orange mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading workflow...</p>
+        </div>
+      </div>
+    );
   }
+
+  const progressPercent = Math.round(((currentStepIndex + 1) / INSTALL_STEPS.length) * 100);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-md border-b">
-        <div className="px-4 py-3 flex items-center justify-between">
+      {/* ULTRAFLOW MINIMAL HEADER */}
+      <div className="bg-white shadow-md border-b sticky top-0 z-10">
+        {/* Top bar with job info */}
+        <div className="px-4 py-3 flex items-center justify-between border-b">
           <div>
-            <h1 className="text-xl font-poppins font-bold text-gray-900">
+            <h1 className="text-lg font-poppins font-bold text-gray-900">
               Install Workflow
             </h1>
-            <p className="text-sm text-gray-600">
-              {job.customerInfo.name} - {job.customerInfo.address}
+            <p className="text-xs text-gray-600">
+              {job.customerInfo.name} • {job.customerInfo.address}
             </p>
           </div>
-          <Button variant="secondary" onClick={handleExit}>
+          <Button variant="secondary" onClick={handleExit} className="text-sm">
             Exit
           </Button>
         </div>
+
+        {/* Clickable Progress Bar */}
+        <div
+          className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setShowStepOverview(!showStepOverview)}
+        >
+          <div className="flex items-center justify-between text-sm mb-2">
+            <span className="text-gray-700 font-medium">
+              Step {currentStepIndex + 1} of {INSTALL_STEPS.length}: {currentStepConfig.title}
+            </span>
+            <span className="font-bold text-entrusted-orange">
+              {progressPercent}%
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div
+              className="bg-entrusted-orange h-3 rounded-full transition-all duration-300"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <p className="text-xs text-gray-500 mt-1 text-center">
+            Click to view all steps
+          </p>
+        </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Progress Sidebar */}
-          <div className="lg:col-span-1">
-            <Card title="Progress" className="sticky top-6">
-              <div className="mb-4">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-gray-600">Step {currentStepIndex + 1} of {INSTALL_STEPS.length}</span>
-                  <span className="font-semibold text-entrusted-orange">
-                    {Math.round(((currentStepIndex + 1) / INSTALL_STEPS.length) * 100)}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-entrusted-orange h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${((currentStepIndex + 1) / INSTALL_STEPS.length) * 100}%` }}
-                  />
-                </div>
-              </div>
+      {/* MAIN CONTENT - SINGLE STEP ONLY */}
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
+        {/* Current Step Header */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="flex items-start gap-4 mb-6">
+            <div className="p-3 bg-entrusted-orange text-white rounded-lg flex-shrink-0">
+              {currentStepConfig.icon}
+            </div>
+            <div className="flex-1">
+              <h2 className="text-3xl font-poppins font-bold text-gray-900 mb-1">
+                {currentStepConfig.title}
+              </h2>
+              <p className="text-gray-600">{currentStepConfig.description}</p>
+            </div>
+          </div>
 
-              <div className="space-y-2">
+          {/* Step Content */}
+          {StepComponent && <StepComponent job={job} onNext={handleNext} />}
+
+          {/* Navigation Buttons */}
+          <div className="flex items-center justify-between mt-8 pt-6 border-t">
+            <Button
+              variant="secondary"
+              onClick={handlePrevious}
+              disabled={currentStepIndex === 0}
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous
+            </Button>
+
+            <div className="text-sm text-gray-500">
+              Step {currentStepIndex + 1} of {INSTALL_STEPS.length}
+            </div>
+
+            <Button
+              variant="primary"
+              onClick={handleNext}
+              disabled={currentStepIndex === INSTALL_STEPS.length - 1}
+              className="flex items-center gap-2"
+            >
+              {currentStepIndex === INSTALL_STEPS.length - 1 ? 'Finish' : 'Continue'}
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* STEP OVERVIEW MODAL */}
+      {showStepOverview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b flex items-center justify-between">
+              <h3 className="text-xl font-poppins font-bold text-gray-900">
+                Workflow Overview
+              </h3>
+              <button
+                onClick={() => setShowStepOverview(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Steps List */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-3">
                 {INSTALL_STEPS.map((step, index) => {
                   const isActive = step.id === installStep;
                   const isCompleted = index < currentStepIndex;
+                  const isCurrent = index === currentStepIndex;
 
                   return (
                     <button
                       key={step.id}
                       onClick={() => handleStepClick(step.id)}
-                      className={`w-full text-left p-3 rounded-lg transition-all ${
-                        isActive
-                          ? 'bg-entrusted-orange text-white shadow-md'
+                      className={`w-full text-left p-4 rounded-lg transition-all border-2 ${
+                        isCurrent
+                          ? 'border-entrusted-orange bg-orange-50'
                           : isCompleted
-                          ? 'bg-green-50 hover:bg-green-100'
-                          : 'bg-gray-50 hover:bg-gray-100'
+                          ? 'border-green-200 bg-green-50 hover:bg-green-100'
+                          : 'border-gray-200 bg-white hover:bg-gray-50'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        {isCompleted ? (
-                          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                        ) : isActive ? (
-                          <div className="w-5 h-5 flex-shrink-0">{step.icon}</div>
-                        ) : (
-                          <Circle className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium truncate ${
-                            isActive ? 'text-white' : 'text-gray-900'
+                      <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0">
+                          {isCompleted ? (
+                            <CheckCircle className="w-6 h-6 text-green-600" />
+                          ) : isCurrent ? (
+                            <div className="w-6 h-6 text-entrusted-orange">
+                              {step.icon}
+                            </div>
+                          ) : (
+                            <Circle className="w-6 h-6 text-gray-400" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-medium text-gray-500">
+                              Step {index + 1}
+                            </span>
+                            {isCurrent && (
+                              <span className="px-2 py-0.5 bg-entrusted-orange text-white text-xs rounded-full">
+                                Current
+                              </span>
+                            )}
+                          </div>
+                          <p className={`font-medium ${
+                            isCurrent ? 'text-entrusted-orange' : 'text-gray-900'
                           }`}>
                             {step.title}
                           </p>
-                          <p className={`text-xs truncate ${
-                            isActive ? 'text-orange-100' : 'text-gray-500'
-                          }`}>
+                          <p className="text-sm text-gray-600 mt-0.5">
                             {step.description}
                           </p>
                         </div>
+                        {!isCompleted && !isCurrent && (
+                          <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                        )}
                       </div>
                     </button>
                   );
                 })}
               </div>
-            </Card>
-          </div>
+            </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <Card>
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-entrusted-orange text-white rounded-lg">
-                    {currentStepConfig.icon}
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-poppins font-bold text-gray-900">
-                      {currentStepConfig.title}
-                    </h2>
-                    <p className="text-gray-600">{currentStepConfig.description}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Step Content */}
-              {StepComponent && <StepComponent job={job} onNext={handleNext} />}
-
-              {/* Navigation */}
-              <div className="flex items-center justify-between mt-6 pt-6 border-t">
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t bg-gray-50">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">
+                  {currentStepIndex} of {INSTALL_STEPS.length} steps completed
+                </span>
                 <Button
                   variant="secondary"
-                  onClick={handlePrevious}
-                  disabled={currentStepIndex === 0}
+                  onClick={() => setShowStepOverview(false)}
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </Button>
-
-                <Button
-                  variant="primary"
-                  onClick={handleNext}
-                  disabled={currentStepIndex === INSTALL_STEPS.length - 1}
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
+                  Close
                 </Button>
               </div>
-            </Card>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
