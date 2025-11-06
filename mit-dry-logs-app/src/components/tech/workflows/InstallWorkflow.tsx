@@ -154,7 +154,7 @@ export const InstallWorkflow: React.FC = () => {
       const jobData = getJobById(jobId);
       setJob(jobData);
     }
-  }, [jobId]);
+  }, [jobId, startWorkflow, getJobById]);
 
   // Auto-scroll to top when step changes
   useEffect(() => {

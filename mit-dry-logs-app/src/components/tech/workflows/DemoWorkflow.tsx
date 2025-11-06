@@ -128,7 +128,7 @@ export const DemoWorkflow: React.FC = () => {
       const jobData = getJobById(jobId);
       setJob(jobData);
     }
-  }, [jobId]);
+  }, [jobId, startWorkflow, getJobById]);
 
   useEffect(() => {
     if (contentRef.current) {
