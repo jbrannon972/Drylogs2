@@ -28,28 +28,51 @@ export function useAuth() {
   useEffect(() => {
     setLoading(true);
 
-    const unsubscribe = authService.onAuthStateChange(async (firebaseUser) => {
-      setFirebaseUser(firebaseUser);
-
-      if (firebaseUser) {
-        // User is signed in, get user data
-        try {
-          const userData = await authService.getCurrentUser(firebaseUser.uid);
-          setUser(userData);
-        } catch (error: any) {
-          console.error('Error fetching user data:', error);
-          setError(error.message);
-          addNotification('error', 'Error', 'Failed to load user data');
-        }
-      } else {
-        // User is signed out
-        setUser(null);
-      }
-
+    // Add a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      console.warn('Auth initialization timed out');
       setLoading(false);
-    });
+      setError('Authentication timeout - please refresh the page');
+    }, 10000); // 10 second timeout
 
-    return () => unsubscribe();
+    try {
+      const unsubscribe = authService.onAuthStateChange(async (firebaseUser) => {
+        clearTimeout(timeout); // Clear timeout once auth state changes
+        setFirebaseUser(firebaseUser);
+
+        if (firebaseUser) {
+          // User is signed in, get user data
+          try {
+            const userData = await authService.getCurrentUser(firebaseUser.uid);
+            if (userData) {
+              setUser(userData);
+            } else {
+              console.error('User data not found in database');
+              setError('User profile not found');
+              await authService.signOut();
+            }
+          } catch (error: any) {
+            console.error('Error fetching user data:', error);
+            setError(error.message);
+          }
+        } else {
+          // User is signed out
+          setUser(null);
+        }
+
+        setLoading(false);
+      });
+
+      return () => {
+        clearTimeout(timeout);
+        unsubscribe();
+      };
+    } catch (error: any) {
+      console.error('Firebase auth initialization error:', error);
+      clearTimeout(timeout);
+      setLoading(false);
+      setError('Failed to initialize authentication');
+    }
   }, []);
 
   const signIn = async (email: string, password: string) => {
