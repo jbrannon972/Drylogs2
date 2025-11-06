@@ -23,6 +23,20 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
     installData.waterClassification?.category || null
   );
 
+  // New fields
+  const [discoveryDate, setDiscoveryDate] = useState(
+    installData.causeOfLoss?.discoveryDate || new Date().toISOString().split('T')[0]
+  );
+  const [eventDate, setEventDate] = useState(
+    installData.causeOfLoss?.eventDate || new Date().toISOString().split('T')[0]
+  );
+  const [thermalImagingUsed, setThermalImagingUsed] = useState(
+    installData.specializedServices?.thermalImaging || false
+  );
+  const [microbialTestingNeeded, setMicrobialTestingNeeded] = useState(
+    installData.specializedServices?.microbialTesting || false
+  );
+
   useEffect(() => {
     updateWorkflowData('install', {
       causeOfLoss: {
@@ -30,13 +44,19 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         location: causeLocation,
         notes: causeNotes,
         photo: causePhoto,
+        discoveryDate,
+        eventDate,
       },
       waterClassification: {
         category: waterCategory,
         determinedAt: new Date().toISOString(),
       },
+      specializedServices: {
+        thermalImaging: thermalImagingUsed,
+        microbialTesting: microbialTestingNeeded,
+      },
     });
-  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory]);
+  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed, microbialTestingNeeded]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -199,6 +219,104 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
           placeholder="Additional observations about the water source or circumstances..."
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:outline-none"
         />
+      </div>
+
+      {/* Timeline */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Discovery Date *
+          </label>
+          <input
+            type="date"
+            value={discoveryDate}
+            onChange={(e) => setDiscoveryDate(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:outline-none"
+          />
+          <p className="text-xs text-gray-500 mt-1">When the damage was first noticed</p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Event Date
+          </label>
+          <input
+            type="date"
+            value={eventDate}
+            onChange={(e) => setEventDate(e.target.value)}
+            max={new Date().toISOString().split('T')[0]}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:outline-none"
+          />
+          <p className="text-xs text-gray-500 mt-1">When the water event occurred (if known)</p>
+        </div>
+      </div>
+
+      {/* Specialized Services */}
+      <div className="border border-gray-200 rounded-lg p-4">
+        <h3 className="font-semibold text-gray-900 mb-3">Specialized Services</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Select any specialized services needed for this job. These will be added to the estimate.
+        </p>
+
+        <div className="space-y-3">
+          {/* Thermal Imaging */}
+          <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={thermalImagingUsed}
+                onChange={(e) => setThermalImagingUsed(e.target.checked)}
+                className="w-5 h-5 text-entrusted-orange border-gray-300 rounded focus:ring-entrusted-orange mt-0.5"
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-gray-900">Thermal Imaging</p>
+                  <span className="text-sm font-medium text-gray-700">+$150</span>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">
+                  Use thermal camera to detect hidden moisture behind walls, under floors, or in ceilings. Required for comprehensive moisture mapping.
+                </p>
+              </div>
+            </label>
+          </div>
+
+          {/* Microbial Testing */}
+          <div className={`border rounded-lg p-4 transition-colors ${
+            microbialTestingNeeded ? 'border-orange-300 bg-orange-50' : 'hover:bg-gray-50'
+          }`}>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={microbialTestingNeeded}
+                onChange={(e) => setMicrobialTestingNeeded(e.target.checked)}
+                className="w-5 h-5 text-entrusted-orange border-gray-300 rounded focus:ring-entrusted-orange mt-0.5"
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-gray-900">Microbial Testing</p>
+                  <span className="text-sm font-medium text-gray-700">+$350</span>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">
+                  Laboratory testing for mold, bacteria, or other microbial growth. Recommended if visible growth is present or if water was Category 2/3.
+                </p>
+                {microbialTestingNeeded && (
+                  <div className="mt-2 p-2 bg-orange-100 border border-orange-200 rounded">
+                    <p className="text-xs text-orange-800">
+                      ⚠️ Containment and antimicrobial treatment may be required. This will be flagged for Lead review.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </label>
+          </div>
+        </div>
+
+        {(thermalImagingUsed || microbialTestingNeeded) && (
+          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+            <p className="text-sm font-medium text-blue-900">
+              Specialized Services Total: ${(thermalImagingUsed ? 150 : 0) + (microbialTestingNeeded ? 350 : 0)}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Water Category Selection */}

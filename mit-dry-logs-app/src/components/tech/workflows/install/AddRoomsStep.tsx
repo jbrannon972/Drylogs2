@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
-import { Plus, Trash2, Home, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, Home, AlertCircle, Camera, CheckCircle } from 'lucide-react';
 import { RoomType } from '../../../../types';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
+import { usePhotos } from '../../../../hooks/usePhotos';
+import { useAuth } from '../../../../hooks/useAuth';
 
 interface AddRoomsStepProps {
   job: any;
@@ -21,10 +23,15 @@ interface RoomData {
   wallSqFt: number;
   ceilingSqFt: number;
   totalSurfaceArea: number;
+  affectedStatus?: 'affected' | 'unaffected' | 'partial';
+  isReferenceRoom?: boolean;
+  overviewPhoto?: string;
 }
 
 export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
+  const { user } = useAuth();
+  const { uploadPhoto, isUploading } = usePhotos();
   const [rooms, setRooms] = useState<RoomData[]>(installData.rooms || []);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [newRoom, setNewRoom] = useState({
@@ -33,6 +40,9 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
     length: '',
     width: '',
     height: '8',
+    affectedStatus: 'affected' as 'affected' | 'unaffected' | 'partial',
+    isReferenceRoom: false,
+    overviewPhoto: null as string | null,
   });
 
   // Auto-calculate surface areas
@@ -50,6 +60,15 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
   useEffect(() => {
     updateWorkflowData('install', { rooms });
   }, [rooms]);
+
+  const handleRoomPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && user) {
+      const roomName = newRoom.name || 'room';
+      const url = await uploadPhoto(file, job.jobId, roomName, 'assessment', user.uid);
+      if (url) setNewRoom({ ...newRoom, overviewPhoto: url });
+    }
+  };
 
   const handleAddRoom = () => {
     if (!newRoom.name || !newRoom.length || !newRoom.width) {
@@ -71,6 +90,9 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       width,
       height,
       ...surfaces,
+      affectedStatus: newRoom.affectedStatus,
+      isReferenceRoom: newRoom.isReferenceRoom,
+      overviewPhoto: newRoom.overviewPhoto || undefined,
     };
 
     setRooms([...rooms, room]);
@@ -80,6 +102,9 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       length: '',
       width: '',
       height: '8',
+      affectedStatus: 'affected',
+      isReferenceRoom: false,
+      overviewPhoto: null,
     });
     setShowAddRoom(false);
   };
@@ -127,16 +152,42 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
           <h3 className="font-semibold text-gray-900 mb-3">Rooms ({rooms.length})</h3>
           <div className="space-y-3">
             {rooms.map(room => (
-              <div key={room.id} className="border rounded-lg bg-white p-4">
+              <div key={room.id} className={`border-2 rounded-lg bg-white p-4 ${
+                room.isReferenceRoom ? 'border-blue-400 bg-blue-50' :
+                room.affectedStatus === 'affected' ? 'border-red-200' :
+                room.affectedStatus === 'partial' ? 'border-yellow-200' :
+                'border-green-200'
+              }`}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3 flex-1">
-                    <Home className="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" />
+                    {room.overviewPhoto && (
+                      <img src={room.overviewPhoto} alt={room.name} className="w-20 h-20 rounded object-cover flex-shrink-0" />
+                    )}
+                    {!room.overviewPhoto && (
+                      <Home className="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" />
+                    )}
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <p className="font-medium text-gray-900">{room.name}</p>
                         <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
                           {room.type}
                         </span>
+                        {room.affectedStatus && (
+                          <span className={`px-2 py-0.5 text-xs rounded font-medium ${
+                            room.affectedStatus === 'affected' ? 'bg-red-100 text-red-800' :
+                            room.affectedStatus === 'partial' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {room.affectedStatus === 'affected' ? '● Affected' :
+                             room.affectedStatus === 'partial' ? '◐ Partial' :
+                             '○ Unaffected'}
+                          </span>
+                        )}
+                        {room.isReferenceRoom && (
+                          <span className="px-2 py-0.5 bg-blue-500 text-white text-xs rounded font-medium">
+                            ★ Reference Room
+                          </span>
+                        )}
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
@@ -208,6 +259,89 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
                   <option>Other</option>
                 </select>
               </div>
+            </div>
+
+            {/* Affected Status */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Affected Status *
+              </label>
+              <select
+                value={newRoom.affectedStatus}
+                onChange={(e) => setNewRoom({ ...newRoom, affectedStatus: e.target.value as 'affected' | 'unaffected' | 'partial' })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-entrusted-orange"
+              >
+                <option value="affected">Affected - Direct water damage</option>
+                <option value="partial">Partial - Some areas affected</option>
+                <option value="unaffected">Unaffected - No water damage</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Whether this room has water damage
+              </p>
+            </div>
+
+            {/* Reference Room Checkbox */}
+            {newRoom.affectedStatus === 'unaffected' && (
+              <div className="border border-blue-200 bg-blue-50 rounded-lg p-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newRoom.isReferenceRoom}
+                    onChange={(e) => setNewRoom({ ...newRoom, isReferenceRoom: e.target.checked })}
+                    className="w-5 h-5 text-entrusted-orange border-gray-300 rounded focus:ring-entrusted-orange mt-0.5"
+                  />
+                  <div>
+                    <p className="font-medium text-blue-900">Use as Reference Room (Dry Standard Baseline)</p>
+                    <p className="text-sm text-blue-800 mt-1">
+                      This room's temperature and humidity will establish the baseline for all moisture readings throughout the job. Only one reference room should be selected.
+                    </p>
+                  </div>
+                </label>
+              </div>
+            )}
+
+            {/* Room Photo */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Room Overview Photo
+              </label>
+              {newRoom.overviewPhoto ? (
+                <div>
+                  <img src={newRoom.overviewPhoto} alt="Room Overview" className="max-h-32 rounded mb-2" />
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm text-green-600 font-medium">Photo added</span>
+                  </div>
+                  <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 text-sm">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleRoomPhoto}
+                      className="hidden"
+                      disabled={isUploading}
+                    />
+                    <Camera className="w-4 h-4" />
+                    Replace Photo
+                  </label>
+                </div>
+              ) : (
+                <label className="btn-secondary cursor-pointer inline-flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleRoomPhoto}
+                    className="hidden"
+                    disabled={isUploading}
+                  />
+                  <Camera className="w-4 h-4" />
+                  {isUploading ? 'Uploading...' : 'Take Room Photo'}
+                </label>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Photo helps with documentation and insurance claims
+              </p>
             </div>
 
             <div className="grid grid-cols-3 gap-4">

@@ -10,6 +10,15 @@ interface AffectedMaterialsStepProps {
   onNext: () => void;
 }
 
+interface DemoMaterial {
+  type: string;
+  affected: boolean;
+  quantity: number;
+  unit: 'SF' | 'LF' | 'EA';
+  notes?: string;
+  drywallHeight?: 'up-to-2ft' | 'up-to-4ft' | 'up-to-6ft' | 'full-height';
+}
+
 interface RoomAffectedData {
   roomId: string;
   floor: {
@@ -25,6 +34,7 @@ interface RoomAffectedData {
     affectedSqFt: number;
     materials: Array<{ type: CeilingMaterialType; sqFt: number }>;
   };
+  demoMaterials?: DemoMaterial[];
 }
 
 export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ job, onNext }) => {
@@ -47,6 +57,22 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
     ceilingMaterial: 'drywall' as CeilingMaterialType,
   });
 
+  // Demo Materials Checklist - These directly feed demolition billing!
+  const defaultDemoMaterials: DemoMaterial[] = [
+    { type: 'Carpet', affected: false, quantity: 0, unit: 'SF' },
+    { type: 'Carpet Pad', affected: false, quantity: 0, unit: 'SF' },
+    { type: 'Baseboard', affected: false, quantity: 0, unit: 'LF' },
+    { type: 'Drywall', affected: false, quantity: 0, unit: 'LF', drywallHeight: 'up-to-2ft' },
+    { type: 'Insulation', affected: false, quantity: 0, unit: 'SF' },
+    { type: 'Hardwood', affected: false, quantity: 0, unit: 'SF' },
+    { type: 'Tile', affected: false, quantity: 0, unit: 'SF' },
+    { type: 'Cabinetry', affected: false, quantity: 0, unit: 'LF' },
+    { type: 'Ceiling Drywall', affected: false, quantity: 0, unit: 'SF' },
+    { type: 'Vinyl/Laminate', affected: false, quantity: 0, unit: 'SF' },
+  ];
+
+  const [demoMaterials, setDemoMaterials] = useState<DemoMaterial[]>(defaultDemoMaterials);
+
   // Load existing data for current room
   useEffect(() => {
     if (currentRoom && roomsAffectedData[currentRoom.id]) {
@@ -60,6 +86,12 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
         wallMaterial: data.walls.materials[0]?.type || 'drywall',
         ceilingMaterial: data.ceiling.materials[0]?.type || 'drywall',
       });
+      // Load demo materials if they exist
+      if (data.demoMaterials) {
+        setDemoMaterials(data.demoMaterials);
+      } else {
+        setDemoMaterials(defaultDemoMaterials);
+      }
     } else {
       // Reset form for new room
       setFormData({
@@ -71,6 +103,7 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
         wallMaterial: 'drywall',
         ceilingMaterial: 'drywall',
       });
+      setDemoMaterials(defaultDemoMaterials);
     }
   }, [currentRoomIndex, currentRoom]);
 
@@ -97,6 +130,7 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
         affectedSqFt: ceilingAffected,
         materials: ceilingAffected > 0 ? [{ type: formData.ceilingMaterial, sqFt: ceilingAffected }] : [],
       },
+      demoMaterials,
     };
 
     const newData = {
@@ -111,6 +145,24 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
     if (currentRoomIndex < rooms.length - 1) {
       setCurrentRoomIndex(currentRoomIndex + 1);
     }
+  };
+
+  const handleMaterialToggle = (index: number) => {
+    const updated = [...demoMaterials];
+    updated[index].affected = !updated[index].affected;
+    setDemoMaterials(updated);
+  };
+
+  const handleMaterialQuantity = (index: number, value: number) => {
+    const updated = [...demoMaterials];
+    updated[index].quantity = value;
+    setDemoMaterials(updated);
+  };
+
+  const handleDrywallHeight = (index: number, height: DemoMaterial['drywallHeight']) => {
+    const updated = [...demoMaterials];
+    updated[index].drywallHeight = height;
+    setDemoMaterials(updated);
   };
 
   const handlePreviousRoom = () => {
@@ -312,6 +364,110 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
             onChange={(e) => setFormData({ ...formData, ceilingAffectedSqFt: e.target.value })}
           />
         </div>
+      </div>
+
+      {/* DEMO MATERIALS CHECKLIST - Critical for billing! */}
+      <div className="border-2 border-entrusted-orange rounded-lg p-5 bg-orange-50">
+        <div className="flex items-start gap-3 mb-4">
+          <AlertCircle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-1">Materials for Removal (Demo Billing)</h3>
+            <p className="text-sm text-gray-700">
+              Check each material that will need to be removed, and enter the quantity. <strong>This data directly feeds demo billing calculations!</strong> Be as accurate as possible.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {demoMaterials.map((material, idx) => (
+            <div
+              key={material.type}
+              className={`border-2 rounded-lg p-4 transition-all ${
+                material.affected
+                  ? 'border-entrusted-orange bg-white'
+                  : 'border-gray-200 bg-gray-50 opacity-60'
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={material.affected}
+                  onChange={() => handleMaterialToggle(idx)}
+                  className="w-5 h-5 text-entrusted-orange border-gray-300 rounded focus:ring-entrusted-orange mt-0.5"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="font-medium text-gray-900">{material.type}</p>
+                    <span className="text-xs text-gray-500 font-medium">{material.unit}</span>
+                  </div>
+
+                  {material.affected && (
+                    <div className="space-y-3">
+                      {/* Quantity Input */}
+                      <div className="flex items-center gap-3">
+                        <label className="text-sm font-medium text-gray-700 w-20">Quantity:</label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          value={material.quantity || ''}
+                          onChange={(e) => handleMaterialQuantity(idx, parseFloat(e.target.value) || 0)}
+                          placeholder={`Enter ${material.unit}...`}
+                          className="flex-1"
+                        />
+                        <span className="text-sm text-gray-600 w-8">{material.unit}</span>
+                      </div>
+
+                      {/* Drywall Height Selection */}
+                      {material.type === 'Drywall' && (
+                        <div className="flex items-center gap-3">
+                          <label className="text-sm font-medium text-gray-700 w-20">Height:</label>
+                          <select
+                            value={material.drywallHeight || 'up-to-2ft'}
+                            onChange={(e) => handleDrywallHeight(idx, e.target.value as DemoMaterial['drywallHeight'])}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
+                          >
+                            <option value="up-to-2ft">Up to 2 feet</option>
+                            <option value="up-to-4ft">Up to 4 feet</option>
+                            <option value="up-to-6ft">Up to 6 feet</option>
+                            <option value="full-height">Full height (8+ ft)</option>
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Show calculated value for reference */}
+                      {material.quantity > 0 && (
+                        <div className="bg-blue-50 border border-blue-200 rounded p-2">
+                          <p className="text-sm text-blue-800">
+                            <strong>{material.type}:</strong> {material.quantity} {material.unit}
+                            {material.type === 'Drywall' && ` @ ${material.drywallHeight?.replace('-', ' ')}`}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Summary of selected materials */}
+        {demoMaterials.some(m => m.affected && m.quantity > 0) && (
+          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <h4 className="font-semibold text-green-900 mb-2">✓ Materials Marked for Removal:</h4>
+            <ul className="text-sm text-green-800 space-y-1">
+              {demoMaterials
+                .filter(m => m.affected && m.quantity > 0)
+                .map(m => (
+                  <li key={m.type}>
+                    • <strong>{m.type}:</strong> {m.quantity} {m.unit}
+                    {m.type === 'Drywall' && m.drywallHeight && ` (${m.drywallHeight.replace('-', ' ')})`}
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Summary & Class Determination */}

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
-import { Droplets, AlertCircle, Info, Plus, Trash2, CheckCircle } from 'lucide-react';
+import { Droplets, AlertCircle, Info, Plus, Trash2, CheckCircle, Camera, AlertTriangle } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
+import { usePhotos } from '../../../../hooks/usePhotos';
+import { useAuth } from '../../../../hooks/useAuth';
 import { MaterialType, ReadingType } from '../../../../types';
 
 interface MoistureReading {
@@ -17,6 +19,7 @@ interface MoistureReading {
   isDryStandard: boolean;
   notes: string;
   timestamp: string;
+  photo?: string;
 }
 
 interface MoistureMappingStepProps {
@@ -26,6 +29,8 @@ interface MoistureMappingStepProps {
 
 export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
+  const { user } = useAuth();
+  const { uploadPhoto, isUploading } = usePhotos();
   const rooms = installData.rooms || [];
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   const [moistureReadings, setMoistureReadings] = useState<MoistureReading[]>(
@@ -40,6 +45,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
     humidity: '50',
     isDryStandard: false,
     notes: '',
+    photo: null as string | null,
   });
 
   const currentRoom = rooms[currentRoomIndex];
@@ -49,24 +55,35 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
     updateWorkflowData('install', { moistureReadings });
   }, [moistureReadings]);
 
+  const handleReadingPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && user && currentRoom) {
+      const url = await uploadPhoto(file, job.jobId, currentRoom.name, 'moisture-reading', user.uid);
+      if (url) setNewReading({ ...newReading, photo: url });
+    }
+  };
+
   const handleAddReading = () => {
     if (!currentRoom || !newReading.location || !newReading.moisturePercent) {
       alert('Please fill in location and moisture percentage');
       return;
     }
 
+    const moistureValue = parseFloat(newReading.moisturePercent);
+
     const reading: MoistureReading = {
       id: Date.now().toString(),
       roomId: currentRoom.id,
       material: newReading.material,
       location: newReading.location,
-      moisturePercent: parseFloat(newReading.moisturePercent),
+      moisturePercent: moistureValue,
       temperature: parseFloat(newReading.temperature),
       humidity: parseFloat(newReading.humidity),
       readingType: 'initial',
       isDryStandard: newReading.isDryStandard,
       notes: newReading.notes,
       timestamp: new Date().toISOString(),
+      photo: newReading.photo || undefined,
     };
 
     setMoistureReadings([...moistureReadings, reading]);
@@ -78,6 +95,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
       humidity: '50',
       isDryStandard: false,
       notes: '',
+      photo: null,
     });
     setShowAddReading(false);
   };
@@ -159,6 +177,33 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
           </div>
         </div>
       </div>
+
+      {/* High Readings Warning */}
+      {affectedReadings.some(r => r.moisturePercent > 40) && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-medium text-red-900 mb-1">⚠️ Very High Moisture Detected (&gt;40%)</h4>
+              <p className="text-sm text-red-800 mb-2">
+                Readings above 40% may indicate Category 2 or 3 water. Materials may not be salvageable and could require removal.
+              </p>
+              <ul className="text-sm text-red-800 space-y-1">
+                {affectedReadings
+                  .filter(r => r.moisturePercent > 40)
+                  .map(r => (
+                    <li key={r.id}>
+                      • <strong>{r.material}</strong> at {r.location}: <strong>{r.moisturePercent}%</strong>
+                    </li>
+                  ))}
+              </ul>
+              <p className="text-sm text-red-800 mt-2 font-medium">
+                → Consider upgrading water category classification and flagging for additional demo.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dry Standard Status */}
       {!dryStandard && (
@@ -250,6 +295,15 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
                         Note: {reading.notes}
                       </p>
                     )}
+                    {reading.photo && (
+                      <div className="mt-2">
+                        <img src={reading.photo} alt="Moisture Meter" className="max-h-24 rounded border border-gray-200" />
+                        <p className="text-xs text-gray-500 mt-1">
+                          <Camera className="w-3 h-3 inline mr-1" />
+                          Meter photo
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <button
                     onClick={() => handleDeleteReading(reading.id)}
@@ -339,6 +393,50 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
                   This is a Dry Standard (unaffected baseline)
                 </span>
               </label>
+            </div>
+
+            {/* Photo Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Moisture Meter Photo (Optional)
+              </label>
+              {newReading.photo ? (
+                <div>
+                  <img src={newReading.photo} alt="Moisture Reading" className="max-h-32 rounded mb-2" />
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm text-green-600 font-medium">Photo added</span>
+                  </div>
+                  <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 text-sm">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleReadingPhoto}
+                      className="hidden"
+                      disabled={isUploading}
+                    />
+                    <Camera className="w-4 h-4" />
+                    Replace Photo
+                  </label>
+                </div>
+              ) : (
+                <label className="btn-secondary cursor-pointer inline-flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleReadingPhoto}
+                    className="hidden"
+                    disabled={isUploading}
+                  />
+                  <Camera className="w-4 h-4" />
+                  {isUploading ? 'Uploading...' : 'Photo Moisture Meter'}
+                </label>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Photograph the moisture meter display for documentation
+              </p>
             </div>
 
             <div>
