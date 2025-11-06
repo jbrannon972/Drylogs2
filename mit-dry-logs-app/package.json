@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seed": "tsx src/scripts/seedData.ts"
+    "seed": "tsx src/scripts/seedData.ts",
+    "cleanup": "tsx src/scripts/cleanupJobs.ts",
+    "fix-assignments": "tsx src/scripts/fixJobAssignments.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
