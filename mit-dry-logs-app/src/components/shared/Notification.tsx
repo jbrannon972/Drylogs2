@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { X, CheckCircle, AlertCircle, Info, WifiOff } from 'lucide-react';
 import { useNotificationStore } from '../../stores/notificationStore';
 
@@ -24,7 +24,7 @@ interface NotificationItemProps {
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClose }) => {
-  const icons = {
+  const icons: Record<string, React.ReactNode> = {
     success: <CheckCircle className="w-5 h-5 text-green-500" />,
     error: <AlertCircle className="w-5 h-5 text-red-500" />,
     warning: <AlertCircle className="w-5 h-5 text-yellow-500" />,
@@ -32,7 +32,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
     'offline-mode': <WifiOff className="w-5 h-5 text-gray-500" />,
   };
 
-  const bgColors = {
+  const bgColors: Record<string, string> = {
     success: 'bg-green-50 border-green-200',
     error: 'bg-red-50 border-red-200',
     warning: 'bg-yellow-50 border-yellow-200',
@@ -42,9 +42,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
 
   return (
     <div
-      className={`${bgColors[notification.type]} border rounded-lg p-4 shadow-lg flex items-start gap-3 animate-slide-in`}
+      className={`${bgColors[notification.type] || bgColors.info} border rounded-lg p-4 shadow-lg flex items-start gap-3 animate-slide-in`}
     >
-      {icons[notification.type]}
+      {icons[notification.type] || icons.info}
       <div className="flex-1">
         <h4 className="font-semibold text-gray-900">{notification.title}</h4>
         <p className="text-sm text-gray-600 mt-1">{notification.message}</p>

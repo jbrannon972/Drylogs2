@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface CardProps {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   children: React.ReactNode;
   className?: string;
@@ -12,9 +12,10 @@ export const Card: React.FC<CardProps> = ({
   children,
   className = '',
   headerClassName = '',
+  ...props
 }) => {
   return (
-    <div className={`card ${className}`}>
+    <div className={`card ${className}`} {...props}>
       {title && (
         <div className={`section-header -m-6 mb-6 ${headerClassName}`}>
           {title}
