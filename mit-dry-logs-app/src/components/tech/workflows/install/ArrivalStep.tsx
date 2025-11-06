@@ -13,7 +13,11 @@ interface ArrivalStepProps {
 export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
-  const [arrivalTime, setArrivalTime] = useState(new Date().toLocaleTimeString());
+  // Fix: Use 24-hour format HH:mm for time input
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const [arrivalTime, setArrivalTime] = useState(`${hours}:${minutes}`);
   const [truckPhoto, setTruckPhoto] = useState<string | null>(null);
   const [propertyPhoto, setPropertyPhoto] = useState<string | null>(null);
 

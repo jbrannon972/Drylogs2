@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
-import { FileCheck, AlertCircle, Info, Droplets, Layers, Home } from 'lucide-react';
+import { Calendar, Clock, AlertCircle, Info, Plus, Trash2 } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 
 interface ScheduleWorkStepProps {
@@ -9,106 +9,72 @@ interface ScheduleWorkStepProps {
   onNext: () => void;
 }
 
+interface ScheduledVisit {
+  id: string;
+  day: number;
+  type: 'demo' | 'check' | 'pull';
+  date: string;
+  arrivalWindow: string;
+  estimatedHours: string;
+  teamSize: string;
+  notes: string;
+}
+
 export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
-  const rooms = installData.rooms || [];
-  const roomsAffectedData = installData.roomsAffectedData || {};
-  const moistureReadings = installData.moistureReadings || [];
-  const waterClassification = installData.waterClassification;
+  const [visits, setVisits] = useState<ScheduledVisit[]>(installData.scheduledVisits || []);
+  const [estimatedDryingDays, setEstimatedDryingDays] = useState(
+    installData.dryingPlan?.estimatedDays || '3'
+  );
 
-  const [dryingPlan, setDryingPlan] = useState({
-    estimatedDays: '',
-    monitoringSchedule: 'daily' as 'daily' | 'twice-daily',
-    targetMoisture: '12',
-    completionCriteria: '',
-  });
-
-  // Calculate totals from all rooms
-  const calculateTotals = () => {
-    let totalFloorSqFt = 0;
-    let totalWallSqFt = 0;
-    let totalCeilingSqFt = 0;
-    let totalAffectedSqFt = 0;
-    let totalSurfaceArea = 0;
-    let highestClass = 1;
-
-    rooms.forEach((room: any) => {
-      const affectedData = roomsAffectedData[room.id];
-      if (affectedData) {
-        totalFloorSqFt += affectedData.floor.affectedSqFt || 0;
-        totalWallSqFt += affectedData.walls.affectedSqFt || 0;
-        totalCeilingSqFt += affectedData.ceiling.affectedSqFt || 0;
-
-        const roomAffected = (affectedData.floor.affectedSqFt || 0) +
-                            (affectedData.walls.affectedSqFt || 0) +
-                            (affectedData.ceiling.affectedSqFt || 0);
-        totalAffectedSqFt += roomAffected;
-
-        // Determine class for this room
-        const roomTotal = room.totalSurfaceArea || 0;
-        if (roomTotal > 0) {
-          const percentAffected = (roomAffected / roomTotal) * 100;
-          let roomClass = 1;
-          if (percentAffected > 40) roomClass = 3;
-          else if (percentAffected >= 5) roomClass = 2;
-
-          if (roomClass > highestClass) highestClass = roomClass;
-        }
-      }
-      totalSurfaceArea += room.totalSurfaceArea || 0;
+  useEffect(() => {
+    updateWorkflowData('install', {
+      scheduledVisits: visits,
+      estimatedDryingDays: parseInt(estimatedDryingDays),
     });
+  }, [visits, estimatedDryingDays]);
 
-    return {
-      totalFloorSqFt,
-      totalWallSqFt,
-      totalCeilingSqFt,
-      totalAffectedSqFt,
-      totalSurfaceArea,
-      overallClass: highestClass,
-    };
-  };
+  const addVisit = (type: 'demo' | 'check' | 'pull') => {
+    const dayNumber = visits.length + 2; // Day 1 is install, so start at Day 2
+    const installDate = new Date();
+    const visitDate = new Date(installDate);
+    visitDate.setDate(visitDate.getDate() + dayNumber - 1);
 
-  const totals = calculateTotals();
-
-  // Count readings
-  const totalReadings = moistureReadings.length;
-  const dryStandards = moistureReadings.filter((r: any) => r.isDryStandard).length;
-  const affectedReadings = totalReadings - dryStandards;
-
-  // Save drying plan
-  const handleSave = () => {
-    const plan = {
-      waterCategory: waterClassification?.category || 1,
-      overallClass: totals.overallClass,
-      totalFloorSqFt: totals.totalFloorSqFt,
-      totalWallSqFt: totals.totalWallSqFt,
-      totalCeilingSqFt: totals.totalCeilingSqFt,
-      totalAffectedSqFt: totals.totalAffectedSqFt,
-      estimatedDays: parseInt(dryingPlan.estimatedDays) || 3,
-      monitoringSchedule: dryingPlan.monitoringSchedule,
-      targetMoisture: parseFloat(dryingPlan.targetMoisture),
-      completionCriteria: dryingPlan.completionCriteria,
-      createdAt: new Date().toISOString(),
+    const newVisit: ScheduledVisit = {
+      id: Date.now().toString(),
+      day: dayNumber,
+      type,
+      date: visitDate.toISOString().split('T')[0],
+      arrivalWindow: type === 'demo' ? '08:00-09:00' : '10:00-14:00',
+      estimatedHours: type === 'demo' ? '4' : type === 'check' ? '1' : '3',
+      teamSize: type === 'demo' ? '2' : '1',
+      notes: '',
     };
 
-    updateWorkflowData('install', { dryingPlan: plan });
+    setVisits([...visits, newVisit]);
   };
 
-  useEffect(() => {
-    handleSave();
-  }, [dryingPlan]);
+  const removeVisit = (id: string) => {
+    setVisits(visits.filter(v => v.id !== id));
+  };
 
-  // Determine default drying days based on class
-  useEffect(() => {
-    if (!dryingPlan.estimatedDays) {
-      let defaultDays = '3';
-      if (totals.overallClass === 1) defaultDays = '2';
-      else if (totals.overallClass === 2) defaultDays = '3';
-      else if (totals.overallClass === 3) defaultDays = '4';
-      else if (totals.overallClass === 4) defaultDays = '5';
-      setDryingPlan({ ...dryingPlan, estimatedDays: defaultDays });
-    }
-  }, [totals.overallClass]);
+  const updateVisit = (id: string, field: string, value: string) => {
+    setVisits(visits.map(v => v.id === id ? { ...v, [field]: value } : v));
+  };
+
+  const getVisitIcon = (type: string) => {
+    if (type === 'demo') return '🔨';
+    if (type === 'check') return '📋';
+    if (type === 'pull') return '📦';
+    return '📅';
+  };
+
+  const getVisitColor = (type: string) => {
+    if (type === 'demo') return 'orange';
+    if (type === 'check') return 'blue';
+    if (type === 'pull') return 'green';
+    return 'gray';
+  };
 
   return (
     <div className="space-y-6">
@@ -117,239 +83,202 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-medium text-blue-900 mb-1">Review & Plan the Job</h4>
+            <h4 className="font-medium text-blue-900 mb-1">Plan Day-by-Day Work Schedule</h4>
             <p className="text-sm text-blue-800">
-              Review all collected data and set drying goals. This plan will guide equipment calculations
-              and daily monitoring throughout the job.
+              Schedule demo work, check services, and equipment pull. Each visit creates a work order for the team.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Job Summary */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <FileCheck className="w-5 h-5 text-entrusted-orange" />
-          Job Summary
-        </h3>
-
-        <div className="grid grid-cols-2 gap-6">
-          {/* Water Classification */}
-          <div>
-            <h4 className="font-medium text-gray-700 mb-2">Water Classification</h4>
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-sm text-gray-600 mb-1">Category</p>
-              <p className="text-lg font-bold text-gray-900">
-                Category {waterClassification?.category || '?'}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {waterClassification?.category === 1 && 'Clean Water'}
-                {waterClassification?.category === 2 && 'Gray Water'}
-                {waterClassification?.category === 3 && 'Black Water'}
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-medium text-gray-700 mb-2">Overall Damage Class</h4>
-            <div className={`rounded-lg p-3 ${
-              totals.overallClass === 3 ? 'bg-red-50' :
-              totals.overallClass === 2 ? 'bg-yellow-50' :
-              'bg-green-50'
-            }`}>
-              <p className="text-sm text-gray-600 mb-1">Class</p>
-              <p className="text-lg font-bold text-gray-900">
-                Class {totals.overallClass}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {totals.overallClass === 1 && '<5% of surfaces affected'}
-                {totals.overallClass === 2 && '5-40% of surfaces affected'}
-                {totals.overallClass === 3 && '>40% of surfaces affected'}
-                {totals.overallClass === 4 && 'Deeply saturated materials'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Affected Areas Breakdown */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <Layers className="w-5 h-5 text-entrusted-orange" />
-          Affected Areas Breakdown
-        </h3>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-blue-900">{totals.totalFloorSqFt.toFixed(0)}</p>
-            <p className="text-sm text-gray-600 mt-1">Floor Sq Ft</p>
-          </div>
-          <div className="bg-orange-50 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-orange-900">{totals.totalWallSqFt.toFixed(0)}</p>
-            <p className="text-sm text-gray-600 mt-1">Wall Sq Ft</p>
-          </div>
-          <div className="bg-purple-50 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-purple-900">{totals.totalCeilingSqFt.toFixed(0)}</p>
-            <p className="text-sm text-gray-600 mt-1">Ceiling Sq Ft</p>
-          </div>
-          <div className="bg-red-50 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-red-900">{totals.totalAffectedSqFt.toFixed(0)}</p>
-            <p className="text-sm text-gray-600 mt-1">Total Affected</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Moisture Readings Summary */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <Droplets className="w-5 h-5 text-entrusted-orange" />
-          Moisture Readings Summary
-        </h3>
-
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-gray-50 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-gray-900">{totalReadings}</p>
-            <p className="text-sm text-gray-600 mt-1">Total Readings</p>
-          </div>
-          <div className="bg-blue-50 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-blue-900">{dryStandards}</p>
-            <p className="text-sm text-gray-600 mt-1">Dry Standards</p>
-          </div>
-          <div className="bg-red-50 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-red-900">{affectedReadings}</p>
-            <p className="text-sm text-gray-600 mt-1">Affected Readings</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Rooms Summary */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <Home className="w-5 h-5 text-entrusted-orange" />
-          Rooms Summary
-        </h3>
-
-        <div className="bg-gray-50 rounded-lg p-4 mb-4">
-          <p className="text-center">
-            <span className="text-3xl font-bold text-gray-900">{rooms.length}</span>
-            <span className="text-gray-600 ml-2">rooms documented</span>
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          {rooms.slice(0, 5).map((room: any) => {
-            const affectedData = roomsAffectedData[room.id];
-            const roomAffected = affectedData
-              ? (affectedData.floor.affectedSqFt + affectedData.walls.affectedSqFt + affectedData.ceiling.affectedSqFt)
-              : 0;
-            return (
-              <div key={room.id} className="flex items-center justify-between text-sm py-2 border-b last:border-0">
-                <span className="text-gray-700">{room.name}</span>
-                <span className="font-medium text-gray-900">{roomAffected.toFixed(0)} sq ft affected</span>
-              </div>
-            );
-          })}
-          {rooms.length > 5 && (
-            <p className="text-sm text-gray-500 text-center pt-2">
-              + {rooms.length - 5} more rooms
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Drying Plan Settings */}
-      <div className="border-2 border-entrusted-orange rounded-lg p-5 bg-orange-50">
-        <h3 className="font-semibold text-gray-900 mb-4">Set Drying Goals</h3>
-
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Estimated Drying Days *"
-              type="number"
-              min="1"
-              max="14"
-              placeholder="3"
-              value={dryingPlan.estimatedDays}
-              onChange={(e) => setDryingPlan({ ...dryingPlan, estimatedDays: e.target.value })}
-            />
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Monitoring Schedule *
-              </label>
-              <select
-                value={dryingPlan.monitoringSchedule}
-                onChange={(e) => setDryingPlan({ ...dryingPlan, monitoringSchedule: e.target.value as 'daily' | 'twice-daily' })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
-              >
-                <option value="daily">Daily Check</option>
-                <option value="twice-daily">Twice Daily</option>
-              </select>
-            </div>
-          </div>
-
+      {/* Estimated Drying Timeline */}
+      <div className="border rounded-lg p-5 bg-gray-50">
+        <h3 className="font-semibold text-gray-900 mb-3">Estimated Drying Timeline</h3>
+        <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Target Moisture % (for completion)"
+            label="Estimated Drying Days"
             type="number"
-            step="0.1"
-            min="0"
-            max="20"
-            value={dryingPlan.targetMoisture}
-            onChange={(e) => setDryingPlan({ ...dryingPlan, targetMoisture: e.target.value })}
+            min="1"
+            max="14"
+            value={estimatedDryingDays}
+            onChange={(e) => setEstimatedDryingDays(e.target.value)}
           />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Completion Criteria
-            </label>
-            <textarea
-              value={dryingPlan.completionCriteria}
-              onChange={(e) => setDryingPlan({ ...dryingPlan, completionCriteria: e.target.value })}
-              rows={3}
-              placeholder="e.g., All materials at or below dry standard + 2%, no visible moisture, psychrometric readings normal..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
-            />
+          <div className="pt-6">
+            <p className="text-sm text-gray-600">
+              Based on damage class and affected area, job will take approximately{' '}
+              <strong>{estimatedDryingDays} days</strong> to dry.
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Validation Warnings */}
-      {totalReadings === 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-yellow-800">
-                <strong>Warning:</strong> No moisture readings recorded. Consider going back to add initial readings.
-              </p>
-            </div>
+      {/* Scheduled Visits */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-gray-900">Scheduled Visits (Day 2+)</h3>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => addVisit('demo')}
+              className="text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Demo
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => addVisit('check')}
+              className="text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Check
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => addVisit('pull')}
+              className="text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Pull
+            </Button>
+          </div>
+        </div>
+
+        {visits.length === 0 ? (
+          <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+            <Calendar className="w-16 h-16 mx-auto mb-3 text-gray-300" />
+            <p className="text-gray-600 font-medium mb-2">No visits scheduled yet</p>
+            <p className="text-sm text-gray-500 mb-4">Add demo, check services, and pull visits</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {visits.sort((a, b) => a.day - b.day).map((visit) => (
+              <div
+                key={visit.id}
+                className={`border-2 rounded-lg p-4 ${
+                  visit.type === 'demo' ? 'border-orange-200 bg-orange-50' :
+                  visit.type === 'check' ? 'border-blue-200 bg-blue-50' :
+                  'border-green-200 bg-green-50'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl flex-shrink-0">{getVisitIcon(visit.type)}</div>
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-gray-900">
+                          Day {visit.day} -{' '}
+                          {visit.type === 'demo' ? 'Demo Work' :
+                           visit.type === 'check' ? 'Check Service' :
+                           'Equipment Pull'}
+                        </h4>
+                      </div>
+                      <button
+                        onClick={() => removeVisit(visit.id)}
+                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Date
+                        </label>
+                        <input
+                          type="date"
+                          value={visit.date}
+                          onChange={(e) => updateVisit(visit.id, 'date', e.target.value)}
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-entrusted-orange"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Arrival Window
+                        </label>
+                        <input
+                          type="text"
+                          value={visit.arrivalWindow}
+                          onChange={(e) => updateVisit(visit.id, 'arrivalWindow', e.target.value)}
+                          placeholder="08:00-09:00"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-entrusted-orange"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Estimated Hours
+                        </label>
+                        <input
+                          type="number"
+                          min="0.5"
+                          step="0.5"
+                          value={visit.estimatedHours}
+                          onChange={(e) => updateVisit(visit.id, 'estimatedHours', e.target.value)}
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-entrusted-orange"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Team Size
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="6"
+                          value={visit.teamSize}
+                          onChange={(e) => updateVisit(visit.id, 'teamSize', e.target.value)}
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-entrusted-orange"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Notes / Work to be done
+                      </label>
+                      <textarea
+                        value={visit.notes}
+                        onChange={(e) => updateVisit(visit.id, 'notes', e.target.value)}
+                        rows={2}
+                        placeholder={
+                          visit.type === 'demo' ? 'e.g., Remove 200 sqft drywall in master bath, demo carpet in hallway' :
+                          visit.type === 'check' ? 'e.g., Take moisture readings, check equipment, adjust as needed' :
+                          'e.g., Final readings, pull all equipment, site restoration'
+                        }
+                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-entrusted-orange"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Quick Add Suggestions */}
+      {visits.length === 0 && (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <h4 className="font-medium text-gray-900 mb-2">Typical Job Schedule</h4>
+          <div className="space-y-2 text-sm text-gray-700">
+            <p>• <strong>Day 1 (Today):</strong> Install equipment, initial readings</p>
+            <p>• <strong>Day 2:</strong> Demo work (remove affected materials)</p>
+            <p>• <strong>Days 3-5:</strong> Check services (monitor progress, adjust equipment)</p>
+            <p>• <strong>Final Day:</strong> Pull equipment when dry standards met</p>
           </div>
         </div>
       )}
 
-      {!waterClassification && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-yellow-800">
-                <strong>Warning:</strong> Water classification not set. Go back to specify category.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Success Message */}
-      {totalReadings > 0 && waterClassification && totals.totalAffectedSqFt > 0 && (
+      {/* Summary */}
+      {visits.length > 0 && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <FileCheck className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-medium text-green-900 mb-1">Job Plan Complete</h4>
-              <p className="text-sm text-green-800">
-                All required data has been collected. Continue to calculate equipment needs based on this plan.
-              </p>
-            </div>
+          <h4 className="font-medium text-green-900 mb-2">Work Schedule Summary</h4>
+          <div className="space-y-1 text-sm text-green-800">
+            <p>• Total visits scheduled: <strong>{visits.length}</strong></p>
+            <p>• Demo days: <strong>{visits.filter(v => v.type === 'demo').length}</strong></p>
+            <p>• Check services: <strong>{visits.filter(v => v.type === 'check').length}</strong></p>
+            <p>• Equipment pulls: <strong>{visits.filter(v => v.type === 'pull').length}</strong></p>
           </div>
         </div>
       )}
