@@ -1,27 +1,33 @@
 /**
- * Setup Page - One-Click Demo User Creation
- * Creates demo users for MIT Tech and MIT Lead with proper Firestore profiles
+ * SetupPage Component
+ * One-click setup for demo users and sample jobs
  */
 
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, setDoc, doc, Timestamp } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
-import { Button } from '../shared/Button';
-import { LoadingSpinner } from '../shared/LoadingSpinner';
-import { CheckCircle, AlertCircle } from 'lucide-react';
-import { User } from '../../types';
+import { User, Job } from '../../types';
 
 interface SetupResult {
-  email: string;
-  status: 'pending' | 'success' | 'error' | 'exists';
+  userId: string;
+  status: 'success' | 'error';
   message: string;
 }
 
-export const SetupPage: React.FC = () => {
+interface JobResult {
+  jobId: string;
+  status: 'success' | 'error';
+  message: string;
+}
+
+export function SetupPage() {
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreatingJobs, setIsCreatingJobs] = useState(false);
   const [results, setResults] = useState<SetupResult[]>([]);
-  const [completed, setCompleted] = useState(false);
+  const [jobResults, setJobResults] = useState<JobResult[]>([]);
+  const [techUid, setTechUid] = useState<string>('');
+  const [leadUid, setLeadUid] = useState<string>('');
 
   const demoUsers = [
     {
@@ -42,12 +48,416 @@ export const SetupPage: React.FC = () => {
     },
   ];
 
+  const createSampleJobs = async (techUid: string, leadUid: string) => {
+    setIsCreatingJobs(true);
+    setJobResults([]);
+
+    const sampleJobs: Partial<Job>[] = [
+      {
+        customerInfo: {
+          name: 'John Smith Family',
+          address: '123 Main Street',
+          city: 'Boston',
+          state: 'MA',
+          zipCode: '02108',
+          phoneNumber: '+1 (555) 234-5678',
+          email: 'john.smith@email.com',
+          coordinates: {
+            latitude: 42.3601,
+            longitude: -71.0589,
+          },
+        },
+        insuranceInfo: {
+          carrierName: 'State Farm Insurance',
+          policyNumber: 'SF-12345678',
+          claimNumber: 'CLM-2025-00123',
+          adjusterName: 'Sarah Johnson',
+          adjusterPhone: '+1 (555) 345-6789',
+          adjusterEmail: 'sarah.j@statefarm.com',
+          deductible: 1000,
+          estimatedValue: 15000,
+          categoryOfWater: 'Category 1' as const,
+        },
+        causeOfLoss: {
+          type: 'Burst Pipe' as any,
+          description: 'Burst pipe in master bathroom',
+          location: 'Master Bathroom',
+          discoveryDate: Timestamp.fromDate(new Date('2025-01-15')),
+          eventDate: Timestamp.fromDate(new Date('2025-01-14')),
+        },
+        jobStatus: 'Install' as const,
+        workflowPhases: {
+          install: {
+            status: 'in-progress',
+            startedAt: Timestamp.now(),
+            technician: techUid,
+          },
+          demo: {
+            status: 'pending',
+          },
+          checkService: {
+            status: 'pending',
+            visits: [],
+          },
+          pull: {
+            status: 'pending',
+          },
+        },
+        rooms: [],
+        equipment: {
+          chambers: [],
+          calculations: {
+            totalAffectedSquareFootage: 0,
+            estimatedDryingDays: 3,
+            recommendedDehumidifierCount: 0,
+            recommendedAirMoverCount: 0,
+            recommendedAirScrubberCount: 0,
+            calculationMethod: 'IICRC S500-2021',
+            lastCalculatedAt: Timestamp.now(),
+            calculatedBy: techUid,
+            waterClass: 'Class 2' as any,
+            waterCategory: 'Category 1' as const,
+          },
+        },
+        safetyChecklist: {
+          preArrivalInspection: false,
+          containmentSetup: false,
+          ppeEquipped: false,
+          safetyConesPlaced: false,
+          utilityLocations: {
+            electrical: false,
+            gas: false,
+            water: false,
+            verified: false,
+          },
+          hazardsIdentified: [],
+        },
+        communication: {
+          groundRulesPresented: false,
+          estimatedTimeline: '',
+          customerConcerns: [],
+          preExistingConditions: [],
+        },
+        financial: {
+          insuranceDeductible: 1000,
+          estimatedMaterials: 0,
+          estimatedLabor: 0,
+          estimatedTotal: 0,
+          actualExpenses: {
+            materials: 0,
+            labor: 0,
+            equipment: 0,
+            total: 0,
+          },
+          paymentStatus: 'unpaid',
+          paymentMethod: 'insurance',
+          payments: [],
+        },
+        documentation: {
+          matterportScan: {
+            completed: false,
+          },
+          certificateOfSatisfaction: {
+            obtained: false,
+          },
+          dryReleaseWaiver: {
+            needed: false,
+            obtained: false,
+          },
+        },
+        scheduledZone: 'Zone 1' as const,
+        scheduledTechnician: techUid,
+        scheduledDate: Timestamp.now(),
+        metadata: {
+          createdAt: Timestamp.now(),
+          createdBy: techUid,
+          lastModifiedAt: Timestamp.now(),
+          lastModifiedBy: techUid,
+          version: 1,
+        },
+      },
+      {
+        customerInfo: {
+          name: 'Maria Garcia Family',
+          address: '456 Oak Avenue',
+          city: 'Cambridge',
+          state: 'MA',
+          zipCode: '02139',
+          phoneNumber: '+1 (555) 456-7890',
+          email: 'maria.garcia@email.com',
+          coordinates: {
+            latitude: 42.3736,
+            longitude: -71.1097,
+          },
+        },
+        insuranceInfo: {
+          carrierName: 'Allstate Insurance',
+          policyNumber: 'AL-87654321',
+          claimNumber: 'CLM-2025-00456',
+          adjusterName: 'Mike Wilson',
+          adjusterPhone: '+1 (555) 567-8901',
+          adjusterEmail: 'mike.w@allstate.com',
+          deductible: 2500,
+          estimatedValue: 12000,
+          categoryOfWater: 'Category 2' as const,
+        },
+        causeOfLoss: {
+          type: 'Appliance Leak' as any,
+          description: 'Washing machine overflow',
+          location: 'Laundry Room',
+          discoveryDate: Timestamp.fromDate(new Date('2025-01-18')),
+          eventDate: Timestamp.fromDate(new Date('2025-01-18')),
+        },
+        jobStatus: 'Pre-Install' as const,
+        workflowPhases: {
+          install: {
+            status: 'pending',
+          },
+          demo: {
+            status: 'pending',
+          },
+          checkService: {
+            status: 'pending',
+            visits: [],
+          },
+          pull: {
+            status: 'pending',
+          },
+        },
+        rooms: [],
+        equipment: {
+          chambers: [],
+          calculations: {
+            totalAffectedSquareFootage: 0,
+            estimatedDryingDays: 3,
+            recommendedDehumidifierCount: 0,
+            recommendedAirMoverCount: 0,
+            recommendedAirScrubberCount: 0,
+            calculationMethod: 'IICRC S500-2021',
+            lastCalculatedAt: Timestamp.now(),
+            calculatedBy: techUid,
+            waterClass: 'Class 3' as any,
+            waterCategory: 'Category 2' as const,
+          },
+        },
+        safetyChecklist: {
+          preArrivalInspection: false,
+          containmentSetup: false,
+          ppeEquipped: false,
+          safetyConesPlaced: false,
+          utilityLocations: {
+            electrical: false,
+            gas: false,
+            water: false,
+            verified: false,
+          },
+          hazardsIdentified: [],
+        },
+        communication: {
+          groundRulesPresented: false,
+          estimatedTimeline: '',
+          customerConcerns: [],
+          preExistingConditions: [],
+        },
+        financial: {
+          insuranceDeductible: 2500,
+          estimatedMaterials: 0,
+          estimatedLabor: 0,
+          estimatedTotal: 0,
+          actualExpenses: {
+            materials: 0,
+            labor: 0,
+            equipment: 0,
+            total: 0,
+          },
+          paymentStatus: 'unpaid',
+          paymentMethod: 'insurance',
+          payments: [],
+        },
+        documentation: {
+          matterportScan: {
+            completed: false,
+          },
+          certificateOfSatisfaction: {
+            obtained: false,
+          },
+          dryReleaseWaiver: {
+            needed: false,
+            obtained: false,
+          },
+        },
+        scheduledZone: 'Zone 1' as const,
+        scheduledTechnician: techUid,
+        scheduledDate: Timestamp.fromDate(new Date('2025-01-20')),
+        metadata: {
+          createdAt: Timestamp.now(),
+          createdBy: techUid,
+          lastModifiedAt: Timestamp.now(),
+          lastModifiedBy: techUid,
+          version: 1,
+        },
+      },
+      {
+        customerInfo: {
+          name: 'Robert Chen Business',
+          address: '789 Elm Street',
+          city: 'Somerville',
+          state: 'MA',
+          zipCode: '02144',
+          phoneNumber: '+1 (555) 678-9012',
+          email: 'robert.chen@email.com',
+          coordinates: {
+            latitude: 42.3876,
+            longitude: -71.0995,
+          },
+        },
+        insuranceInfo: {
+          carrierName: 'Liberty Mutual',
+          policyNumber: 'LM-45678901',
+          claimNumber: 'CLM-2025-00789',
+          adjusterName: 'Emily Davis',
+          adjusterPhone: '+1 (555) 789-0123',
+          adjusterEmail: 'emily.d@libertymutual.com',
+          deductible: 5000,
+          estimatedValue: 25000,
+          categoryOfWater: 'Category 3' as const,
+        },
+        causeOfLoss: {
+          type: 'Sewage Backup' as any,
+          description: 'Sewage backup from main line',
+          location: 'Storage Room',
+          discoveryDate: Timestamp.fromDate(new Date('2025-01-10')),
+          eventDate: Timestamp.fromDate(new Date('2025-01-09')),
+        },
+        jobStatus: 'Demo' as const,
+        workflowPhases: {
+          install: {
+            status: 'completed',
+            startedAt: Timestamp.fromDate(new Date('2025-01-11')),
+            completedAt: Timestamp.fromDate(new Date('2025-01-11')),
+            technician: techUid,
+            notes: 'Initial equipment deployment complete',
+          },
+          demo: {
+            status: 'in-progress',
+            startedAt: Timestamp.now(),
+            technician: techUid,
+          },
+          checkService: {
+            status: 'pending',
+            visits: [],
+          },
+          pull: {
+            status: 'pending',
+          },
+        },
+        rooms: [],
+        equipment: {
+          chambers: [],
+          calculations: {
+            totalAffectedSquareFootage: 0,
+            estimatedDryingDays: 5,
+            recommendedDehumidifierCount: 0,
+            recommendedAirMoverCount: 0,
+            recommendedAirScrubberCount: 2,
+            calculationMethod: 'IICRC S500-2021',
+            lastCalculatedAt: Timestamp.now(),
+            calculatedBy: techUid,
+            waterClass: 'Class 4' as any,
+            waterCategory: 'Category 3' as const,
+          },
+        },
+        safetyChecklist: {
+          preArrivalInspection: false,
+          containmentSetup: false,
+          ppeEquipped: false,
+          safetyConesPlaced: false,
+          utilityLocations: {
+            electrical: false,
+            gas: false,
+            water: false,
+            verified: false,
+          },
+          hazardsIdentified: [],
+        },
+        communication: {
+          groundRulesPresented: false,
+          estimatedTimeline: '',
+          customerConcerns: [],
+          preExistingConditions: [],
+        },
+        financial: {
+          insuranceDeductible: 5000,
+          estimatedMaterials: 0,
+          estimatedLabor: 0,
+          estimatedTotal: 0,
+          actualExpenses: {
+            materials: 0,
+            labor: 0,
+            equipment: 0,
+            total: 0,
+          },
+          paymentStatus: 'unpaid',
+          paymentMethod: 'insurance',
+          payments: [],
+        },
+        documentation: {
+          matterportScan: {
+            completed: false,
+          },
+          certificateOfSatisfaction: {
+            obtained: false,
+          },
+          dryReleaseWaiver: {
+            needed: false,
+            obtained: false,
+          },
+        },
+        scheduledZone: 'Zone 1' as const,
+        scheduledTechnician: techUid,
+        scheduledDate: Timestamp.fromDate(new Date('2025-01-10')),
+        metadata: {
+          createdAt: Timestamp.now(),
+          createdBy: techUid,
+          lastModifiedAt: Timestamp.now(),
+          lastModifiedBy: techUid,
+          version: 1,
+        },
+      },
+    ];
+
+    const newJobResults: JobResult[] = [];
+
+    for (const jobData of sampleJobs) {
+      try {
+        const docRef = await addDoc(collection(db, 'jobs'), jobData);
+
+        newJobResults.push({
+          jobId: docRef.id,
+          status: 'success',
+          message: `✅ Created job: ${jobData.customerInfo?.name} (${jobData.jobStatus})`,
+        });
+      } catch (error: any) {
+        newJobResults.push({
+          jobId: jobData.customerInfo?.name || 'Unknown',
+          status: 'error',
+          message: `❌ Error: ${error.message}`,
+        });
+      }
+
+      setJobResults([...newJobResults]);
+    }
+
+    setIsCreatingJobs(false);
+  };
+
   const createDemoUsers = async () => {
     setIsCreating(true);
     setResults([]);
-    setCompleted(false);
 
     const newResults: SetupResult[] = [];
+    let createdTechUid = '';
+    let createdLeadUid = '';
 
     for (const userData of demoUsers) {
       try {
@@ -68,8 +478,8 @@ export const SetupPage: React.FC = () => {
           role: userData.role,
           zone: userData.zone,
           assignedJobs: [],
-          createdAt: serverTimestamp() as any,
-          lastLogin: serverTimestamp() as any,
+          createdAt: Timestamp.now(),
+          lastLogin: Timestamp.now(),
           isActive: true,
           preferences: {
             notifications: true,
@@ -79,189 +489,194 @@ export const SetupPage: React.FC = () => {
           },
           qualifications: {
             iicrcCertified: true,
+            certificationExpiry: Timestamp.fromDate(new Date('2026-12-31')),
             trainingLevel: 'senior',
           },
           metadata: {
             totalJobsCompleted: 0,
             totalEquipmentScans: 0,
             accuracyScore: 100,
-            lastActivityAt: serverTimestamp() as any,
+            lastActivityAt: Timestamp.now(),
           },
         };
 
         await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
 
-        // Sign out the user we just created so we can create the next one
-        await auth.signOut();
-
         newResults.push({
-          email: userData.email,
+          userId: firebaseUser.uid,
           status: 'success',
-          message: `✅ Created successfully (UID: ${firebaseUser.uid.substring(0, 8)}...)`,
+          message: `✅ Created ${userData.displayName} (${userData.email})`,
         });
-      } catch (error: any) {
-        if (error.code === 'auth/email-already-in-use') {
-          newResults.push({
-            email: userData.email,
-            status: 'exists',
-            message: '⚠️ User already exists',
-          });
-        } else {
-          newResults.push({
-            email: userData.email,
-            status: 'error',
-            message: `❌ Error: ${error.message}`,
-          });
+
+        // Store UIDs for job creation
+        if (userData.role === 'MIT_TECH') {
+          createdTechUid = firebaseUser.uid;
+          setTechUid(firebaseUser.uid);
         }
+        if (userData.role === 'MIT_LEAD') {
+          createdLeadUid = firebaseUser.uid;
+          setLeadUid(firebaseUser.uid);
+        }
+
+        // Sign out to create next user
+        await auth.signOut();
+      } catch (error: any) {
+        newResults.push({
+          userId: userData.email,
+          status: 'error',
+          message: `❌ Error: ${error.message}`,
+        });
       }
 
       setResults([...newResults]);
     }
 
     setIsCreating(false);
-    setCompleted(true);
+
+    // Create sample jobs after users
+    if (createdTechUid && createdLeadUid) {
+      await createSampleJobs(createdTechUid, createdLeadUid);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-entrusted-orange rounded-full mb-4">
-            <span className="text-3xl">🔧</span>
+        <div className="text-center mb-12">
+          <div className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-2xl shadow-lg mb-4">
+            <h1 className="text-4xl font-bold">MIT Dry Logs Setup</h1>
           </div>
-          <h1 className="text-3xl font-poppins font-bold text-gray-900 mb-2">
-            MIT Dry Logs Setup
-          </h1>
-          <p className="text-gray-600">
-            Create demo users for testing the application
+          <p className="text-gray-600 text-lg mt-4">
+            One-click demo environment setup
           </p>
         </div>
 
-        {/* Demo Users Info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-          <h2 className="font-semibold text-gray-900 mb-4">Demo Accounts to Create:</h2>
-          <div className="space-y-3">
-            {demoUsers.map((user) => (
-              <div key={user.email} className="bg-white rounded-lg p-4 border border-blue-100">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-gray-900">{user.displayName}</span>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    user.role === 'MIT_TECH'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-purple-100 text-purple-800'
-                  }`}>
-                    {user.role}
-                  </span>
+        {/* Setup Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            Create Demo Users & Sample Jobs
+          </h2>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+            <h3 className="font-semibold text-blue-900 mb-3">
+              This will create:
+            </h3>
+            <ul className="space-y-2 text-blue-800">
+              <li className="flex items-start">
+                <span className="mr-2">🔐</span>
+                <div>
+                  <strong>MIT Tech:</strong> tech@demo.com / password123
                 </div>
-                <div className="text-sm text-gray-600">
-                  <p>📧 {user.email}</p>
-                  <p>🔑 {user.password}</p>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">🔐</span>
+                <div>
+                  <strong>MIT Lead:</strong> lead@demo.com / password123
                 </div>
-              </div>
-            ))}
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">📋</span>
+                <div>
+                  <strong>3 Sample Jobs:</strong> Install, Pre-Install, and Demo status
+                </div>
+              </li>
+            </ul>
           </div>
+
+          <button
+            onClick={createDemoUsers}
+            disabled={isCreating || isCreatingJobs}
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            {isCreating || isCreatingJobs
+              ? 'Creating...'
+              : 'Create Demo Users & Sample Jobs'}
+          </button>
         </div>
 
-        {/* Create Button */}
-        {!completed && (
-          <Button
-            variant="primary"
-            onClick={createDemoUsers}
-            disabled={isCreating}
-            className="w-full py-4 text-lg"
-          >
-            {isCreating ? (
-              <>
-                <LoadingSpinner size="sm" />
-                Creating Users...
-              </>
-            ) : (
-              '🚀 Create Demo Users'
-            )}
-          </Button>
+        {/* User Creation Results */}
+        {results.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">
+              User Creation Results
+            </h3>
+            <div className="space-y-3">
+              {results.map((result, index) => (
+                <div
+                  key={index}
+                  className={`p-4 rounded-lg ${
+                    result.status === 'success'
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-red-50 border border-red-200'
+                  }`}
+                >
+                  <p
+                    className={`font-medium ${
+                      result.status === 'success'
+                        ? 'text-green-800'
+                        : 'text-red-800'
+                    }`}
+                  >
+                    {result.message}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
-        {/* Results */}
-        {results.length > 0 && (
-          <div className="mt-6 space-y-3">
-            <h3 className="font-semibold text-gray-900 mb-3">Results:</h3>
-            {results.map((result, index) => (
-              <div
-                key={index}
-                className={`p-4 rounded-lg border-2 flex items-start gap-3 ${
-                  result.status === 'success'
-                    ? 'bg-green-50 border-green-200'
-                    : result.status === 'exists'
-                    ? 'bg-yellow-50 border-yellow-200'
-                    : 'bg-red-50 border-red-200'
-                }`}
-              >
-                {result.status === 'success' ? (
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                ) : (
-                  <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                )}
-                <div>
-                  <p className="font-medium text-gray-900">{result.email}</p>
-                  <p className="text-sm text-gray-600">{result.message}</p>
+        {/* Job Creation Results */}
+        {jobResults.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">
+              Job Creation Results
+            </h3>
+            <div className="space-y-3">
+              {jobResults.map((result, index) => (
+                <div
+                  key={index}
+                  className={`p-4 rounded-lg ${
+                    result.status === 'success'
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-red-50 border border-red-200'
+                  }`}
+                >
+                  <p
+                    className={`font-medium ${
+                      result.status === 'success'
+                        ? 'text-green-800'
+                        : 'text-red-800'
+                    }`}
+                  >
+                    {result.message}
+                  </p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
         {/* Success Message */}
-        {completed && (
-          <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-              <h3 className="font-semibold text-green-900">Setup Complete!</h3>
-            </div>
-            <p className="text-green-800 mb-4">
-              You can now log in with the demo accounts.
-            </p>
-            <div className="bg-white rounded-lg p-4 border border-green-200">
-              <p className="text-sm font-medium text-gray-900 mb-2">Test Credentials:</p>
-              <div className="space-y-2 text-sm text-gray-700">
-                <p>
-                  <strong>MIT Tech:</strong> tech@demo.com / password123
-                </p>
-                <p>
-                  <strong>MIT Lead:</strong> lead@demo.com / password123
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 flex gap-3">
-              <Button
-                variant="primary"
-                onClick={() => (window.location.href = '/login')}
-                className="flex-1"
+        {results.length > 0 &&
+          results.every((r) => r.status === 'success') &&
+          jobResults.length > 0 &&
+          jobResults.every((r) => r.status === 'success') && (
+            <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl shadow-xl p-8 text-center">
+              <div className="text-6xl mb-4">🎉</div>
+              <h3 className="text-2xl font-bold mb-2">Setup Complete!</h3>
+              <p className="text-green-50 mb-6">
+                All demo users and sample jobs have been created successfully.
+              </p>
+              <a
+                href="/login"
+                className="inline-block bg-white text-green-600 font-semibold py-3 px-8 rounded-xl hover:bg-green-50 transition-colors duration-200"
               >
                 Go to Login
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setResults([]);
-                  setCompleted(false);
-                }}
-                className="flex-1"
-              >
-                Create More
-              </Button>
+              </a>
             </div>
-          </div>
-        )}
-
-        {/* Warning */}
-        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-xs text-yellow-800">
-            ⚠️ <strong>Development Only:</strong> This setup page should be removed or protected in production.
-            For demo purposes, users are created with simple passwords.
-          </p>
-        </div>
+          )}
       </div>
     </div>
   );
-};
+}
