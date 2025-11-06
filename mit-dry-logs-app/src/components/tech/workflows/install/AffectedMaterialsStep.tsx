@@ -58,20 +58,25 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
   });
 
   // Demo Materials Checklist - These directly feed demolition billing!
-  const defaultDemoMaterials: DemoMaterial[] = [
-    { type: 'Carpet', affected: false, quantity: 0, unit: 'SF' },
-    { type: 'Carpet Pad', affected: false, quantity: 0, unit: 'SF' },
-    { type: 'Baseboard', affected: false, quantity: 0, unit: 'LF' },
-    { type: 'Drywall', affected: false, quantity: 0, unit: 'LF', drywallHeight: 'up-to-2ft' },
-    { type: 'Insulation', affected: false, quantity: 0, unit: 'SF' },
-    { type: 'Hardwood', affected: false, quantity: 0, unit: 'SF' },
-    { type: 'Tile', affected: false, quantity: 0, unit: 'SF' },
-    { type: 'Cabinetry', affected: false, quantity: 0, unit: 'LF' },
-    { type: 'Ceiling Drywall', affected: false, quantity: 0, unit: 'SF' },
-    { type: 'Vinyl/Laminate', affected: false, quantity: 0, unit: 'SF' },
-  ];
+  const getDefaultDemoMaterials = (): DemoMaterial[] => {
+    // Smart defaults based on room type
+    const roomType = currentRoom?.type?.toLowerCase() || '';
+    const materials: DemoMaterial[] = [
+      { type: 'Carpet', affected: roomType.includes('bedroom') || roomType.includes('living'), quantity: 0, unit: 'SF' },
+      { type: 'Carpet Pad', affected: roomType.includes('bedroom') || roomType.includes('living'), quantity: 0, unit: 'SF' },
+      { type: 'Baseboard', affected: true, quantity: 0, unit: 'LF' }, // Always assume baseboard
+      { type: 'Drywall', affected: true, quantity: 0, unit: 'LF', drywallHeight: 'up-to-2ft' }, // Common in water damage
+      { type: 'Insulation', affected: false, quantity: 0, unit: 'SF' },
+      { type: 'Hardwood', affected: roomType.includes('dining') || roomType.includes('kitchen'), quantity: 0, unit: 'SF' },
+      { type: 'Tile', affected: roomType.includes('bathroom') || roomType.includes('kitchen'), quantity: 0, unit: 'SF' },
+      { type: 'Cabinetry', affected: roomType.includes('kitchen') || roomType.includes('bathroom'), quantity: 0, unit: 'LF' },
+      { type: 'Ceiling Drywall', affected: false, quantity: 0, unit: 'SF' },
+      { type: 'Vinyl/Laminate', affected: roomType.includes('laundry') || roomType.includes('basement'), quantity: 0, unit: 'SF' },
+    ];
+    return materials;
+  };
 
-  const [demoMaterials, setDemoMaterials] = useState<DemoMaterial[]>(defaultDemoMaterials);
+  const [demoMaterials, setDemoMaterials] = useState<DemoMaterial[]>(getDefaultDemoMaterials());
 
   // Load existing data for current room
   useEffect(() => {
@@ -90,10 +95,11 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       if (data.demoMaterials) {
         setDemoMaterials(data.demoMaterials);
       } else {
-        setDemoMaterials(defaultDemoMaterials);
+        // Use smart defaults for this room type
+        setDemoMaterials(getDefaultDemoMaterials());
       }
     } else {
-      // Reset form for new room
+      // Reset form for new room with smart defaults
       setFormData({
         floorAffectedSqFt: '',
         wallsAffectedSqFt: '',
@@ -103,7 +109,8 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
         wallMaterial: 'drywall',
         ceilingMaterial: 'drywall',
       });
-      setDemoMaterials(defaultDemoMaterials);
+      // Use smart defaults based on room type
+      setDemoMaterials(getDefaultDemoMaterials());
     }
   }, [currentRoomIndex, currentRoom]);
 
@@ -150,6 +157,26 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
   const handleMaterialToggle = (index: number) => {
     const updated = [...demoMaterials];
     updated[index].affected = !updated[index].affected;
+
+    // AUTO-CALCULATE quantity based on room dimensions when toggling ON
+    if (updated[index].affected && updated[index].quantity === 0 && currentRoom) {
+      const material = updated[index];
+
+      // Calculate suggested quantity based on room dimensions
+      if (material.unit === 'SF') {
+        // For square footage materials (carpet, tile, etc.)
+        updated[index].quantity = currentRoom.floorSqFt || 0;
+      } else if (material.unit === 'LF') {
+        if (material.type === 'Baseboard' || material.type === 'Cabinetry') {
+          // Perimeter = 2 * (length + width)
+          updated[index].quantity = 2 * ((currentRoom.length || 0) + (currentRoom.width || 0));
+        } else if (material.type === 'Drywall') {
+          // Assume 2ft high drywall around perimeter
+          updated[index].quantity = 2 * ((currentRoom.length || 0) + (currentRoom.width || 0));
+        }
+      }
+    }
+
     setDemoMaterials(updated);
   };
 
