@@ -10,9 +10,22 @@ import { LeadDashboard } from './components/lead/LeadDashboard';
 import { LoadingSpinner } from './components/shared/LoadingSpinner';
 import { InstallWorkflow } from './components/tech/workflows/InstallWorkflow';
 
+// Debug version identifier
+console.log('🚀 MIT Dry Logs v1.0.1 - Build:', new Date().toISOString());
+console.log('📦 Environment check:', {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? '✅ Set' : '❌ Missing',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ? '✅ Set' : '❌ Missing',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ? '✅ Set' : '❌ Missing',
+});
+
 function App() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const {} = useOfflineSync(); // Initialize offline sync
+
+  // Debug logging
+  useEffect(() => {
+    console.log('🔄 App render - Loading:', isLoading, 'Authenticated:', isAuthenticated);
+  }, [isLoading, isAuthenticated]);
 
   // Show loading screen while checking auth
   if (isLoading) {

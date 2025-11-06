@@ -27,12 +27,18 @@ const requiredEnvVars = [
 const missingVars = requiredEnvVars.filter((varName) => !import.meta.env[varName]);
 
 if (missingVars.length > 0) {
-  console.error('Missing Firebase environment variables:', missingVars);
+  console.error('🔥 ❌ MISSING FIREBASE ENV VARS:', missingVars);
   console.error('Please check your environment variables in Netlify or .env file');
+  console.error('Current values:', firebaseConfig);
+} else {
+  console.log('🔥 ✅ Firebase config loaded successfully');
+  console.log('Project ID:', firebaseConfig.projectId);
 }
 
 // Initialize Firebase
+console.log('🔥 Initializing Firebase app...');
 export const app = initializeApp(firebaseConfig);
+console.log('🔥 Firebase app initialized');
 
 // Initialize Firebase services
 export const auth = getAuth(app);

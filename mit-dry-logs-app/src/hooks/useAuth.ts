@@ -26,17 +26,24 @@ export function useAuth() {
 
   // Listen to auth state changes
   useEffect(() => {
+    console.log('🔐 useAuth: Initializing auth listener');
     setLoading(true);
 
     // Add a timeout to prevent infinite loading
     const timeout = setTimeout(() => {
-      console.warn('Auth initialization timed out');
+      console.error('⏱️ AUTH TIMEOUT: Firebase did not respond within 10 seconds');
+      console.error('This usually means:');
+      console.error('1. Environment variables are not set');
+      console.error('2. Firebase configuration is incorrect');
+      console.error('3. Network/firewall blocking Firebase');
       setLoading(false);
       setError('Authentication timeout - please refresh the page');
     }, 10000); // 10 second timeout
 
     try {
+      console.log('🔐 useAuth: Setting up Firebase auth state listener');
       const unsubscribe = authService.onAuthStateChange(async (firebaseUser) => {
+        console.log('🔐 useAuth: Auth state changed:', firebaseUser ? 'User signed in' : 'No user');
         clearTimeout(timeout); // Clear timeout once auth state changes
         setFirebaseUser(firebaseUser);
 
