@@ -175,6 +175,7 @@ const generateSampleJobs = (techId: string): Partial<Job>[] => {
         chambers: [],
         calculations: {
           totalAffectedSquareFootage: Math.floor(200 + Math.random() * 800),
+          totalCubicFootage: Math.floor(1500 + Math.random() * 5000),
           estimatedDryingDays: Math.floor(3 + Math.random() * 5),
           recommendedDehumidifierCount: Math.floor(2 + Math.random() * 4),
           recommendedAirMoverCount: Math.floor(4 + Math.random() * 8),

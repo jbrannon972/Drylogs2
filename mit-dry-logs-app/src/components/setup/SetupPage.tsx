@@ -176,6 +176,7 @@ export function SetupPage() {
           chambers: [],
           calculations: {
             totalAffectedSquareFootage: 0,
+            totalCubicFootage: 0,
             estimatedDryingDays: 3,
             recommendedDehumidifierCount: 0,
             recommendedAirMoverCount: 0,
@@ -297,6 +298,7 @@ export function SetupPage() {
           chambers: [],
           calculations: {
             totalAffectedSquareFootage: 0,
+            totalCubicFootage: 0,
             estimatedDryingDays: 3,
             recommendedDehumidifierCount: 0,
             recommendedAirMoverCount: 0,
@@ -424,6 +426,7 @@ export function SetupPage() {
           chambers: [],
           calculations: {
             totalAffectedSquareFootage: 0,
+            totalCubicFootage: 0,
             estimatedDryingDays: 5,
             recommendedDehumidifierCount: 0,
             recommendedAirMoverCount: 0,

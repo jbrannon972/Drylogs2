@@ -28,13 +28,13 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
   // Get IICRC chart factor based on class and dehumidifier type
   const getChartFactor = (damageClass: number, dehType: DehumidifierType): number => {
-    const factors = {
+    const factors: Record<DehumidifierType, Record<number, number>> = {
       'Conventional Refrigerant': { 1: 100, 2: 40, 3: 30, 4: 30 },
       'Low Grain Refrigerant (LGR)': { 1: 100, 2: 50, 3: 40, 4: 40 },
       'Desiccant': { 1: 1, 2: 2, 3: 3, 4: 3 }, // ACH values
     };
 
-    return factors[dehType]?.[damageClass as keyof typeof factors.Conventional] || 50;
+    return factors[dehType]?.[damageClass] || 50;
   };
 
   // Perform IICRC calculations
