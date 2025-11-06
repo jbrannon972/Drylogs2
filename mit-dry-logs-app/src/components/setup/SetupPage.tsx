@@ -4,8 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, addDoc, setDoc, doc, Timestamp } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { collection, addDoc, setDoc, doc, Timestamp, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
 import { User, Job } from '../../types';
 
@@ -28,6 +28,7 @@ export function SetupPage() {
   const [jobResults, setJobResults] = useState<JobResult[]>([]);
   const [techUid, setTechUid] = useState<string>('');
   const [leadUid, setLeadUid] = useState<string>('');
+  const [existingJobCount, setExistingJobCount] = useState<number | null>(null);
 
   const demoUsers = [
     {
@@ -47,6 +48,73 @@ export function SetupPage() {
       zone: 'Zone 1' as const,
     },
   ];
+
+  // Check how many jobs exist
+  const checkExistingJobs = async () => {
+    try {
+      const jobsQuery = query(collection(db, 'jobs'));
+      const snapshot = await getDocs(jobsQuery);
+      setExistingJobCount(snapshot.size);
+      return snapshot.size;
+    } catch (error) {
+      console.error('Error checking jobs:', error);
+      return 0;
+    }
+  };
+
+  // Find existing user UIDs by email
+  const findUserByEmail = async (email: string): Promise<string | null> => {
+    try {
+      const usersQuery = query(collection(db, 'users'), where('email', '==', email));
+      const snapshot = await getDocs(usersQuery);
+      if (!snapshot.empty) {
+        return snapshot.docs[0].id;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error finding user:', error);
+      return null;
+    }
+  };
+
+  // Create jobs using existing user accounts
+  const createJobsWithExistingUsers = async () => {
+    setJobResults([]);
+    setIsCreatingJobs(true);
+
+    try {
+      // Find existing users
+      const foundTechUid = await findUserByEmail('tech@demo.com');
+      const foundLeadUid = await findUserByEmail('lead@demo.com');
+
+      if (!foundTechUid || !foundLeadUid) {
+        setJobResults([
+          {
+            jobId: 'error',
+            status: 'error',
+            message: '❌ Could not find existing demo users. Please create users first.',
+          },
+        ]);
+        setIsCreatingJobs(false);
+        return;
+      }
+
+      setTechUid(foundTechUid);
+      setLeadUid(foundLeadUid);
+
+      // Create jobs
+      await createSampleJobs(foundTechUid, foundLeadUid);
+    } catch (error: any) {
+      setJobResults([
+        {
+          jobId: 'error',
+          status: 'error',
+          message: `❌ Error: ${error.message}`,
+        },
+      ]);
+      setIsCreatingJobs(false);
+    }
+  };
 
   const createSampleJobs = async (techUid: string, leadUid: string) => {
     setIsCreatingJobs(true);
@@ -584,15 +652,43 @@ export function SetupPage() {
             </ul>
           </div>
 
-          <button
-            onClick={createDemoUsers}
-            disabled={isCreating || isCreatingJobs}
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            {isCreating || isCreatingJobs
-              ? 'Creating...'
-              : 'Create Demo Users & Sample Jobs'}
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={createDemoUsers}
+              disabled={isCreating || isCreatingJobs}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              {isCreating || isCreatingJobs
+                ? 'Creating...'
+                : 'Create Demo Users & Sample Jobs'}
+            </button>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={checkExistingJobs}
+                disabled={isCreating || isCreatingJobs}
+                className="w-full bg-gray-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                Check Existing Jobs
+              </button>
+
+              <button
+                onClick={createJobsWithExistingUsers}
+                disabled={isCreating || isCreatingJobs}
+                className="w-full bg-green-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                Create Jobs Only
+              </button>
+            </div>
+
+            {existingJobCount !== null && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+                <p className="font-semibold text-yellow-900">
+                  📊 Found {existingJobCount} existing job{existingJobCount !== 1 ? 's' : ''} in database
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* User Creation Results */}
