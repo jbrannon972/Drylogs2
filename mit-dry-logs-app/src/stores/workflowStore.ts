@@ -46,20 +46,20 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   currentJobId: null,
   installStep: 'arrival',
   installData: {},
-  demoStep: 'pre-demo-safety',
+  demoStep: 'clock-in',
   demoData: {},
-  checkServiceStep: 'chamber-readings',
+  checkServiceStep: 'start-visit',
   checkServiceData: {},
-  pullStep: 'final-readings',
+  pullStep: 'start-pull',
   pullData: {},
   progress: null,
 
   startWorkflow: (workflow, jobId) => {
     const totalSteps = {
       install: 13,
-      demo: 7,
-      'check-service': 5,
-      pull: 6,
+      demo: 10,
+      'check-service': 7,
+      pull: 8,
     }[workflow];
 
     set({
@@ -137,9 +137,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       currentJobId: null,
       progress: null,
       installStep: 'arrival',
-      demoStep: 'pre-demo-safety',
-      checkServiceStep: 'chamber-readings',
-      pullStep: 'final-readings',
+      demoStep: 'clock-in',
+      checkServiceStep: 'start-visit',
+      pullStep: 'start-pull',
     });
   },
 
@@ -149,11 +149,11 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       currentJobId: null,
       installStep: 'arrival',
       installData: {},
-      demoStep: 'pre-demo-safety',
+      demoStep: 'clock-in',
       demoData: {},
-      checkServiceStep: 'chamber-readings',
+      checkServiceStep: 'start-visit',
       checkServiceData: {},
-      pullStep: 'final-readings',
+      pullStep: 'start-pull',
       pullData: {},
       progress: null,
     });

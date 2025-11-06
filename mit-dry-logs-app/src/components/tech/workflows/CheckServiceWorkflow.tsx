@@ -84,7 +84,7 @@ export const CheckServiceWorkflow: React.FC = () => {
 
   useEffect(() => {
     if (jobId) {
-      startWorkflow('checkService', jobId);
+      startWorkflow('check-service', jobId);
       const jobData = getJobById(jobId);
       setJob(jobData);
     }
@@ -254,7 +254,7 @@ export const CheckServiceWorkflow: React.FC = () => {
         {CHECK_SERVICE_STEPS.map((step, index) => (
           <button
             key={step.id}
-            onClick={() => setCurrentStep(step.id)}
+            onClick={() => setCheckServiceStep(step.id)}
             className={`w-2 h-2 rounded-full transition-all ${
               index === currentStepIndex
                 ? 'bg-entrusted-orange w-8'

@@ -17,7 +17,7 @@ export const PullFinalPhotosStep: React.FC<PullFinalPhotosStepProps> = ({ job, o
     const file = e.target.files?.[0];
     if (file && user) {
       const room = job.rooms.find((r: any) => r.roomId === roomId);
-      const url = await uploadPhoto(file, job.jobId, room.roomName, 'final-pull', user.uid);
+      const url = await uploadPhoto(file, job.jobId, room.roomName, 'final', user.uid);
       if (url) {
         setRoomPhotos(prev => ({ ...prev, [roomId]: url }));
       }

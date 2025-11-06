@@ -261,7 +261,7 @@ export const PullWorkflow: React.FC = () => {
         {PULL_STEPS.map((step, index) => (
           <button
             key={step.id}
-            onClick={() => setCurrentStep(step.id)}
+            onClick={() => setPullStep(step.id)}
             className={`w-2 h-2 rounded-full transition-all ${
               index === currentStepIndex
                 ? 'bg-entrusted-orange w-8'
