@@ -3,7 +3,7 @@
  * Manages authentication state and provides auth methods
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { useNotificationStore } from '../stores/notificationStore';
 import { authService } from '../services/firebase/authService';
@@ -23,10 +23,18 @@ export function useAuth() {
   } = useAuthStore();
 
   const { addNotification } = useNotificationStore();
+  const initialized = useRef(false);
 
   // Listen to auth state changes
   useEffect(() => {
+    // Prevent double initialization
+    if (initialized.current) {
+      console.log('🔐 useAuth: Already initialized, skipping');
+      return;
+    }
+
     console.log('🔐 useAuth: Initializing auth listener');
+    initialized.current = true;
     setLoading(true);
 
     // Add a timeout to prevent infinite loading
@@ -71,6 +79,7 @@ export function useAuth() {
       });
 
       return () => {
+        console.log('🔐 useAuth: Cleaning up auth listener');
         clearTimeout(timeout);
         unsubscribe();
       };
@@ -80,7 +89,7 @@ export function useAuth() {
       setLoading(false);
       setError('Failed to initialize authentication');
     }
-  }, []);
+  }, [setUser, setFirebaseUser, setLoading, setError]); // Include Zustand setters (stable references)
 
   const signIn = async (email: string, password: string) => {
     try {
