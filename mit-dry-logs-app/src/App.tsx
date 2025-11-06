@@ -8,6 +8,7 @@ import { Layout } from './components/layout/Layout';
 import { TechDashboard } from './components/tech/TechDashboard';
 import { LeadDashboard } from './components/lead/LeadDashboard';
 import { LoadingSpinner } from './components/shared/LoadingSpinner';
+import { InstallWorkflow } from './components/tech/workflows/InstallWorkflow';
 
 function App() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -45,6 +46,14 @@ function App() {
               <Layout>
                 <TechDashboard />
               </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tech/job/:jobId/install"
+          element={
+            <ProtectedRoute allowedRoles={['MIT_TECH']}>
+              <InstallWorkflow />
             </ProtectedRoute>
           }
         />

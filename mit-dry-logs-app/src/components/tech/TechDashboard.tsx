@@ -20,7 +20,7 @@ export const TechDashboard: React.FC = () => {
     : jobs.filter(job => job.jobStatus === selectedStatus);
 
   const handleJobClick = (jobId: string) => {
-    navigate(`/tech/job/${jobId}`);
+    navigate(`/tech/job/${jobId}/install`);
   };
 
   const statusCounts = {

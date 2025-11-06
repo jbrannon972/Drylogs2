@@ -1,0 +1,4 @@
+
+// Route for Install workflow
+import { InstallWorkflow } from './components/tech/workflows/InstallWorkflow';
+
