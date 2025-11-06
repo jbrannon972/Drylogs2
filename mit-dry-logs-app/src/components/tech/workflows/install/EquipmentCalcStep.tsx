@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
-import { Wind, AlertCircle, Info, Calculator } from 'lucide-react';
+import { Wind, AlertCircle, Info, Calculator, Scan, Plus, Trash2, CheckCircle } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { DehumidifierType } from '../../../../types';
 
