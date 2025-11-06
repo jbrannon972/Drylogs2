@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWorkflowStore } from '../../../stores/workflowStore';
 import { useJobsStore } from '../../../stores/jobsStore';
@@ -15,7 +15,7 @@ import {
   Wind,
   ClipboardCheck,
   Layers,
-  FileCheck,
+  Calendar,
   X
 } from 'lucide-react';
 import { InstallStep } from '../../../types/workflow';
@@ -23,15 +23,14 @@ import { InstallStep } from '../../../types/workflow';
 // Import step components
 import { ArrivalStep } from './install/ArrivalStep';
 import { FrontDoorStep } from './install/FrontDoorStep';
-import { RoomDimensionsStep } from './install/RoomDimensionsStep';
-import { WaterClassificationStep } from './install/WaterClassificationStep';
+import { CauseOfLossStep } from './install/CauseOfLossStep';
+import { AddRoomsStep } from './install/AddRoomsStep';
 import { AffectedMaterialsStep } from './install/AffectedMaterialsStep';
 import { MoistureMappingStep } from './install/MoistureMappingStep';
-import { PlanJobStep } from './install/PlanJobStep';
+import { ScheduleWorkStep } from './install/ScheduleWorkStep';
 import { EquipmentCalcStep } from './install/EquipmentCalcStep';
 import {
   PreExistingStep,
-  CauseOfLossStep,
   EquipmentPlaceStep,
   CommunicatePlanStep,
   FinalPhotosStep,
@@ -64,63 +63,56 @@ const INSTALL_STEPS: StepConfig[] = [
   {
     id: 'pre-existing',
     title: 'Pre-Existing Conditions',
-    description: 'Document existing issues',
+    description: 'Document with photos',
     icon: <Camera className="w-5 h-5" />,
     component: PreExistingStep,
   },
   {
     id: 'cause-of-loss',
     title: 'Cause of Loss',
-    description: 'Identify and photograph',
+    description: 'Source + water category',
     icon: <Droplets className="w-5 h-5" />,
     component: CauseOfLossStep,
   },
   {
-    id: 'room-dimensions',
-    title: 'Room Dimensions',
-    description: 'Measure each room (L × W × H)',
+    id: 'add-rooms',
+    title: 'Add Rooms',
+    description: 'Measure and add all rooms',
     icon: <Ruler className="w-5 h-5" />,
-    component: RoomDimensionsStep,
-  },
-  {
-    id: 'water-classification',
-    title: 'Water Classification',
-    description: 'Determine category & class',
-    icon: <Droplets className="w-5 h-5" />,
-    component: WaterClassificationStep,
+    component: AddRoomsStep,
   },
   {
     id: 'affected-materials',
     title: 'Affected Materials',
-    description: 'Document affected SQFT by surface',
+    description: 'Document affected SQFT per room',
     icon: <Layers className="w-5 h-5" />,
     component: AffectedMaterialsStep,
   },
   {
     id: 'moisture-mapping',
     title: 'Moisture Mapping',
-    description: 'Initial moisture readings',
+    description: 'Readings + photos',
     icon: <Droplets className="w-5 h-5" />,
     component: MoistureMappingStep,
   },
   {
-    id: 'plan-job',
-    title: 'Plan the Job',
-    description: 'Review totals & set goals',
-    icon: <FileCheck className="w-5 h-5" />,
-    component: PlanJobStep,
+    id: 'schedule-work',
+    title: 'Schedule Work',
+    description: 'Plan Day 2+ (demo, checks, pull)',
+    icon: <Calendar className="w-5 h-5" />,
+    component: ScheduleWorkStep,
   },
   {
     id: 'equipment-calc',
     title: 'Equipment Calculation',
-    description: 'IICRC-compliant calculations',
+    description: 'IICRC per-room calculations',
     icon: <Wind className="w-5 h-5" />,
     component: EquipmentCalcStep,
   },
   {
     id: 'equipment-place',
     title: 'Equipment Placement',
-    description: 'Place and scan equipment',
+    description: 'Place and scan by room',
     icon: <Wind className="w-5 h-5" />,
     component: EquipmentPlaceStep,
   },
@@ -154,6 +146,7 @@ export const InstallWorkflow: React.FC = () => {
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
   const [showStepOverview, setShowStepOverview] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (jobId) {
@@ -162,6 +155,13 @@ export const InstallWorkflow: React.FC = () => {
       setJob(jobData);
     }
   }, [jobId]);
+
+  // Auto-scroll to top when step changes
+  useEffect(() => {
+    if (contentRef.current) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [installStep]);
 
   const currentStepIndex = INSTALL_STEPS.findIndex(s => s.id === installStep);
   const currentStepConfig = INSTALL_STEPS[currentStepIndex];
@@ -248,21 +248,9 @@ export const InstallWorkflow: React.FC = () => {
       </div>
 
       {/* MAIN CONTENT - SINGLE STEP ONLY */}
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
-        {/* Current Step Header */}
+      <div ref={contentRef} className="container mx-auto px-4 py-6 max-w-4xl">
+        {/* NO DUPLICATE HEADER - Just the step content */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="p-3 bg-entrusted-orange text-white rounded-lg flex-shrink-0">
-              {currentStepConfig.icon}
-            </div>
-            <div className="flex-1">
-              <h2 className="text-3xl font-poppins font-bold text-gray-900 mb-1">
-                {currentStepConfig.title}
-              </h2>
-              <p className="text-gray-600">{currentStepConfig.description}</p>
-            </div>
-          </div>
-
           {/* Step Content */}
           {StepComponent && <StepComponent job={job} onNext={handleNext} />}
 

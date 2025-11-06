@@ -5,7 +5,7 @@ import { Plus, Trash2, Home, AlertCircle } from 'lucide-react';
 import { RoomType } from '../../../../types';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 
-interface RoomDimensionsStepProps {
+interface AddRoomsStepProps {
   job: any;
   onNext: () => void;
 }
@@ -23,7 +23,7 @@ interface RoomData {
   totalSurfaceArea: number;
 }
 
-export const RoomDimensionsStep: React.FC<RoomDimensionsStepProps> = ({ job, onNext }) => {
+export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
   const [rooms, setRooms] = useState<RoomData[]>(installData.rooms || []);
   const [showAddRoom, setShowAddRoom] = useState(false);
