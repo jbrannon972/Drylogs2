@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
 import { Plus, Trash2, Home } from 'lucide-react';
 import { Room, RoomType, AffectedStatus } from '../../../../types';
+import { useWorkflowStore } from '../../../../stores/workflowStore';
 
 interface RoomEvaluationStepProps {
   job: any;
@@ -10,7 +11,8 @@ interface RoomEvaluationStepProps {
 }
 
 export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onNext }) => {
-  const [rooms, setRooms] = useState<any[]>([]);
+  const { installData, updateWorkflowData } = useWorkflowStore();
+  const [rooms, setRooms] = useState<any[]>(installData.rooms || []);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [newRoom, setNewRoom] = useState({
     name: '',
@@ -20,6 +22,11 @@ export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onN
     height: '8',
     status: 'affected' as AffectedStatus,
   });
+
+  // Save rooms to workflow store whenever they change
+  useEffect(() => {
+    updateWorkflowData('install', { rooms });
+  }, [rooms]);
 
   const handleAddRoom = () => {
     if (!newRoom.name || !newRoom.length || !newRoom.width) {

@@ -2,6 +2,9 @@
 // These will be fully implemented in the next iteration
 
 import React from 'react';
+import { useWorkflowStore } from '../../../../stores/workflowStore';
+import { EquipmentCalculator } from '../../../shared/EquipmentCalculator';
+import { ChamberCalculationResult } from '../../../../utils/iicrcCalculations';
 
 interface StepProps {
   job: any;
@@ -35,14 +38,36 @@ export const AffectedRoomsStep: React.FC<StepProps> = ({ job, onNext }) => (
   </div>
 );
 
-export const EquipmentCalcStep: React.FC<StepProps> = ({ job, onNext }) => (
-  <div>
-    <p className="text-gray-600 mb-4">Calculate equipment needs using IICRC S500 standards.</p>
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <p className="text-sm text-gray-600">Equipment calculator coming soon...</p>
+export const EquipmentCalcStep: React.FC<StepProps> = ({ job, onNext }) => {
+  const { installData, updateWorkflowData } = useWorkflowStore();
+  const rooms = installData.rooms || [];
+
+  const handleCalculationComplete = (result: ChamberCalculationResult) => {
+    updateWorkflowData('install', { equipmentCalculation: result });
+  };
+
+  return (
+    <div>
+      <p className="text-gray-600 mb-4">
+        Calculate equipment needs using IICRC S500-2021 standards based on the rooms you've documented.
+      </p>
+
+      <EquipmentCalculator
+        rooms={rooms}
+        waterCategory={job.insuranceInfo?.categoryOfWater || 'Category 1'}
+        onCalculationComplete={handleCalculationComplete}
+      />
+
+      {rooms.length === 0 && (
+        <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800">
+            ⚠️ No rooms have been added yet. Go back to the Room Evaluation step to add rooms before calculating equipment needs.
+          </p>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => (
   <div>

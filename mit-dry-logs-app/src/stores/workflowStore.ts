@@ -121,9 +121,11 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   updateWorkflowData: (workflow, data) => {
     const state = get();
+    const dataKey = `${workflow}Data` as keyof WorkflowState;
+    const currentData = (state[dataKey] || {}) as Record<string, any>;
     set({
-      [`${workflow}Data`]: {
-        ...state[`${workflow}Data` as keyof WorkflowState],
+      [dataKey]: {
+        ...currentData,
         ...data,
       },
     } as any);
