@@ -249,15 +249,18 @@ export const InstallWorkflow: React.FC = () => {
       {/* ULTRAFIELD CONDENSED HEADER - 48px */}
       <div className="bg-white border-b sticky top-0 z-40">
         <div className="px-3 py-2 flex items-center justify-between">
-          {/* Left: Job info + Step */}
+          {/* Left: Logo + Step info */}
           <div
             className="flex-1 cursor-pointer hover:opacity-75 transition-opacity"
             onClick={() => setShowStepOverview(!showStepOverview)}
           >
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-semibold text-gray-900">
-                #{job.jobId}
-              </span>
+              {/* Logo */}
+              <img
+                src="/Elogo.png"
+                alt="Entrusted"
+                className="h-6 w-auto"
+              />
               <span className="text-gray-400">•</span>
               <span className="text-gray-700">
                 Step {currentStepIndex + 1}/{INSTALL_STEPS.length}
