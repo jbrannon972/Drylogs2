@@ -37,6 +37,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
     installData.moistureReadings || []
   );
   const [showAddReading, setShowAddReading] = useState(false);
+  const [customMaterial, setCustomMaterial] = useState('');
   const [newReading, setNewReading] = useState({
     material: 'Drywall' as MaterialType,
     location: '',
@@ -64,8 +65,8 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
   };
 
   const handleAddReading = () => {
-    if (!currentRoom || !newReading.location || !newReading.moisturePercent) {
-      alert('Please fill in location and moisture percentage');
+    if (!currentRoom || !newReading.moisturePercent) {
+      alert('Please fill in moisture percentage');
       return;
     }
 
@@ -74,7 +75,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
     const reading: MoistureReading = {
       id: Date.now().toString(),
       roomId: currentRoom.id,
-      material: newReading.material,
+      material: (newReading.material === 'Other' && customMaterial) ? customMaterial as MaterialType : newReading.material,
       location: newReading.location,
       moisturePercent: moistureValue,
       temperature: parseFloat(newReading.temperature),
@@ -97,6 +98,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
       notes: '',
       photo: null,
     });
+    setCustomMaterial('');
     setShowAddReading(false);
   };
 
@@ -343,9 +345,18 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
                   <option>Tile</option>
                   <option>Other</option>
                 </select>
+                {newReading.material === 'Other' && (
+                  <Input
+                    label="Custom Material Name *"
+                    placeholder="e.g., Laminate, Vinyl, etc."
+                    value={customMaterial}
+                    onChange={(e) => setCustomMaterial(e.target.value)}
+                    className="mt-2"
+                  />
+                )}
               </div>
               <Input
-                label="Location *"
+                label="Location (optional)"
                 placeholder="e.g., North wall, 2ft height, grid A3"
                 value={newReading.location}
                 onChange={(e) => setNewReading({ ...newReading, location: e.target.value })}
