@@ -33,9 +33,6 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
   const [thermalImagingUsed, setThermalImagingUsed] = useState(
     installData.specializedServices?.thermalImaging || false
   );
-  const [microbialTestingNeeded, setMicrobialTestingNeeded] = useState(
-    installData.specializedServices?.microbialTesting || false
-  );
 
   useEffect(() => {
     updateWorkflowData('install', {
@@ -53,10 +50,9 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       },
       specializedServices: {
         thermalImaging: thermalImagingUsed,
-        microbialTesting: microbialTestingNeeded,
       },
     });
-  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed, microbialTestingNeeded]);
+  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -275,42 +271,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
               </div>
             </label>
           </div>
-
-          {/* Microbial Testing */}
-          <div className={`border rounded-lg p-4 transition-colors ${
-            microbialTestingNeeded ? 'border-orange-300 bg-orange-50' : 'hover:bg-gray-50'
-          }`}>
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={microbialTestingNeeded}
-                onChange={(e) => setMicrobialTestingNeeded(e.target.checked)}
-                className="w-5 h-5 text-entrusted-orange border-gray-300 rounded focus:ring-entrusted-orange mt-0.5"
-              />
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">Microbial Testing</p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Laboratory testing for mold, bacteria, or other microbial growth. Recommended if visible growth is present or if water was Category 2/3.
-                </p>
-                {microbialTestingNeeded && (
-                  <div className="mt-2 p-2 bg-orange-100 border border-orange-200 rounded">
-                    <p className="text-xs text-orange-800">
-                      ⚠️ Containment and antimicrobial treatment may be required. This will be flagged for Lead review.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </label>
-          </div>
         </div>
-
-        {(thermalImagingUsed || microbialTestingNeeded) && (
-          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-sm font-medium text-blue-900">
-              Specialized Services Total: ${(thermalImagingUsed ? 150 : 0) + (microbialTestingNeeded ? 350 : 0)}
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Water Category Selection */}

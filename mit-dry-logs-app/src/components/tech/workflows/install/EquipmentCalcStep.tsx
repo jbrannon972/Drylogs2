@@ -20,14 +20,14 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   const [calculations, setCalculations] = useState<any>(null);
 
   // Calculate total cubic footage from all rooms including insets/offsets
+  // Per IICRC S500: Cubic footage determines dehumidifier requirements
   const calculateCubicFootage = () => {
     return rooms.reduce((total: number, room: any) => {
-      const baseArea = room.length * room.width;
-      const insets = room.insetsSqFt || 0;
-      const offsets = room.offsetsSqFt || 0;
-      const adjustedArea = baseArea + insets - offsets;
-      const cubicFt = adjustedArea * room.height;
-      return total + cubicFt;
+      const baseCubicFt = room.length * room.width * room.height;
+      const insets = room.insetsCubicFt || 0;  // Direct cubic ft addition (closets, alcoves)
+      const offsets = room.offsetsCubicFt || 0; // Direct cubic ft subtraction (columns, obstacles)
+      const adjustedCubicFt = baseCubicFt + insets - offsets;
+      return total + adjustedCubicFt;
     }, 0);
   };
 

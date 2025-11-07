@@ -19,8 +19,8 @@ interface RoomData {
   length: number;
   width: number;
   height: number;
-  insetsSqFt?: number;  // Additional area from closets, alcoves, etc.
-  offsetsSqFt?: number; // Area to subtract from columns, pilasters, etc.
+  insetsCubicFt?: number;  // Add cubic footage (closets, alcoves, etc.) for dehumidifier calculations
+  offsetsCubicFt?: number; // Subtract cubic footage (columns, pilasters, etc.) for dehumidifier calculations
   floorSqFt: number;
   wallSqFt: number;
   ceilingSqFt: number;
@@ -42,8 +42,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
     length: '',
     width: '',
     height: '8',
-    insetsSqFt: '',
-    offsetsSqFt: '',
+    insetsCubicFt: '',
+    offsetsCubicFt: '',
     affectedStatus: 'affected' as 'affected' | 'unaffected' | 'partial',
     isReferenceRoom: false,
     overviewPhoto: null as string | null,
@@ -83,8 +83,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
     const length = parseFloat(newRoom.length);
     const width = parseFloat(newRoom.width);
     const height = parseFloat(newRoom.height);
-    const insetsSqFt = newRoom.insetsSqFt ? parseFloat(newRoom.insetsSqFt) : 0;
-    const offsetsSqFt = newRoom.offsetsSqFt ? parseFloat(newRoom.offsetsSqFt) : 0;
+    const insetsCubicFt = newRoom.insetsCubicFt ? parseFloat(newRoom.insetsCubicFt) : 0;
+    const offsetsCubicFt = newRoom.offsetsCubicFt ? parseFloat(newRoom.offsetsCubicFt) : 0;
 
     const surfaces = calculateSurfaceAreas(length, width, height);
 
@@ -95,8 +95,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       length,
       width,
       height,
-      insetsSqFt: insetsSqFt > 0 ? insetsSqFt : undefined,
-      offsetsSqFt: offsetsSqFt > 0 ? offsetsSqFt : undefined,
+      insetsCubicFt: insetsCubicFt > 0 ? insetsCubicFt : undefined,
+      offsetsCubicFt: offsetsCubicFt > 0 ? offsetsCubicFt : undefined,
       ...surfaces,
       affectedStatus: newRoom.affectedStatus,
       isReferenceRoom: newRoom.isReferenceRoom,
@@ -110,8 +110,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       length: '',
       width: '',
       height: '8',
-      insetsSqFt: '',
-      offsetsSqFt: '',
+      insetsCubicFt: '',
+      offsetsCubicFt: '',
       affectedStatus: 'affected',
       isReferenceRoom: false,
       overviewPhoto: null,
@@ -391,30 +391,30 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
                 Insets & Offsets (Optional)
               </h4>
               <p className="text-xs text-gray-600 mb-3">
-                Add insets (closets, alcoves) or offsets (columns, pilasters) for accurate cubic footage calculations.
+                Enter direct cubic footage adjustments for closets, alcoves, or obstacles. Used for dehumidifier calculations (IICRC S500).
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Input
-                    label="Insets (sq ft)"
+                    label="Insets (cubic ft)"
                     type="number"
                     step="1"
                     min="0"
                     placeholder="0"
-                    value={newRoom.insetsSqFt}
-                    onChange={(e) => setNewRoom({ ...newRoom, insetsSqFt: e.target.value })}
+                    value={newRoom.insetsCubicFt}
+                    onChange={(e) => setNewRoom({ ...newRoom, insetsCubicFt: e.target.value })}
                   />
                   <p className="text-xs text-gray-500 mt-1">Closets, alcoves (adds volume)</p>
                 </div>
                 <div>
                   <Input
-                    label="Offsets (sq ft)"
+                    label="Offsets (cubic ft)"
                     type="number"
                     step="1"
                     min="0"
                     placeholder="0"
-                    value={newRoom.offsetsSqFt}
-                    onChange={(e) => setNewRoom({ ...newRoom, offsetsSqFt: e.target.value })}
+                    value={newRoom.offsetsCubicFt}
+                    onChange={(e) => setNewRoom({ ...newRoom, offsetsCubicFt: e.target.value })}
                   />
                   <p className="text-xs text-gray-500 mt-1">Columns, pilasters (reduces volume)</p>
                 </div>
