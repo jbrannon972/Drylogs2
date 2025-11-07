@@ -68,7 +68,7 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
   );
 
   useEffect(() => {
-    updateWorkflowData({
+    updateWorkflowData('install', {
       officePreparation: {
         completed: true,
         completedBy: user?.uid,

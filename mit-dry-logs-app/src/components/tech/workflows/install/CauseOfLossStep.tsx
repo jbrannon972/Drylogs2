@@ -6,7 +6,7 @@ import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import { SubcontractorRequestModal, SubcontractorRequestData } from '../../../shared/SubcontractorRequestModal';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../../../../services/firebase';
+import { db } from '../../../../config/firebase';
 
 interface CauseOfLossStepProps {
   job: any;
@@ -72,7 +72,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
     // Upload photos if any
     const photoUrls: string[] = [];
     for (const photo of data.photos) {
-      const url = await uploadPhoto(photo, job.jobId, 'subcontractor-request', data.location, user.uid);
+      const url = await uploadPhoto(photo, job.jobId, data.location, 'assessment', user.uid);
       if (url) photoUrls.push(url);
     }
 

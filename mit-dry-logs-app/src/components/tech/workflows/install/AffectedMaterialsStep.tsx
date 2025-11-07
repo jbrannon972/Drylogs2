@@ -589,10 +589,10 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
               onChange={(e) => {
                 const checked = e.target.checked;
                 setPartialDemoPerformed(checked);
-                updateWorkflowData({ partialDemoPerformed: checked });
+                updateWorkflowData('install', { partialDemoPerformed: checked });
                 if (!checked) {
                   setPartialDemoData([]);
-                  updateWorkflowData({ partialDemoDetails: null });
+                  updateWorkflowData('install', { partialDemoDetails: null });
                 }
               }}
               className="h-5 w-5 text-orange-600 rounded focus:ring-orange-500"
@@ -615,7 +615,7 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
               onSave={(demoRooms) => {
                 setPartialDemoData(demoRooms);
                 const totalTime = demoRooms.reduce((sum, r) => sum + r.demoTimeMinutes, 0);
-                updateWorkflowData({
+                updateWorkflowData('install', {
                   partialDemoDetails: {
                     rooms: demoRooms,
                     totalDemoTimeMinutes: totalTime,

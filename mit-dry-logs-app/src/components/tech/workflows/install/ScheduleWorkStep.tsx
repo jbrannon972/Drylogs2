@@ -7,7 +7,7 @@ import { SubcontractorRequestModal, SubcontractorRequestData } from '../../../sh
 import { useAuth } from '../../../../hooks/useAuth';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../../../../services/firebase';
+import { db } from '../../../../config/firebase';
 
 interface ScheduleWorkStepProps {
   job: any;
@@ -48,7 +48,7 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
     // Upload photos if any
     const photoUrls: string[] = [];
     for (const photo of data.photos) {
-      const url = await uploadPhoto(photo, job.jobId, 'subcontractor-request', data.location, user.uid);
+      const url = await uploadPhoto(photo, job.jobId, data.location, 'assessment', user.uid);
       if (url) photoUrls.push(url);
     }
 
