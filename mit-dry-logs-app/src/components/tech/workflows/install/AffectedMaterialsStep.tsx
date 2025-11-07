@@ -37,6 +37,9 @@ interface RoomAffectedData {
     materials: Array<{ type: CeilingMaterialType; sqFt: number }>;
   };
   demoMaterials?: DemoMaterial[];
+  moldVisible?: boolean;
+  moldLocation?: string;
+  moldArea?: number;
 }
 
 export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ job }) => {
@@ -537,6 +540,110 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
             </ul>
           </div>
         )}
+      </div>
+
+      {/* Mold Visibility Assessment */}
+      <div className="border-2 border-gray-200 rounded-lg p-5 bg-white">
+        <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <AlertCircle className="w-5 h-5 text-orange-600" />
+          Mold Visibility Assessment
+        </h4>
+        <div className="space-y-4">
+          <label className="flex items-center gap-3 cursor-pointer p-3 border border-gray-200 rounded-lg hover:border-orange-300">
+            <input
+              type="checkbox"
+              checked={!!(roomsAffectedData[currentRoom?.id]?.moldVisible)}
+              onChange={(e) => {
+                if (!currentRoom) return;
+                const currentData = roomsAffectedData[currentRoom.id] || {
+                  roomId: currentRoom.id,
+                  floor: { affectedSqFt: 0, materials: [] },
+                  walls: { affectedSqFt: 0, wetHeightAvg: 0, materials: [] },
+                  ceiling: { affectedSqFt: 0, materials: [] },
+                };
+                setRoomsAffectedData({
+                  ...roomsAffectedData,
+                  [currentRoom.id]: {
+                    ...currentData,
+                    moldVisible: e.target.checked,
+                    moldLocation: e.target.checked ? (currentData.moldLocation || '') : undefined,
+                    moldArea: e.target.checked ? (currentData.moldArea || 0) : undefined,
+                  },
+                });
+              }}
+              className="w-5 h-5 rounded text-orange-600"
+            />
+            <div>
+              <span className="font-medium text-gray-900">Visible mold growth detected in this room</span>
+              <p className="text-xs text-gray-600">Check if you observe mold on any surfaces</p>
+            </div>
+          </label>
+
+          {roomsAffectedData[currentRoom?.id]?.moldVisible && currentRoom && (
+            <div className="ml-8 space-y-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Mold Location Description *
+                </label>
+                <Input
+                  placeholder="e.g., Behind baseboard, ceiling corner, under sink"
+                  value={roomsAffectedData[currentRoom.id]?.moldLocation || ''}
+                  onChange={(e) => {
+                    const currentData = roomsAffectedData[currentRoom.id];
+                    if (!currentData) return;
+                    setRoomsAffectedData({
+                      ...roomsAffectedData,
+                      [currentRoom.id]: {
+                        ...currentData,
+                        moldLocation: e.target.value,
+                      },
+                    });
+                  }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Approximate Mold Area (sq ft)
+                </label>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={roomsAffectedData[currentRoom.id]?.moldArea || ''}
+                  onChange={(e) => {
+                    const currentData = roomsAffectedData[currentRoom.id];
+                    if (!currentData) return;
+                    setRoomsAffectedData({
+                      ...roomsAffectedData,
+                      [currentRoom.id]: {
+                        ...currentData,
+                        moldArea: parseFloat(e.target.value) || 0,
+                      },
+                    });
+                  }}
+                  min="0"
+                  step="0.1"
+                />
+                {roomsAffectedData[currentRoom.id]?.moldArea && roomsAffectedData[currentRoom.id].moldArea! > 10 && (
+                  <p className="text-xs text-red-600 mt-1 font-medium">
+                    ⚠️ Area &gt; 10 sq ft - Licensed abatement contractor required (IICRC S520)
+                  </p>
+                )}
+                {roomsAffectedData[currentRoom.id]?.moldArea && roomsAffectedData[currentRoom.id].moldArea! <= 10 && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    ℹ️ Area ≤ 10 sq ft - Can be remediated by trained techs with proper PPE
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-300 rounded p-3">
+                <p className="text-xs text-yellow-800">
+                  <strong>⚠️ Important:</strong> Document mold with photos. If area exceeds 10 sq ft, a licensed mold remediation specialist must be contacted before disturbance.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Summary & Class Determination */}
