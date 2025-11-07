@@ -67,12 +67,17 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
     installData.officePreparation?.preparationNotes || ''
   );
 
+  // Timestamp - initialized once and never changes (prevents infinite loop)
+  const [completedAt] = useState(() =>
+    installData.officePreparation?.completedAt || new Date().toISOString()
+  );
+
   useEffect(() => {
     updateWorkflowData('install', {
       officePreparation: {
         completed: true,
         completedBy: user?.uid,
-        completedAt: new Date().toISOString(),
+        completedAt,
 
         workOrderReviewed,
         customerContactVerified,
@@ -95,6 +100,7 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
         preparationNotes,
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     workOrderReviewed,
     customerContactVerified,
@@ -108,7 +114,8 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
     airScrubbersLoaded,
     suppliesChecklist,
     preparationNotes,
-    user
+    user,
+    completedAt
   ]);
 
   const workOrderComplete = workOrderReviewed && customerContactVerified && insuranceInfoReviewed;

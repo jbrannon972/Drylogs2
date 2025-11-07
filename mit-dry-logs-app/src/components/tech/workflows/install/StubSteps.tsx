@@ -1302,6 +1302,10 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
   const [signature, setSignature] = useState<string | null>(installData.customerSignature || null);
   const [customerName, setCustomerName] = useState(installData.customerSignatureName || job.customerInfo?.name || '');
 
+  // Timestamps - initialized once and never change (prevents infinite loop)
+  const [completedAt] = useState(() => installData.completedAt || new Date().toISOString());
+  const [signatureTimestamp, setSignatureTimestamp] = useState(() => installData.customerSignatureTimestamp || null);
+
   // Calculate labor hours
   const calculateLaborHours = () => {
     if (!installData.arrivalTime || !departureTime) return null;
@@ -1411,6 +1415,14 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
     setSignature(null);
   };
 
+  // Update signature timestamp when signature is created
+  React.useEffect(() => {
+    if (signature && !signatureTimestamp) {
+      // Signature was just created, set timestamp in state
+      setSignatureTimestamp(new Date().toISOString());
+    }
+  }, [signature, signatureTimestamp]);
+
   // Auto-save when state changes (prevents infinite loops from calling handleSave directly)
   React.useEffect(() => {
     updateWorkflowData('install', {
@@ -1420,11 +1432,11 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       laborSummary,
       customerSignature: signature,
       customerSignatureName: customerName,
-      customerSignatureTimestamp: signature ? new Date().toISOString() : null,
-      completedAt: new Date().toISOString(),
+      customerSignatureTimestamp: signatureTimestamp,
+      completedAt,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [departureTime, travelTimeFromSite, techNotes, laborSummary, signature, customerName]);
+  }, [departureTime, travelTimeFromSite, techNotes, laborSummary, signature, customerName, completedAt, signatureTimestamp]);
 
   const handleFinalize = () => {
     // useEffect will auto-save before navigation

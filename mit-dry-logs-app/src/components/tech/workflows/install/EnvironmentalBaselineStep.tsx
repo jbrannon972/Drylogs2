@@ -23,13 +23,21 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
   const [refRoomHumidity, setRefRoomHumidity] = useState(installData.environmentalBaseline?.referenceRoom?.humidity || '');
   const [refRoomMoisture, setRefRoomMoisture] = useState(installData.environmentalBaseline?.referenceRoom?.moisture || '');
 
+  // Timestamps - initialized once and never change (prevents infinite loop)
+  const [outsideRecordedAt] = useState(() =>
+    installData.environmentalBaseline?.outside?.recordedAt || new Date().toISOString()
+  );
+  const [refRoomRecordedAt] = useState(() =>
+    installData.environmentalBaseline?.referenceRoom?.recordedAt || new Date().toISOString()
+  );
+
   useEffect(() => {
     updateWorkflowData('install', {
       environmentalBaseline: {
         outside: {
           temperature: parseFloat(outsideTemp) || 0,
           humidity: parseFloat(outsideHumidity) || 0,
-          recordedAt: new Date().toISOString(),
+          recordedAt: outsideRecordedAt,
         },
         referenceRoom: referenceRoom ? {
           roomId: referenceRoom.id,
@@ -37,11 +45,12 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
           temperature: parseFloat(refRoomTemp) || 0,
           humidity: parseFloat(refRoomHumidity) || 0,
           moisture: parseFloat(refRoomMoisture) || 0,
-          recordedAt: new Date().toISOString(),
+          recordedAt: refRoomRecordedAt,
         } : null,
       },
     });
-  }, [outsideTemp, outsideHumidity, refRoomTemp, refRoomHumidity, refRoomMoisture]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outsideTemp, outsideHumidity, refRoomTemp, refRoomHumidity, refRoomMoisture, outsideRecordedAt, refRoomRecordedAt]);
 
   const getDewPoint = (temp: number, humidity: number) => {
     const a = 17.27;

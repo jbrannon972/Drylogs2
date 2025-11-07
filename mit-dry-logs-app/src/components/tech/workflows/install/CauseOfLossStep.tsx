@@ -48,6 +48,11 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
     customerNotified: installData.cat3Containment?.customerNotified || false,
   });
 
+  // Timestamp - initialized once and never changes (prevents infinite loop)
+  const [determinedAt] = useState(() =>
+    installData.waterClassification?.determinedAt || new Date().toISOString()
+  );
+
   useEffect(() => {
     updateWorkflowData('install', {
       causeOfLoss: {
@@ -60,14 +65,15 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       },
       waterClassification: {
         category: waterCategory,
-        determinedAt: new Date().toISOString(),
+        determinedAt,
       },
       specializedServices: {
         thermalImaging: thermalImagingUsed,
       },
       cat3Containment: waterCategory === 3 ? cat3Checklist : undefined,
     });
-  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed, cat3Checklist]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed, cat3Checklist, determinedAt]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -15,17 +15,23 @@ export const WaterClassificationStep: React.FC<WaterClassificationStepProps> = (
   );
   const [notes, setNotes] = useState(installData.waterClassification?.notes || '');
 
+  // Timestamp - initialized once and never changes (prevents infinite loop)
+  const [determinedAt] = useState(() =>
+    installData.waterClassification?.determinedAt || new Date().toISOString()
+  );
+
   useEffect(() => {
     if (waterCategory) {
       updateWorkflowData('install', {
         waterClassification: {
           category: waterCategory,
           notes,
-          determinedAt: new Date().toISOString(),
+          determinedAt,
         },
       });
     }
-  }, [waterCategory, notes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [waterCategory, notes, determinedAt]);
 
   const categories = [
     {
