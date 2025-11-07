@@ -12,12 +12,13 @@ interface AffectedMaterialsStepProps {
 interface DemoMaterial {
   type: string;
   affected: boolean;
-  reason?: 'access' | 'cat3' | 'structural' | 'other';
+  reason?: 'unsalvageable' | 'contaminated' | 'facilitate-drying' | 'structural-compromise' | 'microbial-growth' | 'other';
   reasonOther?: string;
   notes?: string;
   drywallHeight?: 'up-to-2ft' | 'up-to-4ft' | 'up-to-6ft' | 'full-height';
   // Note: Quantities are NOT collected during install
   // Quantities will be measured and entered AFTER demo is completed
+  // Reasons align with IICRC S500 standards for material removal
 }
 
 interface RoomAffectedData {
@@ -455,19 +456,21 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
 
                   {material.affected && (
                     <div className="space-y-3">
-                      {/* Reason for Removal */}
+                      {/* Reason for Removal - IICRC S500 aligned */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Reason for Removal *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Reason for Removal (IICRC S500) *</label>
                         <select
                           value={material.reason || ''}
                           onChange={(e) => handleMaterialReason(idx, e.target.value as DemoMaterial['reason'])}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
                         >
                           <option value="">Select reason...</option>
-                          <option value="access">Removed to gain access to wet materials</option>
-                          <option value="cat3">Removed due to Category 3 water</option>
-                          <option value="structural">Removed due to structural damage</option>
-                          <option value="other">Other</option>
+                          <option value="unsalvageable">Unsalvageable - Cannot be effectively dried/restored</option>
+                          <option value="contaminated">Contaminated - Direct contact with Category 2/3 water</option>
+                          <option value="facilitate-drying">To Facilitate Drying - Access to structural cavities</option>
+                          <option value="structural-compromise">Structural Compromise - Delamination or loss of integrity</option>
+                          <option value="microbial-growth">Microbial Growth - Visible mold or bacteria present</option>
+                          <option value="other">Other (specify)</option>
                         </select>
                       </div>
 
@@ -516,9 +519,11 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
                 .filter(m => m.affected)
                 .map(m => {
                   const reasonText =
-                    m.reason === 'access' ? 'Access to wet materials' :
-                    m.reason === 'cat3' ? 'Category 3 water' :
-                    m.reason === 'structural' ? 'Structural damage' :
+                    m.reason === 'unsalvageable' ? 'Unsalvageable' :
+                    m.reason === 'contaminated' ? 'Contaminated (Cat 2/3)' :
+                    m.reason === 'facilitate-drying' ? 'To Facilitate Drying' :
+                    m.reason === 'structural-compromise' ? 'Structural Compromise' :
+                    m.reason === 'microbial-growth' ? 'Microbial Growth' :
                     m.reason === 'other' && m.reasonOther ? m.reasonOther :
                     'Reason not specified';
 
