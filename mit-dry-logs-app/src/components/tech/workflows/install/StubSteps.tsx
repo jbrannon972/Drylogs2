@@ -1423,7 +1423,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       customerSignatureTimestamp: signature ? new Date().toISOString() : null,
       completedAt: new Date().toISOString(),
     });
-  }, [departureTime, travelTimeFromSite, techNotes, laborSummary, signature, customerName]);
+  }, [departureTime, travelTimeFromSite, techNotes, laborSummary, signature, customerName, updateWorkflowData]);
 
   const handleFinalize = () => {
     // useEffect will auto-save before navigation

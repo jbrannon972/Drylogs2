@@ -72,7 +72,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
         setAsbestosConcern(true);
       }
     }
-  }, [buildingYear]);
+  }, [buildingYear, leadConcern, asbestosConcern]);
 
   // Save to workflow store
   useEffect(() => {
@@ -84,7 +84,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
       leadConcern,
       vulnerableOccupants,
     });
-  }, [frontEntrancePhoto, isAfterHours, buildingYear, asbestosConcern, leadConcern, vulnerableOccupants]);
+  }, [frontEntrancePhoto, isAfterHours, buildingYear, asbestosConcern, leadConcern, vulnerableOccupants, updateWorkflowData]);
 
   const handleFrontEntrancePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
