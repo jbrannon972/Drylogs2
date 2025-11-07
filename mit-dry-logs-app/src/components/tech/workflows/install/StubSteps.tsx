@@ -7,7 +7,7 @@ import { EquipmentCalculator } from '../../../shared/EquipmentCalculator';
 import { ChamberCalculationResult } from '../../../../utils/iicrcCalculations';
 import { useAuth } from '../../../../hooks/useAuth';
 import { photoService } from '../../../../services/firebase/photoService';
-import { Camera, Upload, CheckCircle } from 'lucide-react';
+import { Camera, Upload, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '../../../shared/Button';
 
 interface StepProps {

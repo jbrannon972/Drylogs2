@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
-import { Droplets, AlertCircle, Info, Camera, Wrench } from 'lucide-react';
+import { Droplets, AlertCircle, Info, Camera, Wrench, CheckCircle } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
