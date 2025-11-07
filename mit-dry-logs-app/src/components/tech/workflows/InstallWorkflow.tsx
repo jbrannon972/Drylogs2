@@ -4,6 +4,7 @@ import { useWorkflowStore } from '../../../stores/workflowStore';
 import { useJobsStore } from '../../../stores/jobsStore';
 import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
+import { WorkflowActionBar } from '../../shared/WorkflowActionBar';
 import {
   CheckCircle,
   Circle,
@@ -17,7 +18,8 @@ import {
   ClipboardCheck,
   Layers,
   Calendar,
-  X
+  X,
+  Menu
 } from 'lucide-react';
 import { InstallStep } from '../../../types/workflow';
 
@@ -168,7 +170,7 @@ export const InstallWorkflow: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { installStep, setInstallStep, startWorkflow, progress, saveWorkflowData } = useWorkflowStore();
+  const { installStep, setInstallStep, startWorkflow, progress, saveWorkflowData, installData } = useWorkflowStore();
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
   const [showStepOverview, setShowStepOverview] = useState(false);
@@ -243,93 +245,68 @@ export const InstallWorkflow: React.FC = () => {
   const progressPercent = Math.round(((currentStepIndex + 1) / INSTALL_STEPS.length) * 100);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ULTRAFLOW MINIMAL HEADER */}
-      <div className="bg-white shadow-md border-b sticky top-0 z-10">
-        {/* Top bar with job info */}
-        <div className="px-4 py-3 flex items-center justify-between border-b">
-          <div>
-            <h1 className="text-lg font-poppins font-bold text-gray-900">
-              Install Workflow
-            </h1>
-            <p className="text-xs text-gray-600">
-              {job.customerInfo.name} • {job.customerInfo.address}
-            </p>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* ULTRAFIELD CONDENSED HEADER - 48px */}
+      <div className="bg-white border-b sticky top-0 z-40">
+        <div className="px-3 py-2 flex items-center justify-between">
+          {/* Left: Job info + Step */}
+          <div
+            className="flex-1 cursor-pointer hover:opacity-75 transition-opacity"
+            onClick={() => setShowStepOverview(!showStepOverview)}
+          >
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-semibold text-gray-900">
+                #{job.jobId}
+              </span>
+              <span className="text-gray-400">•</span>
+              <span className="text-gray-700">
+                Step {currentStepIndex + 1}/{INSTALL_STEPS.length}
+              </span>
+              <span className="text-gray-400">•</span>
+              <span className="text-gray-900 font-medium truncate">
+                {currentStepConfig.title}
+              </span>
+            </div>
+            {/* Progress bar - thin */}
+            <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+              <div
+                className="bg-entrusted-orange h-1 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
-          <Button variant="secondary" onClick={handleExit} className="text-sm">
-            Exit
-          </Button>
-        </div>
 
-        {/* Clickable Progress Bar */}
-        <div
-          className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => setShowStepOverview(!showStepOverview)}
-        >
-          <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-gray-700 font-medium">
-              Step {currentStepIndex + 1} of {INSTALL_STEPS.length}: {currentStepConfig.title}
-            </span>
-            <span className="font-bold text-entrusted-orange">
-              {progressPercent}%
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-            <div
-              className="bg-entrusted-orange h-3 rounded-full transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-          <p className="text-xs text-gray-500 mt-1 text-center">
-            Click to view all steps
-          </p>
+          {/* Right: Menu button */}
+          <button
+            onClick={() => setShowStepOverview(!showStepOverview)}
+            className="p-2 hover:bg-gray-100 rounded-lg ml-2"
+          >
+            <Menu className="w-5 h-5 text-gray-600" />
+          </button>
         </div>
       </div>
 
       {/* MAIN CONTENT - SINGLE STEP ONLY */}
       <div ref={contentRef} className="container mx-auto px-4 py-6 max-w-4xl">
         {/* NO DUPLICATE HEADER - Just the step content */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-24">
           {/* Step Content */}
           {StepComponent && <StepComponent job={job} />}
-
-          {/* Navigation Buttons */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t">
-            <Button
-              variant="secondary"
-              onClick={handlePrevious}
-              disabled={currentStepIndex === 0 || isSaving}
-              className="flex items-center gap-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous
-            </Button>
-
-            <div className="text-sm text-gray-500">
-              Step {currentStepIndex + 1} of {INSTALL_STEPS.length}
-            </div>
-
-            <Button
-              variant="primary"
-              onClick={handleSaveAndContinue}
-              disabled={currentStepIndex === INSTALL_STEPS.length - 1 || isSaving}
-              className="flex items-center gap-2 min-w-[140px]"
-            >
-              {isSaving ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  {currentStepIndex === INSTALL_STEPS.length - 1 ? 'Save & Finish' : 'Save & Continue'}
-                  <ChevronRight className="w-4 h-4" />
-                </>
-              )}
-            </Button>
-          </div>
         </div>
       </div>
+
+      {/* ULTRAFIELD ACTION BAR - Fixed Bottom */}
+      <WorkflowActionBar
+        jobId={job.jobId}
+        currentStep={currentStepConfig.id}
+        currentStepIndex={currentStepIndex}
+        totalSteps={INSTALL_STEPS.length}
+        currentRoom={installData.rooms?.[0]?.name} // Pass current room context if available
+        onPrevious={handlePrevious}
+        onNext={handleSaveAndContinue}
+        canGoBack={currentStepIndex > 0 && !isSaving}
+        canGoForward={currentStepIndex < INSTALL_STEPS.length - 1 && !isSaving}
+      />
 
       {/* STEP OVERVIEW MODAL */}
       {showStepOverview && (
