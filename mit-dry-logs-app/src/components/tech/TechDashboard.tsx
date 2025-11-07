@@ -163,7 +163,16 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
             <div className="flex items-center gap-2 text-gray-600 text-sm">
               <Clock className="w-4 h-4" />
               <span>
-                Scheduled: {format(toDate(job.scheduledDate), 'MMM d, yyyy h:mm a')}
+                Scheduled: {format(toDate(job.scheduledDate), 'MMM d, yyyy')}
+                {job.arrivalWindow && (
+                  <span className="ml-2 text-entrusted-orange font-medium">
+                    {job.arrivalWindow === '9-1' ? '9am-1pm' :
+                     job.arrivalWindow === '12-4' ? '12pm-4pm' :
+                     job.customArrivalStart && job.customArrivalEnd ?
+                       `${job.customArrivalStart}-${job.customArrivalEnd}` :
+                       ''}
+                  </span>
+                )}
               </span>
             </div>
           </div>

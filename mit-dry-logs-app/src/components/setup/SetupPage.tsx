@@ -237,6 +237,7 @@ export function SetupPage() {
         scheduledZone: 'Zone 1' as const,
         scheduledTechnician: techUid,
         scheduledDate: Timestamp.now(),
+        arrivalWindow: '9-1' as const,
         metadata: {
           createdAt: Timestamp.now(),
           createdBy: techUid,
@@ -359,6 +360,7 @@ export function SetupPage() {
         scheduledZone: 'Zone 1' as const,
         scheduledTechnician: techUid,
         scheduledDate: Timestamp.fromDate(new Date('2025-01-20')),
+        arrivalWindow: '12-4' as const,
         metadata: {
           createdAt: Timestamp.now(),
           createdBy: techUid,
@@ -487,6 +489,9 @@ export function SetupPage() {
         scheduledZone: 'Zone 1' as const,
         scheduledTechnician: techUid,
         scheduledDate: Timestamp.fromDate(new Date('2025-01-10')),
+        arrivalWindow: 'custom' as const,
+        customArrivalStart: '10:30',
+        customArrivalEnd: '14:30',
         metadata: {
           createdAt: Timestamp.now(),
           createdBy: techUid,

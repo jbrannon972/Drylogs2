@@ -50,6 +50,7 @@ export type PhaseStatus = 'pending' | 'in-progress' | 'completed';
 export type WaterCategory = 'Category 1' | 'Category 2' | 'Category 3';
 export type WaterClass = 'Class 1' | 'Class 2' | 'Class 3' | 'Class 4';
 export type CauseOfLossType = 'Burst Pipe' | 'Flooding' | 'Ice Dam' | 'Sewage Backup' | 'Roof Leak' | 'Appliance Leak' | 'Other';
+export type ArrivalWindow = '9-1' | '12-4' | 'custom';
 
 export interface CustomerInfo {
   name: string;
@@ -504,6 +505,9 @@ export interface Job {
   scheduledZone: Zone;
   scheduledTechnician: string;
   scheduledDate: Timestamp;
+  arrivalWindow?: ArrivalWindow; // Preferred arrival time window
+  customArrivalStart?: string; // For 'custom' window: HH:mm format
+  customArrivalEnd?: string;   // For 'custom' window: HH:mm format
   metadata: JobMetadata;
 }
 
