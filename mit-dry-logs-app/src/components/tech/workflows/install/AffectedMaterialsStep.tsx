@@ -12,7 +12,7 @@ interface AffectedMaterialsStepProps {
 interface DemoMaterial {
   type: string;
   affected: boolean;
-  reason?: 'unsalvageable' | 'contaminated' | 'facilitate-drying' | 'structural-compromise' | 'microbial-growth' | 'other';
+  reason?: 'unsalvageable' | 'contaminated' | 'facilitate-drying' | 'structural-compromise' | 'microbial-growth' | 'access-leak' | 'investigative' | 'other';
   reasonOther?: string;
   notes?: string;
   drywallHeight?: 'up-to-2ft' | 'up-to-4ft' | 'up-to-6ft' | 'full-height';
@@ -473,6 +473,8 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
                           <option value="facilitate-drying">To Facilitate Drying - Access to structural cavities</option>
                           <option value="structural-compromise">Structural Compromise - Delamination or loss of integrity</option>
                           <option value="microbial-growth">Microbial Growth - Visible mold or bacteria present</option>
+                          <option value="access-leak">To Access Source of Loss</option>
+                          <option value="investigative">Investigative Demo - Determine extent of damage</option>
                           <option value="other">Other (specify)</option>
                         </select>
                       </div>

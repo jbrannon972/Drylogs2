@@ -417,8 +417,9 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
                 Insets & Offsets (Optional)
               </h4>
               <p className="text-xs text-gray-600 mb-3">
-                <strong>Insets</strong> add volume (closets, alcoves). <strong>Offsets</strong> subtract volume (columns, obstacles).
-                Used for precise IICRC S500 dehumidifier calculations.
+                <strong>Insets</strong> (closets, alcoves) create dead air zones requiring additional air movers.
+                <strong> Offsets</strong> (columns, obstacles) disrupt airflow patterns.
+                Per IICRC S500, these affect air mover placement to maintain proper air circulation.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div>

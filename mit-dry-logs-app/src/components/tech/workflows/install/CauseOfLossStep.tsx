@@ -38,17 +38,6 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
     installData.specializedServices?.thermalImaging || false
   );
 
-  // Gas Appliance Safety
-  const [gasAppliancesPresent, setGasAppliancesPresent] = useState<boolean | null>(
-    installData.gasAppliances?.present ?? null
-  );
-  const [gasAppliancesAffected, setGasAppliancesAffected] = useState<boolean>(
-    installData.gasAppliances?.affected || false
-  );
-  const [gasApplianceTypes, setGasApplianceTypes] = useState<string[]>(
-    installData.gasAppliances?.types || []
-  );
-
   // Cat 3 Biohazard Containment Checklist (OSHA Compliance)
   const [cat3Checklist, setCat3Checklist] = useState({
     ppeConfirmed: installData.cat3Containment?.ppeConfirmed || false,
@@ -76,14 +65,9 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       specializedServices: {
         thermalImaging: thermalImagingUsed,
       },
-      gasAppliances: {
-        present: gasAppliancesPresent,
-        affected: gasAppliancesAffected,
-        types: gasApplianceTypes,
-      },
       cat3Containment: waterCategory === 3 ? cat3Checklist : undefined,
     });
-  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed, gasAppliancesPresent, gasAppliancesAffected, gasApplianceTypes, cat3Checklist]);
+  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed, cat3Checklist]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -91,12 +75,6 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       const url = await uploadPhoto(file, job.jobId, 'cause-of-loss', 'assessment', user.uid);
       if (url) setCausePhoto(url);
     }
-  };
-
-  const toggleApplianceType = (type: string) => {
-    setGasApplianceTypes(prev =>
-      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
-    );
   };
 
   const toggleCat3Checklist = (key: keyof typeof cat3Checklist) => {
@@ -183,7 +161,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
   };
 
   const cat3ChecklistComplete = waterCategory === 3 ? Object.values(cat3Checklist).every(v => v) : true;
-  const isComplete = causeType && causeLocation && causePhoto && waterCategory && gasAppliancesPresent !== null && cat3ChecklistComplete;
+  const isComplete = causeType && causeLocation && causePhoto && waterCategory && cat3ChecklistComplete;
 
   return (
     <div className="space-y-6">
@@ -574,153 +552,6 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
           </div>
         </div>
       )}
-
-      {/* Gas Appliance Safety Check */}
-      <div className="border border-gray-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <AlertCircle className="w-5 h-5 text-orange-600" />
-          <h3 className="font-semibold text-gray-900">Gas Appliance Safety Assessment *</h3>
-        </div>
-        <p className="text-sm text-gray-600 mb-4">
-          Critical safety check: Water damage near gas appliances can cause fire/explosion risk from corroded connections or damaged controls.
-        </p>
-
-        {/* Are gas appliances present? */}
-        <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-2">
-            Are there gas appliances in or near the affected area?
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                setGasAppliancesPresent(true);
-                if (!gasAppliancesPresent) {
-                  setGasAppliancesAffected(false);
-                  setGasApplianceTypes([]);
-                }
-              }}
-              className={`flex-1 px-4 py-2 border-2 rounded-lg font-medium transition-all ${
-                gasAppliancesPresent === true
-                  ? 'border-orange-500 bg-orange-50 text-orange-900'
-                  : 'border-gray-300 hover:border-orange-300'
-              }`}
-            >
-              Yes
-            </button>
-            <button
-              onClick={() => {
-                setGasAppliancesPresent(false);
-                setGasAppliancesAffected(false);
-                setGasApplianceTypes([]);
-              }}
-              className={`flex-1 px-4 py-2 border-2 rounded-lg font-medium transition-all ${
-                gasAppliancesPresent === false
-                  ? 'border-green-500 bg-green-50 text-green-900'
-                  : 'border-gray-300 hover:border-green-300'
-              }`}
-            >
-              No
-            </button>
-          </div>
-        </div>
-
-        {/* If yes, show appliance types and impact check */}
-        {gasAppliancesPresent && (
-          <div className="space-y-4">
-            {/* Appliance types */}
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Select all gas appliances present:
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {['Furnace', 'Water Heater', 'Stove/Range', 'Dryer', 'Fireplace', 'Boiler'].map(type => (
-                  <button
-                    key={type}
-                    onClick={() => toggleApplianceType(type)}
-                    className={`px-3 py-2 text-sm border rounded-lg transition-all ${
-                      gasApplianceTypes.includes(type)
-                        ? 'border-orange-500 bg-orange-50 text-orange-900 font-medium'
-                        : 'border-gray-300 hover:border-orange-300'
-                    }`}
-                  >
-                    {gasApplianceTypes.includes(type) ? '✓ ' : ''}{type}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Impact assessment */}
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Were any gas appliances directly impacted by water?
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setGasAppliancesAffected(true)}
-                  className={`flex-1 px-4 py-2 border-2 rounded-lg font-medium transition-all ${
-                    gasAppliancesAffected
-                      ? 'border-red-500 bg-red-50 text-red-900'
-                      : 'border-gray-300 hover:border-red-300'
-                  }`}
-                >
-                  Yes - Water Contact
-                </button>
-                <button
-                  onClick={() => setGasAppliancesAffected(false)}
-                  className={`flex-1 px-4 py-2 border-2 rounded-lg font-medium transition-all ${
-                    !gasAppliancesAffected
-                      ? 'border-green-500 bg-green-50 text-green-900'
-                      : 'border-gray-300 hover:border-green-300'
-                  }`}
-                >
-                  No - Nearby Only
-                </button>
-              </div>
-            </div>
-
-            {/* Warning if affected */}
-            {gasAppliancesAffected && (
-              <div className="bg-red-50 border-2 border-red-500 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-bold text-red-900 mb-2">🚨 CRITICAL: Gas Appliance Specialist Required</h4>
-                    <p className="text-sm text-red-800 mb-3">
-                      Water-damaged gas appliances pose explosion/fire risk. DO NOT turn on gas until inspected.
-                    </p>
-                    <ul className="text-sm text-red-800 space-y-1 mb-3">
-                      <li>✓ Licensed plumber or HVAC tech must inspect</li>
-                      <li>✓ Gas valve should remain OFF until cleared</li>
-                      <li>✓ Check for corrosion on connections, valves, and controls</li>
-                      <li>✓ Test for gas leaks before re-energizing</li>
-                    </ul>
-                    <button
-                      onClick={() => setShowSubModal(true)}
-                      className="btn-primary bg-red-600 hover:bg-red-700 flex items-center gap-2"
-                    >
-                      <Wrench className="w-4 h-4" />
-                      Request HVAC/Plumber Now
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Warning if nearby but not affected */}
-            {!gasAppliancesAffected && gasApplianceTypes.length > 0 && (
-              <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3">
-                <div className="flex items-start gap-2">
-                  <Info className="w-4 h-4 text-yellow-700 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-yellow-800">
-                    <strong>Note:</strong> Gas appliances are nearby. Monitor during drying for any signs of moisture intrusion.
-                    If condensation or dampness appears near gas lines, request inspection.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
 
       {/* Request Specialist Button */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
