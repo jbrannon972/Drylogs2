@@ -1397,7 +1397,6 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
     if (canvas) {
       const dataUrl = canvas.toDataURL('image/png');
       setSignature(dataUrl);
-      handleSave();
     }
   };
 
@@ -1410,10 +1409,10 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       }
     }
     setSignature(null);
-    handleSave();
   };
 
-  const handleSave = () => {
+  // Auto-save when state changes (prevents infinite loops from calling handleSave directly)
+  React.useEffect(() => {
     updateWorkflowData('install', {
       departureTime,
       travelTimeFromSite,
@@ -1424,10 +1423,10 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       customerSignatureTimestamp: signature ? new Date().toISOString() : null,
       completedAt: new Date().toISOString(),
     });
-  };
+  }, [departureTime, travelTimeFromSite, techNotes, laborSummary, signature, customerName]);
 
   const handleFinalize = () => {
-    handleSave();
+    // useEffect will auto-save before navigation
     alert('Install workflow completed successfully! Returning to dashboard...');
     window.location.href = '/tech';
   };
@@ -1477,10 +1476,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
             <input
               type="time"
               value={departureTime}
-              onChange={(e) => {
-                setDepartureTime(e.target.value);
-                handleSave();
-              }}
+              onChange={(e) => setDepartureTime(e.target.value)}
               className="input-field"
             />
             <p className="text-xs text-gray-500 mt-1">Time leaving property</p>
@@ -1494,10 +1490,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
           <input
             type="number"
             value={travelTimeFromSite}
-            onChange={(e) => {
-              setTravelTimeFromSite(parseInt(e.target.value) || 0);
-              handleSave();
-            }}
+            onChange={(e) => setTravelTimeFromSite(parseInt(e.target.value) || 0)}
             placeholder="0"
             className="input-field w-32"
             min="0"
@@ -1567,10 +1560,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
         </label>
         <textarea
           value={techNotes}
-          onChange={(e) => {
-            setTechNotes(e.target.value);
-            handleSave();
-          }}
+          onChange={(e) => setTechNotes(e.target.value)}
           placeholder="Any additional notes about the installation..."
           className="input-field min-h-[100px]"
           rows={4}
@@ -1595,10 +1585,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
           <input
             type="text"
             value={customerName}
-            onChange={(e) => {
-              setCustomerName(e.target.value);
-              handleSave();
-            }}
+            onChange={(e) => setCustomerName(e.target.value)}
             placeholder="Enter customer name"
             className="input-field"
           />
