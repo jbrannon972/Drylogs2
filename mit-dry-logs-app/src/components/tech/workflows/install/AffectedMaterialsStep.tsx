@@ -12,10 +12,12 @@ interface AffectedMaterialsStepProps {
 interface DemoMaterial {
   type: string;
   affected: boolean;
-  quantity: number;
-  unit: 'SF' | 'LF' | 'EA';
+  reason?: 'access' | 'cat3' | 'structural' | 'other';
+  reasonOther?: string;
   notes?: string;
   drywallHeight?: 'up-to-2ft' | 'up-to-4ft' | 'up-to-6ft' | 'full-height';
+  // Note: Quantities are NOT collected during install
+  // Quantities will be measured and entered AFTER demo is completed
 }
 
 interface RoomAffectedData {
@@ -56,20 +58,21 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
     ceilingMaterial: 'drywall' as CeilingMaterialType,
   });
 
-  // Demo Materials Checklist - These directly feed demolition billing!
-  // ALL start unchecked - tech must manually check what's actually affected
+  // Demo Materials Checklist - Mark what will be removed, reason why
+  // ALL start unchecked - tech must manually check what needs removal
+  // Quantities will be entered AFTER demo, not during install
   const getDefaultDemoMaterials = (): DemoMaterial[] => {
     const materials: DemoMaterial[] = [
-      { type: 'Carpet', affected: false, quantity: 0, unit: 'SF' },
-      { type: 'Carpet Pad', affected: false, quantity: 0, unit: 'SF' },
-      { type: 'Baseboard', affected: false, quantity: 0, unit: 'LF' },
-      { type: 'Drywall', affected: false, quantity: 0, unit: 'LF', drywallHeight: 'up-to-2ft' },
-      { type: 'Insulation', affected: false, quantity: 0, unit: 'SF' },
-      { type: 'Hardwood', affected: false, quantity: 0, unit: 'SF' },
-      { type: 'Tile', affected: false, quantity: 0, unit: 'SF' },
-      { type: 'Cabinetry', affected: false, quantity: 0, unit: 'LF' },
-      { type: 'Ceiling Drywall', affected: false, quantity: 0, unit: 'SF' },
-      { type: 'Vinyl/Laminate', affected: false, quantity: 0, unit: 'SF' },
+      { type: 'Carpet', affected: false },
+      { type: 'Carpet Pad', affected: false },
+      { type: 'Baseboard', affected: false },
+      { type: 'Drywall', affected: false, drywallHeight: 'up-to-2ft' },
+      { type: 'Insulation', affected: false },
+      { type: 'Hardwood', affected: false },
+      { type: 'Tile', affected: false },
+      { type: 'Cabinetry', affected: false },
+      { type: 'Ceiling Drywall', affected: false },
+      { type: 'Vinyl/Laminate', affected: false },
     ];
     return materials;
   };
@@ -184,13 +187,22 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
   const handleMaterialToggle = (index: number) => {
     const updated = [...demoMaterials];
     updated[index].affected = !updated[index].affected;
-    // NO auto-calculation - tech must enter actual measured quantities
     setDemoMaterials(updated);
   };
 
-  const handleMaterialQuantity = (index: number, value: number) => {
+  const handleMaterialReason = (index: number, reason: DemoMaterial['reason']) => {
     const updated = [...demoMaterials];
-    updated[index].quantity = value;
+    updated[index].reason = reason;
+    // Clear reasonOther if not selecting "other"
+    if (reason !== 'other') {
+      updated[index].reasonOther = undefined;
+    }
+    setDemoMaterials(updated);
+  };
+
+  const handleMaterialReasonOther = (index: number, text: string) => {
+    const updated = [...demoMaterials];
+    updated[index].reasonOther = text;
     setDemoMaterials(updated);
   };
 
@@ -408,7 +420,7 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">Materials for Removal (Demo Billing)</h3>
             <p className="text-sm text-gray-700 mb-2">
-              Check each material that will need to be removed, and enter the quantity. <strong>This data directly feeds demo billing calculations!</strong> Be as accurate as possible.
+              Mark materials that will be removed and select the reason why. <strong>Quantities will be measured after demo is complete.</strong>
             </p>
             {currentRoom && (
               <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
@@ -439,52 +451,52 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
                   className="w-5 h-5 text-entrusted-orange border-gray-300 rounded focus:ring-entrusted-orange mt-0.5"
                 />
                 <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-medium text-gray-900">{material.type}</p>
-                    <span className="text-xs text-gray-500 font-medium">{material.unit}</span>
-                  </div>
+                  <p className="font-medium text-gray-900 mb-2">{material.type}</p>
 
                   {material.affected && (
                     <div className="space-y-3">
-                      {/* Quantity Input */}
-                      <div className="flex items-center gap-3">
-                        <label className="text-sm font-medium text-gray-700 w-20">Quantity:</label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          value={material.quantity || ''}
-                          onChange={(e) => handleMaterialQuantity(idx, parseFloat(e.target.value) || 0)}
-                          placeholder={`Enter ${material.unit}...`}
-                          className="flex-1"
-                        />
-                        <span className="text-sm text-gray-600 w-8">{material.unit}</span>
+                      {/* Reason for Removal */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Reason for Removal *</label>
+                        <select
+                          value={material.reason || ''}
+                          onChange={(e) => handleMaterialReason(idx, e.target.value as DemoMaterial['reason'])}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
+                        >
+                          <option value="">Select reason...</option>
+                          <option value="access">Removed to gain access to wet materials</option>
+                          <option value="cat3">Removed due to Category 3 water</option>
+                          <option value="structural">Removed due to structural damage</option>
+                          <option value="other">Other</option>
+                        </select>
                       </div>
 
-                      {/* Drywall Height Selection */}
+                      {/* Show text input if "Other" is selected */}
+                      {material.reason === 'other' && (
+                        <div>
+                          <Input
+                            label="Specify reason"
+                            placeholder="Explain why this material will be removed..."
+                            value={material.reasonOther || ''}
+                            onChange={(e) => handleMaterialReasonOther(idx, e.target.value)}
+                          />
+                        </div>
+                      )}
+
+                      {/* Drywall Height Selection - still needed for planning */}
                       {material.type === 'Drywall' && (
-                        <div className="flex items-center gap-3">
-                          <label className="text-sm font-medium text-gray-700 w-20">Height:</label>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Estimated Height</label>
                           <select
                             value={material.drywallHeight || 'up-to-2ft'}
                             onChange={(e) => handleDrywallHeight(idx, e.target.value as DemoMaterial['drywallHeight'])}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
                           >
                             <option value="up-to-2ft">Up to 2 feet</option>
                             <option value="up-to-4ft">Up to 4 feet</option>
                             <option value="up-to-6ft">Up to 6 feet</option>
                             <option value="full-height">Full height (8+ ft)</option>
                           </select>
-                        </div>
-                      )}
-
-                      {/* Show calculated value for reference */}
-                      {material.quantity > 0 && (
-                        <div className="bg-blue-50 border border-blue-200 rounded p-2">
-                          <p className="text-sm text-blue-800">
-                            <strong>{material.type}:</strong> {material.quantity} {material.unit}
-                            {material.type === 'Drywall' && ` @ ${material.drywallHeight?.replace('-', ' ')}`}
-                          </p>
                         </div>
                       )}
                     </div>
@@ -496,18 +508,27 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
         </div>
 
         {/* Summary of selected materials */}
-        {demoMaterials.some(m => m.affected && m.quantity > 0) && (
+        {demoMaterials.some(m => m.affected) && (
           <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
             <h4 className="font-semibold text-green-900 mb-2">✓ Materials Marked for Removal:</h4>
             <ul className="text-sm text-green-800 space-y-1">
               {demoMaterials
-                .filter(m => m.affected && m.quantity > 0)
-                .map(m => (
-                  <li key={m.type}>
-                    • <strong>{m.type}:</strong> {m.quantity} {m.unit}
-                    {m.type === 'Drywall' && m.drywallHeight && ` (${m.drywallHeight.replace('-', ' ')})`}
-                  </li>
-                ))}
+                .filter(m => m.affected)
+                .map(m => {
+                  const reasonText =
+                    m.reason === 'access' ? 'Access to wet materials' :
+                    m.reason === 'cat3' ? 'Category 3 water' :
+                    m.reason === 'structural' ? 'Structural damage' :
+                    m.reason === 'other' && m.reasonOther ? m.reasonOther :
+                    'Reason not specified';
+
+                  return (
+                    <li key={m.type}>
+                      • <strong>{m.type}:</strong> {reasonText}
+                      {m.type === 'Drywall' && m.drywallHeight && ` (${m.drywallHeight.replace('-', ' ')})`}
+                    </li>
+                  );
+                })}
             </ul>
           </div>
         )}
