@@ -25,6 +25,17 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
   const [asbestosConcern, setAsbestosConcern] = useState<boolean>(installData.asbestosConcern || false);
   const [leadConcern, setLeadConcern] = useState<boolean>(installData.leadConcern || false);
 
+  // Vulnerable Occupants
+  const [vulnerableOccupants, setVulnerableOccupants] = useState({
+    elderly: installData.vulnerableOccupants?.elderly || false,
+    children: installData.vulnerableOccupants?.children || false,
+    pets: installData.vulnerableOccupants?.pets || false,
+    respiratory: installData.vulnerableOccupants?.respiratory || false,
+    mobility: installData.vulnerableOccupants?.mobility || false,
+    other: installData.vulnerableOccupants?.other || false,
+    notes: installData.vulnerableOccupants?.notes || '',
+  });
+
   const [checklist, setChecklist] = useState({
     introduced: false,
     groundRules: false,
@@ -71,8 +82,9 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
       buildingYear,
       asbestosConcern,
       leadConcern,
+      vulnerableOccupants,
     });
-  }, [frontEntrancePhoto, isAfterHours, buildingYear, asbestosConcern, leadConcern]);
+  }, [frontEntrancePhoto, isAfterHours, buildingYear, asbestosConcern, leadConcern, vulnerableOccupants]);
 
   const handleFrontEntrancePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -248,6 +260,97 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
             <p className="text-xs text-yellow-800">
               <strong>Action Required:</strong> Document concerns in notes. Notify MIT Lead before demo work.
               Customer must be informed in writing of potential hazards.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Vulnerable Occupants Section */}
+      <div className="border border-gray-200 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Info className="w-5 h-5 text-blue-600" />
+          <h3 className="font-semibold text-gray-900">Vulnerable Occupants</h3>
+        </div>
+        <p className="text-sm text-gray-600 mb-4">
+          Identify any vulnerable occupants for special safety considerations during restoration work.
+        </p>
+
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <label className="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
+            <input
+              type="checkbox"
+              checked={vulnerableOccupants.elderly}
+              onChange={(e) => setVulnerableOccupants({ ...vulnerableOccupants, elderly: e.target.checked })}
+            />
+            <span className="text-sm">Elderly residents (65+)</span>
+          </label>
+
+          <label className="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
+            <input
+              type="checkbox"
+              checked={vulnerableOccupants.children}
+              onChange={(e) => setVulnerableOccupants({ ...vulnerableOccupants, children: e.target.checked })}
+            />
+            <span className="text-sm">Young children</span>
+          </label>
+
+          <label className="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
+            <input
+              type="checkbox"
+              checked={vulnerableOccupants.pets}
+              onChange={(e) => setVulnerableOccupants({ ...vulnerableOccupants, pets: e.target.checked })}
+            />
+            <span className="text-sm">Pets</span>
+          </label>
+
+          <label className="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
+            <input
+              type="checkbox"
+              checked={vulnerableOccupants.respiratory}
+              onChange={(e) => setVulnerableOccupants({ ...vulnerableOccupants, respiratory: e.target.checked })}
+            />
+            <span className="text-sm">Respiratory conditions</span>
+          </label>
+
+          <label className="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
+            <input
+              type="checkbox"
+              checked={vulnerableOccupants.mobility}
+              onChange={(e) => setVulnerableOccupants({ ...vulnerableOccupants, mobility: e.target.checked })}
+            />
+            <span className="text-sm">Mobility issues</span>
+          </label>
+
+          <label className="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
+            <input
+              type="checkbox"
+              checked={vulnerableOccupants.other}
+              onChange={(e) => setVulnerableOccupants({ ...vulnerableOccupants, other: e.target.checked })}
+            />
+            <span className="text-sm">Other concerns</span>
+          </label>
+        </div>
+
+        {Object.values(vulnerableOccupants).slice(0, -1).some(v => v) && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Special Notes
+            </label>
+            <textarea
+              value={vulnerableOccupants.notes}
+              onChange={(e) => setVulnerableOccupants({ ...vulnerableOccupants, notes: e.target.value })}
+              placeholder="Additional details about accommodations needed..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows={2}
+            />
+          </div>
+        )}
+
+        {Object.values(vulnerableOccupants).slice(0, -1).some(v => v) && (
+          <div className="mt-3 bg-blue-50 border border-blue-200 rounded p-2">
+            <p className="text-xs text-blue-800">
+              <strong>Customer Care:</strong> Extra attention to noise levels, access paths, and safety barriers.
+              Communicate schedule changes promptly.
             </p>
           </div>
         )}

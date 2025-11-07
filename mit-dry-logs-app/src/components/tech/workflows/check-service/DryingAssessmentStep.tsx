@@ -126,6 +126,26 @@ export const DryingAssessmentStep: React.FC<DryingAssessmentStepProps> = ({ job,
 
   const trend = getDryingTrend();
 
+  // Calculate actual drying rate vs expected
+  const getDryingRateComparison = () => {
+    if (!progress) return null;
+    const days = daysSinceStart();
+    if (days === 0) return null;
+
+    const actualRate = progress.percentDry / days; // % per day
+    const expectedRate = 20; // Expected ~20% per day (IICRC standard)
+    const rateEfficiency = (actualRate / expectedRate) * 100;
+
+    return {
+      actualRate: actualRate.toFixed(1),
+      expectedRate: expectedRate.toFixed(1),
+      efficiency: Math.round(rateEfficiency),
+      isEfficient: rateEfficiency >= 80,
+    };
+  };
+
+  const rateComparison = getDryingRateComparison();
+
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -222,6 +242,53 @@ export const DryingAssessmentStep: React.FC<DryingAssessmentStepProps> = ({ job,
               </p>
             </div>
           </div>
+
+          {/* Drying Rate Comparison */}
+          {rateComparison && (
+            <div className={`border-2 rounded-lg p-4 ${
+              rateComparison.isEfficient ? 'bg-green-50 border-green-300' : 'bg-orange-50 border-orange-300'
+            }`}>
+              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <TrendingDown className="w-5 h-5 text-blue-600" />
+                Drying Rate Performance
+              </h3>
+
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="text-center p-3 bg-white rounded border">
+                  <p className="text-2xl font-bold text-blue-900">{rateComparison.actualRate}%</p>
+                  <p className="text-xs text-gray-600">Actual Rate/Day</p>
+                </div>
+                <div className="text-center p-3 bg-white rounded border">
+                  <p className="text-2xl font-bold text-gray-600">{rateComparison.expectedRate}%</p>
+                  <p className="text-xs text-gray-600">Expected Rate/Day</p>
+                </div>
+                <div className="text-center p-3 bg-white rounded border">
+                  <p className={`text-2xl font-bold ${
+                    rateComparison.efficiency >= 100 ? 'text-green-600' :
+                    rateComparison.efficiency >= 80 ? 'text-green-600' :
+                    rateComparison.efficiency >= 60 ? 'text-orange-600' :
+                    'text-red-600'
+                  }`}>
+                    {rateComparison.efficiency}%
+                  </p>
+                  <p className="text-xs text-gray-600">Efficiency</p>
+                </div>
+              </div>
+
+              <div className={`p-3 rounded ${
+                rateComparison.isEfficient ? 'bg-green-100' : 'bg-orange-100'
+              }`}>
+                <p className="text-sm font-medium mb-1">
+                  {rateComparison.isEfficient ? '✓ Drying Rate: Excellent' : '⚠️ Drying Rate: Below Target'}
+                </p>
+                <p className="text-xs">
+                  {rateComparison.isEfficient
+                    ? 'Equipment is performing well. Continue current protocol.'
+                    : 'Consider adding more equipment or adjusting placement to improve drying rate.'}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Drying Trend */}
           {trend && (

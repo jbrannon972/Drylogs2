@@ -16,6 +16,7 @@ interface RoomData {
   id: string;
   name: string;
   type: RoomType;
+  floor?: string; // Floor/Story (Basement, 1st Floor, 2nd Floor, etc.)
   length: number;
   width: number;
   height: number;
@@ -39,6 +40,7 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
   const [newRoom, setNewRoom] = useState({
     name: '',
     type: 'Bedroom' as RoomType,
+    floor: '1st Floor',
     length: '',
     width: '',
     height: '8',
@@ -92,6 +94,7 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       id: Date.now().toString(),
       name: newRoom.name,
       type: newRoom.type,
+      floor: newRoom.floor,
       length,
       width,
       height,
@@ -107,6 +110,7 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
     setNewRoom({
       name: '',
       type: 'Bedroom',
+      floor: '1st Floor',
       length: '',
       width: '',
       height: '8',
@@ -269,6 +273,28 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
                   <option>Other</option>
                 </select>
               </div>
+            </div>
+
+            {/* Floor/Story Selector */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Floor / Story *
+              </label>
+              <select
+                value={newRoom.floor}
+                onChange={(e) => setNewRoom({ ...newRoom, floor: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-entrusted-orange"
+              >
+                <option value="Basement">Basement</option>
+                <option value="1st Floor">1st Floor</option>
+                <option value="2nd Floor">2nd Floor</option>
+                <option value="3rd Floor">3rd Floor</option>
+                <option value="4th Floor">4th Floor</option>
+                <option value="Attic">Attic</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Helps with equipment allocation and labor estimation
+              </p>
             </div>
 
             {/* Affected Status */}
