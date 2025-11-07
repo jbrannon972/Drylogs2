@@ -1423,7 +1423,8 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       customerSignatureTimestamp: signature ? new Date().toISOString() : null,
       completedAt: new Date().toISOString(),
     });
-  }, [departureTime, travelTimeFromSite, techNotes, laborSummary, signature, customerName, updateWorkflowData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [departureTime, travelTimeFromSite, techNotes, laborSummary, signature, customerName]);
 
   const handleFinalize = () => {
     // useEffect will auto-save before navigation

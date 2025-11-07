@@ -84,7 +84,8 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
       leadConcern,
       vulnerableOccupants,
     });
-  }, [frontEntrancePhoto, isAfterHours, buildingYear, asbestosConcern, leadConcern, vulnerableOccupants, updateWorkflowData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frontEntrancePhoto, isAfterHours, buildingYear, asbestosConcern, leadConcern, vulnerableOccupants]);
 
   const handleFrontEntrancePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
