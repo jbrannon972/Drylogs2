@@ -394,26 +394,30 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
                 Add insets (closets, alcoves) or offsets (columns, pilasters) for accurate cubic footage calculations.
               </p>
               <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Insets (sq ft)"
-                  type="number"
-                  step="1"
-                  min="0"
-                  placeholder="0"
-                  value={newRoom.insetsSqFt}
-                  onChange={(e) => setNewRoom({ ...newRoom, insetsSqFt: e.target.value })}
-                  helperText="Closets, alcoves (adds volume)"
-                />
-                <Input
-                  label="Offsets (sq ft)"
-                  type="number"
-                  step="1"
-                  min="0"
-                  placeholder="0"
-                  value={newRoom.offsetsSqFt}
-                  onChange={(e) => setNewRoom({ ...newRoom, offsetsSqFt: e.target.value })}
-                  helperText="Columns, pilasters (reduces volume)"
-                />
+                <div>
+                  <Input
+                    label="Insets (sq ft)"
+                    type="number"
+                    step="1"
+                    min="0"
+                    placeholder="0"
+                    value={newRoom.insetsSqFt}
+                    onChange={(e) => setNewRoom({ ...newRoom, insetsSqFt: e.target.value })}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Closets, alcoves (adds volume)</p>
+                </div>
+                <div>
+                  <Input
+                    label="Offsets (sq ft)"
+                    type="number"
+                    step="1"
+                    min="0"
+                    placeholder="0"
+                    value={newRoom.offsetsSqFt}
+                    onChange={(e) => setNewRoom({ ...newRoom, offsetsSqFt: e.target.value })}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Columns, pilasters (reduces volume)</p>
+                </div>
               </div>
             </div>
 
