@@ -106,7 +106,7 @@ export const EquipmentRemovalStep: React.FC<EquipmentRemovalStepProps> = ({ job,
               <p className={`text-sm ${
                 waterCategory === 'Category 3' ? 'text-red-800' : 'text-yellow-800'
               }`}>
-                All equipment must be marked for decontamination. This is billable at $38.68 per unit.
+                All equipment must be marked for decontamination.
               </p>
             </div>
           </div>
@@ -136,7 +136,7 @@ export const EquipmentRemovalStep: React.FC<EquipmentRemovalStepProps> = ({ job,
         {decontaminationCount > 0 && (
           <div className="mt-3 pt-3 border-t border-gray-200 text-sm text-gray-700">
             <p>
-              <span className="font-medium">Decontamination Billing:</span> {decontaminationCount} units × $38.68 = ${(decontaminationCount * 38.68).toFixed(2)}
+              <span className="font-medium">Decontamination Required:</span> {decontaminationCount} {decontaminationCount === 1 ? 'unit' : 'units'}
             </p>
           </div>
         )}
@@ -244,7 +244,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({
           </div>
           <div>
             <label className="text-xs text-gray-600">Decontamination</label>
-            <p className="font-medium">{removalData.needsDecontamination ? 'Required ($38.68)' : 'Not needed'}</p>
+            <p className="font-medium">{removalData.needsDecontamination ? 'Required' : 'Not needed'}</p>
           </div>
         </div>
 
@@ -317,7 +317,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({
               className="w-5 h-5"
             />
             <span className="text-sm font-medium text-gray-900">
-              Needs Decontamination (+$38.68)
+              Needs Decontamination
             </span>
           </label>
         </div>

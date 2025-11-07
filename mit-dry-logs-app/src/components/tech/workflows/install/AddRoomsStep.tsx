@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
-import { Plus, Trash2, Home, AlertCircle, Camera, CheckCircle } from 'lucide-react';
+import { Plus, Trash2, Home, AlertCircle, Camera, CheckCircle, Info } from 'lucide-react';
 import { RoomType } from '../../../../types';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
@@ -19,6 +19,8 @@ interface RoomData {
   length: number;
   width: number;
   height: number;
+  insetsSqFt?: number;  // Additional area from closets, alcoves, etc.
+  offsetsSqFt?: number; // Area to subtract from columns, pilasters, etc.
   floorSqFt: number;
   wallSqFt: number;
   ceilingSqFt: number;
@@ -40,6 +42,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
     length: '',
     width: '',
     height: '8',
+    insetsSqFt: '',
+    offsetsSqFt: '',
     affectedStatus: 'affected' as 'affected' | 'unaffected' | 'partial',
     isReferenceRoom: false,
     overviewPhoto: null as string | null,
@@ -79,6 +83,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
     const length = parseFloat(newRoom.length);
     const width = parseFloat(newRoom.width);
     const height = parseFloat(newRoom.height);
+    const insetsSqFt = newRoom.insetsSqFt ? parseFloat(newRoom.insetsSqFt) : 0;
+    const offsetsSqFt = newRoom.offsetsSqFt ? parseFloat(newRoom.offsetsSqFt) : 0;
 
     const surfaces = calculateSurfaceAreas(length, width, height);
 
@@ -89,6 +95,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       length,
       width,
       height,
+      insetsSqFt: insetsSqFt > 0 ? insetsSqFt : undefined,
+      offsetsSqFt: offsetsSqFt > 0 ? offsetsSqFt : undefined,
       ...surfaces,
       affectedStatus: newRoom.affectedStatus,
       isReferenceRoom: newRoom.isReferenceRoom,
@@ -102,6 +110,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       length: '',
       width: '',
       height: '8',
+      insetsSqFt: '',
+      offsetsSqFt: '',
       affectedStatus: 'affected',
       isReferenceRoom: false,
       overviewPhoto: null,
@@ -372,6 +382,39 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
                 value={newRoom.height}
                 onChange={(e) => setNewRoom({ ...newRoom, height: e.target.value })}
               />
+            </div>
+
+            {/* Insets & Offsets for Equipment Calculations */}
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                <Info className="w-4 h-4 text-gray-600" />
+                Insets & Offsets (Optional)
+              </h4>
+              <p className="text-xs text-gray-600 mb-3">
+                Add insets (closets, alcoves) or offsets (columns, pilasters) for accurate cubic footage calculations.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Insets (sq ft)"
+                  type="number"
+                  step="1"
+                  min="0"
+                  placeholder="0"
+                  value={newRoom.insetsSqFt}
+                  onChange={(e) => setNewRoom({ ...newRoom, insetsSqFt: e.target.value })}
+                  helperText="Closets, alcoves (adds volume)"
+                />
+                <Input
+                  label="Offsets (sq ft)"
+                  type="number"
+                  step="1"
+                  min="0"
+                  placeholder="0"
+                  value={newRoom.offsetsSqFt}
+                  onChange={(e) => setNewRoom({ ...newRoom, offsetsSqFt: e.target.value })}
+                  helperText="Columns, pilasters (reduces volume)"
+                />
+              </div>
             </div>
 
             {/* Auto-calculated preview */}

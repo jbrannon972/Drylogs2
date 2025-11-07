@@ -268,10 +268,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
                 className="w-5 h-5 text-entrusted-orange border-gray-300 rounded focus:ring-entrusted-orange mt-0.5"
               />
               <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <p className="font-medium text-gray-900">Thermal Imaging</p>
-                  <span className="text-sm font-medium text-gray-700">+$150</span>
-                </div>
+                <p className="font-medium text-gray-900">Thermal Imaging</p>
                 <p className="text-sm text-gray-600 mt-1">
                   Use thermal camera to detect hidden moisture behind walls, under floors, or in ceilings. Required for comprehensive moisture mapping.
                 </p>
@@ -291,10 +288,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
                 className="w-5 h-5 text-entrusted-orange border-gray-300 rounded focus:ring-entrusted-orange mt-0.5"
               />
               <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <p className="font-medium text-gray-900">Microbial Testing</p>
-                  <span className="text-sm font-medium text-gray-700">+$350</span>
-                </div>
+                <p className="font-medium text-gray-900">Microbial Testing</p>
                 <p className="text-sm text-gray-600 mt-1">
                   Laboratory testing for mold, bacteria, or other microbial growth. Recommended if visible growth is present or if water was Category 2/3.
                 </p>

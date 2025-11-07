@@ -7,6 +7,33 @@ import { create } from 'zustand';
 import { InstallStep, DemoStep, CheckServiceStep, PullStep, WorkflowProgress } from '../types/workflow';
 import { jobsService } from '../services/firebase/jobsService';
 
+/**
+ * Recursively removes undefined values from an object
+ * Firebase Firestore does not accept undefined values
+ */
+function removeUndefined(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return null;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => removeUndefined(item)).filter(item => item !== null);
+  }
+
+  if (typeof obj === 'object') {
+    const cleaned: any = {};
+    for (const key in obj) {
+      const value = removeUndefined(obj[key]);
+      if (value !== undefined) {
+        cleaned[key] = value;
+      }
+    }
+    return cleaned;
+  }
+
+  return obj;
+}
+
 interface WorkflowState {
   // Current workflow
   currentWorkflow: 'install' | 'demo' | 'check-service' | 'pull' | null;
@@ -181,6 +208,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     const state = get();
     const { currentWorkflow, currentJobId, currentUserId } = state;
 
+    console.log('🔍 saveWorkflowData called from:', new Error().stack?.split('\n')[2]?.trim());
+
     if (!currentWorkflow || !currentJobId || !currentUserId) {
       console.warn('Cannot save workflow data: missing workflow, jobId, or userId');
       return;
@@ -190,21 +219,26 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       const dataKey = `${currentWorkflow}Data` as keyof WorkflowState;
       const workflowData = state[dataKey] as Record<string, any>;
 
+      // Remove undefined values to prevent Firebase errors
+      const cleanedData = removeUndefined(workflowData);
+
+      console.log(`💾 Saving workflow data for ${currentWorkflow}:`, cleanedData);
+
       // Save to job document under workflowData field
       await jobsService.updateJob(
         currentJobId,
         {
           workflowData: {
-            [currentWorkflow]: workflowData,
+            [currentWorkflow]: cleanedData,
           },
         } as any,
         currentUserId
       );
 
-      console.log(`✅ Workflow data auto-saved for ${currentWorkflow}`);
+      console.log(`✅ Workflow data saved successfully for ${currentWorkflow}`);
     } catch (error) {
       console.error('Error saving workflow data:', error);
-      // Don't throw - allow workflow to continue even if save fails
+      throw error; // Throw so the UI can show an error message
     }
   },
 

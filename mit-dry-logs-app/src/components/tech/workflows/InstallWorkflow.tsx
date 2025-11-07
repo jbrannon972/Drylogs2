@@ -83,18 +83,18 @@ const INSTALL_STEPS: StepConfig[] = [
     component: AddRoomsStep,
   },
   {
-    id: 'affected-materials',
-    title: 'Affected Materials',
-    description: 'Document affected SQFT per room',
-    icon: <Layers className="w-5 h-5" />,
-    component: AffectedMaterialsStep,
-  },
-  {
     id: 'moisture-mapping',
     title: 'Moisture Mapping',
-    description: 'Readings + photos',
+    description: 'Readings + photos per room',
     icon: <Droplets className="w-5 h-5" />,
     component: MoistureMappingStep,
+  },
+  {
+    id: 'affected-materials',
+    title: 'Materials for Removal',
+    description: 'Document materials to demo per room',
+    icon: <Layers className="w-5 h-5" />,
+    component: AffectedMaterialsStep,
   },
   {
     id: 'schedule-work',

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
 import { Camera, MapPin, Clock } from 'lucide-react';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
+import { useWorkflowStore } from '../../../../stores/workflowStore';
 
 interface ArrivalStepProps {
   job: any;
@@ -13,13 +14,31 @@ interface ArrivalStepProps {
 export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
-  // Fix: Use 24-hour format HH:mm for time input
+  const { installData, updateWorkflowData } = useWorkflowStore();
+
+  // Initialize from saved data or current time
   const now = new Date();
   const hours = now.getHours().toString().padStart(2, '0');
   const minutes = now.getMinutes().toString().padStart(2, '0');
-  const [arrivalTime, setArrivalTime] = useState(`${hours}:${minutes}`);
-  const [truckPhoto, setTruckPhoto] = useState<string | null>(null);
-  const [propertyPhoto, setPropertyPhoto] = useState<string | null>(null);
+
+  const [arrivalTime, setArrivalTime] = useState(
+    installData.arrivalTime || `${hours}:${minutes}`
+  );
+  const [truckPhoto, setTruckPhoto] = useState<string | null>(
+    installData.truckPhoto || null
+  );
+  const [propertyPhoto, setPropertyPhoto] = useState<string | null>(
+    installData.propertyPhoto || null
+  );
+
+  // Save to workflow store when data changes
+  useEffect(() => {
+    updateWorkflowData('install', {
+      arrivalTime,
+      truckPhoto,
+      propertyPhoto,
+    });
+  }, [arrivalTime, truckPhoto, propertyPhoto]);
 
   const handleTruckPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

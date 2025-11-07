@@ -19,10 +19,15 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   const [dehumidifierRating, setDehumidifierRating] = useState(200); // PPD
   const [calculations, setCalculations] = useState<any>(null);
 
-  // Calculate total cubic footage from all rooms
+  // Calculate total cubic footage from all rooms including insets/offsets
   const calculateCubicFootage = () => {
     return rooms.reduce((total: number, room: any) => {
-      return total + (room.length * room.width * room.height);
+      const baseArea = room.length * room.width;
+      const insets = room.insetsSqFt || 0;
+      const offsets = room.offsetsSqFt || 0;
+      const adjustedArea = baseArea + insets - offsets;
+      const cubicFt = adjustedArea * room.height;
+      return total + cubicFt;
     }, 0);
   };
 

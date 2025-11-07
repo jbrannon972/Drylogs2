@@ -14,18 +14,9 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
 
-  const [arrivalTimestamp, setArrivalTimestamp] = useState<string | null>(
-    installData.arrivalTimestamp || null
-  );
-  const [gpsLocation, setGpsLocation] = useState<{ lat: number; lng: number } | null>(
-    installData.arrivalGPS || null
-  );
-  const [gpsError, setGpsError] = useState<string | null>(null);
+  // Removed duplicate arrival tracking - it's now in Step 1 (ArrivalStep)
   const [frontEntrancePhoto, setFrontEntrancePhoto] = useState<string | null>(
     installData.frontEntrancePhoto || null
-  );
-  const [preExistingPhotos, setPreExistingPhotos] = useState<string[]>(
-    installData.preExistingPhotos || []
   );
   const [isAfterHours, setIsAfterHours] = useState(false);
 
@@ -55,37 +46,10 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
   // Save to workflow store
   useEffect(() => {
     updateWorkflowData('install', {
-      arrivalTimestamp,
-      arrivalGPS: gpsLocation,
       frontEntrancePhoto,
-      preExistingPhotos,
       isAfterHours,
     });
-  }, [arrivalTimestamp, gpsLocation, frontEntrancePhoto, preExistingPhotos, isAfterHours]);
-
-  const handleArriveAtJob = () => {
-    const timestamp = new Date().toISOString();
-    setArrivalTimestamp(timestamp);
-
-    // Get GPS location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setGpsLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-          setGpsError(null);
-        },
-        (error) => {
-          setGpsError('GPS unavailable - location not recorded');
-          console.error('GPS error:', error);
-        }
-      );
-    } else {
-      setGpsError('GPS not supported on this device');
-    }
-  };
+  }, [frontEntrancePhoto, isAfterHours]);
 
   const handleFrontEntrancePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,19 +59,11 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
     }
   };
 
-  const handlePreExistingPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user) {
-      const url = await uploadPhoto(file, job.jobId, 'pre-existing', 'arrival', user.uid);
-      if (url) setPreExistingPhotos([...preExistingPhotos, url]);
-    }
-  };
-
   const handleCheck = (key: keyof typeof checklist) => {
     setChecklist(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const allComplete = arrivalTimestamp && frontEntrancePhoto && Object.values(checklist).every(v => v);
+  const allComplete = frontEntrancePhoto && Object.values(checklist).every(v => v);
 
   return (
     <div className="space-y-6">
@@ -119,63 +75,12 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
             <div>
               <h4 className="font-medium text-orange-900 mb-1">After-Hours Service</h4>
               <p className="text-sm text-orange-800">
-                This job is being performed after 5pm or on a weekend. Premium labor rates ($98.27/hr) will apply automatically.
+                This job is being performed after 5pm or on a weekend. Premium labor rates will apply.
               </p>
             </div>
           </div>
         </div>
       )}
-
-      {/* Arrival Tracking */}
-      <div className="border border-gray-200 rounded-lg p-4">
-        <h3 className="font-semibold text-gray-900 mb-3">Arrival at Job Site</h3>
-
-        {!arrivalTimestamp ? (
-          <div>
-            <p className="text-sm text-gray-600 mb-3">
-              Click the button below to record your arrival time and location. This captures your start time for billing.
-            </p>
-            <button
-              onClick={handleArriveAtJob}
-              className="w-full btn-primary flex items-center justify-center gap-2"
-            >
-              <MapPin className="w-5 h-5" />
-              <Clock className="w-5 h-5" />
-              Arrive at Job Site
-            </button>
-          </div>
-        ) : (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-green-900 mb-1">✓ Arrived at Job Site</p>
-                <p className="text-sm text-green-800">
-                  <Clock className="w-4 h-4 inline mr-1" />
-                  {new Date(arrivalTimestamp).toLocaleString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                  })}
-                </p>
-                {gpsLocation && (
-                  <p className="text-sm text-green-800">
-                    <MapPin className="w-4 h-4 inline mr-1" />
-                    GPS: {gpsLocation.lat.toFixed(6)}, {gpsLocation.lng.toFixed(6)}
-                  </p>
-                )}
-                {gpsError && (
-                  <p className="text-sm text-orange-600 mt-1">
-                    ⚠️ {gpsError}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Front Entrance Photo */}
       <div className="border border-gray-200 rounded-lg p-4">
@@ -217,43 +122,6 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
             {isUploading ? 'Uploading...' : 'Take Photo of Front Entrance'}
           </label>
         )}
-      </div>
-
-      {/* Pre-Existing Damage Photos */}
-      <div className="border border-gray-200 rounded-lg p-4">
-        <h3 className="font-semibold text-gray-900 mb-3">Pre-Existing Conditions</h3>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-          <div className="flex items-start gap-2">
-            <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-blue-800">
-              Document any pre-existing damage or conditions to protect against future liability claims.
-            </p>
-          </div>
-        </div>
-
-        {preExistingPhotos.length > 0 && (
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            {preExistingPhotos.map((photo, idx) => (
-              <img key={idx} src={photo} alt={`Pre-existing ${idx + 1}`} className="rounded h-24 w-full object-cover" />
-            ))}
-          </div>
-        )}
-
-        <label className="btn-secondary cursor-pointer inline-flex items-center gap-2">
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handlePreExistingPhoto}
-            className="hidden"
-            disabled={isUploading}
-          />
-          <Camera className="w-4 h-4" />
-          {preExistingPhotos.length === 0 ? 'Add Pre-Existing Damage Photo' : 'Add Another Photo'}
-        </label>
-        <p className="text-xs text-gray-500 mt-2">
-          {preExistingPhotos.length} photo{preExistingPhotos.length !== 1 ? 's' : ''} added
-        </p>
       </div>
 
       {/* Customer Info */}
