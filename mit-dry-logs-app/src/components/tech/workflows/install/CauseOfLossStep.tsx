@@ -38,6 +38,27 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
     installData.specializedServices?.thermalImaging || false
   );
 
+  // Gas Appliance Safety
+  const [gasAppliancesPresent, setGasAppliancesPresent] = useState<boolean | null>(
+    installData.gasAppliances?.present ?? null
+  );
+  const [gasAppliancesAffected, setGasAppliancesAffected] = useState<boolean>(
+    installData.gasAppliances?.affected || false
+  );
+  const [gasApplianceTypes, setGasApplianceTypes] = useState<string[]>(
+    installData.gasAppliances?.types || []
+  );
+
+  // Cat 3 Biohazard Containment Checklist (OSHA Compliance)
+  const [cat3Checklist, setCat3Checklist] = useState({
+    ppeConfirmed: installData.cat3Containment?.ppeConfirmed || false,
+    containmentBarriers: installData.cat3Containment?.containmentBarriers || false,
+    negativeAirSetup: installData.cat3Containment?.negativeAirSetup || false,
+    wasteContainment: installData.cat3Containment?.wasteContainment || false,
+    crossContaminationPrevention: installData.cat3Containment?.crossContaminationPrevention || false,
+    customerNotified: installData.cat3Containment?.customerNotified || false,
+  });
+
   useEffect(() => {
     updateWorkflowData('install', {
       causeOfLoss: {
@@ -55,8 +76,14 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       specializedServices: {
         thermalImaging: thermalImagingUsed,
       },
+      gasAppliances: {
+        present: gasAppliancesPresent,
+        affected: gasAppliancesAffected,
+        types: gasApplianceTypes,
+      },
+      cat3Containment: waterCategory === 3 ? cat3Checklist : undefined,
     });
-  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed]);
+  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed, gasAppliancesPresent, gasAppliancesAffected, gasApplianceTypes, cat3Checklist]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -64,6 +91,16 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       const url = await uploadPhoto(file, job.jobId, 'cause-of-loss', 'assessment', user.uid);
       if (url) setCausePhoto(url);
     }
+  };
+
+  const toggleApplianceType = (type: string) => {
+    setGasApplianceTypes(prev =>
+      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    );
+  };
+
+  const toggleCat3Checklist = (key: keyof typeof cat3Checklist) => {
+    setCat3Checklist(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSubcontractorRequest = async (data: SubcontractorRequestData) => {
@@ -145,7 +182,8 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
     return '';
   };
 
-  const isComplete = causeType && causeLocation && causePhoto && waterCategory;
+  const cat3ChecklistComplete = waterCategory === 3 ? Object.values(cat3Checklist).every(v => v) : true;
+  const isComplete = causeType && causeLocation && causePhoto && waterCategory && gasAppliancesPresent !== null && cat3ChecklistComplete;
 
   return (
     <div className="space-y-6">
@@ -356,36 +394,333 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       </div>
 
       {/* Category 2/3 Warning */}
-      {(waterCategory === 2 || waterCategory === 3) && (
-        <div className={`border rounded-lg p-4 ${
-          waterCategory === 3 ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'
-        }`}>
+      {waterCategory === 2 && (
+        <div className="border rounded-lg p-4 bg-yellow-50 border-yellow-200">
           <div className="flex items-start gap-3">
-            <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-              waterCategory === 3 ? 'text-red-600' : 'text-yellow-600'
-            }`} />
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-yellow-600" />
             <div>
-              <h4 className={`font-medium mb-1 ${
-                waterCategory === 3 ? 'text-red-900' : 'text-yellow-900'
-              }`}>
-                {waterCategory === 3 ? 'Category 3 Safety Requirements' : 'Category 2 Safety Requirements'}
-              </h4>
-              <ul className={`text-sm space-y-1 ${
-                waterCategory === 3 ? 'text-red-800' : 'text-yellow-800'
-              }`}>
+              <h4 className="font-medium mb-1 text-yellow-900">Category 2 Safety Requirements</h4>
+              <ul className="text-sm space-y-1 text-yellow-800">
                 <li>✓ Air scrubbers required during drying</li>
                 <li>✓ Enhanced PPE required (gloves, mask, protective clothing)</li>
-                {waterCategory === 3 && (
-                  <>
-                    <li>✓ Containment barriers recommended</li>
-                    <li>✓ Special disposal procedures for contaminated materials</li>
-                  </>
-                )}
               </ul>
             </div>
           </div>
         </div>
       )}
+
+      {/* Category 3 Biohazard Containment Checklist (OSHA Compliance) */}
+      {waterCategory === 3 && (
+        <div className="border-2 border-red-500 rounded-lg p-4 bg-red-50">
+          <div className="flex items-start gap-3 mb-4">
+            <AlertCircle className="w-6 h-6 flex-shrink-0 mt-0.5 text-red-600" />
+            <div className="flex-1">
+              <h4 className="font-bold text-red-900 mb-1">🚨 CATEGORY 3 BIOHAZARD - OSHA CONTAINMENT REQUIRED</h4>
+              <p className="text-sm text-red-800 mb-3">
+                Sewage/black water contains pathogens (E. coli, Hepatitis A, etc.). OSHA requires strict containment protocols.
+                Complete ALL checklist items before starting work.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white border border-red-300 rounded-lg p-4">
+            <h5 className="font-semibold text-gray-900 mb-3">Containment Protocol Checklist *</h5>
+            <p className="text-xs text-gray-600 mb-4">
+              All items must be completed for OSHA compliance and worker safety.
+            </p>
+
+            <div className="space-y-3">
+              {/* PPE Confirmed */}
+              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={cat3Checklist.ppeConfirmed}
+                  onChange={() => toggleCat3Checklist('ppeConfirmed')}
+                  className="mt-1 w-5 h-5"
+                />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">1. Enhanced PPE Confirmed</p>
+                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
+                    <li>• Nitrile gloves (double layer recommended)</li>
+                    <li>• N95 or P100 respirator (not surgical mask)</li>
+                    <li>• Tyvek suit or waterproof protective clothing</li>
+                    <li>• Safety goggles or face shield</li>
+                    <li>• Rubber boots (no cloth shoes)</li>
+                  </ul>
+                </div>
+              </label>
+
+              {/* Containment Barriers */}
+              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={cat3Checklist.containmentBarriers}
+                  onChange={() => toggleCat3Checklist('containmentBarriers')}
+                  className="mt-1 w-5 h-5"
+                />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">2. Containment Barriers Installed</p>
+                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
+                    <li>• Plastic sheeting (6-mil minimum) sealing work area</li>
+                    <li>• Critical barriers (doorways, HVAC vents, adjacent rooms)</li>
+                    <li>• Floor protection in transit paths</li>
+                    <li>• Dedicated entry/exit point marked</li>
+                  </ul>
+                </div>
+              </label>
+
+              {/* Negative Air Setup */}
+              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={cat3Checklist.negativeAirSetup}
+                  onChange={() => toggleCat3Checklist('negativeAirSetup')}
+                  className="mt-1 w-5 h-5"
+                />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">3. Negative Air Pressure Established</p>
+                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
+                    <li>• Air scrubbers with HEPA filtration running</li>
+                    <li>• Exhaust vented outside (not to unaffected areas)</li>
+                    <li>• Negative pressure prevents contamination spread</li>
+                    <li>• Verify air flows INTO work area (not out)</li>
+                  </ul>
+                </div>
+              </label>
+
+              {/* Waste Containment */}
+              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={cat3Checklist.wasteContainment}
+                  onChange={() => toggleCat3Checklist('wasteContainment')}
+                  className="mt-1 w-5 h-5"
+                />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">4. Biohazard Waste Disposal Plan</p>
+                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
+                    <li>• Red biohazard bags for contaminated materials</li>
+                    <li>• Separate containers for sharps/hard debris</li>
+                    <li>• Designated disposal area outside work zone</li>
+                    <li>• Do NOT mix with regular construction waste</li>
+                  </ul>
+                </div>
+              </label>
+
+              {/* Cross-Contamination Prevention */}
+              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={cat3Checklist.crossContaminationPrevention}
+                  onChange={() => toggleCat3Checklist('crossContaminationPrevention')}
+                  className="mt-1 w-5 h-5"
+                />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">5. Cross-Contamination Prevention</p>
+                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
+                    <li>• Shoe covers or boot wash station at exit</li>
+                    <li>• Hand sanitizer/wash station accessible</li>
+                    <li>• No food/drink in work area</li>
+                    <li>• Tools/equipment decontaminated before removal</li>
+                  </ul>
+                </div>
+              </label>
+
+              {/* Customer Notification */}
+              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={cat3Checklist.customerNotified}
+                  onChange={() => toggleCat3Checklist('customerNotified')}
+                  className="mt-1 w-5 h-5"
+                />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">6. Customer Notification Complete</p>
+                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
+                    <li>• Explained biohazard risks and health concerns</li>
+                    <li>• Advised to avoid contaminated areas</li>
+                    <li>• Pets/children must be kept away from work zone</li>
+                    <li>• Provided timeline for safe re-entry</li>
+                  </ul>
+                </div>
+              </label>
+            </div>
+
+            {/* Completion Status */}
+            {Object.values(cat3Checklist).every(v => v) ? (
+              <div className="mt-4 bg-green-50 border border-green-300 rounded-lg p-3 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <p className="text-sm font-medium text-green-800">
+                  ✓ All containment protocols confirmed. Safe to proceed with Cat 3 work.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-4 bg-yellow-50 border border-yellow-300 rounded-lg p-3 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-yellow-600" />
+                <p className="text-sm font-medium text-yellow-800">
+                  Complete all checklist items before starting Cat 3 biohazard work (
+                  {Object.values(cat3Checklist).filter(v => v).length}/6 completed)
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Emergency Contact */}
+          <div className="mt-4 bg-red-100 border border-red-300 rounded-lg p-3">
+            <p className="text-xs text-red-900">
+              <strong>OSHA Violation Risk:</strong> Failure to follow Cat 3 protocols can result in fines up to $15,625 per violation.
+              In case of exposure (skin contact, ingestion), seek immediate medical attention and report to MIT Lead.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Gas Appliance Safety Check */}
+      <div className="border border-gray-200 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <AlertCircle className="w-5 h-5 text-orange-600" />
+          <h3 className="font-semibold text-gray-900">Gas Appliance Safety Assessment *</h3>
+        </div>
+        <p className="text-sm text-gray-600 mb-4">
+          Critical safety check: Water damage near gas appliances can cause fire/explosion risk from corroded connections or damaged controls.
+        </p>
+
+        {/* Are gas appliances present? */}
+        <div className="mb-4">
+          <p className="text-sm font-medium text-gray-700 mb-2">
+            Are there gas appliances in or near the affected area?
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setGasAppliancesPresent(true);
+                if (!gasAppliancesPresent) {
+                  setGasAppliancesAffected(false);
+                  setGasApplianceTypes([]);
+                }
+              }}
+              className={`flex-1 px-4 py-2 border-2 rounded-lg font-medium transition-all ${
+                gasAppliancesPresent === true
+                  ? 'border-orange-500 bg-orange-50 text-orange-900'
+                  : 'border-gray-300 hover:border-orange-300'
+              }`}
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => {
+                setGasAppliancesPresent(false);
+                setGasAppliancesAffected(false);
+                setGasApplianceTypes([]);
+              }}
+              className={`flex-1 px-4 py-2 border-2 rounded-lg font-medium transition-all ${
+                gasAppliancesPresent === false
+                  ? 'border-green-500 bg-green-50 text-green-900'
+                  : 'border-gray-300 hover:border-green-300'
+              }`}
+            >
+              No
+            </button>
+          </div>
+        </div>
+
+        {/* If yes, show appliance types and impact check */}
+        {gasAppliancesPresent && (
+          <div className="space-y-4">
+            {/* Appliance types */}
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                Select all gas appliances present:
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {['Furnace', 'Water Heater', 'Stove/Range', 'Dryer', 'Fireplace', 'Boiler'].map(type => (
+                  <button
+                    key={type}
+                    onClick={() => toggleApplianceType(type)}
+                    className={`px-3 py-2 text-sm border rounded-lg transition-all ${
+                      gasApplianceTypes.includes(type)
+                        ? 'border-orange-500 bg-orange-50 text-orange-900 font-medium'
+                        : 'border-gray-300 hover:border-orange-300'
+                    }`}
+                  >
+                    {gasApplianceTypes.includes(type) ? '✓ ' : ''}{type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Impact assessment */}
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                Were any gas appliances directly impacted by water?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setGasAppliancesAffected(true)}
+                  className={`flex-1 px-4 py-2 border-2 rounded-lg font-medium transition-all ${
+                    gasAppliancesAffected
+                      ? 'border-red-500 bg-red-50 text-red-900'
+                      : 'border-gray-300 hover:border-red-300'
+                  }`}
+                >
+                  Yes - Water Contact
+                </button>
+                <button
+                  onClick={() => setGasAppliancesAffected(false)}
+                  className={`flex-1 px-4 py-2 border-2 rounded-lg font-medium transition-all ${
+                    !gasAppliancesAffected
+                      ? 'border-green-500 bg-green-50 text-green-900'
+                      : 'border-gray-300 hover:border-green-300'
+                  }`}
+                >
+                  No - Nearby Only
+                </button>
+              </div>
+            </div>
+
+            {/* Warning if affected */}
+            {gasAppliancesAffected && (
+              <div className="bg-red-50 border-2 border-red-500 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-bold text-red-900 mb-2">🚨 CRITICAL: Gas Appliance Specialist Required</h4>
+                    <p className="text-sm text-red-800 mb-3">
+                      Water-damaged gas appliances pose explosion/fire risk. DO NOT turn on gas until inspected.
+                    </p>
+                    <ul className="text-sm text-red-800 space-y-1 mb-3">
+                      <li>✓ Licensed plumber or HVAC tech must inspect</li>
+                      <li>✓ Gas valve should remain OFF until cleared</li>
+                      <li>✓ Check for corrosion on connections, valves, and controls</li>
+                      <li>✓ Test for gas leaks before re-energizing</li>
+                    </ul>
+                    <button
+                      onClick={() => setShowSubModal(true)}
+                      className="btn-primary bg-red-600 hover:bg-red-700 flex items-center gap-2"
+                    >
+                      <Wrench className="w-4 h-4" />
+                      Request HVAC/Plumber Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Warning if nearby but not affected */}
+            {!gasAppliancesAffected && gasApplianceTypes.length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <Info className="w-4 h-4 text-yellow-700 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-yellow-800">
+                    <strong>Note:</strong> Gas appliances are nearby. Monitor during drying for any signs of moisture intrusion.
+                    If condensation or dampness appears near gas lines, request inspection.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Request Specialist Button */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

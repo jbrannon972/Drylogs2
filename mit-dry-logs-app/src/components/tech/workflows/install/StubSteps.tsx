@@ -523,6 +523,18 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
   const [currentRoom, setCurrentRoom] = useState<string>('');
   const [equipmentType, setEquipmentType] = useState<'dehumidifier' | 'air-mover' | 'air-scrubber'>('dehumidifier');
   const [equipmentId, setEquipmentId] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
+  const [equipmentCondition, setEquipmentCondition] = useState<'good' | 'worn' | 'damaged'>('good');
+
+  const handleQRScan = () => {
+    // In production, this would open device camera for QR/barcode scanning
+    // For now, prompt for manual entry
+    const scannedId = prompt('Scan QR code or enter equipment ID:');
+    if (scannedId) {
+      setEquipmentId(scannedId);
+      setIsScanning(false);
+    }
+  };
 
   const handleAddEquipment = () => {
     if (!currentRoom || !equipmentId.trim()) {
@@ -530,11 +542,23 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
       return;
     }
 
+    const now = new Date();
     const roomEquipment = placedEquipment[currentRoom] || [];
     const newEquipment = {
       id: equipmentId,
       type: equipmentType,
-      placedAt: new Date().toISOString(),
+      condition: equipmentCondition,
+      placedAt: now.toISOString(),
+      placedAtTimestamp: now.getTime(), // Unix timestamp for easy sorting/filtering
+      placedBy: job.assignedTech || 'Unknown',
+      placedAtFormatted: now.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }),
     };
 
     const updated = {
@@ -545,6 +569,7 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
     setPlacedEquipment(updated);
     updateWorkflowData('install', { placedEquipment: updated });
     setEquipmentId('');
+    setEquipmentCondition('good');
   };
 
   const handleRemoveEquipment = (roomId: string, equipmentId: string) => {
@@ -660,6 +685,34 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
+              Equipment Condition *
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: 'good' as const, label: 'Good', color: 'green' },
+                { value: 'worn' as const, label: 'Worn', color: 'yellow' },
+                { value: 'damaged' as const, label: 'Damaged', color: 'red' }
+              ].map(({ value, label, color }) => (
+                <button
+                  key={value}
+                  onClick={() => setEquipmentCondition(value)}
+                  className={`p-2 rounded-lg border-2 text-sm font-medium transition-all ${
+                    equipmentCondition === value
+                      ? `border-${color}-500 bg-${color}-50 text-${color}-900`
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Document equipment condition for billing disputes
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Equipment ID / Serial Number *
             </label>
             <div className="flex gap-2">
@@ -667,7 +720,7 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
                 type="text"
                 value={equipmentId}
                 onChange={(e) => setEquipmentId(e.target.value)}
-                placeholder="Enter ID or scan barcode..."
+                placeholder="Enter ID or scan QR code..."
                 className="input-field flex-1"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
@@ -676,12 +729,20 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
                   }
                 }}
               />
+              <Button
+                variant="secondary"
+                onClick={handleQRScan}
+                className="flex items-center gap-2 whitespace-nowrap"
+              >
+                <Camera className="w-4 h-4" />
+                Scan QR
+              </Button>
               <Button variant="primary" onClick={handleAddEquipment}>
                 Add
               </Button>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              Enter the equipment ID manually or use a barcode scanner
+              ⏱️ Timestamp will be recorded automatically for billing verification
             </p>
           </div>
         </div>
@@ -712,25 +773,44 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
 
                 {roomEquipment.length > 0 ? (
                   <div className="space-y-2">
-                    {roomEquipment.map((equipment, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-3 bg-white rounded border"
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{equipment.id}</p>
-                          <p className="text-xs text-gray-600">
-                            {equipment.type.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveEquipment(room.id, equipment.id)}
-                          className="text-red-600 hover:bg-red-50 p-2 rounded"
+                    {roomEquipment.map((equipment, index) => {
+                      const conditionColors = {
+                        good: 'bg-green-100 text-green-800 border-green-300',
+                        worn: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                        damaged: 'bg-red-100 text-red-800 border-red-300',
+                      };
+                      const conditionColor = conditionColors[equipment.condition as keyof typeof conditionColors] || conditionColors.good;
+
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-start justify-between p-3 bg-white rounded border"
                         >
-                          <span className="text-sm">Remove</span>
-                        </button>
-                      </div>
-                    ))}
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="text-sm font-medium text-gray-900">{equipment.id}</p>
+                              <span className={`px-2 py-0.5 text-xs font-medium rounded border ${conditionColor}`}>
+                                {equipment.condition || 'good'}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-1">
+                              {equipment.type.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                            </p>
+                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                              <Clock className="w-3 h-3" />
+                              <span className="font-medium">Placed:</span>
+                              <span>{equipment.placedAtFormatted || new Date(equipment.placedAt).toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleRemoveEquipment(room.id, equipment.id)}
+                            className="text-red-600 hover:bg-red-50 p-2 rounded flex-shrink-0"
+                          >
+                            <span className="text-sm">Remove</span>
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500">No equipment placed yet</p>
@@ -1216,6 +1296,12 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
   const [travelTimeFromSite, setTravelTimeFromSite] = useState(installData.travelTimeFromSite || 0);
   const [techNotes, setTechNotes] = useState(installData.completionNotes || '');
 
+  // Customer Signature
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [signature, setSignature] = useState<string | null>(installData.customerSignature || null);
+  const [customerName, setCustomerName] = useState(installData.customerSignatureName || job.customerInfo?.name || '');
+
   // Calculate labor hours
   const calculateLaborHours = () => {
     if (!installData.arrivalTime || !departureTime) return null;
@@ -1266,12 +1352,76 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
 
   const laborSummary = calculateLaborHours();
 
+  // Signature canvas functions
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    setIsDrawing(true);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const dataUrl = canvas.toDataURL('image/png');
+      setSignature(dataUrl);
+      handleSave();
+    }
+  };
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    setSignature(null);
+    handleSave();
+  };
+
   const handleSave = () => {
     updateWorkflowData('install', {
       departureTime,
       travelTimeFromSite,
       completionNotes: techNotes,
       laborSummary,
+      customerSignature: signature,
+      customerSignatureName: customerName,
+      customerSignatureTimestamp: signature ? new Date().toISOString() : null,
       completedAt: new Date().toISOString(),
     });
   };
@@ -1427,6 +1577,83 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
         />
       </div>
 
+      {/* Customer Signature Capture */}
+      <div className="bg-white border-2 border-gray-300 rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <CheckCircle className="w-5 h-5 text-entrusted-orange" />
+          <h4 className="font-semibold text-gray-900">Customer Signature *</h4>
+        </div>
+        <p className="text-sm text-gray-600 mb-4">
+          Customer signature confirms work completion and equipment placement. Required for dispute prevention.
+        </p>
+
+        {/* Customer Name */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Customer Name *
+          </label>
+          <input
+            type="text"
+            value={customerName}
+            onChange={(e) => {
+              setCustomerName(e.target.value);
+              handleSave();
+            }}
+            placeholder="Enter customer name"
+            className="input-field"
+          />
+        </div>
+
+        {/* Signature Pad */}
+        <div className="border-2 border-gray-300 rounded-lg bg-white">
+          <div className="p-2 bg-gray-50 border-b-2 border-gray-300 flex items-center justify-between">
+            <p className="text-sm font-medium text-gray-700">Sign below:</p>
+            <button
+              onClick={clearSignature}
+              className="text-sm text-red-600 hover:text-red-800 font-medium"
+            >
+              Clear
+            </button>
+          </div>
+          <div className="relative">
+            <canvas
+              ref={canvasRef}
+              width={600}
+              height={200}
+              className="w-full touch-none cursor-crosshair"
+              style={{ touchAction: 'none' }}
+              onMouseDown={startDrawing}
+              onMouseMove={draw}
+              onMouseUp={stopDrawing}
+              onMouseLeave={stopDrawing}
+              onTouchStart={startDrawing}
+              onTouchMove={draw}
+              onTouchEnd={stopDrawing}
+            />
+            {!signature && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <p className="text-gray-400 text-sm">Draw signature here</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {signature && (
+          <div className="mt-4 bg-green-50 border border-green-300 rounded-lg p-3 flex items-start gap-2">
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-green-900">Signature Captured</p>
+              <p className="text-xs text-green-700 mt-1">
+                Signed by: <strong>{customerName}</strong> on {new Date().toLocaleString()}
+              </p>
+              <p className="text-xs text-green-700">
+                This digital signature has the same legal weight as a handwritten signature.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Next Steps */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-sm text-blue-800">
@@ -1445,16 +1672,21 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
         variant="primary"
         onClick={handleFinalize}
         className="w-full py-4 text-lg"
-        disabled={!departureTime}
+        disabled={!departureTime || !signature || !customerName.trim()}
       >
         <CheckCircle className="w-5 h-5" />
         Finalize and Return to Dashboard
       </Button>
 
-      {!departureTime && (
-        <p className="text-sm text-red-600 text-center">
-          Please enter departure time before finalizing
-        </p>
+      {(!departureTime || !signature || !customerName.trim()) && (
+        <div className="text-sm text-red-600 text-center space-y-1">
+          <p className="font-medium">Required before finalizing:</p>
+          <ul className="text-xs">
+            {!departureTime && <li>• Enter departure time</li>}
+            {!signature && <li>• Capture customer signature</li>}
+            {!customerName.trim() && <li>• Enter customer name</li>}
+          </ul>
+        </div>
       )}
     </div>
   );

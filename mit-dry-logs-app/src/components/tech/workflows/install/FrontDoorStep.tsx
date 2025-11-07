@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, MapPin, Clock, Camera, AlertTriangle, Info } from 'lucide-react';
+import { CheckCircle, MapPin, Clock, Camera, AlertTriangle, Info, ShieldAlert } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
@@ -19,6 +19,11 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
     installData.frontEntrancePhoto || null
   );
   const [isAfterHours, setIsAfterHours] = useState(false);
+
+  // EPA Compliance - Asbestos/Lead
+  const [buildingYear, setBuildingYear] = useState<string>(installData.buildingYear || '');
+  const [asbestosConcern, setAsbestosConcern] = useState<boolean>(installData.asbestosConcern || false);
+  const [leadConcern, setLeadConcern] = useState<boolean>(installData.leadConcern || false);
 
   const [checklist, setChecklist] = useState({
     introduced: false,
@@ -43,13 +48,31 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
     checkAfterHours();
   }, []);
 
+  // Auto-detect hazard flags based on building year
+  useEffect(() => {
+    const year = parseInt(buildingYear);
+    if (!isNaN(year)) {
+      // Lead paint concern for pre-1978 buildings (EPA lead-based paint regulations)
+      if (year < 1978 && !leadConcern) {
+        setLeadConcern(true);
+      }
+      // Asbestos concern for pre-1980 buildings (EPA asbestos regulations)
+      if (year < 1980 && !asbestosConcern) {
+        setAsbestosConcern(true);
+      }
+    }
+  }, [buildingYear]);
+
   // Save to workflow store
   useEffect(() => {
     updateWorkflowData('install', {
       frontEntrancePhoto,
       isAfterHours,
+      buildingYear,
+      asbestosConcern,
+      leadConcern,
     });
-  }, [frontEntrancePhoto, isAfterHours]);
+  }, [frontEntrancePhoto, isAfterHours, buildingYear, asbestosConcern, leadConcern]);
 
   const handleFrontEntrancePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,7 +86,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
     setChecklist(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const allComplete = frontEntrancePhoto && Object.values(checklist).every(v => v);
+  const allComplete = frontEntrancePhoto && buildingYear && Object.values(checklist).every(v => v);
 
   return (
     <div className="space-y-6">
@@ -128,6 +151,106 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h3 className="font-semibold text-blue-900 mb-2">Customer: {job.customerInfo.name}</h3>
         <p className="text-sm text-gray-700">Phone: {job.customerInfo.phoneNumber}</p>
+      </div>
+
+      {/* EPA Compliance - Property Hazards */}
+      <div className="border border-gray-200 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldAlert className="w-5 h-5 text-red-600" />
+          <h3 className="font-semibold text-gray-900">Property Age & EPA Hazards *</h3>
+        </div>
+        <p className="text-sm text-gray-600 mb-4">
+          Required for EPA compliance. Pre-1978 buildings may contain lead paint. Pre-1980 buildings may contain asbestos.
+        </p>
+
+        {/* Building Year */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Building Year Built *
+          </label>
+          <input
+            type="number"
+            min="1800"
+            max={new Date().getFullYear()}
+            value={buildingYear}
+            onChange={(e) => setBuildingYear(e.target.value)}
+            placeholder="e.g., 1975"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Hazard Warnings */}
+        {buildingYear && parseInt(buildingYear) < 1980 && (
+          <div className="space-y-3 mb-4">
+            {parseInt(buildingYear) < 1978 && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium text-red-900 mb-1">⚠️ Lead Paint Warning (Pre-1978)</p>
+                    <p className="text-red-800 text-xs">
+                      EPA requires lead-safe work practices. Notify customer of potential lead-based paint.
+                      Violation penalties up to $16,000/day. Do NOT sand, scrape, or create dust without proper containment.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {parseInt(buildingYear) < 1980 && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium text-orange-900 mb-1">⚠️ Asbestos Warning (Pre-1980)</p>
+                    <p className="text-orange-800 text-xs">
+                      Common in: pipe insulation, floor tiles, ceiling tiles, roofing materials.
+                      If suspected during demo, STOP WORK and notify MIT Lead. Licensed abatement may be required.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Confirmation Checkboxes */}
+        <div className="space-y-2">
+          <label className="flex items-start gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
+            <input
+              type="checkbox"
+              checked={asbestosConcern}
+              onChange={(e) => setAsbestosConcern(e.target.checked)}
+              className="mt-1"
+            />
+            <div className="text-sm">
+              <p className="font-medium text-gray-900">Asbestos concern identified or suspected</p>
+              <p className="text-xs text-gray-600">Check if building pre-1980 or materials suspected</p>
+            </div>
+          </label>
+
+          <label className="flex items-start gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
+            <input
+              type="checkbox"
+              checked={leadConcern}
+              onChange={(e) => setLeadConcern(e.target.checked)}
+              className="mt-1"
+            />
+            <div className="text-sm">
+              <p className="font-medium text-gray-900">Lead paint concern identified or suspected</p>
+              <p className="text-xs text-gray-600">Check if building pre-1978 or paint suspected</p>
+            </div>
+          </label>
+        </div>
+
+        {(asbestosConcern || leadConcern) && (
+          <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded p-2">
+            <p className="text-xs text-yellow-800">
+              <strong>Action Required:</strong> Document concerns in notes. Notify MIT Lead before demo work.
+              Customer must be informed in writing of potential hazards.
+            </p>
+          </div>
+        )}
       </div>
 
       <div>
