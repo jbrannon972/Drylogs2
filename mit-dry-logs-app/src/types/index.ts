@@ -103,8 +103,34 @@ export interface CheckServiceVisit {
   readingsVerified: boolean;
 }
 
+export interface PartialDemoMaterial {
+  materialType: string;
+  quantity: number;
+  unit: 'sqft' | 'linear-ft' | 'each';
+  notes: string;
+}
+
+export interface PartialDemoRoom {
+  roomId: string;
+  roomName: string;
+  materialsRemoved: PartialDemoMaterial[];
+  demoTimeMinutes: number;
+  photos: string[];
+  notes: string;
+}
+
+export interface PartialDemoDetails {
+  rooms: PartialDemoRoom[];
+  totalDemoTimeMinutes: number;
+  loggedAt: Timestamp;
+  loggedBy?: string;
+}
+
 export interface WorkflowPhases {
-  install: WorkflowPhase;
+  install: WorkflowPhase & {
+    partialDemoPerformed?: boolean;
+    partialDemoDetails?: PartialDemoDetails;
+  };
   demo: WorkflowPhase & { scheduledDate?: Timestamp };
   checkService: WorkflowPhase & {
     visits: CheckServiceVisit[];
@@ -485,6 +511,80 @@ export interface JobMetadata {
 }
 
 // ============================================================================
+// ADDITIONAL BILLABLE WORK (GENERAL PAGE)
+// ============================================================================
+
+export interface BillableItem {
+  performed: boolean;
+  quantity: number;
+  unit: 'each' | 'sqft' | 'linear-ft' | 'daily';
+  notes?: string;
+}
+
+export interface AdditionalWork {
+  // Structural Materials
+  insulation?: BillableItem;
+  insulationVacuum?: BillableItem;
+  insulationTruss?: BillableItem;
+  countertops?: BillableItem;
+  backsplash?: BillableItem;
+  cabinetry?: BillableItem;
+  // Contents & Protection
+  contents?: BillableItem;
+  contentsBags?: BillableItem;
+  applianceMoving?: BillableItem;
+  floorProtection?: BillableItem;
+  plasticCoverings?: BillableItem;
+  areaRugRedelivery?: BillableItem;
+  // Containment
+  containmentSqft?: BillableItem;
+  zipPoleSystem?: BillableItem;
+  zippers?: BillableItem;
+  // Specialized Services
+  waterExtraction?: BillableItem;
+  sprayAntiMicrobial?: BillableItem;
+  cleaning?: BillableItem;
+  finalCleaning?: BillableItem;
+  thermalImaging?: BillableItem;
+  moldTesting?: BillableItem;
+  leadTesting?: BillableItem;
+  categoryTestingStrips?: BillableItem;
+  drillHoles?: BillableItem;
+  // Equipment Services
+  jobsiteMonitoring?: BillableItem;
+  decontaminateDehus?: BillableItem;
+  decontaminateAirScrubbers?: BillableItem;
+  decontaminateAirMovers?: BillableItem;
+  toolRental?: BillableItem;
+  ladder?: BillableItem;
+  // Materials & Supplies
+  plastic?: BillableItem;
+  bubbleWrap?: BillableItem;
+  lumber2x4?: BillableItem;
+  fullCoveralls?: BillableItem;
+  fullFaceRespirator?: BillableItem;
+  halfFaceRespirator?: BillableItem;
+  disposableGloves?: BillableItem;
+  heavyDutyGloves?: BillableItem;
+  eyeProtection?: BillableItem;
+  disposableMask?: BillableItem;
+  // Disposal & Logistics
+  pod?: BillableItem;
+  podDeliveryPickup?: BillableItem;
+  pickupDumpCharge?: BillableItem;
+  dumpsterBag?: BillableItem;
+  // Other Services
+  emergencyCallDuringHours?: BillableItem;
+  emergencyCallAfterHours?: BillableItem;
+  tempSinkHookup?: BillableItem;
+  matterport?: BillableItem;
+  other?: BillableItem & { description?: string };
+  // Metadata
+  loggedBy?: string;
+  loggedAt?: Timestamp;
+}
+
+// ============================================================================
 // COMPLETE JOB TYPE
 // ============================================================================
 
@@ -498,6 +598,7 @@ export interface Job {
   rooms: Room[];
   equipment: JobEquipment;
   dryingPlan?: DryingPlan; // NEW: Comprehensive drying plan
+  additionalWork?: AdditionalWork; // NEW: General page billable items
   safetyChecklist: SafetyChecklist;
   communication: Communication;
   financial: Financial;
@@ -509,6 +610,60 @@ export interface Job {
   customArrivalStart?: string; // For 'custom' window: HH:mm format
   customArrivalEnd?: string;   // For 'custom' window: HH:mm format
   metadata: JobMetadata;
+}
+
+// ============================================================================
+// SUBCONTRACTOR REQUEST TYPES
+// ============================================================================
+
+export type SpecialistType =
+  | 'Plumber'
+  | 'Electrician'
+  | 'HVAC Technician'
+  | 'Asbestos Abatement'
+  | 'Mold Remediation'
+  | 'Structural Engineer'
+  | 'Roofing Contractor'
+  | 'Other';
+
+export type UrgencyLevel = 'emergency' | 'urgent' | 'standard';
+export type SubRequestStatus = 'pending' | 'scheduled' | 'completed' | 'cancelled';
+
+export interface SubcontractorRequest {
+  requestId: string;
+  jobId: string;
+  requestedBy: string; // MIT Tech UID
+  requestedAt: Timestamp;
+
+  specialistType: SpecialistType;
+  otherSpecialistType?: string; // If specialistType is 'Other'
+  urgency: UrgencyLevel;
+  location: string; // Room name
+  issueDescription: string;
+  photos: string[]; // Photo URLs
+  customerAware: boolean;
+
+  status: SubRequestStatus;
+
+  // MIT Lead actions
+  assignedTo?: string; // Sub company/contact
+  scheduledDate?: Timestamp;
+  assignedBy?: string; // MIT Lead UID
+  assignedAt?: Timestamp;
+
+  // Completion tracking
+  completedAt?: Timestamp;
+  completedBy?: string;
+  completionNotes?: string;
+  charge?: number; // Billable amount
+  chargeApproved?: boolean;
+
+  // Notifications
+  notifications?: Array<{
+    sentTo: string;
+    sentAt: Timestamp;
+    type: 'request' | 'scheduled' | 'completed';
+  }>;
 }
 
 // ============================================================================

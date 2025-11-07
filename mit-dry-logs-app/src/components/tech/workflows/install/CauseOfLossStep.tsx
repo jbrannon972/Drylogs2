@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
-import { Droplets, AlertCircle, Info, Camera } from 'lucide-react';
+import { Droplets, AlertCircle, Info, Camera, Wrench } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
+import { SubcontractorRequestModal, SubcontractorRequestData } from '../../../shared/SubcontractorRequestModal';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../../../../services/firebase';
 
 interface CauseOfLossStepProps {
   job: any;
@@ -14,6 +17,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
+  const [showSubModal, setShowSubModal] = useState(false);
 
   const [causeType, setCauseType] = useState(installData.causeOfLoss?.type || '');
   const [causeLocation, setCauseLocation] = useState(installData.causeOfLoss?.location || '');
@@ -60,6 +64,36 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       const url = await uploadPhoto(file, job.jobId, 'cause-of-loss', 'assessment', user.uid);
       if (url) setCausePhoto(url);
     }
+  };
+
+  const handleSubcontractorRequest = async (data: SubcontractorRequestData) => {
+    if (!user) return;
+
+    // Upload photos if any
+    const photoUrls: string[] = [];
+    for (const photo of data.photos) {
+      const url = await uploadPhoto(photo, job.jobId, 'subcontractor-request', data.location, user.uid);
+      if (url) photoUrls.push(url);
+    }
+
+    // Create subcontractor request document
+    const requestData = {
+      jobId: job.jobId,
+      requestedBy: user.uid,
+      requestedAt: Timestamp.now(),
+      specialistType: data.specialistType,
+      otherSpecialistType: data.specialistType === 'Other' ? data.otherSpecialistType : null,
+      urgency: data.urgency,
+      location: data.location,
+      issueDescription: data.issueDescription,
+      photos: photoUrls,
+      customerAware: data.customerAware,
+      status: 'pending',
+    };
+
+    await addDoc(collection(db, 'subcontractorRequests'), requestData);
+
+    alert('Subcontractor request submitted successfully. MIT Lead will be notified.');
   };
 
   const causeTypes = [
@@ -353,6 +387,27 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         </div>
       )}
 
+      {/* Request Specialist Button */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start gap-3 mb-3">
+          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <h4 className="font-medium text-blue-900 mb-1">Need a Specialist?</h4>
+            <p className="text-sm text-blue-700">
+              If you identified a need for a plumber, electrician, or other specialist during assessment, you can request one now.
+            </p>
+          </div>
+        </div>
+        <Button
+          variant="secondary"
+          onClick={() => setShowSubModal(true)}
+          className="flex items-center gap-2"
+        >
+          <Wrench className="w-4 h-4" />
+          Request Specialist
+        </Button>
+      </div>
+
       {/* Validation Warning */}
       {!isComplete && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -365,6 +420,16 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
             </div>
           </div>
         </div>
+      )}
+
+      {/* Subcontractor Request Modal */}
+      {showSubModal && (
+        <SubcontractorRequestModal
+          jobId={job.jobId}
+          rooms={installData.rooms || []}
+          onClose={() => setShowSubModal(false)}
+          onSubmit={handleSubcontractorRequest}
+        />
       )}
     </div>
   );

@@ -30,6 +30,7 @@ import { AffectedMaterialsStep } from './install/AffectedMaterialsStep';
 import { MoistureMappingStep } from './install/MoistureMappingStep';
 import { ScheduleWorkStep } from './install/ScheduleWorkStep';
 import { EquipmentCalcStep } from './install/EquipmentCalcStep';
+import { GeneralBillablesStep } from './install/GeneralBillablesStep';
 import {
   PreExistingStep,
   EquipmentPlaceStep,
@@ -116,6 +117,13 @@ const INSTALL_STEPS: StepConfig[] = [
     description: 'Place and scan by room',
     icon: <Wind className="w-5 h-5" />,
     component: EquipmentPlaceStep,
+  },
+  {
+    id: 'general-billables',
+    title: 'Additional Billable Work',
+    description: 'Log additional services performed',
+    icon: <ClipboardCheck className="w-5 h-5" />,
+    component: GeneralBillablesStep,
   },
   {
     id: 'communicate-plan',

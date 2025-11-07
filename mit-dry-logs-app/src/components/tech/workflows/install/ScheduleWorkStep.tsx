@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
-import { Calendar, Clock, AlertCircle, Info, Plus, Trash2 } from 'lucide-react';
+import { Calendar, Clock, AlertCircle, Info, Plus, Trash2, Wrench } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
+import { SubcontractorRequestModal, SubcontractorRequestData } from '../../../shared/SubcontractorRequestModal';
+import { useAuth } from '../../../../hooks/useAuth';
+import { usePhotos } from '../../../../hooks/usePhotos';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../../../../services/firebase';
 
 interface ScheduleWorkStepProps {
   job: any;
@@ -22,10 +27,13 @@ interface ScheduledVisit {
 
 export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
+  const { user } = useAuth();
+  const { uploadPhoto } = usePhotos();
   const [visits, setVisits] = useState<ScheduledVisit[]>(installData.scheduledVisits || []);
   const [estimatedDryingDays, setEstimatedDryingDays] = useState(
     installData.dryingPlan?.estimatedDays || '3'
   );
+  const [showSubModal, setShowSubModal] = useState(false);
 
   useEffect(() => {
     updateWorkflowData('install', {
@@ -33,6 +41,36 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
       estimatedDryingDays: parseInt(estimatedDryingDays),
     });
   }, [visits, estimatedDryingDays]);
+
+  const handleSubcontractorRequest = async (data: SubcontractorRequestData) => {
+    if (!user) return;
+
+    // Upload photos if any
+    const photoUrls: string[] = [];
+    for (const photo of data.photos) {
+      const url = await uploadPhoto(photo, job.jobId, 'subcontractor-request', data.location, user.uid);
+      if (url) photoUrls.push(url);
+    }
+
+    // Create subcontractor request document
+    const requestData = {
+      jobId: job.jobId,
+      requestedBy: user.uid,
+      requestedAt: Timestamp.now(),
+      specialistType: data.specialistType,
+      otherSpecialistType: data.specialistType === 'Other' ? data.otherSpecialistType : null,
+      urgency: data.urgency,
+      location: data.location,
+      issueDescription: data.issueDescription,
+      photos: photoUrls,
+      customerAware: data.customerAware,
+      status: 'pending',
+    };
+
+    await addDoc(collection(db, 'subcontractorRequests'), requestData);
+
+    alert('Subcontractor request submitted successfully. MIT Lead will be notified.');
+  };
 
   const addVisit = (type: 'demo' | 'check' | 'pull') => {
     const dayNumber = visits.length + 2; // Day 1 is install, so start at Day 2
@@ -270,6 +308,27 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
         </div>
       )}
 
+      {/* Request Specialist Button */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start gap-3 mb-3">
+          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <h4 className="font-medium text-blue-900 mb-1">Need a Specialist for Future Work?</h4>
+            <p className="text-sm text-blue-700">
+              If you identified work that requires a specialist (plumber, electrician, etc.), request scheduling now.
+            </p>
+          </div>
+        </div>
+        <Button
+          variant="secondary"
+          onClick={() => setShowSubModal(true)}
+          className="flex items-center gap-2"
+        >
+          <Wrench className="w-4 h-4" />
+          Request Specialist
+        </Button>
+      </div>
+
       {/* Summary */}
       {visits.length > 0 && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -281,6 +340,16 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
             <p>• Equipment pulls: <strong>{visits.filter(v => v.type === 'pull').length}</strong></p>
           </div>
         </div>
+      )}
+
+      {/* Subcontractor Request Modal */}
+      {showSubModal && (
+        <SubcontractorRequestModal
+          jobId={job.jobId}
+          rooms={installData.rooms || []}
+          onClose={() => setShowSubModal(false)}
+          onSubmit={handleSubcontractorRequest}
+        />
       )}
     </div>
   );

@@ -14,9 +14,10 @@ export type InstallStep =
   | 'schedule-work'          // Step 8: Plan Day 2+ (demo, checks, pull)
   | 'equipment-calc'         // Step 9: IICRC equipment calculations per room
   | 'equipment-place'        // Step 10: Place and scan equipment by room
-  | 'communicate-plan'       // Step 11: Customer communication
-  | 'final-photos'           // Step 12: Final documentation
-  | 'complete';              // Step 13: Complete and depart
+  | 'general-billables'      // Step 11: Additional billable work (generals page)
+  | 'communicate-plan'       // Step 12: Customer communication
+  | 'final-photos'           // Step 13: Final documentation
+  | 'complete';              // Step 14: Complete and depart
 
 export type DemoStep =
   | 'clock-in'                // Step 1: Arrival & clock in

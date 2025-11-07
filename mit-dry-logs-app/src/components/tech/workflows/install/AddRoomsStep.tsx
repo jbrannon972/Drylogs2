@@ -391,7 +391,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
                 Insets & Offsets (Optional)
               </h4>
               <p className="text-xs text-gray-600 mb-3">
-                Enter direct cubic footage adjustments for closets, alcoves, or obstacles. Used for dehumidifier calculations (IICRC S500).
+                <strong>Insets</strong> add volume (closets, alcoves). <strong>Offsets</strong> subtract volume (columns, obstacles).
+                Used for precise IICRC S500 dehumidifier calculations.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
