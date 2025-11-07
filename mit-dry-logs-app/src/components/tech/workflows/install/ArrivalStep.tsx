@@ -24,6 +24,9 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   const [arrivalTime, setArrivalTime] = useState(
     installData.arrivalTime || `${hours}:${minutes}`
   );
+  const [travelTimeToSite, setTravelTimeToSite] = useState(
+    installData.travelTimeToSite || 0
+  );
   const [truckPhoto, setTruckPhoto] = useState<string | null>(
     installData.truckPhoto || null
   );
@@ -35,10 +38,11 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   useEffect(() => {
     updateWorkflowData('install', {
       arrivalTime,
+      travelTimeToSite,
       truckPhoto,
       propertyPhoto,
     });
-  }, [arrivalTime, truckPhoto, propertyPhoto]);
+  }, [arrivalTime, travelTimeToSite, truckPhoto, propertyPhoto]);
 
   const handleTruckPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,15 +80,30 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Clock In */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Arrival Time
-        </label>
-        <Input
-          type="time"
-          value={arrivalTime}
-          onChange={(e) => setArrivalTime(e.target.value)}
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Arrival Time
+          </label>
+          <Input
+            type="time"
+            value={arrivalTime}
+            onChange={(e) => setArrivalTime(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Travel Time to Site (minutes)
+          </label>
+          <Input
+            type="number"
+            value={travelTimeToSite}
+            onChange={(e) => setTravelTimeToSite(parseInt(e.target.value) || 0)}
+            placeholder="0"
+            min="0"
+          />
+          <p className="text-xs text-gray-500 mt-1">Drive time from office/home</p>
+        </div>
       </div>
 
       {/* Truck Photo */}
