@@ -12,13 +12,14 @@ export type InstallStep =
   | 'add-rooms'              // Step 5: Add rooms with dimensions
   | 'affected-materials'     // Step 6: Document affected SQFT per room
   | 'moisture-mapping'       // Step 7: Initial moisture readings + photos
-  | 'schedule-work'          // Step 8: Plan Day 2+ (demo, checks, pull)
-  | 'equipment-calc'         // Step 9: IICRC equipment calculations per room
-  | 'equipment-place'        // Step 10: Place and scan equipment by room
-  | 'general-billables'      // Step 11: Additional billable work (generals page)
-  | 'communicate-plan'       // Step 12: Customer communication
-  | 'final-photos'           // Step 13: Final documentation
-  | 'complete';              // Step 14: Complete and depart
+  | 'partial-demo'           // Step 8: Partial demo work during install (optional)
+  | 'schedule-work'          // Step 9: Plan Day 2+ (demo, checks, pull)
+  | 'equipment-calc'         // Step 10: IICRC equipment calculations per room
+  | 'equipment-place'        // Step 11: Place and scan equipment by room
+  | 'general-billables'      // Step 12: Additional billable work (generals page)
+  | 'communicate-plan'       // Step 13: Customer communication
+  | 'final-photos'           // Step 14: Final documentation
+  | 'complete';              // Step 15: Complete and depart
 
 export type DemoStep =
   | 'clock-in'                // Step 1: Arrival & clock in

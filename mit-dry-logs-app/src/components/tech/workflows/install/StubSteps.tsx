@@ -1206,12 +1206,78 @@ export const ReviewStep: React.FC<StepProps> = ({ job, onNext }) => {
 };
 
 export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
-  const { installData } = useWorkflowStore();
-  const [clockOutTime, setClockOutTime] = useState(new Date().toLocaleTimeString());
+  const { installData, updateWorkflowData } = useWorkflowStore();
+
+  // Get current time as default
+  const now = new Date();
+  const defaultTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+  const [departureTime, setDepartureTime] = useState(installData.departureTime || defaultTime);
+  const [travelTimeFromSite, setTravelTimeFromSite] = useState(installData.travelTimeFromSite || 0);
   const [techNotes, setTechNotes] = useState(installData.completionNotes || '');
 
+  // Calculate labor hours
+  const calculateLaborHours = () => {
+    if (!installData.arrivalTime || !departureTime) return null;
+
+    try {
+      const arrival = new Date();
+      const [arrHours, arrMinutes] = installData.arrivalTime.split(':').map(Number);
+      arrival.setHours(arrHours, arrMinutes, 0, 0);
+
+      const departure = new Date();
+      const [depHours, depMinutes] = departureTime.split(':').map(Number);
+      departure.setHours(depHours, depMinutes, 0, 0);
+
+      // If departure is before arrival, assume next day
+      if (departure < arrival) {
+        departure.setDate(departure.getDate() + 1);
+      }
+
+      const totalMinutes = Math.floor((departure.getTime() - arrival.getTime()) / 1000 / 60);
+      const totalHours = totalMinutes / 60;
+
+      // Calculate during hours (8 AM - 5 PM) and after hours
+      let duringHours = 0;
+      let afterHours = 0;
+
+      // Simple calculation: if most of work falls in 8-5, count as during, else after
+      const avgHour = (arrHours + depHours) / 2;
+      if (avgHour >= 8 && avgHour < 17) {
+        // Work mostly during business hours
+        duringHours = totalHours;
+      } else {
+        // Work mostly after hours
+        afterHours = totalHours;
+      }
+
+      return {
+        totalHours: parseFloat(totalHours.toFixed(2)),
+        duringHours: parseFloat(duringHours.toFixed(2)),
+        afterHours: parseFloat(afterHours.toFixed(2)),
+        arrivalTime: installData.arrivalTime,
+        departureTime,
+      };
+    } catch (error) {
+      console.error('Error calculating labor hours:', error);
+      return null;
+    }
+  };
+
+  const laborSummary = calculateLaborHours();
+
+  const handleSave = () => {
+    updateWorkflowData('install', {
+      departureTime,
+      travelTimeFromSite,
+      completionNotes: techNotes,
+      laborSummary,
+      completedAt: new Date().toISOString(),
+    });
+  };
+
   const handleFinalize = () => {
-    // In a real app, this would save to Firebase
+    handleSave();
     alert('Install workflow completed successfully! Returning to dashboard...');
     window.location.href = '/tech';
   };
@@ -1237,6 +1303,83 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
         </p>
       </div>
 
+      {/* Labor Hours Tracking */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h4 className="font-semibold text-gray-900 mb-4">Labor Hours</h4>
+
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Arrival Time
+            </label>
+            <input
+              type="time"
+              value={installData.arrivalTime || ''}
+              disabled
+              className="input-field bg-gray-100"
+            />
+            <p className="text-xs text-gray-500 mt-1">Recorded at arrival</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Departure Time *
+            </label>
+            <input
+              type="time"
+              value={departureTime}
+              onChange={(e) => {
+                setDepartureTime(e.target.value);
+                handleSave();
+              }}
+              className="input-field"
+            />
+            <p className="text-xs text-gray-500 mt-1">Time leaving property</p>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Travel Time from Site (minutes)
+          </label>
+          <input
+            type="number"
+            value={travelTimeFromSite}
+            onChange={(e) => {
+              setTravelTimeFromSite(parseInt(e.target.value) || 0);
+              handleSave();
+            }}
+            placeholder="0"
+            className="input-field w-32"
+            min="0"
+          />
+          <p className="text-xs text-gray-500 mt-1">Drive time back to office/home</p>
+        </div>
+
+        {laborSummary && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h5 className="font-semibold text-blue-900 mb-3">Labor Summary</h5>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-blue-900">{laborSummary.totalHours}</p>
+                <p className="text-xs text-gray-600">Total Hours</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-green-900">{laborSummary.duringHours}</p>
+                <p className="text-xs text-gray-600">During Hours<br/>(8 AM - 5 PM)</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-orange-900">{laborSummary.afterHours}</p>
+                <p className="text-xs text-gray-600">After Hours</p>
+              </div>
+            </div>
+            <p className="text-xs text-blue-700 mt-3 text-center">
+              {installData.arrivalTime} → {departureTime} = {laborSummary.totalHours} hours on-site
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Installation Summary */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h4 className="font-semibold text-gray-900 mb-4">Installation Summary</h4>
         <div className="grid grid-cols-2 gap-4">
@@ -1267,31 +1410,24 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Clock Out Time
-        </label>
-        <input
-          type="time"
-          value={clockOutTime}
-          onChange={(e) => setClockOutTime(e.target.value)}
-          className="input-field"
-        />
-      </div>
-
+      {/* Completion Notes */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Completion Notes (Optional)
         </label>
         <textarea
           value={techNotes}
-          onChange={(e) => setTechNotes(e.target.value)}
+          onChange={(e) => {
+            setTechNotes(e.target.value);
+            handleSave();
+          }}
           placeholder="Any additional notes about the installation..."
           className="input-field min-h-[100px]"
           rows={4}
         />
       </div>
 
+      {/* Next Steps */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-sm text-blue-800">
           <strong>Next Steps:</strong>
@@ -1304,14 +1440,22 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
         </ul>
       </div>
 
+      {/* Finalize Button */}
       <Button
         variant="primary"
         onClick={handleFinalize}
         className="w-full py-4 text-lg"
+        disabled={!departureTime}
       >
         <CheckCircle className="w-5 h-5" />
         Finalize and Return to Dashboard
       </Button>
+
+      {!departureTime && (
+        <p className="text-sm text-red-600 text-center">
+          Please enter departure time before finalizing
+        </p>
+      )}
     </div>
   );
 };

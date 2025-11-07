@@ -4,7 +4,6 @@ import { Input } from '../../../shared/Input';
 import { Layers, AlertCircle, Info, CheckCircle } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { FloorMaterialType, WallMaterialType, CeilingMaterialType } from '../../../../types';
-import { PartialDemoForm } from './PartialDemoForm';
 
 interface AffectedMaterialsStepProps {
   job: any;
@@ -46,14 +45,6 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   const [roomsAffectedData, setRoomsAffectedData] = useState<Record<string, RoomAffectedData>>(
     installData.roomsAffectedData || {}
-  );
-
-  // Partial demo tracking
-  const [partialDemoPerformed, setPartialDemoPerformed] = useState(
-    installData.partialDemoPerformed || false
-  );
-  const [partialDemoData, setPartialDemoData] = useState(
-    installData.partialDemoDetails?.rooms || []
   );
 
   const currentRoom = rooms[currentRoomIndex];
@@ -578,55 +569,6 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
           {waterClass === 3 && 'More than 40% of surfaces affected'}
         </p>
       </div>
-
-      {/* Partial Demo Toggle (Only shown after all rooms processed) */}
-      {currentRoomIndex === rooms.length - 1 && (
-        <div className="mt-8 pt-6 border-t-2">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={partialDemoPerformed}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                setPartialDemoPerformed(checked);
-                updateWorkflowData('install', { partialDemoPerformed: checked });
-                if (!checked) {
-                  setPartialDemoData([]);
-                  updateWorkflowData('install', { partialDemoDetails: null });
-                }
-              }}
-              className="h-5 w-5 text-orange-600 rounded focus:ring-orange-500"
-            />
-            <div>
-              <span className="font-semibold text-gray-900 text-lg">
-                Demo work performed during install
-              </span>
-              <p className="text-sm text-gray-600">
-                Check this if you performed any demolition work during the install (before scheduled demo day)
-              </p>
-            </div>
-          </label>
-
-          {/* Partial Demo Form */}
-          {partialDemoPerformed && (
-            <PartialDemoForm
-              rooms={rooms}
-              initialData={partialDemoData}
-              onSave={(demoRooms) => {
-                setPartialDemoData(demoRooms);
-                const totalTime = demoRooms.reduce((sum, r) => sum + r.demoTimeMinutes, 0);
-                updateWorkflowData('install', {
-                  partialDemoDetails: {
-                    rooms: demoRooms,
-                    totalDemoTimeMinutes: totalTime,
-                    loggedAt: new Date()
-                  }
-                });
-              }}
-            />
-          )}
-        </div>
-      )}
 
       {/* Navigation */}
       <div className="flex items-center justify-between pt-4">

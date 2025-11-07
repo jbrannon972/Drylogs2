@@ -29,6 +29,7 @@ import { CauseOfLossStep } from './install/CauseOfLossStep';
 import { AddRoomsStep } from './install/AddRoomsStep';
 import { AffectedMaterialsStep } from './install/AffectedMaterialsStep';
 import { MoistureMappingStep } from './install/MoistureMappingStep';
+import { PartialDemoStep } from './install/PartialDemoStep';
 import { ScheduleWorkStep } from './install/ScheduleWorkStep';
 import { EquipmentCalcStep } from './install/EquipmentCalcStep';
 import { GeneralBillablesStep } from './install/GeneralBillablesStep';
@@ -92,6 +93,13 @@ const INSTALL_STEPS: StepConfig[] = [
     component: AddRoomsStep,
   },
   {
+    id: 'affected-materials',
+    title: 'Materials for Removal',
+    description: 'Document materials to demo per room',
+    icon: <Layers className="w-5 h-5" />,
+    component: AffectedMaterialsStep,
+  },
+  {
     id: 'moisture-mapping',
     title: 'Moisture Mapping',
     description: 'Readings + photos per room',
@@ -99,11 +107,11 @@ const INSTALL_STEPS: StepConfig[] = [
     component: MoistureMappingStep,
   },
   {
-    id: 'affected-materials',
-    title: 'Materials for Removal',
-    description: 'Document materials to demo per room',
+    id: 'partial-demo',
+    title: 'Partial Demo',
+    description: 'Demo work during install (optional)',
     icon: <Layers className="w-5 h-5" />,
-    component: AffectedMaterialsStep,
+    component: PartialDemoStep,
   },
   {
     id: 'schedule-work',
