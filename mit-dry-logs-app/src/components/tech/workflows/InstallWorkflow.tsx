@@ -22,6 +22,7 @@ import {
 import { InstallStep } from '../../../types/workflow';
 
 // Import step components
+import { OfficePreparationStep } from './install/OfficePreparationStep';
 import { ArrivalStep } from './install/ArrivalStep';
 import { FrontDoorStep } from './install/FrontDoorStep';
 import { CauseOfLossStep } from './install/CauseOfLossStep';
@@ -48,6 +49,13 @@ interface StepConfig {
 }
 
 const INSTALL_STEPS: StepConfig[] = [
+  {
+    id: 'office-prep',
+    title: 'Office Preparation',
+    description: 'Pre-departure prep (optional)',
+    icon: <ClipboardCheck className="w-5 h-5" />,
+    component: OfficePreparationStep,
+  },
   {
     id: 'arrival',
     title: 'Property Arrival',

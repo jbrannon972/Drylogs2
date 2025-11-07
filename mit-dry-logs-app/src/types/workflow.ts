@@ -4,6 +4,7 @@
  */
 
 export type InstallStep =
+  | 'office-prep'            // Step 0: Office preparation (optional)
   | 'arrival'                // Step 1: Property arrival, clock in
   | 'front-door'             // Step 2: Customer intro, ground rules
   | 'pre-existing'           // Step 3: Document pre-existing conditions with photos
