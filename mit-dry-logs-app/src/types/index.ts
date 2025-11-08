@@ -145,27 +145,58 @@ export interface WorkflowPhases {
 export type RoomType = 'Bedroom' | 'Bathroom' | 'Kitchen' | 'Living Room' | 'Dining' | 'Laundry' | 'Hallway' | 'Basement' | 'Attic' | 'Garage' | 'Other';
 export type AffectedStatus = 'affected' | 'unaffected' | 'partially-affected';
 export type MaterialType =
+  // Flooring
   | 'Carpet & Pad'
   | 'Hardwood Flooring'
   | 'Vinyl/Linoleum Flooring'
   | 'Tile Flooring'
   | 'Laminate Flooring'
   | 'Engineered Flooring'
-  | 'Glue-Down Flooring'
   | 'Subfloor'
-  | 'Drywall'
+  // Drywall
+  | 'Drywall - Wall'
+  | 'Drywall - Ceiling'
+  // Trim & Molding
   | 'Baseboards'
-  | 'Trimwork/Molding'
+  | 'Shoe Molding'
+  | 'Crown Molding'
   | 'Door Casing'
+  | 'Window Casing'
+  | 'Chair Rail'
+  | 'Other Trim'
+  // Tile & Backsplash
   | 'Tile Walls'
   | 'Backsplash'
-  | 'Insulation'
-  | 'Countertops'
-  | 'Cabinetry'
+  | 'Tub Surround'
+  // Cabinetry & Counters
+  | 'Base Cabinets'
+  | 'Upper Cabinets'
   | 'Vanity'
+  | 'Countertops'
+  | 'Shelving'
+  // Insulation
+  | 'Insulation - Wall'
+  | 'Insulation - Ceiling/Attic'
+  // Fixtures & Appliances
+  | 'Sink/Faucet'
+  | 'Tub'
+  | 'Shower Pan'
   | 'Appliances'
   | 'Mirror'
+  | 'Towel Bars/Accessories'
+  // Other
   | 'Other';
+
+export type FlooringInstallationType =
+  | 'Floating'
+  | 'Glue Down'
+  | 'Nail Down'
+  | 'Staple Down'
+  | 'Stretch' // For carpet
+  | 'Tar & Screed'
+  | 'Direct Glue'
+  | 'N/A';
+
 export type MaterialCondition = 'wet' | 'damp' | 'dry';
 export type ReadingType = 'dry-standard' | 'initial' | 'daily' | 'final';
 export type PhotoStep = 'arrival' | 'assessment' | 'preexisting' | 'pre-demo' | 'demo' | 'post-demo' | 'daily-check' | 'final';

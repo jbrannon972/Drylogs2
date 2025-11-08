@@ -7,7 +7,7 @@ import {
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
-import { RoomType, MaterialType } from '../../../../types';
+import { RoomType, MaterialType, FlooringInstallationType } from '../../../../types';
 
 interface RoomAssessmentStepProps {
   job: any;
@@ -29,6 +29,7 @@ interface MaterialAffected {
   squareFootage: number;
   removalRequired: boolean;
   removalReason?: string;
+  installationType?: FlooringInstallationType; // For flooring materials only
   notes?: string;
 }
 
@@ -73,6 +74,9 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   );
   const [activeTab, setActiveTab] = useState<'info' | 'moisture' | 'materials'>('info');
   const [showPreexistingModal, setShowPreexistingModal] = useState(false);
+
+  // Material category expansion state
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['flooring'])); // Default: Flooring expanded
 
   // New room form
   const [newRoomForm, setNewRoomForm] = useState({
@@ -152,7 +156,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
     const newReading: MoistureReading = {
       id: `reading-${Date.now()}`,
-      material: 'Drywall',
+      material: 'Drywall - Wall',
       location: '',
       percentage: 0,
       isDryStandard: false,
@@ -208,31 +212,51 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   };
 
   const getDefaultMaterials = (): MaterialAffected[] => [
-    // Flooring materials
-    { materialType: 'Carpet & Pad', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Hardwood Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Vinyl/Linoleum Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Tile Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Laminate Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Engineered Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Glue-Down Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
+    // Flooring
+    { materialType: 'Carpet & Pad', isAffected: false, squareFootage: 0, removalRequired: false, installationType: 'N/A' },
+    { materialType: 'Hardwood Flooring', isAffected: false, squareFootage: 0, removalRequired: false, installationType: 'N/A' },
+    { materialType: 'Vinyl/Linoleum Flooring', isAffected: false, squareFootage: 0, removalRequired: false, installationType: 'N/A' },
+    { materialType: 'Tile Flooring', isAffected: false, squareFootage: 0, removalRequired: false, installationType: 'N/A' },
+    { materialType: 'Laminate Flooring', isAffected: false, squareFootage: 0, removalRequired: false, installationType: 'N/A' },
+    { materialType: 'Engineered Flooring', isAffected: false, squareFootage: 0, removalRequired: false, installationType: 'N/A' },
     { materialType: 'Subfloor', isAffected: false, squareFootage: 0, removalRequired: false },
 
-    // Wall materials
-    { materialType: 'Drywall', isAffected: false, squareFootage: 0, removalRequired: false },
+    // Drywall
+    { materialType: 'Drywall - Wall', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Drywall - Ceiling', isAffected: false, squareFootage: 0, removalRequired: false },
+
+    // Trim & Molding
     { materialType: 'Baseboards', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Trimwork/Molding', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Shoe Molding', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Crown Molding', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Door Casing', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Window Casing', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Chair Rail', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Other Trim', isAffected: false, squareFootage: 0, removalRequired: false },
+
+    // Tile & Backsplash
     { materialType: 'Tile Walls', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Backsplash', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Insulation', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Tub Surround', isAffected: false, squareFootage: 0, removalRequired: false },
 
-    // Fixtures & Cabinets
-    { materialType: 'Countertops', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Cabinetry', isAffected: false, squareFootage: 0, removalRequired: false },
+    // Cabinetry & Counters
+    { materialType: 'Base Cabinets', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Upper Cabinets', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Vanity', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Countertops', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Shelving', isAffected: false, squareFootage: 0, removalRequired: false },
+
+    // Insulation
+    { materialType: 'Insulation - Wall', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Insulation - Ceiling/Attic', isAffected: false, squareFootage: 0, removalRequired: false },
+
+    // Fixtures & Appliances
+    { materialType: 'Sink/Faucet', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Tub', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Shower Pan', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Appliances', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Mirror', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Towel Bars/Accessories', isAffected: false, squareFootage: 0, removalRequired: false },
 
     // Other
     { materialType: 'Other', isAffected: false, squareFootage: 0, removalRequired: false },
@@ -240,6 +264,17 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
   const completedCount = rooms.filter(r => r.isComplete).length;
   const totalCount = rooms.length;
+
+  // Toggle category expansion
+  const toggleCategory = (category: string) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(category)) {
+      newExpanded.delete(category);
+    } else {
+      newExpanded.add(category);
+    }
+    setExpandedCategories(newExpanded);
+  };
 
   // View state: 'list' | 'detail' | 'add'
   const [viewMode, setViewMode] = useState<'list' | 'detail' | 'add'>('list');
@@ -615,100 +650,655 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               )}
 
               {activeTab === 'materials' && (
-                <div className="max-w-4xl space-y-6">
+                <div className="max-w-4xl space-y-4">
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Materials Removal Plan</h3>
-                    <p className="text-sm text-gray-600">
-                      Document what materials need to be removed and why. This helps with demo planning and billing.
+                    <p className="text-sm text-gray-600 mb-4">
+                      Document what materials need to be removed and why. Expand categories to select materials.
                     </p>
                   </div>
 
-                  {selectedRoom.materialsAffected.map((material) => (
-                    <div key={material.materialType} className="border-2 border-gray-300 rounded-lg p-4 bg-white">
-                      {/* Material Selection */}
-                      <div className="flex items-center gap-3 mb-4">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={material.removalRequired}
-                            onChange={(e) => updateMaterial(material.materialType, {
-                              removalRequired: e.target.checked,
-                              isAffected: e.target.checked
-                            })}
-                            className="h-5 w-5 text-orange-600"
-                          />
-                          <span className="text-lg font-medium text-gray-900">{material.materialType}</span>
-                        </label>
-                        {material.removalRequired && (
-                          <span className="ml-auto px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                            Scheduled for Removal
+                  {/* FLOORING CATEGORY */}
+                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory('flooring')}
+                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Layers className="w-5 h-5" />
+                        Flooring
+                        {selectedRoom.materialsAffected.filter(m =>
+                          ['Carpet & Pad', 'Hardwood Flooring', 'Vinyl/Linoleum Flooring', 'Tile Flooring', 'Laminate Flooring', 'Engineered Flooring', 'Subfloor'].includes(m.materialType) && m.removalRequired
+                        ).length > 0 && (
+                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                            {selectedRoom.materialsAffected.filter(m =>
+                              ['Carpet & Pad', 'Hardwood Flooring', 'Vinyl/Linoleum Flooring', 'Tile Flooring', 'Laminate Flooring', 'Engineered Flooring', 'Subfloor'].includes(m.materialType) && m.removalRequired
+                            ).length} selected
                           </span>
                         )}
+                      </span>
+                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('flooring') ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedCategories.has('flooring') && (
+                      <div className="p-4 space-y-3 bg-white">
+                        {selectedRoom.materialsAffected
+                          .filter(m => ['Carpet & Pad', 'Hardwood Flooring', 'Vinyl/Linoleum Flooring', 'Tile Flooring', 'Laminate Flooring', 'Engineered Flooring', 'Subfloor'].includes(m.materialType))
+                          .map((material) => {
+                            const isFlooringType = material.materialType !== 'Subfloor';
+                            return (
+                              <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
+                                <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={material.removalRequired}
+                                    onChange={(e) => updateMaterial(material.materialType, {
+                                      removalRequired: e.target.checked,
+                                      isAffected: e.target.checked
+                                    })}
+                                    className="h-4 w-4 text-orange-600"
+                                  />
+                                  <span className="font-medium text-gray-900">{material.materialType}</span>
+                                </label>
+                                {material.removalRequired && (
+                                  <div className="ml-6 space-y-3 mt-3">
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div>
+                                        <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (sq ft)</label>
+                                        <input
+                                          type="number"
+                                          value={material.squareFootage}
+                                          onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
+                                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                          placeholder="0"
+                                        />
+                                      </div>
+                                      {isFlooringType && (
+                                        <div>
+                                          <label className="block text-xs font-medium text-gray-700 mb-1">Installation Type</label>
+                                          <select
+                                            value={material.installationType || 'N/A'}
+                                            onChange={(e) => updateMaterial(material.materialType, { installationType: e.target.value as FlooringInstallationType })}
+                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                          >
+                                            <option value="N/A">Select...</option>
+                                            <option value="Floating">Floating</option>
+                                            <option value="Glue Down">Glue Down</option>
+                                            <option value="Nail Down">Nail Down</option>
+                                            <option value="Staple Down">Staple Down</option>
+                                            <option value="Stretch">Stretch (Carpet)</option>
+                                            <option value="Tar & Screed">Tar & Screed</option>
+                                            <option value="Direct Glue">Direct Glue</option>
+                                          </select>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Reason for Removal</label>
+                                      <select
+                                        value={material.removalReason || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      >
+                                        <option value="">Select...</option>
+                                        <option value="saturated">Saturated / Water-logged</option>
+                                        <option value="contaminated">Contaminated (Cat 2/3)</option>
+                                        <option value="visual-contamination">Visual Contamination</option>
+                                        <option value="damaged">Structurally Damaged</option>
+                                        <option value="access">Access Required</option>
+                                        <option value="customer">Customer Request</option>
+                                        <option value="other">Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                       </div>
+                    )}
+                  </div>
 
-                      {/* Removal Details */}
-                      {material.removalRequired && (
-                        <div className="space-y-4 pl-7 border-l-2 border-orange-300">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Quantity (sq ft)
+                  {/* DRYWALL CATEGORY */}
+                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory('drywall')}
+                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Layers className="w-5 h-5" />
+                        Drywall
+                        {selectedRoom.materialsAffected.filter(m =>
+                          ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType) && m.removalRequired
+                        ).length > 0 && (
+                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                            {selectedRoom.materialsAffected.filter(m =>
+                              ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType) && m.removalRequired
+                            ).length} selected
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('drywall') ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedCategories.has('drywall') && (
+                      <div className="p-4 space-y-3 bg-white">
+                        {selectedRoom.materialsAffected
+                          .filter(m => ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType))
+                          .map((material) => (
+                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
+                              <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                <input
+                                  type="checkbox"
+                                  checked={material.removalRequired}
+                                  onChange={(e) => updateMaterial(material.materialType, {
+                                    removalRequired: e.target.checked,
+                                    isAffected: e.target.checked
+                                  })}
+                                  className="h-4 w-4 text-orange-600"
+                                />
+                                <span className="font-medium text-gray-900">{material.materialType}</span>
                               </label>
-                              <input
-                                type="number"
-                                value={material.squareFootage}
-                                onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                                placeholder="0"
-                                step="1"
-                                min="0"
-                              />
+                              {material.removalRequired && (
+                                <div className="ml-6 space-y-3 mt-3">
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (sq ft)</label>
+                                      <input
+                                        type="number"
+                                        value={material.squareFootage}
+                                        onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Reason for Removal</label>
+                                      <select
+                                        value={material.removalReason || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      >
+                                        <option value="">Select...</option>
+                                        <option value="saturated">Saturated / Water-logged</option>
+                                        <option value="contaminated">Contaminated (Cat 2/3)</option>
+                                        <option value="visual-contamination">Visual Contamination</option>
+                                        <option value="damaged">Structurally Damaged</option>
+                                        <option value="access">Access Required</option>
+                                        <option value="other">Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
 
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Reason for Removal *
+                  {/* TRIM & MOLDING CATEGORY */}
+                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory('trim')}
+                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Layers className="w-5 h-5" />
+                        Trim & Molding
+                        {selectedRoom.materialsAffected.filter(m =>
+                          ['Baseboards', 'Shoe Molding', 'Crown Molding', 'Door Casing', 'Window Casing', 'Chair Rail', 'Other Trim'].includes(m.materialType) && m.removalRequired
+                        ).length > 0 && (
+                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                            {selectedRoom.materialsAffected.filter(m =>
+                              ['Baseboards', 'Shoe Molding', 'Crown Molding', 'Door Casing', 'Window Casing', 'Chair Rail', 'Other Trim'].includes(m.materialType) && m.removalRequired
+                            ).length} selected
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('trim') ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedCategories.has('trim') && (
+                      <div className="p-4 space-y-3 bg-white">
+                        {selectedRoom.materialsAffected
+                          .filter(m => ['Baseboards', 'Shoe Molding', 'Crown Molding', 'Door Casing', 'Window Casing', 'Chair Rail', 'Other Trim'].includes(m.materialType))
+                          .map((material) => (
+                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
+                              <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                <input
+                                  type="checkbox"
+                                  checked={material.removalRequired}
+                                  onChange={(e) => updateMaterial(material.materialType, {
+                                    removalRequired: e.target.checked,
+                                    isAffected: e.target.checked
+                                  })}
+                                  className="h-4 w-4 text-orange-600"
+                                />
+                                <span className="font-medium text-gray-900">{material.materialType}</span>
                               </label>
-                              <select
-                                value={material.removalReason || ''}
-                                onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                              >
-                                <option value="">Select reason...</option>
-                                <option value="saturated">Saturated / Water-logged</option>
-                                <option value="contaminated">Contaminated (Cat 2/3)</option>
-                                <option value="visual-contamination">Visual Contamination</option>
-                                <option value="damaged">Structurally Damaged</option>
-                                <option value="access">Access Required</option>
-                                <option value="customer">Customer Request</option>
-                                <option value="preventive">Preventive Measure</option>
-                                <option value="other">Other</option>
-                              </select>
+                              {material.removalRequired && (
+                                <div className="ml-6 space-y-3 mt-3">
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (linear ft)</label>
+                                      <input
+                                        type="number"
+                                        value={material.squareFootage}
+                                        onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Reason for Removal</label>
+                                      <select
+                                        value={material.removalReason || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      >
+                                        <option value="">Select...</option>
+                                        <option value="saturated">Saturated</option>
+                                        <option value="contaminated">Contaminated (Cat 2/3)</option>
+                                        <option value="damaged">Damaged</option>
+                                        <option value="access">Access Required</option>
+                                        <option value="other">Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
 
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Additional Notes (optional)
-                            </label>
-                            <textarea
-                              value={material.notes || ''}
-                              onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                              rows={2}
-                              placeholder="Any additional details about this material removal..."
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                  {/* TILE & BACKSPLASH CATEGORY */}
+                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory('tile')}
+                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Layers className="w-5 h-5" />
+                        Tile & Backsplash
+                        {selectedRoom.materialsAffected.filter(m =>
+                          ['Tile Walls', 'Backsplash', 'Tub Surround'].includes(m.materialType) && m.removalRequired
+                        ).length > 0 && (
+                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                            {selectedRoom.materialsAffected.filter(m =>
+                              ['Tile Walls', 'Backsplash', 'Tub Surround'].includes(m.materialType) && m.removalRequired
+                            ).length} selected
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('tile') ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedCategories.has('tile') && (
+                      <div className="p-4 space-y-3 bg-white">
+                        {selectedRoom.materialsAffected
+                          .filter(m => ['Tile Walls', 'Backsplash', 'Tub Surround'].includes(m.materialType))
+                          .map((material) => (
+                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
+                              <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                <input
+                                  type="checkbox"
+                                  checked={material.removalRequired}
+                                  onChange={(e) => updateMaterial(material.materialType, {
+                                    removalRequired: e.target.checked,
+                                    isAffected: e.target.checked
+                                  })}
+                                  className="h-4 w-4 text-orange-600"
+                                />
+                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                              </label>
+                              {material.removalRequired && (
+                                <div className="ml-6 space-y-3 mt-3">
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (sq ft)</label>
+                                      <input
+                                        type="number"
+                                        value={material.squareFootage}
+                                        onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Reason for Removal</label>
+                                      <select
+                                        value={material.removalReason || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      >
+                                        <option value="">Select...</option>
+                                        <option value="damaged">Damaged/Cracked</option>
+                                        <option value="contaminated">Contaminated (Cat 2/3)</option>
+                                        <option value="access">Access Required</option>
+                                        <option value="other">Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CABINETRY & COUNTERS CATEGORY */}
+                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory('cabinetry')}
+                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Layers className="w-5 h-5" />
+                        Cabinetry & Counters
+                        {selectedRoom.materialsAffected.filter(m =>
+                          ['Base Cabinets', 'Upper Cabinets', 'Vanity', 'Countertops', 'Shelving'].includes(m.materialType) && m.removalRequired
+                        ).length > 0 && (
+                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                            {selectedRoom.materialsAffected.filter(m =>
+                              ['Base Cabinets', 'Upper Cabinets', 'Vanity', 'Countertops', 'Shelving'].includes(m.materialType) && m.removalRequired
+                            ).length} selected
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('cabinetry') ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedCategories.has('cabinetry') && (
+                      <div className="p-4 space-y-3 bg-white">
+                        {selectedRoom.materialsAffected
+                          .filter(m => ['Base Cabinets', 'Upper Cabinets', 'Vanity', 'Countertops', 'Shelving'].includes(m.materialType))
+                          .map((material) => (
+                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
+                              <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                <input
+                                  type="checkbox"
+                                  checked={material.removalRequired}
+                                  onChange={(e) => updateMaterial(material.materialType, {
+                                    removalRequired: e.target.checked,
+                                    isAffected: e.target.checked
+                                  })}
+                                  className="h-4 w-4 text-orange-600"
+                                />
+                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                              </label>
+                              {material.removalRequired && (
+                                <div className="ml-6 space-y-3 mt-3">
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (linear ft)</label>
+                                      <input
+                                        type="number"
+                                        value={material.squareFootage}
+                                        onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Reason for Removal</label>
+                                      <select
+                                        value={material.removalReason || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      >
+                                        <option value="">Select...</option>
+                                        <option value="saturated">Saturated</option>
+                                        <option value="contaminated">Contaminated (Cat 2/3)</option>
+                                        <option value="damaged">Damaged</option>
+                                        <option value="access">Access Required</option>
+                                        <option value="other">Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* INSULATION CATEGORY */}
+                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory('insulation')}
+                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Layers className="w-5 h-5" />
+                        Insulation
+                        {selectedRoom.materialsAffected.filter(m =>
+                          ['Insulation - Wall', 'Insulation - Ceiling/Attic'].includes(m.materialType) && m.removalRequired
+                        ).length > 0 && (
+                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                            {selectedRoom.materialsAffected.filter(m =>
+                              ['Insulation - Wall', 'Insulation - Ceiling/Attic'].includes(m.materialType) && m.removalRequired
+                            ).length} selected
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('insulation') ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedCategories.has('insulation') && (
+                      <div className="p-4 space-y-3 bg-white">
+                        {selectedRoom.materialsAffected
+                          .filter(m => ['Insulation - Wall', 'Insulation - Ceiling/Attic'].includes(m.materialType))
+                          .map((material) => (
+                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
+                              <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                <input
+                                  type="checkbox"
+                                  checked={material.removalRequired}
+                                  onChange={(e) => updateMaterial(material.materialType, {
+                                    removalRequired: e.target.checked,
+                                    isAffected: e.target.checked
+                                  })}
+                                  className="h-4 w-4 text-orange-600"
+                                />
+                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                              </label>
+                              {material.removalRequired && (
+                                <div className="ml-6 space-y-3 mt-3">
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (sq ft)</label>
+                                      <input
+                                        type="number"
+                                        value={material.squareFootage}
+                                        onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Reason for Removal</label>
+                                      <select
+                                        value={material.removalReason || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      >
+                                        <option value="">Select...</option>
+                                        <option value="saturated">Saturated</option>
+                                        <option value="contaminated">Contaminated (Cat 2/3)</option>
+                                        <option value="access">Access Required</option>
+                                        <option value="other">Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* FIXTURES & APPLIANCES CATEGORY */}
+                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory('fixtures')}
+                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Layers className="w-5 h-5" />
+                        Fixtures & Appliances
+                        {selectedRoom.materialsAffected.filter(m =>
+                          ['Sink/Faucet', 'Tub', 'Shower Pan', 'Appliances', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType) && m.removalRequired
+                        ).length > 0 && (
+                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                            {selectedRoom.materialsAffected.filter(m =>
+                              ['Sink/Faucet', 'Tub', 'Shower Pan', 'Appliances', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType) && m.removalRequired
+                            ).length} selected
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('fixtures') ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedCategories.has('fixtures') && (
+                      <div className="p-4 space-y-3 bg-white">
+                        {selectedRoom.materialsAffected
+                          .filter(m => ['Sink/Faucet', 'Tub', 'Shower Pan', 'Appliances', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType))
+                          .map((material) => (
+                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
+                              <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                <input
+                                  type="checkbox"
+                                  checked={material.removalRequired}
+                                  onChange={(e) => updateMaterial(material.materialType, {
+                                    removalRequired: e.target.checked,
+                                    isAffected: e.target.checked
+                                  })}
+                                  className="h-4 w-4 text-orange-600"
+                                />
+                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                              </label>
+                              {material.removalRequired && (
+                                <div className="ml-6 space-y-3 mt-3">
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (each)</label>
+                                      <input
+                                        type="number"
+                                        value={material.squareFootage}
+                                        onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Reason for Removal</label>
+                                      <select
+                                        value={material.removalReason || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      >
+                                        <option value="">Select...</option>
+                                        <option value="access">Access Required</option>
+                                        <option value="damaged">Damaged</option>
+                                        <option value="customer">Customer Request</option>
+                                        <option value="other">Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* OTHER CATEGORY */}
+                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory('other')}
+                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Layers className="w-5 h-5" />
+                        Other
+                        {selectedRoom.materialsAffected.filter(m => m.materialType === 'Other' && m.removalRequired).length > 0 && (
+                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                            1 selected
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('other') ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedCategories.has('other') && (
+                      <div className="p-4 space-y-3 bg-white">
+                        {selectedRoom.materialsAffected
+                          .filter(m => m.materialType === 'Other')
+                          .map((material) => (
+                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
+                              <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                <input
+                                  type="checkbox"
+                                  checked={material.removalRequired}
+                                  onChange={(e) => updateMaterial(material.materialType, {
+                                    removalRequired: e.target.checked,
+                                    isAffected: e.target.checked
+                                  })}
+                                  className="h-4 w-4 text-orange-600"
+                                />
+                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                              </label>
+                              {material.removalRequired && (
+                                <div className="ml-6 space-y-3 mt-3">
+                                  <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Material Description</label>
+                                    <input
+                                      type="text"
+                                      value={material.notes || ''}
+                                      onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
+                                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded mb-2"
+                                      placeholder="Describe the material..."
+                                    />
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
+                                      <input
+                                        type="number"
+                                        value={material.squareFootage}
+                                        onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Reason for Removal</label>
+                                      <select
+                                        value={material.removalReason || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      >
+                                        <option value="">Select...</option>
+                                        <option value="saturated">Saturated</option>
+                                        <option value="contaminated">Contaminated</option>
+                                        <option value="damaged">Damaged</option>
+                                        <option value="access">Access Required</option>
+                                        <option value="other">Other</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
 
                   {selectedRoom.materialsAffected.filter(m => m.removalRequired).length === 0 && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center mt-4">
                       <Layers className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                       <p className="text-gray-600">
-                        No materials selected for removal yet. Check the boxes above to mark materials for demo.
+                        No materials selected for removal yet. Expand categories above to select materials for demo.
                       </p>
                     </div>
                   )}
