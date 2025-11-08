@@ -13,6 +13,8 @@ import { InstallWorkflow } from './components/tech/workflows/InstallWorkflow';
 import { DemoWorkflow } from './components/tech/workflows/DemoWorkflow';
 import { CheckServiceWorkflow } from './components/tech/workflows/CheckServiceWorkflow';
 import { PullWorkflow } from './components/tech/workflows/PullWorkflow';
+import { PSMDashboard } from './components/psm/dashboard/PSMDashboard';
+import { JobDetailView } from './components/psm/job-detail/JobDetailView';
 
 // Debug version identifier
 console.log('🚀 MIT Dry Logs v1.0.1 - Build:', new Date().toISOString());
@@ -50,7 +52,16 @@ function App() {
           path="/login"
           element={
             isAuthenticated ? (
-              <Navigate to={user?.role === 'MIT_TECH' ? '/tech' : '/lead'} replace />
+              <Navigate
+                to={
+                  user?.role === 'MIT_TECH'
+                    ? '/tech'
+                    : user?.role === 'PSM'
+                    ? '/psm'
+                    : '/lead'
+                }
+                replace
+              />
             ) : (
               <LoginPage />
             )
@@ -113,12 +124,39 @@ function App() {
           }
         />
 
+        {/* PSM Routes */}
+        <Route
+          path="/psm"
+          element={
+            <ProtectedRoute allowedRoles={['PSM', 'ADMIN']}>
+              <PSMDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/psm/job/:jobId"
+          element={
+            <ProtectedRoute allowedRoles={['PSM', 'ADMIN']}>
+              <JobDetailView />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Root redirect */}
         <Route
           path="/"
           element={
             isAuthenticated ? (
-              <Navigate to={user?.role === 'MIT_TECH' ? '/tech' : '/lead'} replace />
+              <Navigate
+                to={
+                  user?.role === 'MIT_TECH'
+                    ? '/tech'
+                    : user?.role === 'PSM'
+                    ? '/psm'
+                    : '/lead'
+                }
+                replace
+              />
             ) : (
               <Navigate to="/login" replace />
             )
@@ -129,7 +167,18 @@ function App() {
         <Route
           path="*"
           element={
-            <Navigate to={isAuthenticated ? (user?.role === 'MIT_TECH' ? '/tech' : '/lead') : '/login'} replace />
+            <Navigate
+              to={
+                isAuthenticated
+                  ? user?.role === 'MIT_TECH'
+                    ? '/tech'
+                    : user?.role === 'PSM'
+                    ? '/psm'
+                    : '/lead'
+                  : '/login'
+              }
+              replace
+            />
           }
         />
       </Routes>

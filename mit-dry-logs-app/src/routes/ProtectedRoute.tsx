@@ -32,6 +32,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     const dashboardMap: Record<UserRole, string> = {
       MIT_TECH: '/tech',
       MIT_LEAD: '/lead',
+      PSM: '/psm',
       ADMIN: '/admin',
     };
 

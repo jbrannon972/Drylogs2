@@ -7,7 +7,7 @@ import { Timestamp } from 'firebase/firestore';
 // USER TYPES
 // ============================================================================
 
-export type UserRole = 'MIT_TECH' | 'MIT_LEAD' | 'ADMIN';
+export type UserRole = 'MIT_TECH' | 'MIT_LEAD' | 'PSM' | 'ADMIN';
 export type Zone = 'Zone 1' | 'Zone 2' | 'Zone 3' | '2nd Shift';
 export type TrainingLevel = 'junior' | 'mid' | 'senior';
 
@@ -610,6 +610,7 @@ export interface Job {
   customArrivalStart?: string; // For 'custom' window: HH:mm format
   customArrivalEnd?: string;   // For 'custom' window: HH:mm format
   metadata: JobMetadata;
+  psmData?: PSMJobData; // PSM-specific data (office workflows)
 }
 
 // ============================================================================
@@ -759,4 +760,171 @@ export interface Coordinates {
 export interface DateRange {
   start: Date;
   end: Date;
+}
+
+// ============================================================================
+// PSM (PROJECT SUPPORT MANAGER) TYPES
+// ============================================================================
+
+export type CommunicationType = 'call' | 'email' | 'meeting' | 'portal-message';
+export type ApprovalStatus = 'pending' | 'approved' | 'denied' | 'partial';
+export type InvoiceStatus = 'draft' | 'sent' | 'reviewed' | 'disputed' | 'approved' | 'paid';
+export type RedFlagType =
+  | 'equipment-variance'
+  | 'missing-photos'
+  | 'moisture-not-improving'
+  | 'demo-no-reason'
+  | 'no-adjuster-approval'
+  | 'cost-overrun'
+  | 'timeline-delay';
+export type RedFlagSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type PSMPhaseStatus =
+  | 'field-complete'
+  | 'reviewing'
+  | 'awaiting-adjuster'
+  | 'approved'
+  | 'invoiced';
+
+export interface AdjusterCommunication {
+  id: string;
+  communicationType: CommunicationType;
+  timestamp: Timestamp;
+  contactedBy: string; // PSM name
+  summary: string;
+  questionsAsked: string[];
+  answersProvided: string[];
+  nextStep: string;
+  followUpDate?: Timestamp;
+}
+
+export interface LineItemApproval {
+  status: ApprovalStatus;
+  requestedQty: number;
+  approvedQty: number;
+  denialReason?: string;
+}
+
+export interface ConditionalApproval {
+  item: string;
+  condition: string;
+  conditionMet: boolean;
+}
+
+export interface ApprovalTracking {
+  demoScope: ApprovalStatus;
+  demoAmount: {
+    requested: number;
+    approved: number;
+    deniedAmount: number;
+    denialReason?: string;
+  };
+  equipmentPlan: ApprovalStatus;
+  equipmentModifications?: string;
+  billableItems: Record<string, LineItemApproval>;
+  conditionalApprovals: ConditionalApproval[];
+}
+
+export interface HomeownerCommunication {
+  id: string;
+  timestamp: Timestamp;
+  contactedBy: string;
+  method: 'phone' | 'email' | 'in-person';
+  topicsDiscussed: string[];
+  questionsAsked: string[];
+  nextContact?: Timestamp;
+}
+
+export interface DocumentationChecklist {
+  allRoomsPhotographed: boolean;
+  moistureReadingsComplete: boolean;
+  equipmentScanned: boolean;
+  demoDocumented: boolean;
+  customerSignatures: boolean;
+  matterportCompleted: boolean;
+}
+
+export interface DocumentationReview {
+  checklist: DocumentationChecklist;
+  missingItems: string[];
+  reviewedBy: string;
+  reviewedAt: Timestamp;
+  readyForSubmission: boolean;
+}
+
+export interface InvoiceLineItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  approvalStatus: ApprovalStatus;
+}
+
+export interface Invoice {
+  generated: boolean;
+  generatedAt?: Timestamp;
+  generatedBy?: string;
+  invoiceNumber?: string;
+  lineItems: InvoiceLineItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  amountDue: number;
+  status: InvoiceStatus;
+  sentToAdjusterAt?: Timestamp;
+  approvedByAdjusterAt?: Timestamp;
+  paidAt?: Timestamp;
+}
+
+export interface RedFlag {
+  id: string;
+  type: RedFlagType;
+  severity: RedFlagSeverity;
+  description: string;
+  detectedAt: Timestamp;
+  resolved: boolean;
+  resolvedBy?: string;
+  resolvedAt?: Timestamp;
+  resolutionNotes?: string;
+}
+
+export interface PSMPhase {
+  status: PSMPhaseStatus;
+  assignedPSM: string;
+  startedReviewAt?: Timestamp;
+  submittedToAdjusterAt?: Timestamp;
+  approvedByAdjusterAt?: Timestamp;
+  invoicedAt?: Timestamp;
+  completedAt?: Timestamp;
+  daysInPhase: number;
+  notes: string;
+}
+
+export interface PSMJobData {
+  adjusterCommunications: AdjusterCommunication[];
+  approvalStatus: ApprovalTracking;
+  homeownerCommunications: HomeownerCommunication[];
+  documentationReview: DocumentationReview;
+  invoice: Invoice;
+  redFlags: RedFlag[];
+  psmPhase: PSMPhase;
+}
+
+// ============================================================================
+// PRICE DATABASE TYPES
+// ============================================================================
+
+export interface PriceItem {
+  id: string;
+  category: string;
+  description: string;
+  unitPrice: number;
+  unit: 'each' | 'sqft' | 'linear-ft' | 'daily' | 'hourly';
+  lastUpdated: Timestamp;
+  updatedBy: string;
+}
+
+export interface PriceDatabase {
+  items: Record<string, PriceItem>;
+  version: number;
+  lastUpdated: Timestamp;
 }
