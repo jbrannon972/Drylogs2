@@ -70,12 +70,12 @@ export const SubcontractorModal: React.FC<SubcontractorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
 
-      {/* Modal */}
-      <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      {/* Modal - Full Screen */}
+      <div className="relative bg-white h-full w-full overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white z-10">
           <h2 className="text-lg font-semibold text-gray-900">Request Subcontractor</h2>
