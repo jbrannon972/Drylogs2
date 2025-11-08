@@ -208,14 +208,39 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   };
 
   const getDefaultMaterials = (): MaterialAffected[] => [
-    { materialType: 'Carpet', isAffected: false, squareFootage: 0, removalRequired: false },
+    // Flooring materials
+    { materialType: 'Carpet & Pad', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Hardwood Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Vinyl/Linoleum Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Tile Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Laminate Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Engineered Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Glue-Down Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Subfloor', isAffected: false, squareFootage: 0, removalRequired: false },
+
+    // Wall materials
     { materialType: 'Drywall', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Wood Framing', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Flooring', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Tile', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Baseboards', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Trimwork/Molding', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Door Casing', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Tile Walls', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Backsplash', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Insulation', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Concrete', isAffected: false, squareFootage: 0, removalRequired: false },
+
+    // Fixtures & Cabinets
+    { materialType: 'Countertops', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Cabinetry', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Vanity', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Appliances', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Mirror', isAffected: false, squareFootage: 0, removalRequired: false },
+
+    // Contents & Containment
+    { materialType: 'Contents', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Contents (Bagged for Disposal)', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Containment/Poly', isAffected: false, squareFootage: 0, removalRequired: false },
+
+    // Other
+    { materialType: 'Other', isAffected: false, squareFootage: 0, removalRequired: false },
   ];
 
   const completedCount = rooms.filter(r => r.isComplete).length;
@@ -657,7 +682,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                 <option value="">Select reason...</option>
                                 <option value="saturated">Saturated / Water-logged</option>
                                 <option value="contaminated">Contaminated (Cat 2/3)</option>
-                                <option value="mold">Mold Visible</option>
+                                <option value="visual-contamination">Visual Contamination</option>
                                 <option value="damaged">Structurally Damaged</option>
                                 <option value="access">Access Required</option>
                                 <option value="customer">Customer Request</option>

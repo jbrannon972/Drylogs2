@@ -144,7 +144,31 @@ export interface WorkflowPhases {
 
 export type RoomType = 'Bedroom' | 'Bathroom' | 'Kitchen' | 'Living Room' | 'Dining' | 'Laundry' | 'Hallway' | 'Basement' | 'Attic' | 'Garage' | 'Other';
 export type AffectedStatus = 'affected' | 'unaffected' | 'partially-affected';
-export type MaterialType = 'Drywall' | 'Flooring' | 'Carpet' | 'Wood Framing' | 'Subfloor' | 'Concrete' | 'Insulation' | 'Tile' | 'Other';
+export type MaterialType =
+  | 'Carpet & Pad'
+  | 'Hardwood Flooring'
+  | 'Vinyl/Linoleum Flooring'
+  | 'Tile Flooring'
+  | 'Laminate Flooring'
+  | 'Engineered Flooring'
+  | 'Glue-Down Flooring'
+  | 'Subfloor'
+  | 'Drywall'
+  | 'Baseboards'
+  | 'Trimwork/Molding'
+  | 'Door Casing'
+  | 'Tile Walls'
+  | 'Backsplash'
+  | 'Insulation'
+  | 'Countertops'
+  | 'Cabinetry'
+  | 'Vanity'
+  | 'Appliances'
+  | 'Mirror'
+  | 'Contents'
+  | 'Contents (Bagged for Disposal)'
+  | 'Containment/Poly'
+  | 'Other';
 export type MaterialCondition = 'wet' | 'damp' | 'dry';
 export type ReadingType = 'dry-standard' | 'initial' | 'daily' | 'final';
 export type PhotoStep = 'arrival' | 'assessment' | 'preexisting' | 'pre-demo' | 'demo' | 'post-demo' | 'daily-check' | 'final';
