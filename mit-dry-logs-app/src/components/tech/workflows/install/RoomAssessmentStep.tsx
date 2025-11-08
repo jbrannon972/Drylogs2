@@ -28,6 +28,7 @@ interface MaterialAffected {
   isAffected: boolean;
   squareFootage: number;
   removalRequired: boolean;
+  removalReason?: string;
   notes?: string;
 }
 
@@ -71,7 +72,6 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     rooms.length > 0 ? rooms[0].id : null
   );
   const [activeTab, setActiveTab] = useState<'info' | 'moisture' | 'materials'>('info');
-  const [showAddRoom, setShowAddRoom] = useState(false);
   const [showPreexistingModal, setShowPreexistingModal] = useState(false);
 
   // New room form
@@ -96,6 +96,16 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const selectedRoom = rooms.find(r => r.id === selectedRoomId);
 
   const addRoom = () => {
+    // Validation
+    if (!newRoomForm.name.trim()) {
+      alert('Please enter a room name');
+      return;
+    }
+    if (!newRoomForm.length || !newRoomForm.width) {
+      alert('Please enter room dimensions');
+      return;
+    }
+
     const newRoom: RoomData = {
       id: `room-${Date.now()}`,
       name: newRoomForm.name,
@@ -117,7 +127,6 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     };
 
     setRooms([...rooms, newRoom]);
-    setShowAddRoom(false);
     setNewRoomForm({ name: '', type: 'Bedroom', floor: '1st Floor', length: '', width: '', height: '8' });
     // Open the newly created room in detail view
     openRoomDetail(newRoom.id);
@@ -212,8 +221,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const completedCount = rooms.filter(r => r.isComplete).length;
   const totalCount = rooms.length;
 
-  // View state: 'list' or 'detail'
-  const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
+  // View state: 'list' | 'detail' | 'add'
+  const [viewMode, setViewMode] = useState<'list' | 'detail' | 'add'>('list');
 
   const openRoomDetail = (roomId: string) => {
     setSelectedRoomId(roomId);
@@ -263,7 +272,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
           {/* Add Room Button */}
           <Button
             variant="primary"
-            onClick={() => setShowAddRoom(true)}
+            onClick={() => setViewMode('add')}
             className="w-full mb-4"
           >
             <Plus className="w-5 h-5" />
@@ -586,49 +595,103 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               )}
 
               {activeTab === 'materials' && (
-                <div className="max-w-4xl space-y-4">
-                  <h3 className="font-semibold text-gray-900 mb-4">Affected Materials</h3>
+                <div className="max-w-4xl space-y-6">
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Materials Removal Plan</h3>
+                    <p className="text-sm text-gray-600">
+                      Document what materials need to be removed and why. This helps with demo planning and billing.
+                    </p>
+                  </div>
 
                   {selectedRoom.materialsAffected.map((material) => (
-                    <div key={material.materialType} className="border border-gray-300 rounded-lg p-4 bg-white">
-                      <div className="flex items-center gap-4">
-                        <label className="flex items-center gap-2 cursor-pointer min-w-[150px]">
+                    <div key={material.materialType} className="border-2 border-gray-300 rounded-lg p-4 bg-white">
+                      {/* Material Selection */}
+                      <div className="flex items-center gap-3 mb-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="checkbox"
-                            checked={material.isAffected}
-                            onChange={(e) => updateMaterial(material.materialType, { isAffected: e.target.checked })}
-                            className="h-5 w-5"
+                            checked={material.removalRequired}
+                            onChange={(e) => updateMaterial(material.materialType, {
+                              removalRequired: e.target.checked,
+                              isAffected: e.target.checked
+                            })}
+                            className="h-5 w-5 text-orange-600"
                           />
-                          <span className="font-medium text-gray-900">{material.materialType}</span>
+                          <span className="text-lg font-medium text-gray-900">{material.materialType}</span>
                         </label>
+                        {material.removalRequired && (
+                          <span className="ml-auto px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                            Scheduled for Removal
+                          </span>
+                        )}
+                      </div>
 
-                        {material.isAffected && (
-                          <>
-                            <div className="flex-1">
+                      {/* Removal Details */}
+                      {material.removalRequired && (
+                        <div className="space-y-4 pl-7 border-l-2 border-orange-300">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Quantity (sq ft)
+                              </label>
                               <input
                                 type="number"
                                 value={material.squareFootage}
                                 onChange={(e) => updateMaterial(material.materialType, { squareFootage: parseFloat(e.target.value) || 0 })}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                                placeholder="Square footage"
+                                placeholder="0"
                                 step="1"
+                                min="0"
                               />
                             </div>
 
-                            <label className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={material.removalRequired}
-                                onChange={(e) => updateMaterial(material.materialType, { removalRequired: e.target.checked })}
-                                className="h-4 w-4"
-                              />
-                              <span className="text-sm text-gray-700">Remove</span>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Reason for Removal *
+                              </label>
+                              <select
+                                value={material.removalReason || ''}
+                                onChange={(e) => updateMaterial(material.materialType, { removalReason: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                              >
+                                <option value="">Select reason...</option>
+                                <option value="saturated">Saturated / Water-logged</option>
+                                <option value="contaminated">Contaminated (Cat 2/3)</option>
+                                <option value="mold">Mold Visible</option>
+                                <option value="damaged">Structurally Damaged</option>
+                                <option value="access">Access Required</option>
+                                <option value="customer">Customer Request</option>
+                                <option value="preventive">Preventive Measure</option>
+                                <option value="other">Other</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Additional Notes (optional)
                             </label>
-                          </>
-                        )}
-                      </div>
+                            <textarea
+                              value={material.notes || ''}
+                              onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                              rows={2}
+                              placeholder="Any additional details about this material removal..."
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
+
+                  {selectedRoom.materialsAffected.filter(m => m.removalRequired).length === 0 && (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                      <Layers className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-600">
+                        No materials selected for removal yet. Check the boxes above to mark materials for demo.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -648,38 +711,45 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
         </div>
       )}
 
-      {/* Add Room Modal */}
-      {showAddRoom && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Add New Room</h2>
-              <button
-                onClick={() => setShowAddRoom(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
+      {/* ADD ROOM VIEW (Full Screen) */}
+      {viewMode === 'add' && (
+        <div className="min-h-screen bg-white flex flex-col">
+          {/* Header */}
+          <div className="border-b border-gray-300 bg-gray-50 p-4">
+            <button
+              onClick={() => {
+                setViewMode('list');
+                setNewRoomForm({ name: '', type: 'Bedroom', floor: '1st Floor', length: '', width: '', height: '8' });
+              }}
+              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-3"
+            >
+              <ChevronRight className="w-5 h-5 transform rotate-180" />
+              <span>Back to Rooms</span>
+            </button>
+            <h2 className="text-2xl font-bold text-gray-900">Add New Room</h2>
+          </div>
 
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Form Content */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-2xl mx-auto p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Room Name *</label>
                   <input
                     type="text"
                     value={newRoomForm.name}
                     onChange={(e) => setNewRoomForm({ ...newRoomForm, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
                     placeholder="e.g., Master Bedroom"
+                    autoFocus
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Room Type</label>
                   <select
                     value={newRoomForm.type}
                     onChange={(e) => setNewRoomForm({ ...newRoomForm, type: e.target.value as RoomType })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
                   >
                     <option>Bedroom</option>
                     <option>Bathroom</option>
@@ -698,11 +768,11 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Floor Level</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Floor Level</label>
                 <select
                   value={newRoomForm.floor}
                   onChange={(e) => setNewRoomForm({ ...newRoomForm, floor: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
                 >
                   <option>Basement</option>
                   <option>1st Floor</option>
@@ -712,50 +782,77 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                 </select>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Length (ft)</label>
-                  <input
-                    type="number"
-                    value={newRoomForm.length}
-                    onChange={(e) => setNewRoomForm({ ...newRoomForm, length: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    step="0.5"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Width (ft)</label>
-                  <input
-                    type="number"
-                    value={newRoomForm.width}
-                    onChange={(e) => setNewRoomForm({ ...newRoomForm, width: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    step="0.5"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Height (ft)</label>
-                  <input
-                    type="number"
-                    value={newRoomForm.height}
-                    onChange={(e) => setNewRoomForm({ ...newRoomForm, height: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    step="0.5"
-                  />
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Room Dimensions *</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Length (ft)</label>
+                    <input
+                      type="number"
+                      value={newRoomForm.length}
+                      onChange={(e) => setNewRoomForm({ ...newRoomForm, length: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
+                      step="0.5"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Width (ft)</label>
+                    <input
+                      type="number"
+                      value={newRoomForm.width}
+                      onChange={(e) => setNewRoomForm({ ...newRoomForm, width: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
+                      step="0.5"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Height (ft)</label>
+                    <input
+                      type="number"
+                      value={newRoomForm.height}
+                      onChange={(e) => setNewRoomForm({ ...newRoomForm, height: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
+                      step="0.5"
+                      placeholder="8"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="sticky bottom-0 bg-gray-50 border-t px-6 py-4 flex gap-3">
+              {newRoomForm.length && newRoomForm.width && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-900">
+                    <strong>Cubic Footage:</strong> {(parseFloat(newRoomForm.length) * parseFloat(newRoomForm.width) * parseFloat(newRoomForm.height || '8')).toFixed(0)} cf
+                  </p>
+                  <p className="text-sm text-blue-900 mt-1">
+                    <strong>Square Footage:</strong> {(parseFloat(newRoomForm.length) * parseFloat(newRoomForm.width)).toFixed(0)} sq ft
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom Buttons */}
+          <div className="border-t border-gray-300 bg-white p-4 sticky bottom-0">
+            <div className="max-w-2xl mx-auto flex gap-3">
               <Button
                 variant="primary"
                 onClick={addRoom}
                 disabled={!newRoomForm.name || !newRoomForm.length || !newRoomForm.width}
+                className="flex-1"
               >
-                <Plus className="w-4 h-4" />
-                Add Room
+                <Plus className="w-5 h-5" />
+                Add Room & Continue
               </Button>
-              <Button variant="secondary" onClick={() => setShowAddRoom(false)}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setViewMode('list');
+                  setNewRoomForm({ name: '', type: 'Bedroom', floor: '1st Floor', length: '', width: '', height: '8' });
+                }}
+              >
                 Cancel
               </Button>
             </div>
