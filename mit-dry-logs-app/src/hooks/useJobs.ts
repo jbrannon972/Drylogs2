@@ -42,15 +42,18 @@ export function useJobs(enableRealtime: boolean = true) {
         setLoading(true);
         let fetchedJobs: Job[] = [];
 
-        if (user.role === 'MIT_TECH') {
-          // Techs see only their assigned jobs
+        // Demo account sees all jobs for demonstration purposes
+        const isDemoAccount = user.email === 'tech@demo.com';
+
+        if (isDemoAccount || user.role === 'PSM' || user.role === 'ADMIN') {
+          // Demo tech, PSM, and Admins see all jobs
+          fetchedJobs = await jobsService.getAllJobs();
+        } else if (user.role === 'MIT_TECH') {
+          // Regular techs see only their assigned jobs
           fetchedJobs = await jobsService.getJobsByTechnician(user.uid);
         } else if (user.role === 'MIT_LEAD') {
           // Leads see jobs in their zone
           fetchedJobs = await jobsService.getJobsByZone(user.zone);
-        } else if (user.role === 'PSM' || user.role === 'ADMIN') {
-          // PSM and Admins see all jobs - PSM is the bridge to insurance
-          fetchedJobs = await jobsService.getAllJobs();
         }
 
         setJobs(fetchedJobs);
@@ -71,15 +74,18 @@ export function useJobs(enableRealtime: boolean = true) {
         // Filter based on user role
         let filteredJobs = updatedJobs;
 
-        if (user.role === 'MIT_TECH') {
+        // Demo account sees all jobs
+        const isDemoAccount = user.email === 'tech@demo.com';
+
+        if (isDemoAccount || user.role === 'PSM' || user.role === 'ADMIN') {
+          // Demo tech, PSM, and Admins see all jobs
+          filteredJobs = updatedJobs;
+        } else if (user.role === 'MIT_TECH') {
           filteredJobs = updatedJobs.filter(
             (job) => job.scheduledTechnician === user.uid
           );
         } else if (user.role === 'MIT_LEAD') {
           filteredJobs = updatedJobs.filter((job) => job.scheduledZone === user.zone);
-        } else if (user.role === 'PSM' || user.role === 'ADMIN') {
-          // PSM and Admins see all jobs
-          filteredJobs = updatedJobs;
         }
 
         setJobs(filteredJobs);
