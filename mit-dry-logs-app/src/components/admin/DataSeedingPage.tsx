@@ -463,8 +463,29 @@ export const DataSeedingPage: React.FC = () => {
     try {
       await clearAllJobs();
 
+      // Fetch actual users from Firestore to assign jobs to real techs
+      setStatus('Fetching users from database...');
+      const usersSnapshot = await getDocs(collection(db, 'users'));
+      const users = usersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+
+      // Find tech users
+      const techUsers = users.filter((u: any) => u.role === 'MIT_TECH');
+      const zones = ['Zone 1', 'Zone 2', 'Zone 3', '2nd Shift'];
+
       setStatus('Generating comprehensive PSM job data...');
       const jobs = generateComprehensiveJobs();
+
+      // Assign jobs to actual tech users if we have any, otherwise use default
+      if (techUsers.length > 0) {
+        setStatus(`Assigning jobs to ${techUsers.length} tech users...`);
+        jobs.forEach((job, idx) => {
+          const techUser: any = techUsers[idx % techUsers.length];
+          job.scheduledTechnician = techUser.uid;
+          job.scheduledZone = (techUser.zone || zones[idx % zones.length]) as any;
+        });
+      } else {
+        setStatus('⚠️ No tech users found - jobs will use placeholder IDs');
+      }
 
       setStatus(`Seeding ${jobs.length} jobs...`);
 
@@ -476,7 +497,11 @@ export const DataSeedingPage: React.FC = () => {
         setJobsCreated(prev => prev + 1);
       }
 
-      setStatus(`✅ Successfully seeded ${jobs.length} jobs!`);
+      if (techUsers.length > 0) {
+        setStatus(`✅ Successfully seeded ${jobs.length} jobs assigned to ${techUsers.length} techs!`);
+      } else {
+        setStatus(`✅ Jobs seeded, but create tech users first for proper assignment!`);
+      }
 
     } catch (err: any) {
       console.error('Seeding error:', err);
@@ -501,7 +526,8 @@ export const DataSeedingPage: React.FC = () => {
             <ul className="list-disc list-inside text-blue-800 space-y-1 text-sm">
               <li>Clears ALL existing jobs from the database</li>
               <li>Creates 15 comprehensive test jobs across all workflow phases</li>
-              <li>Generates realistic PSM data for all jobs</li>
+              <li><strong>Assigns jobs to actual tech users in your system</strong> (so techs see jobs in their app)</li>
+              <li>Generates realistic PSM data with room-by-room moisture readings</li>
               <li>Includes jobs in Pre-Install, Install, Demo, Check Service, Pull, and Complete states</li>
               <li>PSM Dashboard will show ALL jobs for tracking and reporting</li>
             </ul>
