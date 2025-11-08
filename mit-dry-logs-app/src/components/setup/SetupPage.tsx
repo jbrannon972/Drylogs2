@@ -864,11 +864,39 @@ export function SetupPage() {
         // Sign out to create next user
         await auth.signOut();
       } catch (error: any) {
-        newResults.push({
-          userId: userData.email,
-          status: 'error',
-          message: `❌ Error: ${error.message}`,
-        });
+        // If user already exists, find their UID instead
+        if (error.code === 'auth/email-already-in-use') {
+          const existingUid = await findUserByEmail(userData.email);
+          if (existingUid) {
+            newResults.push({
+              userId: existingUid,
+              status: 'success',
+              message: `ℹ️ Using existing ${userData.displayName} (${userData.email})`,
+            });
+
+            // Store UIDs for job creation
+            if (userData.role === 'MIT_TECH') {
+              createdTechUid = existingUid;
+              setTechUid(existingUid);
+            }
+            if (userData.role === 'MIT_LEAD') {
+              createdLeadUid = existingUid;
+              setLeadUid(existingUid);
+            }
+          } else {
+            newResults.push({
+              userId: userData.email,
+              status: 'error',
+              message: `❌ User exists but couldn't find UID: ${userData.email}`,
+            });
+          }
+        } else {
+          newResults.push({
+            userId: userData.email,
+            status: 'error',
+            message: `❌ Error: ${error.message}`,
+          });
+        }
       }
 
       setResults([...newResults]);
@@ -876,7 +904,7 @@ export function SetupPage() {
 
     setIsCreating(false);
 
-    // Create sample jobs after users
+    // Create sample jobs after users (whether created or found)
     if (createdTechUid && createdLeadUid) {
       await createSampleJobs(createdTechUid, createdLeadUid);
     }
