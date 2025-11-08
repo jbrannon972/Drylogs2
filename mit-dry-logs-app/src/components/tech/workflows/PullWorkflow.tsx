@@ -8,7 +8,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
 import { WorkflowActionBar } from '../../shared/WorkflowActionBar';
 import { StartPullStep } from './pull/StartPullStep';
-import { FinalVerificationStep } from './pull/FinalVerificationStep';
+import { FinalMoistureVerification } from './pull/FinalMoistureVerification';
 import { EquipmentRemovalStep } from './pull/EquipmentRemovalStep';
 import { PullFinalPhotosStep } from './pull/PullFinalPhotosStep';
 import { CustomerPaperworkStep } from './pull/CustomerPaperworkStep';
@@ -34,10 +34,10 @@ const PULL_STEPS: StepConfig[] = [
   },
   {
     id: 'final-verification',
-    title: 'Final Verification',
-    description: 'Confirm all materials < 12% moisture',
+    title: 'Final Moisture Verification',
+    description: 'Verify all tracked materials are dry',
     icon: <CheckCircle className="w-5 h-5" />,
-    component: FinalVerificationStep,
+    component: FinalMoistureVerification,
   },
   {
     id: 'equipment-removal',

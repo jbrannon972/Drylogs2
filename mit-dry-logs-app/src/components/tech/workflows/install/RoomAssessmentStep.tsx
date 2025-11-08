@@ -7,7 +7,8 @@ import {
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
-import { RoomType, MaterialType, FlooringInstallationType } from '../../../../types';
+import { RoomType, MaterialType, FlooringInstallationType, MaterialMoistureTracking } from '../../../../types';
+import { MoistureTabContent } from './MoistureTabContent';
 
 interface RoomAssessmentStepProps {
   job: any;
@@ -71,6 +72,9 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const { uploadPhoto, isUploading } = usePhotos();
 
   const [rooms, setRooms] = useState<RoomData[]>(installData.roomAssessments || []);
+  const [moistureTracking, setMoistureTracking] = useState<MaterialMoistureTracking[]>(
+    installData.moistureTracking || []
+  );
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(
     rooms.length > 0 ? rooms[0].id : null
   );
@@ -116,14 +120,17 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save to workflow store whenever rooms change
+  // Save to workflow store whenever rooms or moisture tracking change
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      updateWorkflowData('install', { roomAssessments: rooms });
+      updateWorkflowData('install', {
+        roomAssessments: rooms,
+        moistureTracking: moistureTracking
+      });
     }, 300);
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rooms]);
+  }, [rooms, moistureTracking]);
 
   const selectedRoom = rooms.find(r => r.id === selectedRoomId);
 
@@ -428,7 +435,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       {room.length > 0 ? `${room.length}' × ${room.width}' × ${room.height}'` : 'No dimensions yet'}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      {room.moistureReadings.length} moisture reading(s)
+                      {moistureTracking.filter(t => t.roomId === room.id).length} material(s) tracked
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
@@ -520,7 +527,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                 }`}
               >
                 <Droplets className="w-4 h-4 inline mr-2" />
-                Moisture ({selectedRoom.moistureReadings.length})
+                Moisture ({moistureTracking.filter(t => t.roomId === selectedRoom.id).length})
               </button>
               <button
                 onClick={() => setActiveTab('materials')}
@@ -641,88 +648,13 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               )}
 
               {activeTab === 'moisture' && (
-                <div className="max-w-4xl space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-900">Moisture Readings</h3>
-                    <Button variant="primary" onClick={addMoistureReading}>
-                      <Plus className="w-4 h-4" />
-                      Add Reading
-                    </Button>
-                  </div>
-
-                  {selectedRoom.moistureReadings.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      <Droplets className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                      <p>No moisture readings yet</p>
-                    </div>
-                  )}
-
-                  {selectedRoom.moistureReadings.map((reading) => (
-                    <div key={reading.id} className="border border-gray-300 rounded-lg p-4 bg-white">
-                      <div className="flex items-start gap-4">
-                        <div className="flex-1 grid grid-cols-3 gap-4">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Material</label>
-                            <select
-                              value={reading.material}
-                              onChange={(e) => updateMoistureReading(reading.id, { material: e.target.value as MaterialType })}
-                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                            >
-                              <option>Drywall</option>
-                              <option>Carpet</option>
-                              <option>Pad</option>
-                              <option>Hardwood</option>
-                              <option>Subfloor</option>
-                              <option>Concrete</option>
-                              <option>Baseboard</option>
-                              <option>Insulation</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Location</label>
-                            <input
-                              type="text"
-                              value={reading.location}
-                              onChange={(e) => updateMoistureReading(reading.id, { location: e.target.value })}
-                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                              placeholder="e.g., North wall"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Moisture %</label>
-                            <input
-                              type="number"
-                              value={reading.percentage}
-                              onChange={(e) => updateMoistureReading(reading.id, { percentage: parseFloat(e.target.value) || 0 })}
-                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                              step="0.1"
-                              min="0"
-                              max="100"
-                            />
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-start gap-2 pt-6">
-                          <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
-                            <input
-                              type="checkbox"
-                              checked={reading.isDryStandard}
-                              onChange={(e) => updateMoistureReading(reading.id, { isDryStandard: e.target.checked })}
-                              className="h-4 w-4"
-                            />
-                            <span className="text-xs text-gray-700">Dry Standard</span>
-                          </label>
-                          <button
-                            onClick={() => deleteMoistureReading(reading.id)}
-                            className="p-1 hover:bg-red-50 rounded"
-                            title="Delete reading"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <MoistureTabContent
+                  job={job}
+                  roomId={selectedRoom.id}
+                  roomName={selectedRoom.name}
+                  moistureTracking={moistureTracking}
+                  onUpdate={setMoistureTracking}
+                />
               )}
 
               {activeTab === 'materials' && (

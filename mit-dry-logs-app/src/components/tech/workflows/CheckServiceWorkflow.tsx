@@ -9,7 +9,7 @@ import { Button } from '../../shared/Button';
 import { WorkflowActionBar } from '../../shared/WorkflowActionBar';
 import { StartVisitStep } from './check-service/StartVisitStep';
 import { EnvironmentalCheckStep } from './check-service/EnvironmentalCheckStep';
-import { RoomReadingsStep } from './check-service/RoomReadingsStep';
+import { RoomReadingsStepNew } from './check-service/RoomReadingsStepNew';
 import { EquipmentStatusStep } from './check-service/EquipmentStatusStep';
 import { DryingAssessmentStep } from './check-service/DryingAssessmentStep';
 import { CheckEquipmentAdjustStep } from './check-service/CheckEquipmentAdjustStep';
@@ -43,7 +43,7 @@ const CHECK_SERVICE_STEPS: StepConfig[] = [
     title: 'Room Readings',
     description: 'Moisture readings per room',
     icon: <CheckCircle className="w-5 h-5" />,
-    component: RoomReadingsStep,
+    component: RoomReadingsStepNew,
   },
   {
     id: 'equipment-status',
@@ -79,7 +79,7 @@ export const CheckServiceWorkflow: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { checkServiceStep, setCheckServiceStep, startWorkflow } = useWorkflowStore();
+  const { checkServiceStep, setCheckServiceStep, startWorkflow, checkServiceData } = useWorkflowStore();
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
   const [showOverview, setShowOverview] = useState(false);
@@ -236,7 +236,16 @@ export const CheckServiceWorkflow: React.FC = () => {
       {/* MAIN CONTENT */}
       <div ref={contentRef} className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="bg-white rounded-lg shadow-md p-6 mb-24">
-          {CurrentStepComponent && <CurrentStepComponent job={job} onNext={handleNext} />}
+          {CurrentStepComponent && checkServiceStep === 'room-readings' && (
+            <CurrentStepComponent
+              job={job}
+              onNext={handleNext}
+              visitNumber={(checkServiceData?.visits?.length || 0) + 1}
+            />
+          )}
+          {CurrentStepComponent && checkServiceStep !== 'room-readings' && (
+            <CurrentStepComponent job={job} onNext={handleNext} />
+          )}
         </div>
       </div>
 
