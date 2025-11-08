@@ -32,19 +32,19 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-block bg-entrusted-orange text-white px-6 py-3 rounded-lg mb-4">
-            <h1 className="text-3xl font-poppins font-bold">MIT Dry Logs</h1>
-          </div>
-          <p className="text-gray-600">Water Damage Mitigation Management</p>
-        </div>
-
         {/* Login Card */}
         <div className="bg-white rounded-lg shadow-xl p-8">
-          <h2 className="text-2xl font-poppins font-bold text-gray-900 mb-6">
-            Sign In
-          </h2>
+          {/* Logo at top of card */}
+          <div className="text-center mb-6">
+            <img
+              src="/Elogo.png"
+              alt="Entrusted"
+              className="h-12 w-auto mx-auto mb-4"
+            />
+            <h2 className="text-2xl font-poppins font-bold text-gray-900">
+              Sign In
+            </h2>
+          </div>
 
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 flex items-start gap-2">

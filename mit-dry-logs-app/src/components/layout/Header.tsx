@@ -13,9 +13,11 @@ export const Header: React.FC = () => {
       <div className="px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="bg-entrusted-orange text-white px-3 py-2 rounded-lg">
-            <h1 className="text-lg font-poppins font-bold">MIT Dry Logs</h1>
-          </div>
+          <img
+            src="/Elogo.png"
+            alt="Entrusted"
+            className="h-8 w-auto"
+          />
           {!isOnline && (
             <div className="flex items-center gap-2 bg-yellow-50 px-3 py-1 rounded-lg border border-yellow-200">
               <WifiOff className="w-4 h-4 text-yellow-600" />

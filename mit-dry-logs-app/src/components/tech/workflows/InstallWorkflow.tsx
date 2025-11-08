@@ -279,13 +279,21 @@ export const InstallWorkflow: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Menu button */}
-          <button
-            onClick={() => setShowStepOverview(!showStepOverview)}
-            className="p-2 hover:bg-gray-100 rounded-lg ml-2"
-          >
-            <Menu className="w-5 h-5 text-gray-600" />
-          </button>
+          {/* Right: Exit + Menu buttons */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleExit}
+              className="px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded transition-colors"
+            >
+              Exit
+            </button>
+            <button
+              onClick={() => setShowStepOverview(!showStepOverview)}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+            >
+              <Menu className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
         </div>
       </div>
 
