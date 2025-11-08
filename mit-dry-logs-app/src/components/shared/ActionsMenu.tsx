@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Camera, Hammer, Droplets, FileText, AlertTriangle, X } from 'lucide-react';
+import { Camera, Hammer, Droplets, FileText, AlertTriangle, X, Images } from 'lucide-react';
 import { PreExistingModal } from './modals/PreExistingModal';
 import { DemoModal } from './modals/DemoModal';
 import { SubcontractorModal } from './modals/SubcontractorModal';
 import { QuickNotesModal } from './modals/QuickNotesModal';
 import { SafetyFlagModal } from './modals/SafetyFlagModal';
+import { PhotoGalleryModal } from './gallery/PhotoGalleryModal';
 
 interface ActionsMenuProps {
   jobId: string;
@@ -13,7 +14,7 @@ interface ActionsMenuProps {
   onClose: () => void;
 }
 
-type ActionType = 'preexisting' | 'demo' | 'sub' | 'notes' | 'safety' | null;
+type ActionType = 'preexisting' | 'demo' | 'sub' | 'notes' | 'safety' | 'gallery' | null;
 
 export const ActionsMenu: React.FC<ActionsMenuProps> = ({
   jobId,
@@ -44,6 +45,13 @@ export const ActionsMenu: React.FC<ActionsMenuProps> = ({
   };
 
   const actions = [
+    {
+      id: 'gallery' as ActionType,
+      icon: Images,
+      label: 'Photo Gallery',
+      description: 'View all job photos by date & room',
+      color: 'text-indigo-600',
+    },
     {
       id: 'preexisting' as ActionType,
       icon: Camera,
@@ -147,6 +155,9 @@ export const ActionsMenu: React.FC<ActionsMenuProps> = ({
       </div>
 
       {/* Modals */}
+      {activeModal === 'gallery' && (
+        <PhotoGalleryModal jobId={jobId} onClose={handleModalClose} />
+      )}
       {activeModal === 'preexisting' && (
         <PreExistingModal jobId={jobId} currentRoom={currentRoom} onClose={handleModalClose} />
       )}
