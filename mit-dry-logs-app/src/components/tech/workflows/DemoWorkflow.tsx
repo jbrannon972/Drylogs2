@@ -4,6 +4,7 @@ import { useWorkflowStore } from '../../../stores/workflowStore';
 import { useJobsStore } from '../../../stores/jobsStore';
 import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
+import { WorkflowActionBar } from '../../shared/WorkflowActionBar';
 import {
   CheckCircle,
   Circle,
@@ -179,81 +180,59 @@ export const DemoWorkflow: React.FC = () => {
   const progressPercent = Math.round(((currentStepIndex + 1) / DEMO_STEPS.length) * 100);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* HEADER */}
-      <div className="bg-white shadow-md border-b sticky top-0 z-10">
-        <div className="px-4 py-3 flex items-center justify-between border-b">
-          <div>
-            <h1 className="text-lg font-poppins font-bold text-gray-900">
-              Demo Workflow
-            </h1>
-            <p className="text-xs text-gray-600">
-              {job.customerInfo.name} • {job.customerInfo.address}
-            </p>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* ULTRAFIELD CONDENSED HEADER - 48px */}
+      <div className="bg-white border-b sticky top-0 z-40">
+        <div className="px-3 py-2 flex items-center justify-between">
+          {/* Left: Logo + Step info - CLICKABLE for menu */}
+          <div
+            className="flex-1 cursor-pointer hover:opacity-75 transition-opacity"
+            onClick={() => setShowStepOverview(!showStepOverview)}
+          >
+            <div className="flex items-center gap-2 text-sm">
+              <img src="/Elogo.png" alt="Entrusted" className="h-6 w-auto" />
+              <span className="text-gray-400">•</span>
+              <span className="text-gray-700">Step {currentStepIndex + 1}/{DEMO_STEPS.length}</span>
+              <span className="text-gray-400">•</span>
+              <span className="text-gray-900 font-medium truncate">{currentStepConfig.title}</span>
+            </div>
+            {/* Thin progress bar */}
+            <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+              <div
+                className="bg-entrusted-orange h-1 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
-          <Button variant="secondary" onClick={handleExit} className="text-sm">
-            Exit
-          </Button>
-        </div>
 
-        {/* Progress Bar */}
-        <div
-          className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => setShowStepOverview(!showStepOverview)}
-        >
-          <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-gray-700 font-medium">
-              Step {currentStepIndex + 1} of {DEMO_STEPS.length}: {currentStepConfig.title}
-            </span>
-            <span className="font-bold text-entrusted-orange">
-              {progressPercent}%
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-            <div
-              className="bg-entrusted-orange h-3 rounded-full transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-          <p className="text-xs text-gray-500 mt-1 text-center">
-            Click to view all steps
-          </p>
+          {/* Right: Exit button */}
+          <button
+            onClick={handleExit}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-sm ml-3"
+          >
+            Exit
+          </button>
         </div>
       </div>
 
       {/* MAIN CONTENT */}
       <div ref={contentRef} className="container mx-auto px-4 py-6 max-w-4xl">
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-24">
           {StepComponent && <StepComponent job={job} onNext={handleNext} />}
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t">
-            <Button
-              variant="secondary"
-              onClick={handlePrevious}
-              disabled={currentStepIndex === 0}
-              className="flex items-center gap-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous
-            </Button>
-
-            <div className="text-sm text-gray-500">
-              Step {currentStepIndex + 1} of {DEMO_STEPS.length}
-            </div>
-
-            <Button
-              variant="primary"
-              onClick={handleNext}
-              disabled={currentStepIndex === DEMO_STEPS.length - 1}
-              className="flex items-center gap-2"
-            >
-              {currentStepIndex === DEMO_STEPS.length - 1 ? 'Finish' : 'Continue'}
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
         </div>
       </div>
+
+      {/* Bottom Action Bar */}
+      <WorkflowActionBar
+        jobId={job.jobId}
+        currentStep={currentStepConfig.id}
+        currentStepIndex={currentStepIndex}
+        totalSteps={DEMO_STEPS.length}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        canGoBack={currentStepIndex > 0}
+        canGoForward={currentStepIndex < DEMO_STEPS.length - 1}
+      />
 
       {/* STEP OVERVIEW MODAL */}
       {showStepOverview && (
