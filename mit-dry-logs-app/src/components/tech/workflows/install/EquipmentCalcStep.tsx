@@ -1,163 +1,191 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Button } from '../../../shared/Button';
-import { Wind, AlertCircle, Info, Calculator, Scan, Plus, Trash2, CheckCircle } from 'lucide-react';
+import { Wind, AlertCircle, Info, Calculator, CheckCircle } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
-import { DehumidifierType } from '../../../../types';
+import { DehumidifierType, DryingChamber } from '../../../../types';
+import { calculateChamberEquipment } from '../../../../utils/iicrcCalculations';
 
 interface EquipmentCalcStepProps {
   job: any;
   onNext: () => void;
 }
 
+interface RoomData {
+  id: string;
+  name: string;
+  length: number;
+  width: number;
+  height: number;
+  insetsCubicFt?: number;
+  offsetsCubicFt?: number;
+  floorSqFt: number;
+  wallSqFt: number;
+  ceilingSqFt: number;
+}
+
+interface ChamberCalculations {
+  chamberId: string;
+  chamberName: string;
+  cubicFootage: number;
+  dehumidifiers: number;
+  airMovers: number;
+  airScrubbers: number;
+  formula: string;
+  breakdown: string[];
+}
+
 export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
 
-  // ULTRAFAULT: Memoize derived values to prevent unnecessary re-renders
-  const dryingPlan = useMemo(() => installData.dryingPlan || {}, [installData.dryingPlan]);
+  const chambers: DryingChamber[] = useMemo(() => installData.chambers || [], [installData.chambers]);
+  const rooms: RoomData[] = useMemo(() => installData.rooms || [], [installData.rooms]);
   const waterClassification = useMemo(() => installData.waterClassification || {}, [installData.waterClassification]);
-  const rooms = useMemo(() => installData.rooms || [], [installData.rooms]);
+  const dryingPlan = useMemo(() => installData.dryingPlan || {}, [installData.dryingPlan]);
 
   const [dehumidifierType, setDehumidifierType] = useState<DehumidifierType>('Low Grain Refrigerant (LGR)');
   const [dehumidifierRating, setDehumidifierRating] = useState(200); // PPD
-  const [calculations, setCalculations] = useState<any>(null);
+  const [chamberCalculations, setChamberCalculations] = useState<ChamberCalculations[]>([]);
 
-  // ULTRAFAULT: Track last saved calculations to prevent duplicate saves
   const lastSavedCalculationsRef = useRef<string | null>(null);
 
-  // Calculate total cubic footage from all rooms including insets/offsets
-  // Per IICRC S500: Cubic footage determines dehumidifier requirements
-  const calculateCubicFootage = () => {
-    return rooms.reduce((total: number, room: any) => {
-      const baseCubicFt = room.length * room.width * room.height;
-      const insets = room.insetsCubicFt || 0;  // Direct cubic ft addition (closets, alcoves)
-      const offsets = room.offsetsCubicFt || 0; // Direct cubic ft subtraction (columns, obstacles)
-      const adjustedCubicFt = baseCubicFt + insets - offsets;
-      return total + adjustedCubicFt;
-    }, 0);
-  };
-
-  // Get IICRC chart factor based on class and dehumidifier type
-  const getChartFactor = (damageClass: number, dehType: DehumidifierType): number => {
-    const factors: Record<DehumidifierType, Record<number, number>> = {
-      'Conventional Refrigerant': { 1: 100, 2: 40, 3: 30, 4: 30 },
-      'Low Grain Refrigerant (LGR)': { 1: 100, 2: 50, 3: 40, 4: 40 },
-      'Desiccant': { 1: 1, 2: 2, 3: 3, 4: 3 }, // ACH values
-    };
-
-    return factors[dehType]?.[damageClass] || 50;
-  };
-
-  // Perform IICRC calculations
+  // Perform calculations for all chambers
   const performCalculations = () => {
-    const cubicFootage = calculateCubicFootage();
-    const damageClass = dryingPlan.overallClass || 2;
-    const waterCategory = waterClassification.category || 1;
-    const totalAffectedSqFt = dryingPlan.totalAffectedSqFt || 0;
-    const totalFloorSqFt = dryingPlan.totalFloorSqFt || 0;
-    const totalWallSqFt = dryingPlan.totalWallSqFt || 0;
-
-    // DEHUMIDIFIER CALCULATION
-    const chartFactor = getChartFactor(damageClass, dehumidifierType);
-    let dehumidifierCount = 0;
-    let calculationMethod = '';
-
-    if (dehumidifierType === 'Desiccant') {
-      // Desiccant uses ACH (Air Changes per Hour)
-      const cfmRequired = (cubicFootage * chartFactor) / 60;
-      dehumidifierCount = Math.ceil(cfmRequired / 2000); // Assuming 2000 CFM per desiccant unit
-      calculationMethod = `Desiccant: ${cubicFootage} cf × ${chartFactor} ACH ÷ 60 = ${cfmRequired.toFixed(0)} CFM ÷ 2000 CFM/unit`;
-    } else {
-      // Refrigerant uses PPD (Pints Per Day)
-      const ppdRequired = cubicFootage / chartFactor;
-      dehumidifierCount = Math.ceil(ppdRequired / dehumidifierRating);
-      calculationMethod = `${dehumidifierType}: ${cubicFootage} cf ÷ ${chartFactor} = ${ppdRequired.toFixed(0)} PPD ÷ ${dehumidifierRating} PPD/unit`;
+    if (chambers.length === 0) {
+      console.warn('📊 EquipmentCalcStep: No chambers defined');
+      return;
     }
 
-    // AIR MOVER CALCULATION
-    // Base: 1 per room
-    let airMoverCount = rooms.length;
+    const calculations: ChamberCalculations[] = chambers.map(chamber => {
+      const chamberRooms = rooms.filter(r => chamber.assignedRooms.includes(r.id));
 
-    // Add based on floor area (1 per 60 sq ft of wet floor)
-    const floorMovers = Math.ceil(totalFloorSqFt / 60);
-    airMoverCount += floorMovers;
+      // Calculate cubic footage for this chamber
+      const cubicFootage = chamberRooms.reduce((total, room) => {
+        const baseCubicFt = room.length * room.width * room.height;
+        const insets = room.insetsCubicFt || 0;
+        const offsets = room.offsetsCubicFt || 0;
+        return total + baseCubicFt + insets - offsets;
+      }, 0);
 
-    // Add based on wall/ceiling area (1 per 125 sq ft)
-    const wallCeilingMovers = Math.ceil(totalWallSqFt / 125);
-    airMoverCount += wallCeilingMovers;
+      // Get chart factor based on class and dehumidifier type
+      const chartFactors: Record<string, Record<number, number>> = {
+        'Conventional Refrigerant': { 1: 100, 2: 40, 3: 30, 4: 0 },
+        'Low Grain Refrigerant (LGR)': { 1: 100, 2: 50, 3: 40, 4: 40 },
+        'Desiccant': { 1: 1, 2: 2, 3: 3, 4: 3 },
+      };
 
-    const airMoverCalculation = `Base (${rooms.length} rooms) + Floor (${totalFloorSqFt.toFixed(0)} ÷ 60) + Walls (${totalWallSqFt.toFixed(0)} ÷ 125)`;
+      const chartFactor = chartFactors[dehumidifierType]?.[dryingPlan.overallClass] || 50;
 
-    // AIR SCRUBBER CALCULATION
-    // Required for Category 2 or 3 water
-    const airScrubberCount = (waterCategory >= 2)
-      ? Math.ceil(totalAffectedSqFt / 250)
-      : 0;
+      // Calculate dehumidifiers
+      let dehumidifierCount: number;
+      let dehumidifierFormula: string;
 
-    const airScrubberCalculation = (waterCategory >= 2)
-      ? `Category ${waterCategory}: ${totalAffectedSqFt.toFixed(0)} sq ft ÷ 250 sq ft/unit`
-      : 'Not required for Category 1 water';
+      if (dehumidifierType === 'Desiccant') {
+        const totalCfmRequired = (cubicFootage * chartFactor) / 60;
+        dehumidifierCount = Math.ceil(totalCfmRequired / dehumidifierRating);
+        dehumidifierFormula = `${cubicFootage.toFixed(0)} cf × ${chartFactor} ACH ÷ 60 = ${totalCfmRequired.toFixed(0)} CFM ÷ ${dehumidifierRating} CFM/unit = ${dehumidifierCount} units`;
+      } else {
+        const ppdRequired = cubicFootage / chartFactor;
+        dehumidifierCount = Math.ceil(ppdRequired / dehumidifierRating);
+        dehumidifierFormula = `${cubicFootage.toFixed(0)} cf ÷ ${chartFactor} = ${ppdRequired.toFixed(1)} PPD ÷ ${dehumidifierRating} PPD/unit = ${dehumidifierCount} units`;
+      }
 
-    const calc = {
-      cubicFootage,
-      totalAffectedSqFt,
-      damageClass,
-      waterCategory,
+      // Calculate air movers
+      const totalWetFloorArea = chamberRooms.reduce((sum, r) => sum + r.floorSqFt, 0);
+      const totalWetWallArea = chamberRooms.reduce((sum, r) => sum + r.wallSqFt, 0);
+
+      const baseAirMovers = chamberRooms.length; // 1 per room
+      const floorAirMovers = Math.ceil(totalWetFloorArea / 60);
+      const wallAirMovers = Math.ceil(totalWetWallArea / 125);
+      const totalAirMovers = baseAirMovers + floorAirMovers + wallAirMovers;
+
+      const airMoverBreakdown = [
+        `Base (${chamberRooms.length} rooms): ${baseAirMovers}`,
+        `Floor (${totalWetFloorArea.toFixed(0)} sf ÷ 60): ${floorAirMovers}`,
+        `Wall (${totalWetWallArea.toFixed(0)} sf ÷ 125): ${wallAirMovers}`,
+      ];
+
+      // Calculate air scrubbers (Category 2 or 3 only)
+      let airScrubberCount = 0;
+      if (waterClassification.category >= 2) {
+        const totalAffectedArea = chamberRooms.reduce((sum, r) => sum + (r.length * r.width), 0);
+        airScrubberCount = Math.ceil(totalAffectedArea / 250);
+      }
+
+      return {
+        chamberId: chamber.chamberId,
+        chamberName: chamber.chamberName,
+        cubicFootage,
+        dehumidifiers: dehumidifierCount,
+        airMovers: totalAirMovers,
+        airScrubbers: airScrubberCount,
+        formula: dehumidifierFormula,
+        breakdown: airMoverBreakdown,
+      };
+    });
+
+    setChamberCalculations(calculations);
+
+    // Save to workflow store
+    const calcString = JSON.stringify({
+      perChamber: calculations,
       dehumidifierType,
       dehumidifierRating,
-      chartFactor,
-      dehumidifiers: {
-        count: dehumidifierCount,
-        calculation: calculationMethod,
-      },
-      airMovers: {
-        count: airMoverCount,
-        calculation: airMoverCalculation,
-      },
-      airScrubbers: {
-        count: airScrubberCount,
-        calculation: airScrubberCalculation,
-      },
-    };
+    });
 
-    setCalculations(calc);
-
-    // ULTRAFAULT: Only save to workflow store if calculations actually changed (deep comparison)
-    const calcString = JSON.stringify(calc);
     if (calcString !== lastSavedCalculationsRef.current) {
-      console.log('📊 EquipmentCalcStep: Calculations changed, saving to workflow store');
+      console.log('📊 EquipmentCalcStep: Chamber calculations changed, saving to workflow store');
       lastSavedCalculationsRef.current = calcString;
+
+      const totalEquipment = calculations.reduce(
+        (totals, chamber) => ({
+          dehumidifiers: totals.dehumidifiers + chamber.dehumidifiers,
+          airMovers: totals.airMovers + chamber.airMovers,
+          airScrubbers: totals.airScrubbers + chamber.airScrubbers,
+        }),
+        { dehumidifiers: 0, airMovers: 0, airScrubbers: 0 }
+      );
+
       updateWorkflowData('install', {
-        equipmentCalculations: calc,
+        equipmentCalculations: {
+          perChamber: calculations,
+          total: totalEquipment,
+          dehumidifierType,
+          dehumidifierRating,
+        },
       });
-    } else {
-      console.log('📊 EquipmentCalcStep: Calculations unchanged, skipping save');
     }
   };
 
-  // ULTRAFAULT: Recalculate when dehumidifier settings change
-  // Use debounced effect to prevent rapid recalculations
+  // Recalculate when settings change
   useEffect(() => {
-    console.log('📊 EquipmentCalcStep: Triggering calculation due to settings change');
     const timeoutId = setTimeout(() => {
       performCalculations();
-    }, 100); // 100ms debounce
+    }, 100);
 
     return () => clearTimeout(timeoutId);
-    // CRITICAL FIX: Only depend on actual user inputs, NOT derived state
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dehumidifierType, dehumidifierRating]);
 
-  // ULTRAFAULT: Recalculate when rooms or dryingPlan change from installData
-  // This handles when user goes back and modifies previous steps
+  // Recalculate when chambers or rooms change
   useEffect(() => {
-    console.log('📊 EquipmentCalcStep: Room/plan data changed, recalculating');
     const timeoutId = setTimeout(() => {
       performCalculations();
-    }, 150); // Slightly longer debounce for data changes
+    }, 150);
 
     return () => clearTimeout(timeoutId);
-    // Safe to depend on memoized values - they only change when underlying data changes
-  }, [rooms, dryingPlan]);
+  }, [chambers, rooms, dryingPlan]);
+
+  // Validation
+  if (chambers.length === 0) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+        <AlertCircle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
+        <p className="text-gray-700 mb-2">
+          No drying chambers defined. Please go back and complete the "Define Chambers" step first.
+        </p>
+      </div>
+    );
+  }
 
   if (!dryingPlan.overallClass) {
     return (
@@ -170,6 +198,15 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     );
   }
 
+  const totalEquipment = chamberCalculations.reduce(
+    (totals, chamber) => ({
+      dehumidifiers: totals.dehumidifiers + chamber.dehumidifiers,
+      airMovers: totals.airMovers + chamber.airMovers,
+      airScrubbers: totals.airScrubbers + chamber.airScrubbers,
+    }),
+    { dehumidifiers: 0, airMovers: 0, airScrubbers: 0 }
+  );
+
   return (
     <div className="space-y-6">
       {/* Instructions */}
@@ -177,34 +214,18 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-medium text-blue-900 mb-1">IICRC Equipment Calculations</h4>
+            <h4 className="font-medium text-blue-900 mb-1">IICRC Equipment Calculations (Per Chamber)</h4>
             <p className="text-sm text-blue-800">
-              Equipment quantities are calculated using ANSI/IICRC S500-2021 standards based on
-              cubic footage, damage class, and affected areas.
+              Equipment quantities are calculated PER CHAMBER using ANSI/IICRC S500-2021 standards.
+              Each chamber is calculated independently based on its cubic footage and damage class.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Job Context */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-gray-50 border rounded-lg p-4 text-center">
-          <p className="text-sm text-gray-600 mb-1">Cubic Footage</p>
-          <p className="text-2xl font-bold text-gray-900">{calculations?.cubicFootage.toFixed(0) || '0'}</p>
-        </div>
-        <div className="bg-gray-50 border rounded-lg p-4 text-center">
-          <p className="text-sm text-gray-600 mb-1">Damage Class</p>
-          <p className="text-2xl font-bold text-gray-900">Class {dryingPlan.overallClass}</p>
-        </div>
-        <div className="bg-gray-50 border rounded-lg p-4 text-center">
-          <p className="text-sm text-gray-600 mb-1">Water Category</p>
-          <p className="text-2xl font-bold text-gray-900">Cat {waterClassification.category}</p>
-        </div>
-      </div>
-
-      {/* Dehumidifier Settings */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4">Dehumidifier Specifications</h3>
+      {/* Global Settings */}
+      <div className="border rounded-lg p-5 bg-white">
+        <h3 className="font-semibold text-gray-900 mb-4">Dehumidifier Specifications (All Chambers)</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -213,7 +234,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
             <select
               value={dehumidifierType}
               onChange={(e) => setDehumidifierType(e.target.value as DehumidifierType)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
             >
               <option>Conventional Refrigerant</option>
               <option>Low Grain Refrigerant (LGR)</option>
@@ -232,144 +253,110 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 step="10"
                 value={dehumidifierRating}
                 onChange={(e) => setDehumidifierRating(parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               />
             </div>
           )}
         </div>
       </div>
 
-      {/* Calculations Results */}
-      {calculations && (
-        <div className="space-y-4">
-          {/* Dehumidifiers */}
-          <div className="border-2 border-blue-300 rounded-lg p-5 bg-blue-50">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  <Wind className="w-5 h-5 text-blue-600" />
-                  Dehumidifiers
-                </h3>
-                <p className="text-xs text-gray-600">IICRC Chart Factor: {calculations.chartFactor}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-4xl font-bold text-blue-900">{calculations.dehumidifiers.count}</p>
-                <p className="text-sm text-gray-600">units</p>
-              </div>
-            </div>
-            <div className="bg-white rounded p-3 mt-3">
-              <p className="text-xs font-mono text-gray-700">
-                {calculations.dehumidifiers.calculation}
-              </p>
+      {/* Per-Chamber Calculations */}
+      {chamberCalculations.map((calc, index) => (
+        <div key={calc.chamberId} className="border-2 border-gray-300 rounded-lg p-5 bg-gray-50">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Wind className="w-6 h-6 text-orange-600" />
+              {calc.chamberName}
+            </h3>
+            <div className="text-sm text-gray-600">
+              {calc.cubicFootage.toFixed(0)} cubic feet
             </div>
           </div>
 
-          {/* Air Movers */}
-          <div className="border-2 border-orange-300 rounded-lg p-5 bg-orange-50">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  <Wind className="w-5 h-5 text-orange-600" />
-                  Air Movers
-                </h3>
-                <p className="text-xs text-gray-600">1 per room + floor/wall area coverage</p>
-              </div>
-              <div className="text-right">
-                <p className="text-4xl font-bold text-orange-900">{calculations.airMovers.count}</p>
-                <p className="text-sm text-gray-600">units</p>
-              </div>
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {/* Dehumidifiers */}
+            <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 text-center">
+              <Wind className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+              <p className="text-3xl font-bold text-blue-900">{calc.dehumidifiers}</p>
+              <p className="text-sm text-blue-700 font-medium">Dehumidifiers</p>
             </div>
-            <div className="bg-white rounded p-3 mt-3">
-              <p className="text-xs font-mono text-gray-700">
-                {calculations.airMovers.calculation}
-              </p>
+
+            {/* Air Movers */}
+            <div className="bg-orange-100 border-2 border-orange-300 rounded-lg p-4 text-center">
+              <Wind className="w-6 h-6 text-orange-600 mx-auto mb-2" />
+              <p className="text-3xl font-bold text-orange-900">{calc.airMovers}</p>
+              <p className="text-sm text-orange-700 font-medium">Air Movers</p>
+            </div>
+
+            {/* Air Scrubbers */}
+            <div className={`rounded-lg p-4 text-center ${
+              calc.airScrubbers > 0
+                ? 'bg-purple-100 border-2 border-purple-300'
+                : 'bg-gray-100 border-2 border-gray-300'
+            }`}>
+              <Wind className={`w-6 h-6 mx-auto mb-2 ${
+                calc.airScrubbers > 0 ? 'text-purple-600' : 'text-gray-400'
+              }`} />
+              <p className={`text-3xl font-bold ${
+                calc.airScrubbers > 0 ? 'text-purple-900' : 'text-gray-500'
+              }`}>{calc.airScrubbers}</p>
+              <p className={`text-sm font-medium ${
+                calc.airScrubbers > 0 ? 'text-purple-700' : 'text-gray-500'
+              }`}>Air Scrubbers</p>
             </div>
           </div>
 
-          {/* Air Scrubbers */}
-          <div className={`border-2 rounded-lg p-5 ${
-            calculations.airScrubbers.count > 0
-              ? 'border-purple-300 bg-purple-50'
-              : 'border-gray-300 bg-gray-50'
-          }`}>
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  <Wind className={`w-5 h-5 ${calculations.airScrubbers.count > 0 ? 'text-purple-600' : 'text-gray-400'}`} />
-                  Air Scrubbers
-                </h3>
-                <p className="text-xs text-gray-600">
-                  {calculations.airScrubbers.count > 0 ? 'Required for Category 2/3 water' : 'Not required for Category 1'}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className={`text-4xl font-bold ${
-                  calculations.airScrubbers.count > 0 ? 'text-purple-900' : 'text-gray-400'
-                }`}>
-                  {calculations.airScrubbers.count}
-                </p>
-                <p className="text-sm text-gray-600">units</p>
-              </div>
+          {/* Calculation Details */}
+          <div className="space-y-2">
+            <div className="bg-white rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-600 mb-1">Dehumidifier Calculation:</p>
+              <p className="text-xs font-mono text-gray-800">{calc.formula}</p>
             </div>
-            <div className="bg-white rounded p-3 mt-3">
-              <p className="text-xs font-mono text-gray-700">
-                {calculations.airScrubbers.calculation}
-              </p>
+            <div className="bg-white rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-600 mb-1">Air Mover Breakdown:</p>
+              {calc.breakdown.map((line, idx) => (
+                <p key={idx} className="text-xs font-mono text-gray-800">{line}</p>
+              ))}
             </div>
           </div>
         </div>
-      )}
+      ))}
 
-      {/* Total Equipment Summary */}
-      {calculations && (
-        <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 rounded-lg p-6 text-white">
-          <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
-            <Calculator className="w-6 h-6" />
-            Total Equipment Required
-          </h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white bg-opacity-20 rounded-lg p-4 text-center">
-              <p className="text-3xl font-bold">{calculations.dehumidifiers.count}</p>
-              <p className="text-sm mt-1">Dehumidifiers</p>
-            </div>
-            <div className="bg-white bg-opacity-20 rounded-lg p-4 text-center">
-              <p className="text-3xl font-bold">{calculations.airMovers.count}</p>
-              <p className="text-sm mt-1">Air Movers</p>
-            </div>
-            <div className="bg-white bg-opacity-20 rounded-lg p-4 text-center">
-              <p className="text-3xl font-bold">{calculations.airScrubbers.count}</p>
-              <p className="text-sm mt-1">Air Scrubbers</p>
-            </div>
+      {/* Total Summary */}
+      <div className="bg-green-50 border-2 border-green-300 rounded-lg p-5">
+        <div className="flex items-start gap-3 mb-4">
+          <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-medium text-green-900 mb-1">Total Equipment Required</h4>
+            <p className="text-sm text-green-800">
+              Combined requirements across all {chamberCalculations.length} chamber(s)
+            </p>
           </div>
         </div>
-      )}
 
-      {/* IICRC Reference */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <h4 className="font-medium text-gray-900 mb-2">Calculation Standards</h4>
-        <div className="space-y-1 text-xs text-gray-600">
-          <p>• <strong>Dehumidifiers:</strong> ANSI/IICRC S500-2021 Appendix B - Chart Factors</p>
-          <p>• <strong>Air Movers:</strong> 1 per room + 1 per 60 sq ft floor + 1 per 125 sq ft walls/ceiling</p>
-          <p>• <strong>Air Scrubbers:</strong> 1 per 250 sq ft for Category 2/3 water</p>
-          <p className="mt-2">All calculations follow industry best practices and may be adjusted based on field conditions.</p>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white border-2 border-blue-300 rounded-lg p-4 text-center">
+            <p className="text-4xl font-bold text-blue-900">{totalEquipment.dehumidifiers}</p>
+            <p className="text-sm text-gray-600 mt-1">Dehumidifiers</p>
+          </div>
+          <div className="bg-white border-2 border-orange-300 rounded-lg p-4 text-center">
+            <p className="text-4xl font-bold text-orange-900">{totalEquipment.airMovers}</p>
+            <p className="text-sm text-gray-600 mt-1">Air Movers</p>
+          </div>
+          <div className="bg-white border-2 border-purple-300 rounded-lg p-4 text-center">
+            <p className="text-4xl font-bold text-purple-900">{totalEquipment.airScrubbers}</p>
+            <p className="text-sm text-gray-600 mt-1">Air Scrubbers</p>
+          </div>
         </div>
       </div>
 
-      {/* Warning if no equipment calculated */}
-      {calculations && (calculations.dehumidifiers.count === 0 || calculations.airMovers.count === 0) && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-medium text-red-900 mb-1">Warning: Insufficient Equipment</h4>
-              <p className="text-sm text-red-800">
-                The calculations show 0 equipment needed, which may indicate missing data.
-                Please verify room dimensions and affected areas in previous steps.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Navigation */}
+      <div className="flex justify-between pt-4">
+        <div></div>
+        <Button variant="primary" onClick={onNext}>
+          Continue to Equipment Placement
+        </Button>
+      </div>
     </div>
   );
 };

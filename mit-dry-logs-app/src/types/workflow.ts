@@ -10,16 +10,17 @@ export type InstallStep =
   | 'pre-existing'           // Step 3: Document pre-existing conditions with photos
   | 'cause-of-loss'          // Step 4: Document cause + water category (1/2/3)
   | 'add-rooms'              // Step 5: Add rooms with dimensions
-  | 'affected-materials'     // Step 6: Document affected SQFT per room
-  | 'moisture-mapping'       // Step 7: Initial moisture readings + photos
-  | 'partial-demo'           // Step 8: Partial demo work during install (optional)
-  | 'schedule-work'          // Step 9: Plan Day 2+ (demo, checks, pull)
-  | 'equipment-calc'         // Step 10: IICRC equipment calculations per room
-  | 'equipment-place'        // Step 11: Place and scan equipment by room
-  | 'general-billables'      // Step 12: Additional billable work (generals page)
-  | 'communicate-plan'       // Step 13: Customer communication
-  | 'final-photos'           // Step 14: Final documentation
-  | 'complete';              // Step 15: Complete and depart
+  | 'define-chambers'        // Step 6: Define drying chambers and assign rooms
+  | 'affected-materials'     // Step 7: Document affected SQFT per room
+  | 'moisture-mapping'       // Step 8: Initial moisture readings + photos
+  | 'partial-demo'           // Step 9: Partial demo work during install (optional)
+  | 'schedule-work'          // Step 10: Plan Day 2+ (demo, checks, pull)
+  | 'equipment-calc'         // Step 11: IICRC equipment calculations per chamber
+  | 'equipment-place'        // Step 12: Place and scan equipment by chamber
+  | 'general-billables'      // Step 13: Additional billable work (generals page)
+  | 'communicate-plan'       // Step 14: Customer communication
+  | 'final-photos'           // Step 15: Final documentation
+  | 'complete';              // Step 16: Complete and depart
 
 export type DemoStep =
   | 'clock-in'                // Step 1: Arrival & clock in

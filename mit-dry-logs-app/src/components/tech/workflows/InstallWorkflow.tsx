@@ -29,6 +29,7 @@ import { ArrivalStep } from './install/ArrivalStep';
 import { FrontDoorStep } from './install/FrontDoorStep';
 import { CauseOfLossStep } from './install/CauseOfLossStep';
 import { AddRoomsStep } from './install/AddRoomsStep';
+import { DefineChambersStep } from './install/DefineChambersStep';
 import { AffectedMaterialsStep } from './install/AffectedMaterialsStep';
 import { MoistureMappingStep } from './install/MoistureMappingStep';
 import { PartialDemoStep } from './install/PartialDemoStep';
@@ -93,6 +94,13 @@ const INSTALL_STEPS: StepConfig[] = [
     description: 'Measure and add all rooms',
     icon: <Ruler className="w-5 h-5" />,
     component: AddRoomsStep,
+  },
+  {
+    id: 'define-chambers',
+    title: 'Define Drying Chambers',
+    description: 'Group rooms into drying zones',
+    icon: <Wind className="w-5 h-5" />,
+    component: DefineChambersStep,
   },
   {
     id: 'affected-materials',

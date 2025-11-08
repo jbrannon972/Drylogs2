@@ -324,9 +324,20 @@ export interface AirScrubber {
   conditionOnRemoval?: EquipmentCondition;
 }
 
+export interface ChamberAmbientReading {
+  readingId: string;
+  temperature: number; // Fahrenheit
+  humidity: number; // Relative humidity %
+  timestamp: Timestamp;
+  takenBy: string;
+  dehumidifierId?: string; // If reading is from dehumidifier sensor
+  notes?: string;
+}
+
 export interface DryingChamber {
   chamberId: string;
   chamberName: string;
+  floorLevel?: string; // "First Floor", "Basement", etc.
   assignedRooms: string[];
   deploymentDate: Timestamp;
   removalDate?: Timestamp;
@@ -334,6 +345,9 @@ export interface DryingChamber {
   dehumidifiers: Dehumidifier[];
   airMovers: AirMover[];
   airScrubbers: AirScrubber[];
+  ambientReadings: ChamberAmbientReading[]; // Environmental conditions over time
+  hasContainment?: boolean; // Poly barriers for Category 2/3
+  containmentNotes?: string;
 }
 
 // NEW: Drying Plan and Goals
