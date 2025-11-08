@@ -182,7 +182,8 @@ export const InstallWorkflow: React.FC = () => {
       const jobData = getJobById(jobId);
       setJob(jobData);
     }
-  }, [jobId, user, startWorkflow, getJobById]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobId, user]);
 
   // Auto-scroll to top when step changes
   useEffect(() => {

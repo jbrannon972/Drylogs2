@@ -91,7 +91,8 @@ export const CheckServiceWorkflow: React.FC = () => {
       const jobData = getJobById(jobId);
       setJob(jobData);
     }
-  }, [jobId, user, startWorkflow, getJobById]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobId, user]);
 
   useEffect(() => {
     if (contentRef.current) {
