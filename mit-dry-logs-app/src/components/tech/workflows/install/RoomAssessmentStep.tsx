@@ -88,6 +88,29 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     height: '8',
   });
 
+  // Migrate old rooms to new material structure
+  useEffect(() => {
+    let needsMigration = false;
+    const migratedRooms = rooms.map(room => {
+      // Check if room has old material structure (< 33 materials or has old material names)
+      if (room.materialsAffected.length < 33) {
+        needsMigration = true;
+        return {
+          ...room,
+          materialsAffected: getDefaultMaterials()
+        };
+      }
+      return room;
+    });
+
+    if (needsMigration) {
+      console.log('🔄 Migrating rooms to new material structure');
+      setRooms(migratedRooms);
+    }
+    // Only run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Save to workflow store whenever rooms change
   useEffect(() => {
     const timeoutId = setTimeout(() => {
