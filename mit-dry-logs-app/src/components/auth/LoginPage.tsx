@@ -89,6 +89,7 @@ export const LoginPage: React.FC = () => {
             <div className="text-xs text-blue-800 space-y-1">
               <p><strong>MIT Tech:</strong> tech@demo.com / password123</p>
               <p><strong>MIT Lead:</strong> lead@demo.com / password123</p>
+              <p><strong>PSM:</strong> psm@demo.com / password123</p>
             </div>
           </div>
         </div>

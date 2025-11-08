@@ -47,6 +47,14 @@ export function SetupPage() {
       role: 'MIT_LEAD' as const,
       zone: 'Zone 1' as const,
     },
+    {
+      email: 'psm@demo.com',
+      password: 'password123',
+      displayName: 'Demo PSM',
+      phoneNumber: '+1 (555) 456-7890',
+      role: 'PSM' as const,
+      zone: 'Zone 1' as const,
+    },
   ];
 
   // Check how many jobs exist
@@ -649,6 +657,12 @@ export function SetupPage() {
                 <span className="mr-2">🔐</span>
                 <div>
                   <strong>MIT Lead:</strong> lead@demo.com / password123
+                </div>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">🔐</span>
+                <div>
+                  <strong>PSM:</strong> psm@demo.com / password123
                 </div>
               </li>
               <li className="flex items-start">
