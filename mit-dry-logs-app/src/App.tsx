@@ -15,6 +15,7 @@ import { CheckServiceWorkflow } from './components/tech/workflows/CheckServiceWo
 import { PullWorkflow } from './components/tech/workflows/PullWorkflow';
 import { PSMDashboard } from './components/psm/dashboard/PSMDashboard';
 import { JobDetailView } from './components/psm/job-detail/JobDetailView';
+import { DataSeedingPage } from './components/admin/DataSeedingPage';
 
 // Debug version identifier
 console.log('🚀 MIT Dry Logs v1.0.1 - Build:', new Date().toISOString());
@@ -47,6 +48,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/setup" element={<SetupPage />} />
+        <Route path="/admin/seed" element={<DataSeedingPage />} />
 
         <Route
           path="/login"
