@@ -45,13 +45,12 @@ export function useJobs(enableRealtime: boolean = true) {
         if (user.role === 'MIT_TECH') {
           // Techs see only their assigned jobs
           fetchedJobs = await jobsService.getJobsByTechnician(user.uid);
-        } else if (user.role === 'MIT_LEAD' || user.role === 'ADMIN') {
-          // Leads/Admins see all jobs in their zone or all jobs
-          if (user.role === 'MIT_LEAD') {
-            fetchedJobs = await jobsService.getJobsByZone(user.zone);
-          } else {
-            fetchedJobs = await jobsService.getAllJobs();
-          }
+        } else if (user.role === 'MIT_LEAD') {
+          // Leads see jobs in their zone
+          fetchedJobs = await jobsService.getJobsByZone(user.zone);
+        } else if (user.role === 'PSM' || user.role === 'ADMIN') {
+          // PSM and Admins see all jobs - PSM is the bridge to insurance
+          fetchedJobs = await jobsService.getAllJobs();
         }
 
         setJobs(fetchedJobs);
@@ -78,6 +77,9 @@ export function useJobs(enableRealtime: boolean = true) {
           );
         } else if (user.role === 'MIT_LEAD') {
           filteredJobs = updatedJobs.filter((job) => job.scheduledZone === user.zone);
+        } else if (user.role === 'PSM' || user.role === 'ADMIN') {
+          // PSM and Admins see all jobs
+          filteredJobs = updatedJobs;
         }
 
         setJobs(filteredJobs);

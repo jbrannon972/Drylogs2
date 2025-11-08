@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useJobsStore } from '../../../stores/jobsStore';
+import { useJobs } from '../../../hooks/useJobs';
 import { useAuth } from '../../../hooks/useAuth';
 import { Job, PSMPhaseStatus } from '../../../types';
 import {
@@ -25,7 +25,7 @@ interface FilterOptions {
 export const PSMDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { jobs } = useJobsStore();
+  const { allJobs: jobs, isLoading } = useJobs();
 
   const [filters, setFilters] = useState<FilterOptions>({
     status: 'all',
