@@ -76,7 +76,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const [showPreexistingModal, setShowPreexistingModal] = useState(false);
 
   // Material category expansion state
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['flooring'])); // Default: Flooring expanded
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set()); // Default: All collapsed
 
   // New room form
   const [newRoomForm, setNewRoomForm] = useState({
