@@ -31,6 +31,36 @@ export const DataSeedingPage: React.FC = () => {
 
   const now = () => Timestamp.now();
 
+  // Helper: Remove undefined values from objects (Firestore doesn't support undefined)
+  const removeUndefined = (obj: any): any => {
+    if (obj === null || obj === undefined) {
+      return null;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(item => removeUndefined(item));
+    }
+
+    if (obj instanceof Timestamp || obj instanceof Date) {
+      return obj;
+    }
+
+    if (typeof obj === 'object') {
+      const cleaned: any = {};
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          const value = obj[key];
+          if (value !== undefined) {
+            cleaned[key] = removeUndefined(value);
+          }
+        }
+      }
+      return cleaned;
+    }
+
+    return obj;
+  };
+
   const clearAllJobs = async () => {
     setStatus('Clearing existing jobs...');
     const jobsRef = collection(db, 'jobs');
@@ -440,7 +470,9 @@ export const DataSeedingPage: React.FC = () => {
 
       for (const job of jobs) {
         const jobRef = doc(db, 'jobs', job.jobId);
-        await setDoc(jobRef, job);
+        // Remove undefined values before saving to Firestore
+        const cleanedJob = removeUndefined(job);
+        await setDoc(jobRef, cleanedJob);
         setJobsCreated(prev => prev + 1);
       }
 
