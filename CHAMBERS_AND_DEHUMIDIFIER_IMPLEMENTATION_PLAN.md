@@ -395,27 +395,27 @@ Please answer these questions so I can finalize the implementation plan:
 
 ### 1. Chamber Creation Approach
 
-**Which option do you prefer?**
+**Which option do you prefer?** 1 chamber per floor, then manually assign rooms to the chambers. Need to be able to add more)
 - [ ] **Option 1:** Automatic (1 chamber per job, can split if needed)
 - [ ] **Option 2:** Guided (system suggests, tech reviews/customizes)
 - [ ] **Option 3:** Manual only (tech creates all chambers from scratch)
 - [ ] **Other:** ______________________________
 
-**Follow-up:** How often do your jobs require multiple chambers?
+**Follow-up:** How often do your jobs require multiple chambers? Frequently
 - [ ] Rarely (< 10% of jobs)
-- [ ] Sometimes (10-30% of jobs)
+- [ ] Sometimes (10-30% of jobs) 
 - [ ] Frequently (30-50% of jobs)
 - [ ] Almost always (> 50% of jobs)
 
 ### 2. Temperature & Humidity Readings
 
-**Where should temp/humidity be entered?**
+**Where should temp/humidity be entered?** both A and C
 - [ ] **Option A:** Separate "Environmental Check" step (once per chamber per visit)
 - [ ] **Option B:** First moisture reading prompts, then auto-fills for subsequent readings
 - [ ] **Option C:** Per dehumidifier (since they have built-in sensors)
 - [ ] **Option D:** Keep current approach (per moisture reading) - NOT RECOMMENDED
 
-**Follow-up:** Do your dehumidifiers have digital displays showing temp/humidity?
+**Follow-up:** Do your dehumidifiers have digital displays showing temp/humidity? Some do, some dont
 - [ ] Yes, all of them
 - [ ] Some do, some don't
 - [ ] No, we use separate hygrometers
@@ -423,7 +423,7 @@ Please answer these questions so I can finalize the implementation plan:
 
 ### 3. Workflow Integration
 
-**Where should "Define Chambers" step go?**
+**Where should "Define Chambers" step go?** after adding rooms. 
 - [ ] **After Step 10** (Plan the Job) - as Step 10.5
 - [ ] **Part of Step 10** (Plan the Job) - embedded in same step
 - [ ] **After Step 11** (Equipment Calculations) - adjust chambers after seeing equipment needs
@@ -431,7 +431,7 @@ Please answer these questions so I can finalize the implementation plan:
 
 ### 4. Equipment Assignment
 
-**When equipment is scanned/deployed, should tech select which chamber?**
+**When equipment is scanned/deployed, should tech select which chamber?** **No, assign automatically** - System assigns based on room location
 - [ ] **Yes, always** - Tech must select chamber for every piece of equipment
 - [ ] **Yes, but default to nearest chamber** - System suggests, tech can override
 - [ ] **No, assign automatically** - System assigns based on room location
@@ -439,7 +439,7 @@ Please answer these questions so I can finalize the implementation plan:
 
 ### 5. Check Service Workflow
 
-**How should Check Service handle chambers?**
+**How should Check Service handle chambers?** option a 
 - [ ] **Option A:** Show chamber-level summary first, then drill into rooms
 - [ ] **Option B:** Show all rooms flat, but group by chamber visually
 - [ ] **Option C:** Let tech choose chamber, then see rooms in that chamber
@@ -447,7 +447,7 @@ Please answer these questions so I can finalize the implementation plan:
 
 ### 6. Chamber Naming
 
-**How should chambers be named by default?**
+**How should chambers be named by default?** Generic but can be editited by tech
 - [ ] **By floor level:** "First Floor", "Second Floor", "Basement"
 - [ ] **By location:** "East Wing", "West Wing", "Main Area"
 - [ ] **Generic numbers:** "Chamber A", "Chamber B", "Chamber C"
@@ -456,13 +456,13 @@ Please answer these questions so I can finalize the implementation plan:
 
 ### 7. Containment Zones
 
-**Do you use poly containment barriers for Category 2/3 water?**
+**Do you use poly containment barriers for Category 2/3 water?** sometimies
 - [ ] Yes, frequently (need to track containment in app)
 - [ ] Sometimes (optional feature)
 - [ ] Rarely (don't need this feature)
 - [ ] No, never
 
-**Follow-up if Yes:** Should containment setup be a required step in Install workflow?
+**Follow-up if Yes:** Should containment setup be a required step in Install workflow? no, just document
 - [ ] Yes, required for Category 2/3
 - [ ] No, just document it in notes
 
@@ -470,13 +470,13 @@ Please answer these questions so I can finalize the implementation plan:
 
 **Rate your preference (1-5):**
 
-**I prefer accuracy and IICRC compliance (even if more complex):**
-1 (Simple) ☐☐☐☐☐ 5 (Accurate)
+**I prefer accuracy and IICRC compliance (even if more complex):** 4
+1 (Simple) ☐☐☐☐☐ 5 (Accurate) 
 
-**I prefer speed and ease of use (even if less precise):**
+**I prefer speed and ease of use (even if less precise):** 3
 1 (Accurate) ☐☐☐☐☐ 5 (Simple)
 
-**My techs are comfortable with technology:**
+**My techs are comfortable with technology:** 2
 1 (Struggle) ☐☐☐☐☐ 5 (Excel)
 
 ### 9. Current Pain Points
@@ -489,7 +489,7 @@ _______________________________________________________________
 
 ### 10. Future Considerations
 
-**Will you need to track equipment movement between chambers?**
+**Will you need to track equipment movement between chambers?** - [ ] No (equipment stays in assigned chamber until pull)
 - [ ] Yes (equipment can be moved between chambers during drying)
 - [ ] No (equipment stays in assigned chamber until pull)
 - [ ] Maybe (not sure yet)
