@@ -302,6 +302,92 @@ export interface MoistureReading {
   isDryStandard?: boolean; // True if this is the baseline reading
 }
 
+// ============================================================================
+// CONSTRUCTION MATERIALS (for moisture readings only)
+// ============================================================================
+
+// Only construction materials that can have moisture readings
+// Excludes: appliances, mirrors, fixtures, and other non-porous items
+export type ConstructionMaterialType =
+  // Flooring Materials
+  | 'Carpet & Pad'
+  | 'Hardwood Flooring'
+  | 'Vinyl/Linoleum Flooring'
+  | 'Tile Flooring'
+  | 'Laminate Flooring'
+  | 'Engineered Flooring'
+  | 'Subfloor'
+  // Drywall & Ceiling
+  | 'Drywall - Wall'
+  | 'Drywall - Ceiling'
+  // Trim & Molding
+  | 'Baseboards'
+  | 'Shoe Molding'
+  | 'Crown Molding'
+  | 'Door Casing'
+  | 'Window Casing'
+  | 'Chair Rail'
+  | 'Other Trim'
+  // Insulation
+  | 'Insulation - Wall'
+  | 'Insulation - Ceiling/Attic'
+  // Tile & Backsplash
+  | 'Tile Walls'
+  | 'Backsplash'
+  | 'Tub Surround'
+  // Cabinetry (wood can absorb moisture)
+  | 'Base Cabinets'
+  | 'Upper Cabinets'
+  | 'Vanity'
+  | 'Countertops'
+  | 'Shelving';
+
+// ============================================================================
+// ULTRAFIELD MOISTURE TRACKING SYSTEM
+// ============================================================================
+
+// Individual reading entry in the timeline
+export interface MoistureReadingEntry {
+  timestamp: string; // ISO string
+  moisturePercent: number;
+  temperature: number; // Fahrenheit
+  humidity: number; // Relative humidity %
+  photo?: string; // Photo URL
+  technicianId: string;
+  technicianName: string;
+  workflowPhase: 'install' | 'check-service' | 'pull';
+  visitNumber?: number; // For check services (1, 2, 3, etc.)
+  notes?: string;
+}
+
+// Material moisture tracking record - persists across all phases
+export interface MaterialMoistureTracking {
+  id: string; // Unique ID for this material/location combination
+  roomId: string;
+  roomName: string;
+  material: ConstructionMaterialType;
+  location: string; // Specific location within room (e.g., "North wall, 2ft height")
+  dryStandard: number; // Baseline from unaffected area - set once at install
+  readings: MoistureReadingEntry[]; // All readings over time (chronological)
+  createdAt: string; // ISO string
+  lastReadingAt: string; // ISO string
+  status: 'wet' | 'drying' | 'dry'; // Current status based on last reading
+  trend: 'improving' | 'stable' | 'worsening' | 'unknown'; // Based on last 2+ readings
+}
+
+// Helper to get trend between two readings
+export const getMoistureTrend = (current: number, previous: number): 'improving' | 'stable' | 'worsening' => {
+  const diff = current - previous;
+  if (Math.abs(diff) <= 0.5) return 'stable';
+  return diff < 0 ? 'improving' : 'worsening';
+};
+
+// Helper to determine if material is dry
+export const isMaterialDry = (currentReading: number, dryStandard: number): boolean => {
+  // Material is dry if within 2% of dry standard OR below 12% (IICRC guideline)
+  return currentReading <= dryStandard + 2 || currentReading <= 12;
+};
+
 export interface Photo {
   photoId: string;
   url: string;
