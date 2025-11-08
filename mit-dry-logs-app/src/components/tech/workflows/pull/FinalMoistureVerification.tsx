@@ -68,7 +68,7 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
       moisturePercent: readingNum,
       temperature: parseFloat(temperature),
       humidity: parseFloat(humidity),
-      photo,
+      photo: photo || undefined,
       technicianId: user?.uid || 'unknown',
       technicianName: user?.displayName || 'Unknown Tech',
       workflowPhase: 'pull',
@@ -82,11 +82,13 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
     // Update tracking record
     const updatedTracking = moistureTracking.map(m => {
       if (m.id === selectedMaterialId) {
+        const newStatus: 'wet' | 'drying' | 'dry' = isMaterialDry(readingNum, m.dryStandard) ? 'dry' : 'wet';
+
         return {
           ...m,
           readings: [...m.readings, entry],
           lastReadingAt: entry.timestamp,
-          status: isMaterialDry(readingNum, m.dryStandard) ? 'dry' : 'wet',
+          status: newStatus,
           trend,
         };
       }
@@ -289,7 +291,6 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
                         <Button
                           variant={selectedMaterialId === material.id ? 'secondary' : 'primary'}
                           onClick={() => setSelectedMaterialId(selectedMaterialId === material.id ? null : material.id)}
-                          size="sm"
                         >
                           {selectedMaterialId === material.id ? 'Cancel' : 'Verify'}
                         </Button>

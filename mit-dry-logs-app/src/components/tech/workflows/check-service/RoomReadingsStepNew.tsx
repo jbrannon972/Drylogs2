@@ -70,7 +70,7 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
       moisturePercent: readingNum,
       temperature: parseFloat(temperature),
       humidity: parseFloat(humidity),
-      photo,
+      photo: photo || undefined,
       technicianId: user?.uid || 'unknown',
       technicianName: user?.displayName || 'Unknown Tech',
       workflowPhase: 'check-service',
@@ -85,11 +85,18 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
     // Update tracking record
     const updatedTracking = moistureTracking.map(m => {
       if (m.id === selectedMaterialId) {
+        // Determine status
+        const newStatus: 'wet' | 'drying' | 'dry' = isMaterialDry(readingNum, m.dryStandard)
+          ? 'dry'
+          : readingNum < lastReading.moisturePercent
+          ? 'drying'
+          : 'wet';
+
         return {
           ...m,
           readings: [...m.readings, entry],
           lastReadingAt: entry.timestamp,
-          status: isMaterialDry(readingNum, m.dryStandard) ? 'dry' : readingNum < lastReading.moisturePercent ? 'drying' : 'wet',
+          status: newStatus,
           trend,
         };
       }
@@ -256,7 +263,6 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
                       <Button
                         variant={selectedMaterialId === material.id ? 'secondary' : 'primary'}
                         onClick={() => setSelectedMaterialId(selectedMaterialId === material.id ? null : material.id)}
-                        size="sm"
                       >
                         {selectedMaterialId === material.id ? 'Cancel' : 'Update'}
                       </Button>

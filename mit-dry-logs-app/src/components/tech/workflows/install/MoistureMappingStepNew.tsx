@@ -126,7 +126,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
       moisturePercent: wetReadingNum,
       temperature: parseFloat(temperature),
       humidity: parseFloat(humidity),
-      photo,
+      photo: photo || undefined,
       technicianId: user?.uid || 'unknown',
       technicianName: user?.displayName || 'Unknown Tech',
       workflowPhase: 'install',

@@ -43,7 +43,7 @@ const CHECK_SERVICE_STEPS: StepConfig[] = [
     title: 'Room Readings',
     description: 'Moisture readings per room',
     icon: <CheckCircle className="w-5 h-5" />,
-    component: RoomReadingsStepNew,
+    component: RoomReadingsStepNew as any, // Cast to any due to visitNumber prop
   },
   {
     id: 'equipment-status',
