@@ -117,9 +117,10 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     };
 
     setRooms([...rooms, newRoom]);
-    setSelectedRoomId(newRoom.id);
     setShowAddRoom(false);
     setNewRoomForm({ name: '', type: 'Bedroom', floor: '1st Floor', length: '', width: '', height: '8' });
+    // Open the newly created room in detail view
+    openRoomDetail(newRoom.id);
   };
 
   const deleteRoom = (roomId: string) => {
@@ -181,25 +182,6 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     });
   };
 
-  const markRoomComplete = () => {
-    if (!selectedRoom) return;
-
-    // Validation
-    if (selectedRoom.length === 0 || selectedRoom.width === 0) {
-      alert('Please enter room dimensions');
-      return;
-    }
-
-    updateSelectedRoom({ isComplete: true });
-
-    // Move to next incomplete room
-    const nextIncomplete = rooms.find(r => r.id !== selectedRoomId && !r.isComplete);
-    if (nextIncomplete) {
-      setSelectedRoomId(nextIncomplete.id);
-      setActiveTab('info');
-    }
-  };
-
   const handleNext = () => {
     const incompleteRooms = rooms.filter(r => !r.isComplete);
 
@@ -230,155 +212,196 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const completedCount = rooms.filter(r => r.isComplete).length;
   const totalCount = rooms.length;
 
+  // View state: 'list' or 'detail'
+  const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
+
+  const openRoomDetail = (roomId: string) => {
+    setSelectedRoomId(roomId);
+    setViewMode('detail');
+    setActiveTab('info');
+  };
+
+  const returnToList = () => {
+    setViewMode('list');
+    setSelectedRoomId(null);
+  };
+
+  const markCompleteAndReturn = () => {
+    if (!selectedRoom) return;
+
+    // If already complete, just return to list
+    if (selectedRoom.isComplete) {
+      returnToList();
+      return;
+    }
+
+    // Validation for new completions
+    if (selectedRoom.length === 0 || selectedRoom.width === 0) {
+      alert('Please enter room dimensions before marking complete');
+      return;
+    }
+
+    updateSelectedRoom({ isComplete: true });
+    returnToList();
+  };
+
   return (
-    <div className="flex h-screen">
-      {/* Left Sidebar - Room List */}
-      <div className="w-80 bg-gray-50 border-r border-gray-300 flex flex-col">
-        <div className="p-4 border-b border-gray-300 bg-white">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-gray-900">Rooms</h3>
-            <Button variant="primary" onClick={() => setShowAddRoom(true)} className="text-sm px-3 py-1">
-              <Plus className="w-4 h-4" />
-              Add Room
+    <div className="min-h-screen bg-gray-50">
+      {/* ROOM LIST VIEW */}
+      {viewMode === 'list' && (
+        <div className="max-w-4xl mx-auto p-6">
+          {/* Header */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Room Assessment</h2>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-900">
+                <strong>{completedCount}/{totalCount}</strong> rooms completed
+              </p>
+            </div>
+          </div>
+
+          {/* Add Room Button */}
+          <Button
+            variant="primary"
+            onClick={() => setShowAddRoom(true)}
+            className="w-full mb-4"
+          >
+            <Plus className="w-5 h-5" />
+            Add Room
+          </Button>
+
+          {/* Room List */}
+          <div className="space-y-3">
+            {rooms.map(room => (
+              <button
+                key={room.id}
+                onClick={() => openRoomDetail(room.id)}
+                className="w-full text-left p-4 rounded-lg border-2 border-gray-300 bg-white hover:border-orange-500 transition-all"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg font-bold text-gray-900">{room.name}</span>
+                      {room.isComplete && (
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{room.floor}</p>
+                    <p className="text-sm text-gray-700">
+                      {room.length > 0 ? `${room.length}' × ${room.width}' × ${room.height}'` : 'No dimensions yet'}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {room.moistureReadings.length} moisture reading(s)
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <ChevronRight className="w-6 h-6 text-gray-400" />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteRoom(room.id);
+                      }}
+                      className="p-2 hover:bg-red-50 rounded-lg"
+                    >
+                      <Trash2 className="w-5 h-5 text-red-600" />
+                    </button>
+                  </div>
+                </div>
+              </button>
+            ))}
+
+            {rooms.length === 0 && (
+              <div className="text-center py-12 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
+                <Home className="w-16 h-16 mx-auto mb-3 text-gray-300" />
+                <p className="text-base">No rooms added yet</p>
+                <p className="text-sm mt-1">Click "Add Room" to get started</p>
+              </div>
+            )}
+          </div>
+
+          {/* Continue Button */}
+          <div className="mt-6">
+            <Button
+              variant="primary"
+              onClick={handleNext}
+              disabled={completedCount !== totalCount || totalCount === 0}
+              className="w-full"
+            >
+              Continue to Define Chambers
+              <ChevronRight className="w-5 h-5" />
             </Button>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded p-2">
-            <p className="text-sm text-blue-900">
-              <strong>{completedCount}/{totalCount}</strong> rooms completed
-            </p>
-          </div>
         </div>
+      )}
 
-        {/* Room List */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-2">
-          {rooms.map(room => (
+      {/* ROOM DETAIL VIEW */}
+      {viewMode === 'detail' && selectedRoom && (
+        <div className="min-h-screen bg-white flex flex-col">
+          {/* Header */}
+          <div className="border-b border-gray-300 bg-gray-50 p-4">
             <button
-              key={room.id}
-              onClick={() => setSelectedRoomId(room.id)}
-              className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
-                selectedRoomId === room.id
-                  ? 'border-orange-500 bg-orange-50'
-                  : 'border-gray-300 bg-white hover:border-gray-400'
-              }`}
+              onClick={returnToList}
+              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-3"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Home className="w-4 h-4 text-gray-600" />
-                    <span className="font-medium text-gray-900">{room.name}</span>
-                  </div>
-                  <p className="text-xs text-gray-600">{room.floor}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {room.length > 0 ? `${room.length}' × ${room.width}' × ${room.height}'` : 'No dimensions'}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {room.moistureReadings.length} readings
-                  </p>
-                </div>
-                <div className="flex flex-col items-end gap-2">
-                  {room.isComplete ? (
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                  ) : (
-                    <AlertCircle className="w-5 h-5 text-yellow-500" />
-                  )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteRoom(room.id);
-                    }}
-                    className="p-1 hover:bg-red-50 rounded"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
-                </div>
-              </div>
+              <ChevronRight className="w-5 h-5 transform rotate-180" />
+              <span>Back to Rooms</span>
             </button>
-          ))}
-
-          {rooms.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <Home className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-              <p className="text-sm">No rooms added yet</p>
-              <p className="text-xs mt-1">Click "Add Room" to start</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Right Panel - Room Details */}
-      <div className="flex-1 flex flex-col bg-white">
-        {!selectedRoom && (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
-            <div className="text-center">
-              <Home className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p>Select a room to assess</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">{selectedRoom.name}</h2>
+                <p className="text-sm text-gray-600">{selectedRoom.floor} • {selectedRoom.type}</p>
+              </div>
+              {selectedRoom.isComplete && (
+                <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-lg">
+                  <CheckCircle className="w-5 h-5" />
+                  <span className="font-medium">Complete</span>
+                </div>
+              )}
             </div>
           </div>
-        )}
 
-        {selectedRoom && (
-          <>
-            {/* Room Header */}
-            <div className="border-b border-gray-300 bg-gray-50 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedRoom.name}</h2>
-                  <p className="text-sm text-gray-600">{selectedRoom.floor} • {selectedRoom.type}</p>
-                </div>
-                {selectedRoom.isComplete ? (
-                  <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-lg">
-                    <CheckCircle className="w-5 h-5" />
-                    <span className="font-medium">Complete</span>
-                  </div>
-                ) : (
-                  <Button variant="primary" onClick={markRoomComplete}>
-                    Mark Complete
-                  </Button>
-                )}
-              </div>
+          {/* Tabs */}
+          <div className="border-b border-gray-300 bg-white sticky top-0 z-10">
+            <div className="flex gap-1 px-4">
+              <button
+                onClick={() => setActiveTab('info')}
+                className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+                  activeTab === 'info'
+                    ? 'border-orange-500 text-orange-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Home className="w-4 h-4 inline mr-2" />
+                Room Info
+              </button>
+              <button
+                onClick={() => setActiveTab('moisture')}
+                className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+                  activeTab === 'moisture'
+                    ? 'border-orange-500 text-orange-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Droplets className="w-4 h-4 inline mr-2" />
+                Moisture ({selectedRoom.moistureReadings.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('materials')}
+                className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+                  activeTab === 'materials'
+                    ? 'border-orange-500 text-orange-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Layers className="w-4 h-4 inline mr-2" />
+                Materials
+              </button>
             </div>
+          </div>
 
-            {/* Tabs */}
-            <div className="border-b border-gray-300 bg-white">
-              <div className="flex gap-1 px-4">
-                <button
-                  onClick={() => setActiveTab('info')}
-                  className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-                    activeTab === 'info'
-                      ? 'border-orange-500 text-orange-600'
-                      : 'border-transparent text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Home className="w-4 h-4 inline mr-2" />
-                  Room Info
-                </button>
-                <button
-                  onClick={() => setActiveTab('moisture')}
-                  className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-                    activeTab === 'moisture'
-                      ? 'border-orange-500 text-orange-600'
-                      : 'border-transparent text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Droplets className="w-4 h-4 inline mr-2" />
-                  Moisture ({selectedRoom.moistureReadings.length})
-                </button>
-                <button
-                  onClick={() => setActiveTab('materials')}
-                  className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-                    activeTab === 'materials'
-                      ? 'border-orange-500 text-orange-600'
-                      : 'border-transparent text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Layers className="w-4 h-4 inline mr-2" />
-                  Materials
-                </button>
-              </div>
-            </div>
-
-            {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+          {/* Tab Content */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-4xl mx-auto p-6">
               {activeTab === 'info' && (
                 <div className="max-w-2xl space-y-6">
                   <div className="grid grid-cols-3 gap-4">
@@ -609,26 +632,21 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                 </div>
               )}
             </div>
-          </>
-        )}
+          </div>
 
-        {/* Bottom Navigation */}
-        <div className="border-t border-gray-300 bg-white p-4">
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-600">
-              {completedCount} of {totalCount} rooms completed
-            </div>
+          {/* Bottom Button */}
+          <div className="border-t border-gray-300 bg-white p-4 sticky bottom-0">
             <Button
               variant="primary"
-              onClick={handleNext}
-              disabled={completedCount !== totalCount || totalCount === 0}
+              onClick={markCompleteAndReturn}
+              className="w-full"
             >
-              Continue to Define Chambers
+              {selectedRoom.isComplete ? 'Return to Room List' : 'Mark Complete & Return'}
               <ChevronRight className="w-5 h-5" />
             </Button>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Add Room Modal */}
       {showAddRoom && (
