@@ -117,12 +117,13 @@ export const PSMDashboard: React.FC = () => {
             border-bottom: 4px solid #ea580c;
             padding-bottom: 20px;
             margin-bottom: 30px;
+            text-align: center;
           }
-          .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #ea580c;
-            letter-spacing: 1px;
+          .logo-img {
+            max-width: 350px;
+            height: auto;
+            margin: 0 auto 15px auto;
+            display: block;
           }
           .report-title {
             font-size: 22px;
@@ -271,7 +272,7 @@ export const PSMDashboard: React.FC = () => {
         <button class="print-button no-print" onclick="window.print()">🖨️ Print Dry Log</button>
 
         <div class="header">
-          <div class="logo">ENTRUSTED RESTORATION</div>
+          <img src="/Elogo.png" alt="Entrusted Restoration" class="logo-img" />
           <div class="report-title">WATER DAMAGE RESTORATION DRY LOG</div>
           <div style="color: #6b7280; margin-top: 8px; font-size: 11pt;">
             IICRC S500 Compliant Documentation<br>
