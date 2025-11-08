@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CheckCircle, MapPin, Clock, Camera, AlertTriangle, Info, ShieldAlert } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
@@ -13,6 +13,9 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
+
+  // ULTRAFAULT: Track last saved state to prevent duplicate saves
+  const lastSavedStateRef = useRef<string | null>(null);
 
   // Removed duplicate arrival tracking - it's now in Step 1 (ArrivalStep)
   const [frontEntrancePhoto, setFrontEntrancePhoto] = useState<string | null>(
@@ -59,31 +62,52 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
     checkAfterHours();
   }, []);
 
-  // Auto-detect hazard flags based on building year
+  // ULTRAFAULT: Auto-detect hazard flags based on building year
+  // Only depend on buildingYear, not the flags themselves (prevents circular updates)
   useEffect(() => {
     const year = parseInt(buildingYear);
     if (!isNaN(year)) {
       // Lead paint concern for pre-1978 buildings (EPA lead-based paint regulations)
       if (year < 1978 && !leadConcern) {
+        console.log('🏠 FrontDoorStep: Setting lead concern flag for pre-1978 building');
         setLeadConcern(true);
       }
       // Asbestos concern for pre-1980 buildings (EPA asbestos regulations)
       if (year < 1980 && !asbestosConcern) {
+        console.log('🏠 FrontDoorStep: Setting asbestos concern flag for pre-1980 building');
         setAsbestosConcern(true);
       }
     }
-  }, [buildingYear, leadConcern, asbestosConcern]);
+    // CRITICAL FIX: Only depend on buildingYear to prevent circular updates
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buildingYear]);
 
-  // Save to workflow store
+  // ULTRAFAULT: Save to workflow store with deep comparison and debouncing
   useEffect(() => {
-    updateWorkflowData('install', {
-      frontEntrancePhoto,
-      isAfterHours,
-      buildingYear,
-      asbestosConcern,
-      leadConcern,
-      vulnerableOccupants,
-    });
+    console.log('🏠 FrontDoorStep: State changed, preparing to save');
+
+    const timeoutId = setTimeout(() => {
+      const dataToSave = {
+        frontEntrancePhoto,
+        isAfterHours,
+        buildingYear,
+        asbestosConcern,
+        leadConcern,
+        vulnerableOccupants,
+      };
+
+      // Deep comparison to prevent unnecessary saves
+      const dataString = JSON.stringify(dataToSave);
+      if (dataString !== lastSavedStateRef.current) {
+        console.log('🏠 FrontDoorStep: Data changed, saving to workflow store');
+        lastSavedStateRef.current = dataString;
+        updateWorkflowData('install', dataToSave);
+      } else {
+        console.log('🏠 FrontDoorStep: Data unchanged, skipping save');
+      }
+    }, 200); // 200ms debounce
+
+    return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [frontEntrancePhoto, isAfterHours, buildingYear, asbestosConcern, leadConcern, vulnerableOccupants]);
 

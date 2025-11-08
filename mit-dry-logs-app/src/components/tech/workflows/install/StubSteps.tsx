@@ -1306,8 +1306,12 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
   const [completedAt] = useState(() => installData.completedAt || new Date().toISOString());
   const [signatureTimestamp, setSignatureTimestamp] = useState(() => installData.customerSignatureTimestamp || null);
 
-  // Calculate labor hours
-  const calculateLaborHours = () => {
+  // ULTRAFAULT: Track last saved state to prevent duplicate saves
+  const lastSavedStateRef = React.useRef<string | null>(null);
+
+  // ULTRAFAULT: Calculate labor hours with memoization to prevent infinite loops
+  // Only recalculate when actual dependencies change
+  const calculateLaborHours = React.useCallback(() => {
     if (!installData.arrivalTime || !departureTime) return null;
 
     try {
@@ -1352,9 +1356,12 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       console.error('Error calculating labor hours:', error);
       return null;
     }
-  };
+  }, [installData.arrivalTime, departureTime]);
 
-  const laborSummary = calculateLaborHours();
+  // ULTRAFAULT: Memoize labor summary to prevent recalculation on every render
+  const laborSummary = React.useMemo(() => {
+    return calculateLaborHours();
+  }, [calculateLaborHours]);
 
   // Signature canvas functions
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -1423,18 +1430,36 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
     }
   }, [signature, signatureTimestamp]);
 
-  // Auto-save when state changes (prevents infinite loops from calling handleSave directly)
+  // ULTRAFAULT: Auto-save when state changes with deep comparison and debouncing
   React.useEffect(() => {
-    updateWorkflowData('install', {
-      departureTime,
-      travelTimeFromSite,
-      completionNotes: techNotes,
-      laborSummary,
-      customerSignature: signature,
-      customerSignatureName: customerName,
-      customerSignatureTimestamp: signatureTimestamp,
-      completedAt,
-    });
+    console.log('✅ CompleteStep: State change detected, preparing to save');
+
+    // Debounce rapid changes
+    const timeoutId = setTimeout(() => {
+      const dataToSave = {
+        departureTime,
+        travelTimeFromSite,
+        completionNotes: techNotes,
+        laborSummary,
+        customerSignature: signature,
+        customerSignatureName: customerName,
+        customerSignatureTimestamp: signatureTimestamp,
+        completedAt,
+      };
+
+      // CRITICAL FIX: Deep comparison to prevent infinite loops
+      const dataString = JSON.stringify(dataToSave);
+      if (dataString !== lastSavedStateRef.current) {
+        console.log('✅ CompleteStep: Data changed, saving to workflow store');
+        lastSavedStateRef.current = dataString;
+        updateWorkflowData('install', dataToSave);
+      } else {
+        console.log('✅ CompleteStep: Data unchanged, skipping save');
+      }
+    }, 200); // 200ms debounce for better UX
+
+    return () => clearTimeout(timeoutId);
+    // Safe to depend on memoized laborSummary now
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [departureTime, travelTimeFromSite, techNotes, laborSummary, signature, customerName, completedAt, signatureTimestamp]);
 

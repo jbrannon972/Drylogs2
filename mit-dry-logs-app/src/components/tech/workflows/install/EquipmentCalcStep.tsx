@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Button } from '../../../shared/Button';
 import { Wind, AlertCircle, Info, Calculator, Scan, Plus, Trash2, CheckCircle } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
@@ -11,13 +11,18 @@ interface EquipmentCalcStepProps {
 
 export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
-  const dryingPlan = installData.dryingPlan || {};
-  const waterClassification = installData.waterClassification || {};
-  const rooms = installData.rooms || [];
+
+  // ULTRAFAULT: Memoize derived values to prevent unnecessary re-renders
+  const dryingPlan = useMemo(() => installData.dryingPlan || {}, [installData.dryingPlan]);
+  const waterClassification = useMemo(() => installData.waterClassification || {}, [installData.waterClassification]);
+  const rooms = useMemo(() => installData.rooms || [], [installData.rooms]);
 
   const [dehumidifierType, setDehumidifierType] = useState<DehumidifierType>('Low Grain Refrigerant (LGR)');
   const [dehumidifierRating, setDehumidifierRating] = useState(200); // PPD
   const [calculations, setCalculations] = useState<any>(null);
+
+  // ULTRAFAULT: Track last saved calculations to prevent duplicate saves
+  const lastSavedCalculationsRef = useRef<string | null>(null);
 
   // Calculate total cubic footage from all rooms including insets/offsets
   // Per IICRC S500: Cubic footage determines dehumidifier requirements
@@ -116,16 +121,43 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
     setCalculations(calc);
 
-    // Save to workflow store
-    updateWorkflowData('install', {
-      equipmentCalculations: calc,
-    });
+    // ULTRAFAULT: Only save to workflow store if calculations actually changed (deep comparison)
+    const calcString = JSON.stringify(calc);
+    if (calcString !== lastSavedCalculationsRef.current) {
+      console.log('📊 EquipmentCalcStep: Calculations changed, saving to workflow store');
+      lastSavedCalculationsRef.current = calcString;
+      updateWorkflowData('install', {
+        equipmentCalculations: calc,
+      });
+    } else {
+      console.log('📊 EquipmentCalcStep: Calculations unchanged, skipping save');
+    }
   };
 
-  // Recalculate when dehumidifier settings change
+  // ULTRAFAULT: Recalculate when dehumidifier settings change
+  // Use debounced effect to prevent rapid recalculations
   useEffect(() => {
-    performCalculations();
-  }, [dehumidifierType, dehumidifierRating, rooms, dryingPlan]);
+    console.log('📊 EquipmentCalcStep: Triggering calculation due to settings change');
+    const timeoutId = setTimeout(() => {
+      performCalculations();
+    }, 100); // 100ms debounce
+
+    return () => clearTimeout(timeoutId);
+    // CRITICAL FIX: Only depend on actual user inputs, NOT derived state
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dehumidifierType, dehumidifierRating]);
+
+  // ULTRAFAULT: Recalculate when rooms or dryingPlan change from installData
+  // This handles when user goes back and modifies previous steps
+  useEffect(() => {
+    console.log('📊 EquipmentCalcStep: Room/plan data changed, recalculating');
+    const timeoutId = setTimeout(() => {
+      performCalculations();
+    }, 150); // Slightly longer debounce for data changes
+
+    return () => clearTimeout(timeoutId);
+    // Safe to depend on memoized values - they only change when underlying data changes
+  }, [rooms, dryingPlan]);
 
   if (!dryingPlan.overallClass) {
     return (

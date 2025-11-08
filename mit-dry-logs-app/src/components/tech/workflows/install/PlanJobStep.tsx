@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
 import { FileCheck, AlertCircle, Info, Droplets, Layers, Home } from 'lucide-react';
@@ -11,10 +11,16 @@ interface PlanJobStepProps {
 
 export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
-  const rooms = installData.rooms || [];
-  const roomsAffectedData = installData.roomsAffectedData || {};
-  const moistureReadings = installData.moistureReadings || [];
+
+  // ULTRAFAULT: Memoize derived values to prevent unnecessary re-renders
+  const rooms = useMemo(() => installData.rooms || [], [installData.rooms]);
+  const roomsAffectedData = useMemo(() => installData.roomsAffectedData || {}, [installData.roomsAffectedData]);
+  const moistureReadings = useMemo(() => installData.moistureReadings || [], [installData.moistureReadings]);
   const waterClassification = installData.waterClassification;
+
+  // ULTRAFAULT: Track if we've initialized default days to prevent infinite loops
+  const hasInitializedDefaultDaysRef = useRef(false);
+  const lastSavedPlanRef = useRef<string | null>(null);
 
   const [dryingPlan, setDryingPlan] = useState({
     estimatedDays: '',
@@ -23,8 +29,8 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
     completionCriteria: '',
   });
 
-  // Calculate totals from all rooms
-  const calculateTotals = () => {
+  // ULTRAFAULT: Calculate totals with memoization to prevent recalculation on every render
+  const calculateTotals = useCallback(() => {
     let totalFloorSqFt = 0;
     let totalWallSqFt = 0;
     let totalCeilingSqFt = 0;
@@ -66,9 +72,10 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
       totalSurfaceArea,
       overallClass: highestClass,
     };
-  };
+  }, [rooms, roomsAffectedData]);
 
-  const totals = calculateTotals();
+  // ULTRAFAULT: Memoize totals to prevent recalculation on every render
+  const totals = useMemo(() => calculateTotals(), [calculateTotals]);
 
   // Count readings
   const totalReadings = moistureReadings.length;
@@ -91,24 +98,45 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
       createdAt: new Date().toISOString(),
     };
 
-    updateWorkflowData('install', { dryingPlan: plan });
+    // ULTRAFAULT: Deep comparison before saving
+    const planString = JSON.stringify(plan);
+    if (planString !== lastSavedPlanRef.current) {
+      console.log('📋 PlanJobStep: Plan changed, saving to workflow store');
+      lastSavedPlanRef.current = planString;
+      updateWorkflowData('install', { dryingPlan: plan });
+    } else {
+      console.log('📋 PlanJobStep: Plan unchanged, skipping save');
+    }
   };
 
+  // ULTRAFAULT: Initialize default drying days ONCE based on class
+  // Use ref to prevent infinite loop
   useEffect(() => {
-    handleSave();
-  }, [dryingPlan]);
-
-  // Determine default drying days based on class
-  useEffect(() => {
-    if (!dryingPlan.estimatedDays) {
+    if (!hasInitializedDefaultDaysRef.current && !dryingPlan.estimatedDays) {
+      console.log('📋 PlanJobStep: Initializing default drying days based on class', totals.overallClass);
       let defaultDays = '3';
       if (totals.overallClass === 1) defaultDays = '2';
       else if (totals.overallClass === 2) defaultDays = '3';
       else if (totals.overallClass === 3) defaultDays = '4';
       else if (totals.overallClass === 4) defaultDays = '5';
-      setDryingPlan({ ...dryingPlan, estimatedDays: defaultDays });
+
+      setDryingPlan(prev => ({ ...prev, estimatedDays: defaultDays }));
+      hasInitializedDefaultDaysRef.current = true;
     }
-  }, [totals.overallClass]);
+    // Run only once on mount, totals.overallClass is stable due to memoization
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ULTRAFAULT: Save when drying plan changes with debouncing
+  useEffect(() => {
+    console.log('📋 PlanJobStep: Drying plan state changed, preparing to save');
+    const timeoutId = setTimeout(() => {
+      handleSave();
+    }, 200); // 200ms debounce
+
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dryingPlan, totals]);
 
   return (
     <div className="space-y-6">

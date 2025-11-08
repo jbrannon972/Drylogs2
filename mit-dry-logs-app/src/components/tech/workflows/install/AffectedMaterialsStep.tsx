@@ -44,13 +44,16 @@ interface RoomAffectedData {
 
 export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ job }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
-  const rooms = installData.rooms || [];
+
+  // ULTRAFAULT: Memoize derived values to prevent unnecessary re-renders
+  const rooms = React.useMemo(() => installData.rooms || [], [installData.rooms]);
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   const [roomsAffectedData, setRoomsAffectedData] = useState<Record<string, RoomAffectedData>>(
     installData.roomsAffectedData || {}
   );
 
-  const currentRoom = rooms[currentRoomIndex];
+  // ULTRAFAULT: Get current room based on index (memoized to prevent unnecessary recalculations)
+  const currentRoom = React.useMemo(() => rooms[currentRoomIndex], [rooms, currentRoomIndex]);
 
   const [formData, setFormData] = useState({
     floorAffectedSqFt: '',
@@ -112,8 +115,11 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
 
   const [demoMaterials, setDemoMaterials] = useState<DemoMaterial[]>(getDefaultDemoMaterials());
 
-  // Load existing data for current room
+  // ULTRAFAULT: Load existing data for current room
+  // Only depend on currentRoomIndex, not currentRoom (which is derived and would cause unnecessary re-runs)
   useEffect(() => {
+    console.log('📝 AffectedMaterialsStep: Loading data for room index', currentRoomIndex);
+
     if (currentRoom && roomsAffectedData[currentRoom.id]) {
       const data = roomsAffectedData[currentRoom.id];
       setFormData({
@@ -146,7 +152,10 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       // Use smart defaults based on room type
       setDemoMaterials(getDefaultDemoMaterials());
     }
-  }, [currentRoomIndex, currentRoom]);
+    // CRITICAL FIX: Only depend on currentRoomIndex, not currentRoom
+    // currentRoom is memoized and derived, depending on it would cause re-runs on every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentRoomIndex]);
 
   const handleSaveRoom = () => {
     if (!currentRoom) return;
