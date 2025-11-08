@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "seed": "tsx src/scripts/seedData.ts",
+    "seed:proper": "tsx src/scripts/runProperSeed.ts",
     "cleanup": "tsx src/scripts/cleanupJobs.ts",
     "fix-assignments": "tsx src/scripts/fixJobAssignments.ts"
   },

@@ -9,6 +9,7 @@ import {
   CheckCircle,
   Clock,
   Filter,
+  LogOut,
   Search,
 } from 'lucide-react';
 
@@ -21,7 +22,7 @@ interface FilterOptions {
 
 export const PSMDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { jobs } = useJobsStore();
 
   const [filters, setFilters] = useState<FilterOptions>({
@@ -115,6 +116,13 @@ export const PSMDashboard: React.FC = () => {
                 <p className="text-sm text-gray-600">Welcome back,</p>
                 <p className="font-medium text-gray-900">{user?.displayName}</p>
               </div>
+              <button
+                onClick={() => signOut()}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
 
