@@ -35,7 +35,6 @@ import { ScheduleWorkStep } from './install/ScheduleWorkStep';
 import { EquipmentCalcStep } from './install/EquipmentCalcStep';
 import { GeneralBillablesStep } from './install/GeneralBillablesStep';
 import {
-  PreExistingStep,
   EquipmentPlaceStep,
   CommunicatePlanStep,
   FinalPhotosStep,
@@ -73,13 +72,6 @@ const INSTALL_STEPS: StepConfig[] = [
     component: FrontDoorStep,
   },
   {
-    id: 'pre-existing',
-    title: 'Pre-Existing Conditions',
-    description: 'Document with photos',
-    icon: <Camera className="w-5 h-5" />,
-    component: PreExistingStep,
-  },
-  {
     id: 'cause-of-loss',
     title: 'Cause of Loss',
     description: 'Source + water category',
@@ -89,7 +81,7 @@ const INSTALL_STEPS: StepConfig[] = [
   {
     id: 'room-assessment',
     title: 'Room Assessment',
-    description: 'Measure, moisture map, and assess all rooms',
+    description: 'Dimensions, moisture, materials & pre-existing damage',
     icon: <Ruler className="w-5 h-5" />,
     component: RoomAssessmentStep,
   },

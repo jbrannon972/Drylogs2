@@ -147,7 +147,7 @@ export type AffectedStatus = 'affected' | 'unaffected' | 'partially-affected';
 export type MaterialType = 'Drywall' | 'Flooring' | 'Carpet' | 'Wood Framing' | 'Subfloor' | 'Concrete' | 'Insulation' | 'Tile' | 'Other';
 export type MaterialCondition = 'wet' | 'damp' | 'dry';
 export type ReadingType = 'dry-standard' | 'initial' | 'daily' | 'final';
-export type PhotoStep = 'arrival' | 'assessment' | 'pre-demo' | 'demo' | 'post-demo' | 'daily-check' | 'final';
+export type PhotoStep = 'arrival' | 'assessment' | 'preexisting' | 'pre-demo' | 'demo' | 'post-demo' | 'daily-check' | 'final';
 
 // New: Specific material subtypes for affected areas
 export type FloorMaterialType = 'carpet' | 'hardwood' | 'tile' | 'vinyl' | 'laminate' | 'concrete' | 'other';

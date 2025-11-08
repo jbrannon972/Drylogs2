@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import {
   Home, Plus, Trash2, Camera, Droplets, AlertCircle, CheckCircle,
-  Layers, Info, ChevronRight, Edit2
+  Layers, Info, ChevronRight, Edit2, X
 } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
@@ -42,6 +42,11 @@ interface RoomData {
   insetsCubicFt: number;
   offsetsCubicFt: number;
 
+  // Pre-existing damage
+  hasPreexistingDamage: boolean;
+  preexistingDamageNotes?: string;
+  preexistingDamagePhotos: string[];
+
   // Moisture readings
   moistureReadings: MoistureReading[];
 
@@ -67,6 +72,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   );
   const [activeTab, setActiveTab] = useState<'info' | 'moisture' | 'materials'>('info');
   const [showAddRoom, setShowAddRoom] = useState(false);
+  const [showPreexistingModal, setShowPreexistingModal] = useState(false);
 
   // New room form
   const [newRoomForm, setNewRoomForm] = useState({
@@ -100,6 +106,9 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       height: parseFloat(newRoomForm.height),
       insetsCubicFt: 0,
       offsetsCubicFt: 0,
+      hasPreexistingDamage: false,
+      preexistingDamageNotes: '',
+      preexistingDamagePhotos: [],
       moistureReadings: [],
       materialsAffected: getDefaultMaterials(),
       overviewPhoto: undefined,
@@ -298,7 +307,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
       {/* Right Panel - Room Details */}
       <div className="flex-1 flex flex-col bg-white">
-        {!selectedRoom && !showAddRoom && (
+        {!selectedRoom && (
           <div className="flex-1 flex items-center justify-center text-gray-500">
             <div className="text-center">
               <Home className="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -307,112 +316,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
           </div>
         )}
 
-        {showAddRoom && (
-          <div className="flex-1 p-6 overflow-y-auto">
-            <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Add New Room</h2>
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Room Name</label>
-                    <input
-                      type="text"
-                      value={newRoomForm.name}
-                      onChange={(e) => setNewRoomForm({ ...newRoomForm, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                      placeholder="e.g., Master Bedroom"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Room Type</label>
-                    <select
-                      value={newRoomForm.type}
-                      onChange={(e) => setNewRoomForm({ ...newRoomForm, type: e.target.value as RoomType })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    >
-                      <option>Bedroom</option>
-                      <option>Bathroom</option>
-                      <option>Kitchen</option>
-                      <option>Living Room</option>
-                      <option>Dining Room</option>
-                      <option>Hallway</option>
-                      <option>Closet</option>
-                      <option>Laundry</option>
-                      <option>Garage</option>
-                      <option>Basement</option>
-                      <option>Attic</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Floor Level</label>
-                  <select
-                    value={newRoomForm.floor}
-                    onChange={(e) => setNewRoomForm({ ...newRoomForm, floor: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  >
-                    <option>Basement</option>
-                    <option>1st Floor</option>
-                    <option>2nd Floor</option>
-                    <option>3rd Floor</option>
-                    <option>Attic</option>
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Length (ft)</label>
-                    <input
-                      type="number"
-                      value={newRoomForm.length}
-                      onChange={(e) => setNewRoomForm({ ...newRoomForm, length: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                      step="0.5"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Width (ft)</label>
-                    <input
-                      type="number"
-                      value={newRoomForm.width}
-                      onChange={(e) => setNewRoomForm({ ...newRoomForm, width: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                      step="0.5"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Height (ft)</label>
-                    <input
-                      type="number"
-                      value={newRoomForm.height}
-                      onChange={(e) => setNewRoomForm({ ...newRoomForm, height: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                      step="0.5"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <Button
-                    variant="primary"
-                    onClick={addRoom}
-                    disabled={!newRoomForm.name || !newRoomForm.length || !newRoomForm.width}
-                  >
-                    Add Room
-                  </Button>
-                  <Button variant="secondary" onClick={() => setShowAddRoom(false)}>
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {selectedRoom && !showAddRoom && (
+        {selectedRoom && (
           <>
             {/* Room Header */}
             <div className="border-b border-gray-300 bg-gray-50 p-4">
@@ -517,6 +421,61 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                     <p className="text-sm text-blue-900 mt-1">
                       <strong>Square Footage:</strong> {(selectedRoom.length * selectedRoom.width).toFixed(0)} sq ft
                     </p>
+                  </div>
+
+                  {/* Pre-existing Damage Section */}
+                  <div className="border-t pt-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Pre-existing Damage</h3>
+
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-start gap-3">
+                        <Info className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm text-yellow-900">
+                            Document any pre-existing damage in this room (damage not caused by current water loss).
+                            This protects you from liability claims later.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <label className="flex items-center gap-3 cursor-pointer mb-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedRoom.hasPreexistingDamage}
+                        onChange={(e) => updateSelectedRoom({ hasPreexistingDamage: e.target.checked })}
+                        className="h-5 w-5 text-orange-600 rounded"
+                      />
+                      <span className="text-base font-medium text-gray-900">
+                        This room has pre-existing damage
+                      </span>
+                    </label>
+
+                    {selectedRoom.hasPreexistingDamage && (
+                      <div className="space-y-4">
+                        <Button
+                          variant="primary"
+                          onClick={() => setShowPreexistingModal(true)}
+                        >
+                          <Camera className="w-4 h-4" />
+                          Document Pre-existing Damage
+                        </Button>
+
+                        {selectedRoom.preexistingDamagePhotos.length > 0 && (
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                            <p className="text-sm text-green-900">
+                              <CheckCircle className="w-4 h-4 inline mr-1" />
+                              <strong>{selectedRoom.preexistingDamagePhotos.length}</strong> photo(s) captured
+                            </p>
+                            {selectedRoom.preexistingDamageNotes && (
+                              <p className="text-sm text-green-800 mt-2">
+                                <strong>Notes:</strong> {selectedRoom.preexistingDamageNotes}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -670,6 +629,240 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
           </div>
         </div>
       </div>
+
+      {/* Add Room Modal */}
+      {showAddRoom && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Add New Room</h2>
+              <button
+                onClick={() => setShowAddRoom(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Name</label>
+                  <input
+                    type="text"
+                    value={newRoomForm.name}
+                    onChange={(e) => setNewRoomForm({ ...newRoomForm, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    placeholder="e.g., Master Bedroom"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Room Type</label>
+                  <select
+                    value={newRoomForm.type}
+                    onChange={(e) => setNewRoomForm({ ...newRoomForm, type: e.target.value as RoomType })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option>Bedroom</option>
+                    <option>Bathroom</option>
+                    <option>Kitchen</option>
+                    <option>Living Room</option>
+                    <option>Dining Room</option>
+                    <option>Hallway</option>
+                    <option>Closet</option>
+                    <option>Laundry</option>
+                    <option>Garage</option>
+                    <option>Basement</option>
+                    <option>Attic</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Floor Level</label>
+                <select
+                  value={newRoomForm.floor}
+                  onChange={(e) => setNewRoomForm({ ...newRoomForm, floor: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option>Basement</option>
+                  <option>1st Floor</option>
+                  <option>2nd Floor</option>
+                  <option>3rd Floor</option>
+                  <option>Attic</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Length (ft)</label>
+                  <input
+                    type="number"
+                    value={newRoomForm.length}
+                    onChange={(e) => setNewRoomForm({ ...newRoomForm, length: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    step="0.5"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Width (ft)</label>
+                  <input
+                    type="number"
+                    value={newRoomForm.width}
+                    onChange={(e) => setNewRoomForm({ ...newRoomForm, width: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    step="0.5"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Height (ft)</label>
+                  <input
+                    type="number"
+                    value={newRoomForm.height}
+                    onChange={(e) => setNewRoomForm({ ...newRoomForm, height: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    step="0.5"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-gray-50 border-t px-6 py-4 flex gap-3">
+              <Button
+                variant="primary"
+                onClick={addRoom}
+                disabled={!newRoomForm.name || !newRoomForm.length || !newRoomForm.width}
+              >
+                <Plus className="w-4 h-4" />
+                Add Room
+              </Button>
+              <Button variant="secondary" onClick={() => setShowAddRoom(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pre-existing Damage Modal */}
+      {showPreexistingModal && selectedRoom && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Document Pre-existing Damage</h2>
+              <button
+                onClick={() => setShowPreexistingModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-yellow-900">
+                      Document damage that existed <strong>before</strong> the current water loss.
+                      This protects you from liability claims.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description of Pre-existing Damage
+                </label>
+                <textarea
+                  value={selectedRoom.preexistingDamageNotes || ''}
+                  onChange={(e) => updateSelectedRoom({ preexistingDamageNotes: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  rows={4}
+                  placeholder="Describe the pre-existing damage (e.g., cracked drywall, stained ceiling, damaged flooring...)"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Photos of Pre-existing Damage
+                </label>
+                <div className="space-y-3">
+                  <Button
+                    variant="secondary"
+                    onClick={async () => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.capture = 'environment';
+                      input.onchange = async (e: any) => {
+                        const file = e.target?.files?.[0];
+                        if (file && user && job && selectedRoom) {
+                          try {
+                            const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'preexisting', user.uid);
+                            if (photoUrl) {
+                              updateSelectedRoom({
+                                preexistingDamagePhotos: [...selectedRoom.preexistingDamagePhotos, photoUrl],
+                              });
+                            }
+                          } catch (error) {
+                            console.error('Error uploading photo:', error);
+                            alert('Failed to upload photo');
+                          }
+                        }
+                      };
+                      input.click();
+                    }}
+                    disabled={isUploading}
+                  >
+                    <Camera className="w-4 h-4" />
+                    {isUploading ? 'Uploading...' : 'Take Photo'}
+                  </Button>
+
+                  {selectedRoom.preexistingDamagePhotos.length > 0 && (
+                    <div className="grid grid-cols-2 gap-3">
+                      {selectedRoom.preexistingDamagePhotos.map((photoUrl, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={photoUrl}
+                            alt={`Pre-existing damage ${index + 1}`}
+                            className="w-full h-32 object-cover rounded-lg border border-gray-300"
+                          />
+                          <button
+                            onClick={() => {
+                              updateSelectedRoom({
+                                preexistingDamagePhotos: selectedRoom.preexistingDamagePhotos.filter((_, i) => i !== index),
+                              });
+                            }}
+                            className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-gray-50 border-t px-6 py-4 flex gap-3">
+              <Button
+                variant="primary"
+                onClick={() => setShowPreexistingModal(false)}
+              >
+                <CheckCircle className="w-4 h-4" />
+                Save Documentation
+              </Button>
+              <Button variant="secondary" onClick={() => setShowPreexistingModal(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
