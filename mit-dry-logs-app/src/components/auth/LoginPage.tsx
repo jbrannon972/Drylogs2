@@ -39,11 +39,8 @@ export const LoginPage: React.FC = () => {
             <img
               src="/Elogo.png"
               alt="Entrusted"
-              className="h-12 w-auto mx-auto mb-4"
+              className="h-16 w-auto mx-auto"
             />
-            <h2 className="text-2xl font-poppins font-bold text-gray-900">
-              Sign In
-            </h2>
           </div>
 
           {error && (

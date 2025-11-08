@@ -18,8 +18,7 @@ import {
   ClipboardCheck,
   Layers,
   Calendar,
-  X,
-  Menu
+  X
 } from 'lucide-react';
 import { InstallStep } from '../../../types/workflow';
 
@@ -279,21 +278,13 @@ export const InstallWorkflow: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Exit + Menu buttons */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={handleExit}
-              className="px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded transition-colors"
-            >
-              Exit
-            </button>
-            <button
-              onClick={() => setShowStepOverview(!showStepOverview)}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <Menu className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
+          {/* Right: Exit button */}
+          <button
+            onClick={handleExit}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors shadow-sm ml-3"
+          >
+            Exit
+          </button>
         </div>
       </div>
 
