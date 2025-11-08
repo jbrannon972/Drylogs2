@@ -34,14 +34,19 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
     installData.propertyPhoto || null
   );
 
-  // Save to workflow store when data changes
+  // ULTRAFAULT: Save to workflow store when data changes with debounce
   useEffect(() => {
-    updateWorkflowData('install', {
-      arrivalTime,
-      travelTimeToSite,
-      truckPhoto,
-      propertyPhoto,
-    });
+    const timeoutId = setTimeout(() => {
+      updateWorkflowData('install', {
+        arrivalTime,
+        travelTimeToSite,
+        truckPhoto,
+        propertyPhoto,
+      });
+    }, 100); // 100ms debounce
+
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [arrivalTime, travelTimeToSite, truckPhoto, propertyPhoto]);
 
   const handleTruckPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {

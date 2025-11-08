@@ -63,8 +63,17 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
   };
 
   // Save rooms to workflow store whenever they change
+  // ULTRAFAULT: Debounce and prevent unnecessary updates
   useEffect(() => {
-    updateWorkflowData('install', { rooms });
+    // Only update if rooms actually changed (deep comparison)
+    const currentRooms = installData.rooms || [];
+    const roomsChanged = JSON.stringify(rooms) !== JSON.stringify(currentRooms);
+
+    if (roomsChanged) {
+      console.log('📝 AddRoomsStep: Updating rooms in workflow data');
+      updateWorkflowData('install', { rooms });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rooms]);
 
   const handleRoomPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {

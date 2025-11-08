@@ -5,6 +5,7 @@ import { useJobsStore } from '../../../stores/jobsStore';
 import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
 import { WorkflowActionBar } from '../../shared/WorkflowActionBar';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import {
   CheckCircle,
   Circle,
@@ -196,6 +197,19 @@ export const InstallWorkflow: React.FC = () => {
   const currentStepConfig = INSTALL_STEPS[currentStepIndex];
   const StepComponent = currentStepConfig?.component;
 
+  // ULTRAFAULT: Track render count to detect infinite loops
+  const renderCountRef = useRef(0);
+  useEffect(() => {
+    renderCountRef.current += 1;
+    console.log(`🔄 InstallWorkflow render #${renderCountRef.current} - Step: ${currentStepConfig?.title || 'unknown'}`);
+
+    if (renderCountRef.current > 50) {
+      console.error('🔥 INFINITE LOOP DETECTED - Too many renders!');
+      console.error('Current step:', currentStepConfig?.title);
+      console.error('Step ID:', installStep);
+    }
+  });
+
   const handleSaveAndContinue = async () => {
     setIsSaving(true);
     try {
@@ -293,8 +307,16 @@ export const InstallWorkflow: React.FC = () => {
       <div ref={contentRef} className="container mx-auto px-4 py-6 max-w-4xl">
         {/* NO DUPLICATE HEADER - Just the step content */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-24">
-          {/* Step Content */}
-          {StepComponent && <StepComponent job={job} />}
+          {/* Step Content with Error Boundary */}
+          <ErrorBoundary
+            onError={(error, errorInfo) => {
+              console.error('🔥 Step component crashed:', currentStepConfig?.title);
+              console.error('Error:', error);
+              console.error('Error info:', errorInfo);
+            }}
+          >
+            {StepComponent && <StepComponent job={job} />}
+          </ErrorBoundary>
         </div>
       </div>
 
