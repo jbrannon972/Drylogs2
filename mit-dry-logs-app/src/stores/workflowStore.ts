@@ -59,6 +59,10 @@ interface WorkflowState {
   // Progress tracking
   progress: WorkflowProgress | null;
 
+  // Save guard
+  isSaving: boolean;
+  lastSaveTime: number;
+
   // Actions
   startWorkflow: (workflow: 'install' | 'demo' | 'check-service' | 'pull', jobId: string, userId: string) => Promise<void>;
   setInstallStep: (step: InstallStep) => void;
@@ -84,6 +88,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   pullStep: 'start-pull',
   pullData: {},
   progress: null,
+  isSaving: false,
+  lastSaveTime: 0,
 
   startWorkflow: async (workflow, jobId, userId) => {
     const totalSteps = {
@@ -197,6 +203,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       ...data,
     };
 
+    console.log(`📝 updateWorkflowData called for ${workflow}`, data);
+
     // Only update local state - NO AUTO-SAVE
     // User must click "Save & Continue" to persist to Firebase
     set({
@@ -206,14 +214,31 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   saveWorkflowData: async () => {
     const state = get();
-    const { currentWorkflow, currentJobId, currentUserId } = state;
+    const { currentWorkflow, currentJobId, currentUserId, isSaving, lastSaveTime } = state;
 
     console.log('🔍 saveWorkflowData called from:', new Error().stack?.split('\n')[2]?.trim());
+
+    // ULTRAFAULT GUARD: Prevent infinite loops
+    // 1. Check if already saving
+    if (isSaving) {
+      console.warn('⚠️ Save already in progress, skipping duplicate call');
+      return;
+    }
+
+    // 2. Check if called too frequently (debounce: max once per 500ms)
+    const now = Date.now();
+    if (now - lastSaveTime < 500) {
+      console.warn('⚠️ Save called too soon after last save, skipping (debounce)');
+      return;
+    }
 
     if (!currentWorkflow || !currentJobId || !currentUserId) {
       console.warn('Cannot save workflow data: missing workflow, jobId, or userId');
       return;
     }
+
+    // Set saving flag
+    set({ isSaving: true, lastSaveTime: now });
 
     try {
       const dataKey = `${currentWorkflow}Data` as keyof WorkflowState;
@@ -239,6 +264,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     } catch (error) {
       console.error('Error saving workflow data:', error);
       throw error; // Throw so the UI can show an error message
+    } finally {
+      // Clear saving flag
+      set({ isSaving: false });
     }
   },
 
