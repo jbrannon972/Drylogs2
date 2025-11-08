@@ -165,9 +165,6 @@ export type MaterialType =
   | 'Vanity'
   | 'Appliances'
   | 'Mirror'
-  | 'Contents'
-  | 'Contents (Bagged for Disposal)'
-  | 'Containment/Poly'
   | 'Other';
 export type MaterialCondition = 'wet' | 'damp' | 'dry';
 export type ReadingType = 'dry-standard' | 'initial' | 'daily' | 'final';

@@ -234,11 +234,6 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     { materialType: 'Appliances', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Mirror', isAffected: false, squareFootage: 0, removalRequired: false },
 
-    // Contents & Containment
-    { materialType: 'Contents', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Contents (Bagged for Disposal)', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Containment/Poly', isAffected: false, squareFootage: 0, removalRequired: false },
-
     // Other
     { materialType: 'Other', isAffected: false, squareFootage: 0, removalRequired: false },
   ];
