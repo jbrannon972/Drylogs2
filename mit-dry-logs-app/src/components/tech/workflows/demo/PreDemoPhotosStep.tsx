@@ -24,7 +24,7 @@ export const PreDemoPhotosStep: React.FC<PreDemoPhotosStepProps> = ({ job, onNex
     }
   };
 
-  const affectedRooms = job.rooms?.filter((r: any) => r.affectedStatus === 'affected') || [];
+  const affectedRooms = Array.isArray(job?.rooms) ? job.rooms.filter((r: any) => r.affectedStatus === 'affected') : [];
   const allPhotosTaken = affectedRooms.every((r: any) => roomPhotos[r.roomId]);
 
   return (

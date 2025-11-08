@@ -23,8 +23,9 @@ export const EquipmentRemovalStep: React.FC<EquipmentRemovalStepProps> = ({ job,
   const { updateWorkflowData } = useWorkflowStore();
   const [removedEquipment, setRemovedEquipment] = useState<RemovedEquipment[]>([]);
 
-  const installedEquipment = job.equipment || [];
-  const waterCategory = job.insuranceInfo?.categoryOfWater || 'Category 1';
+  // ULTRAFAULT: Defensive array check to prevent .map() errors
+  const installedEquipment = Array.isArray(job?.equipment) ? job.equipment : [];
+  const waterCategory = job?.insuranceInfo?.categoryOfWater || 'Category 1';
   const requiresDecontamination = waterCategory === 'Category 2' || waterCategory === 'Category 3';
 
   React.useEffect(() => {

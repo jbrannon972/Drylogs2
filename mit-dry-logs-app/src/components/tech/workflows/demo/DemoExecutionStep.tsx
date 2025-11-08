@@ -25,7 +25,7 @@ export const DemoExecutionStep: React.FC<DemoExecutionStepProps> = ({ job, onNex
   const [selectedRoom, setSelectedRoom] = useState('');
   const [demoData, setDemoData] = useState<Record<string, DemoItem[]>>({});
 
-  const affectedRooms = job.rooms?.filter((r: any) => r.affectedStatus === 'affected') || [];
+  const affectedRooms = Array.isArray(job?.rooms) ? job.rooms.filter((r: any) => r.affectedStatus === 'affected') : [];
   const currentRoom = affectedRooms.find((r: any) => r.roomId === selectedRoom);
 
   // Initialize demo items from Install plan

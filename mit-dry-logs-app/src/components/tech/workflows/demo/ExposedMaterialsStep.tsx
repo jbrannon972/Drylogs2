@@ -12,7 +12,7 @@ export const ExposedMaterialsStep: React.FC<ExposedMaterialsStepProps> = ({ job,
   const { updateWorkflowData } = useWorkflowStore();
   const [exposedData, setExposedData] = useState<Record<string, any>>({});
 
-  const affectedRooms = job.rooms?.filter((r: any) => r.affectedStatus === 'affected') || [];
+  const affectedRooms = Array.isArray(job?.rooms) ? job.rooms.filter((r: any) => r.affectedStatus === 'affected') : [];
 
   const materialTypes = [
     'Wood Framing (2x4/2x6)',

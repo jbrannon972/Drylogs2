@@ -22,8 +22,8 @@ export const EquipmentStatusStep: React.FC<EquipmentStatusStepProps> = ({ job, o
   const { updateWorkflowData } = useWorkflowStore();
   const [equipmentChecks, setEquipmentChecks] = useState<EquipmentCheck[]>([]);
 
-  // Get equipment from job data (this would come from install workflow)
-  const installedEquipment = job.equipment || [];
+  // ULTRAFAULT: Defensive array check to prevent .map() errors
+  const installedEquipment = Array.isArray(job?.equipment) ? job.equipment : [];
 
   React.useEffect(() => {
     updateWorkflowData('checkService', {

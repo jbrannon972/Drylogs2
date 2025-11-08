@@ -30,7 +30,8 @@ export const RoomReadingsStep: React.FC<RoomReadingsStepProps> = ({ job, onNext 
   const [location, setLocation] = useState('');
   const [currentReading, setCurrentReading] = useState('');
 
-  const affectedRooms = job.rooms?.filter((r: any) => r.affectedStatus === 'affected') || [];
+  // ULTRAFAULT: Defensive array check to prevent .filter() errors
+  const affectedRooms = Array.isArray(job?.rooms) ? job.rooms.filter((r: any) => r.affectedStatus === 'affected') : [];
 
   const materialTypes = [
     'Drywall',

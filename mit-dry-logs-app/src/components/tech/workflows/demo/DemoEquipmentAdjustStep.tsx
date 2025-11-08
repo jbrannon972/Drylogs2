@@ -36,7 +36,7 @@ export const DemoEquipmentAdjustStep: React.FC<DemoEquipmentAdjustStepProps> = (
     }
   };
 
-  const affectedRooms = job.rooms?.filter((r: any) => r.affectedStatus === 'affected') || [];
+  const affectedRooms = Array.isArray(job?.rooms) ? job.rooms.filter((r: any) => r.affectedStatus === 'affected') : [];
 
   return (
     <div className="space-y-6">

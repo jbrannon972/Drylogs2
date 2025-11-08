@@ -40,7 +40,7 @@ export const CheckEquipmentAdjustStep: React.FC<CheckEquipmentAdjustStepProps> =
     }
   };
 
-  const affectedRooms = job.rooms?.filter((r: any) => r.affectedStatus === 'affected') || [];
+  const affectedRooms = Array.isArray(job?.rooms) ? job.rooms.filter((r: any) => r.affectedStatus === 'affected') : [];
 
   // Check if assessment suggests additional equipment needed
   const needsMoreEquipment = () => {

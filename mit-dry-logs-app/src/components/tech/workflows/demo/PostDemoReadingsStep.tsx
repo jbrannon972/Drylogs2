@@ -12,7 +12,7 @@ export const PostDemoReadingsStep: React.FC<PostDemoReadingsStepProps> = ({ job,
   const { updateWorkflowData } = useWorkflowStore();
   const [readings, setReadings] = useState<Record<string, any>>({});
 
-  const affectedRooms = job.rooms?.filter((r: any) => r.affectedStatus === 'affected') || [];
+  const affectedRooms = Array.isArray(job?.rooms) ? job.rooms.filter((r: any) => r.affectedStatus === 'affected') : [];
 
   const updateReading = (roomId: string, material: string, field: string, value: any) => {
     const roomData = readings[roomId] || {};
