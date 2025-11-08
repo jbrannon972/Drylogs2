@@ -45,6 +45,146 @@ export const DataSeedingPage: React.FC = () => {
     setStatus(`Deleted ${snapshot.docs.length} existing jobs`);
   };
 
+  // Helper: Generate realistic room data with moisture readings
+  const generateRoomData = (jobNum: string, status: Job['jobStatus'], daysOld: number) => {
+    const roomTypes = ['Living Room', 'Kitchen', 'Master Bedroom', 'Bathroom'];
+    const roomDimensions = [
+      { length: 20, width: 15, height: 8 },
+      { length: 12, width: 10, height: 8 },
+      { length: 15, width: 12, height: 8 },
+      { length: 8, width: 6, height: 8 },
+    ];
+
+    return roomTypes.slice(0, 2 + (parseInt(jobNum) % 3)).map((name, idx) => {
+      const dim = roomDimensions[idx];
+      const sqFt = dim.length * dim.width;
+      const affectedPercent = 40 + (idx * 15);
+
+      // Generate moisture readings showing drying progression
+      const moistureReadings: any[] = [];
+      const numReadings = status === 'Complete' ? 5 : status === 'Pull' ? 4 : status === 'Check Service' ? 3 : 2;
+
+      // Dry standard (baseline from unaffected area)
+      moistureReadings.push({
+        readingId: `${jobNum}-${idx}-dry-std`,
+        material: 'Drywall',
+        location: 'Unaffected hallway wall',
+        moisturePercentage: 8,
+        temperature: 72,
+        humidity: 45,
+        recordedAt: daysAgo(daysOld, 9),
+        readingType: 'baseline',
+        technicianId: 'tech1',
+        meterType: 'Tramex MES II',
+        isDryStandard: true,
+      });
+
+      // Affected area readings showing progression toward dry standard
+      for (let r = 0; r < numReadings; r++) {
+        const daysBack = daysOld - r;
+        const moisture = Math.max(8, 45 - (r * 8)); // Start wet, get drier
+        moistureReadings.push({
+          readingId: `${jobNum}-${idx}-reading-${r}`,
+          material: 'Drywall',
+          location: `${name} - North wall, 3ft height`,
+          moisturePercentage: moisture,
+          temperature: 70 + r,
+          humidity: Math.max(35, 65 - (r * 6)),
+          recordedAt: daysAgo(daysBack, 10 + (r * 2)),
+          readingType: 'daily',
+          technicianId: 'tech1',
+          meterType: 'Tramex MES II',
+          isDryStandard: false,
+          notes: r === numReadings - 1 && moisture <= 11 ? 'Within dry standard range' : undefined,
+        });
+      }
+
+      return {
+        roomId: `room-${jobNum}-${idx}`,
+        roomName: name,
+        roomType: name.toLowerCase().replace(' ', '-') as any,
+        affectedStatus: 'affected' as any,
+        dimensions: {
+          ...dim,
+          squareFootage: sqFt,
+        },
+        waterDamageClassification: {
+          category: (idx % 2) + 1 as any,
+          class: Math.min(3, idx + 1) as any,
+          determinedAt: daysAgo(daysOld),
+          determinedBy: 'tech1',
+          notes: 'Based on affected surface area percentage',
+        },
+        affectedAreas: {
+          floor: {
+            totalSqFt: sqFt,
+            affectedSqFt: Math.round(sqFt * (affectedPercent / 100)),
+            percentAffected: affectedPercent,
+            materials: [
+              { type: (idx % 2 === 0 ? 'hardwood' : 'carpet') as any, sqFt: Math.round(sqFt * (affectedPercent / 100)) },
+            ],
+          },
+          walls: {
+            totalSqFt: (dim.length + dim.width) * 2 * dim.height,
+            affectedSqFt: Math.round((dim.length + dim.width) * 2 * 3),
+            percentAffected: Math.round((3 / dim.height) * 100),
+            wetHeightAvg: 3,
+            materials: [
+              { type: 'drywall' as any, sqFt: Math.round((dim.length + dim.width) * 2 * 3) },
+            ],
+          },
+          ceiling: {
+            totalSqFt: sqFt,
+            affectedSqFt: idx === 1 ? Math.round(sqFt * 0.3) : 0,
+            percentAffected: idx === 1 ? 30 : 0,
+            materials: idx === 1 ? [{ type: 'drywall' as any, sqFt: Math.round(sqFt * 0.3) }] : [],
+          },
+          totalSurfaceArea: sqFt + ((dim.length + dim.width) * 2 * dim.height) + sqFt,
+          totalAffectedArea: Math.round(sqFt * (affectedPercent / 100)) + Math.round((dim.length + dim.width) * 2 * 3) + (idx === 1 ? Math.round(sqFt * 0.3) : 0),
+          percentAffected: affectedPercent,
+        },
+        materialsAffected: [
+          {
+            materialId: `mat-${jobNum}-${idx}-1`,
+            materialType: (idx % 2 === 0 ? 'Carpet' : 'Flooring') as any,
+            condition: 'wet' as any,
+            squareFootageAffected: Math.round(sqFt * (affectedPercent / 100)),
+            removalDate: ['Demo', 'Check Service', 'Pull', 'Complete'].includes(status) ? daysAgo(Math.max(1, daysOld - 1)) : undefined,
+            removalPhotos: [],
+            exposedMaterials: [
+              {
+                materialId: `exposed-${jobNum}-${idx}-1`,
+                materialType: 'Concrete' as any,
+                exposedAt: daysAgo(Math.max(1, daysOld - 1)),
+                readingsRequired: true,
+              },
+            ],
+          },
+          {
+            materialId: `mat-${jobNum}-${idx}-2`,
+            materialType: 'Drywall' as any,
+            condition: 'wet' as any,
+            squareFootageAffected: Math.round((dim.length + dim.width) * 2 * 2),
+            removalDate: ['Demo', 'Check Service', 'Pull', 'Complete'].includes(status) ? daysAgo(Math.max(1, daysOld - 1)) : undefined,
+            removalPhotos: [],
+            exposedMaterials: [
+              {
+                materialId: `exposed-${jobNum}-${idx}-2`,
+                materialType: 'Wood Framing' as any,
+                exposedAt: daysAgo(Math.max(1, daysOld - 1)),
+                readingsRequired: true,
+              },
+            ],
+          },
+        ],
+        moistureReadings,
+        photos: [],
+        isClosed: status === 'Complete',
+        closureNotes: status === 'Complete' ? 'All moisture readings within dry standard range' : undefined,
+      };
+    });
+  };
+
   const generateComprehensiveJobs = (): Job[] => {
     const jobs: Job[] = [];
 
@@ -124,7 +264,7 @@ export const DataSeedingPage: React.FC = () => {
             }),
           },
         },
-        rooms: [],
+        rooms: generateRoomData(jobNum, status, daysOld),
         equipment: {
           chambers: [],
           calculations: {

@@ -94,49 +94,68 @@ export const PSMDashboard: React.FC = () => {
   const generateReport = (job: Job, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent navigation to job detail
 
-    // Generate professional HTML report
+    // Generate comprehensive IICRC dry log report
     const reportHTML = `
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Job Report - ${job.jobId}</title>
+        <title>Dry Log Report - ${job.jobId}</title>
         <style>
           @media print {
-            body { margin: 0; }
+            body { margin: 0; padding: 20px; }
             .no-print { display: none; }
+            .page-break { page-break-after: always; }
           }
           body {
             font-family: Arial, sans-serif;
             padding: 40px;
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
+            font-size: 11pt;
           }
           .header {
-            border-bottom: 3px solid #ea580c;
+            border-bottom: 4px solid #ea580c;
             padding-bottom: 20px;
             margin-bottom: 30px;
           }
           .logo {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: bold;
             color: #ea580c;
+            letter-spacing: 1px;
+          }
+          .report-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 8px;
+            color: #1f2937;
           }
           .section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            break-inside: avoid;
           }
           .section-title {
-            font-size: 18px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background: #374151;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            border-left: 5px solid #ea580c;
+          }
+          .subsection-title {
+            font-size: 14px;
             font-weight: bold;
             color: #1f2937;
-            margin-bottom: 12px;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 8px;
+            margin: 15px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #d1d5db;
           }
           .info-grid {
             display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 8px;
-            line-height: 1.6;
+            grid-template-columns: 180px 1fr;
+            gap: 6px;
+            line-height: 1.5;
           }
           .label {
             font-weight: 600;
@@ -145,24 +164,84 @@ export const PSMDashboard: React.FC = () => {
           .value {
             color: #1f2937;
           }
-          .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 14px;
+          .room-box {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #f9fafb;
+          }
+          .room-header {
+            font-size: 15px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #ea580c;
+          }
+          .moisture-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 10pt;
+          }
+          .moisture-table th {
+            background: #374151;
+            color: white;
+            padding: 8px;
+            text-align: left;
             font-weight: 600;
           }
-          .status-install { background: #dbeafe; color: #1e40af; }
-          .status-demo { background: #fef3c7; color: #92400e; }
-          .status-check { background: #e0e7ff; color: #3730a3; }
-          .status-pull { background: #dcfce7; color: #166534; }
-          .status-complete { background: #d1fae5; color: #065f46; }
-          .red-flag {
-            background: #fee2e2;
-            border-left: 4px solid #dc2626;
-            padding: 12px;
-            margin-bottom: 8px;
+          .moisture-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e5e7eb;
           }
+          .moisture-table tr:nth-child(even) {
+            background: #f3f4f6;
+          }
+          .dry-standard {
+            background: #dcfce7 !important;
+            font-weight: 600;
+          }
+          .material-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0;
+          }
+          .material-item {
+            padding: 8px;
+            margin: 4px 0;
+            background: white;
+            border-left: 3px solid #ea580c;
+            border-radius: 4px;
+          }
+          .removed {
+            background: #fee2e2 !important;
+            border-left-color: #dc2626 !important;
+          }
+          .equipment-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            font-size: 10pt;
+          }
+          .water-class {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin: 4px;
+          }
+          .class-1 { background: #dbeafe; color: #1e40af; }
+          .class-2 { background: #fef3c7; color: #92400e; }
+          .class-3 { background: #fed7aa; color: #9a3412; }
+          .class-4 { background: #fee2e2; color: #991b1b; }
+          .category-1 { background: #dcfce7; color: #166534; }
+          .category-2 { background: #fef3c7; color: #854d0e; }
+          .category-3 { background: #fee2e2; color: #991b1b; }
           .print-button {
             position: fixed;
             top: 20px;
@@ -174,142 +253,277 @@ export const PSMDashboard: React.FC = () => {
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
           }
           .print-button:hover {
             background: #c2410c;
           }
+          .highlight-box {
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+          }
         </style>
       </head>
       <body>
-        <button class="print-button no-print" onclick="window.print()">Print Report</button>
+        <button class="print-button no-print" onclick="window.print()">🖨️ Print Dry Log</button>
 
         <div class="header">
           <div class="logo">ENTRUSTED RESTORATION</div>
-          <div style="font-size: 24px; font-weight: 600; margin-top: 8px;">Job Status Report</div>
-          <div style="color: #6b7280; margin-top: 4px;">Generated: ${new Date().toLocaleString()}</div>
-        </div>
-
-        <!-- Job Information -->
-        <div class="section">
-          <div class="section-title">Job Information</div>
-          <div class="info-grid">
-            <div class="label">Job ID:</div>
-            <div class="value">${job.jobId}</div>
-            <div class="label">Status:</div>
-            <div class="value"><span class="status-badge status-${job.jobStatus.toLowerCase().replace(' ', '-')}">${job.jobStatus}</span></div>
-            <div class="label">Customer:</div>
-            <div class="value">${job.customerInfo.name}</div>
-            <div class="label">Address:</div>
-            <div class="value">${job.customerInfo.address}, ${job.customerInfo.city}, ${job.customerInfo.state} ${job.customerInfo.zipCode}</div>
-            <div class="label">Phone:</div>
-            <div class="value">${job.customerInfo.phoneNumber}</div>
-            <div class="label">Email:</div>
-            <div class="value">${job.customerInfo.email}</div>
+          <div class="report-title">WATER DAMAGE RESTORATION DRY LOG</div>
+          <div style="color: #6b7280; margin-top: 8px; font-size: 11pt;">
+            IICRC S500 Compliant Documentation<br>
+            Report Generated: ${new Date().toLocaleString()}
           </div>
         </div>
 
-        <!-- Insurance Information -->
+        <!-- Job & Property Information -->
         <div class="section">
-          <div class="section-title">Insurance Information</div>
+          <div class="section-title">JOB & PROPERTY INFORMATION</div>
           <div class="info-grid">
-            <div class="label">Carrier:</div>
+            <div class="label">Job Number:</div>
+            <div class="value"><strong>${job.jobId}</strong></div>
+            <div class="label">Customer Name:</div>
+            <div class="value">${job.customerInfo.name}</div>
+            <div class="label">Property Address:</div>
+            <div class="value">${job.customerInfo.address}, ${job.customerInfo.city}, ${job.customerInfo.state} ${job.customerInfo.zipCode}</div>
+            <div class="label">Contact Phone:</div>
+            <div class="value">${job.customerInfo.phoneNumber}</div>
+            <div class="label">Insurance Carrier:</div>
             <div class="value">${job.insuranceInfo.carrierName}</div>
             <div class="label">Claim Number:</div>
             <div class="value">${job.insuranceInfo.claimNumber}</div>
-            <div class="label">Policy Number:</div>
-            <div class="value">${job.insuranceInfo.policyNumber}</div>
             <div class="label">Adjuster:</div>
-            <div class="value">${job.insuranceInfo.adjusterName}</div>
-            <div class="label">Adjuster Phone:</div>
-            <div class="value">${job.insuranceInfo.adjusterPhone}</div>
-            <div class="label">Adjuster Email:</div>
-            <div class="value">${job.insuranceInfo.adjusterEmail}</div>
-            <div class="label">Deductible:</div>
-            <div class="value">$${job.insuranceInfo.deductible.toLocaleString()}</div>
-            <div class="label">Estimated Value:</div>
-            <div class="value">$${job.insuranceInfo.estimatedValue.toLocaleString()}</div>
-            <div class="label">Water Category:</div>
-            <div class="value">${job.insuranceInfo.categoryOfWater}</div>
+            <div class="value">${job.insuranceInfo.adjusterName} (${job.insuranceInfo.adjusterPhone})</div>
           </div>
         </div>
 
-        <!-- Cause of Loss -->
+        <!-- Cause of Loss & Classification -->
         <div class="section">
-          <div class="section-title">Cause of Loss</div>
-          <div class="info-grid">
-            <div class="label">Type:</div>
-            <div class="value">${job.causeOfLoss.type}</div>
-            <div class="label">Location:</div>
-            <div class="value">${job.causeOfLoss.location}</div>
-            <div class="label">Description:</div>
-            <div class="value">${job.causeOfLoss.description}</div>
+          <div class="section-title">CAUSE OF LOSS & WATER DAMAGE CLASSIFICATION</div>
+          <div class="highlight-box">
+            <div class="info-grid">
+              <div class="label">Loss Type:</div>
+              <div class="value"><strong>${job.causeOfLoss.type}</strong></div>
+              <div class="label">Loss Location:</div>
+              <div class="value">${job.causeOfLoss.location}</div>
+              <div class="label">Date Discovered:</div>
+              <div class="value">${job.causeOfLoss.discoveryDate ? new Date(job.causeOfLoss.discoveryDate.seconds * 1000).toLocaleString() : 'N/A'}</div>
+              <div class="label">Date of Event:</div>
+              <div class="value">${job.causeOfLoss.eventDate ? new Date(job.causeOfLoss.eventDate.seconds * 1000).toLocaleString() : 'N/A'}</div>
+            </div>
+          </div>
+          <div style="margin-top: 10px;">
+            <strong>Description:</strong><br>
+            ${job.causeOfLoss.description}
+          </div>
+          <div style="margin-top: 15px;">
+            <strong>IICRC Water Damage Classification:</strong><br>
+            <span class="water-class category-${job.insuranceInfo.categoryOfWater?.includes('1') ? '1' : job.insuranceInfo.categoryOfWater?.includes('2') ? '2' : '3'}">
+              ${job.insuranceInfo.categoryOfWater || 'Category 2'}
+            </span>
+            <span class="water-class class-${job.equipment?.calculations?.waterClass?.includes('1') ? '1' : job.equipment?.calculations?.waterClass?.includes('2') ? '2' : job.equipment?.calculations?.waterClass?.includes('3') ? '3' : '2'}">
+              ${job.equipment?.calculations?.waterClass || 'Class 2'}
+            </span>
           </div>
         </div>
 
-        <!-- PSM Status -->
+        <!-- Equipment Deployment -->
+        <div class="section">
+          <div class="section-title">EQUIPMENT DEPLOYMENT & DRYING PLAN</div>
+          <div class="info-grid">
+            <div class="label">Drying Method:</div>
+            <div class="value">${job.equipment?.calculations?.calculationMethod || 'IICRC S500'}</div>
+            <div class="label">Affected Sq. Ft.:</div>
+            <div class="value">${job.equipment?.calculations?.totalAffectedSquareFootage || 0} sq ft</div>
+            <div class="label">Cubic Footage:</div>
+            <div class="value">${job.equipment?.calculations?.totalCubicFootage || 0} cu ft</div>
+            <div class="label">Estimated Drying Time:</div>
+            <div class="value">${job.equipment?.calculations?.estimatedDryingDays || 3} days</div>
+          </div>
+          <div style="margin-top: 12px;">
+            <strong>Equipment Deployed:</strong><br>
+            <div style="margin-top: 6px;">
+              ${job.equipment?.calculations?.recommendedDehumidifierCount ?
+                `<span class="equipment-badge">${job.equipment.calculations.recommendedDehumidifierCount} Dehumidifier(s)</span>` : ''}
+              ${job.equipment?.calculations?.recommendedAirMoverCount ?
+                `<span class="equipment-badge">${job.equipment.calculations.recommendedAirMoverCount} Air Mover(s)</span>` : ''}
+              ${job.equipment?.calculations?.recommendedAirScrubberCount ?
+                `<span class="equipment-badge">${job.equipment.calculations.recommendedAirScrubberCount} Air Scrubber(s)</span>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- Room-by-Room Dry Log -->
+        <div class="section page-break">
+          <div class="section-title">ROOM-BY-ROOM DRY LOG & MOISTURE DOCUMENTATION</div>
+          ${job.rooms && job.rooms.length > 0 ? job.rooms.map(room => `
+            <div class="room-box">
+              <div class="room-header">${room.roomName} (${room.roomType})</div>
+
+              <div class="subsection-title">Room Dimensions & Affected Areas</div>
+              <div class="info-grid" style="margin-bottom: 10px;">
+                <div class="label">Dimensions:</div>
+                <div class="value">${room.dimensions?.length || 0}' L × ${room.dimensions?.width || 0}' W × ${room.dimensions?.height || 0}' H</div>
+                <div class="label">Square Footage:</div>
+                <div class="value">${room.dimensions?.squareFootage || 0} sq ft</div>
+                <div class="label">Status:</div>
+                <div class="value"><strong>${room.affectedStatus?.toUpperCase() || 'AFFECTED'}</strong></div>
+                ${room.waterDamageClassification ? `
+                  <div class="label">Water Class/Category:</div>
+                  <div class="value">Category ${room.waterDamageClassification.category}, Class ${room.waterDamageClassification.class}</div>
+                ` : ''}
+              </div>
+
+              ${room.affectedAreas ? `
+                <div class="subsection-title">Affected Materials Breakdown</div>
+                ${room.affectedAreas.floor ? `
+                  <div style="margin: 8px 0;">
+                    <strong>Floor:</strong> ${room.affectedAreas.floor.affectedSqFt} sq ft affected (${room.affectedAreas.floor.percentAffected}%)<br>
+                    ${room.affectedAreas.floor.materials?.map(m =>
+                      `&nbsp;&nbsp;• ${m.type}: ${m.sqFt} sq ft`
+                    ).join('<br>') || ''}
+                  </div>
+                ` : ''}
+                ${room.affectedAreas.walls ? `
+                  <div style="margin: 8px 0;">
+                    <strong>Walls:</strong> ${room.affectedAreas.walls.affectedSqFt} sq ft affected (${room.affectedAreas.walls.percentAffected}%)<br>
+                    <em>Water line height: ${room.affectedAreas.walls.wetHeightAvg} feet</em><br>
+                    ${room.affectedAreas.walls.materials?.map(m =>
+                      `&nbsp;&nbsp;• ${m.type}: ${m.sqFt} sq ft`
+                    ).join('<br>') || ''}
+                  </div>
+                ` : ''}
+                ${room.affectedAreas.ceiling ? `
+                  <div style="margin: 8px 0;">
+                    <strong>Ceiling:</strong> ${room.affectedAreas.ceiling.affectedSqFt} sq ft affected (${room.affectedAreas.ceiling.percentAffected}%)<br>
+                    ${room.affectedAreas.ceiling.materials?.map(m =>
+                      `&nbsp;&nbsp;• ${m.type}: ${m.sqFt} sq ft`
+                    ).join('<br>') || ''}
+                  </div>
+                ` : ''}
+              ` : ''}
+
+              ${room.materialsAffected && room.materialsAffected.length > 0 ? `
+                <div class="subsection-title">Materials Removed & Reason</div>
+                <ul class="material-list">
+                  ${room.materialsAffected.map(mat => `
+                    <li class="material-item ${mat.removalDate ? 'removed' : ''}">
+                      <strong>${mat.materialType}</strong> - ${mat.condition}<br>
+                      <em>${mat.squareFootageAffected} sq ft</em>
+                      ${mat.removalDate ? `<br>✗ REMOVED: ${new Date(mat.removalDate.seconds * 1000).toLocaleDateString()}` : ''}
+                      ${mat.exposedMaterials && mat.exposedMaterials.length > 0 ?
+                        `<br>Exposed: ${mat.exposedMaterials.map(e => e.materialType).join(', ')}` : ''}
+                    </li>
+                  `).join('')}
+                </ul>
+              ` : '<em>No materials removed from this room</em>'}
+
+              ${room.moistureReadings && room.moistureReadings.length > 0 ? `
+                <div class="subsection-title">Moisture Readings Log</div>
+                <table class="moisture-table">
+                  <thead>
+                    <tr>
+                      <th>Date/Time</th>
+                      <th>Location</th>
+                      <th>Material</th>
+                      <th>Moisture %</th>
+                      <th>Temp °F</th>
+                      <th>RH %</th>
+                      <th>Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${room.moistureReadings.sort((a, b) => a.recordedAt.seconds - b.recordedAt.seconds).map(reading => `
+                      <tr class="${reading.isDryStandard ? 'dry-standard' : ''}">
+                        <td>${new Date(reading.recordedAt.seconds * 1000).toLocaleString()}</td>
+                        <td>${reading.location}</td>
+                        <td>${reading.material}</td>
+                        <td><strong>${reading.moisturePercentage}%</strong></td>
+                        <td>${reading.temperature}°</td>
+                        <td>${reading.humidity}%</td>
+                        <td>${reading.isDryStandard ? '🌟 DRY STANDARD' : reading.readingType}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+                <div style="margin-top: 6px; font-size: 10pt; color: #6b7280;">
+                  <strong>Note:</strong> Dry standard readings (highlighted) are baseline moisture levels from unaffected areas.
+                  Per IICRC S500, materials within 3-4% of dry standard are considered dry.
+                </div>
+              ` : '<em>No moisture readings recorded for this room</em>'}
+            </div>
+          `).join('') : `
+            <div class="highlight-box">
+              <strong>Note:</strong> This job does not have detailed room-by-room documentation yet.
+              Room data will be populated as technicians complete install, check service, and demo workflows.
+              <br><br>
+              <em>Expected data includes: room dimensions, affected materials, moisture readings, and removal documentation.</em>
+            </div>
+          `}
+        </div>
+
+        <!-- Workflow & Mitigation Timeline -->
+        <div class="section">
+          <div class="section-title">MITIGATION WORKFLOW TIMELINE</div>
+          <div class="info-grid">
+            <div class="label">Install Phase:</div>
+            <div class="value"><strong>${job.workflowPhases.install.status.toUpperCase()}</strong>
+              ${job.workflowPhases.install.completedAt ?
+                ` - Completed ${new Date(job.workflowPhases.install.completedAt.seconds * 1000).toLocaleDateString()}` : ''}
+            </div>
+            <div class="label">Demo Phase:</div>
+            <div class="value"><strong>${job.workflowPhases.demo.status.toUpperCase()}</strong>
+              ${job.workflowPhases.demo.completedAt ?
+                ` - Completed ${new Date(job.workflowPhases.demo.completedAt.seconds * 1000).toLocaleDateString()}` : ''}
+            </div>
+            <div class="label">Check Service:</div>
+            <div class="value"><strong>${job.workflowPhases.checkService.status.toUpperCase()}</strong>
+              (${job.workflowPhases.checkService.visits?.length || 0} visits completed)
+            </div>
+            <div class="label">Pull Phase:</div>
+            <div class="value"><strong>${job.workflowPhases.pull.status.toUpperCase()}</strong>
+              ${job.workflowPhases.pull.completedAt ?
+                ` - Completed ${new Date(job.workflowPhases.pull.completedAt.seconds * 1000).toLocaleDateString()}` : ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- PSM & Insurance Documentation -->
         ${job.psmData ? `
         <div class="section">
-          <div class="section-title">PSM Review Status</div>
+          <div class="section-title">PSM REVIEW & INSURANCE APPROVAL STATUS</div>
           <div class="info-grid">
-            <div class="label">PSM Phase:</div>
-            <div class="value">${job.psmData.psmPhase.status.replace(/-/g, ' ').toUpperCase()}</div>
-            <div class="label">Assigned PSM:</div>
+            <div class="label">PSM Assigned:</div>
             <div class="value">${job.psmData.psmPhase.assignedPSM}</div>
-            <div class="label">Days in Phase:</div>
-            <div class="value">${job.psmData.psmPhase.daysInPhase}</div>
+            <div class="label">Review Status:</div>
+            <div class="value"><strong>${job.psmData.psmPhase.status.replace(/-/g, ' ').toUpperCase()}</strong></div>
+            <div class="label">Days in Review:</div>
+            <div class="value">${job.psmData.psmPhase.daysInPhase} days</div>
             <div class="label">Demo Scope:</div>
             <div class="value">${job.psmData.approvalStatus.demoScope.toUpperCase()}</div>
-            <div class="label">Demo Amount Requested:</div>
-            <div class="value">$${job.psmData.approvalStatus.demoAmount.requested.toLocaleString()}</div>
-            <div class="label">Demo Amount Approved:</div>
-            <div class="value">$${job.psmData.approvalStatus.demoAmount.approved.toLocaleString()}</div>
+            <div class="label">Demo Amount:</div>
+            <div class="value">Requested: $${job.psmData.approvalStatus.demoAmount.requested.toLocaleString()} |
+              Approved: $${job.psmData.approvalStatus.demoAmount.approved.toLocaleString()}</div>
             <div class="label">Equipment Plan:</div>
             <div class="value">${job.psmData.approvalStatus.equipmentPlan.toUpperCase()}</div>
+            <div class="label">Documentation Ready:</div>
+            <div class="value">${job.psmData.documentationReview?.readyForSubmission ? '✓ YES' : '✗ NO'}</div>
           </div>
+          ${job.psmData.redFlags && job.psmData.redFlags.length > 0 ? `
+            <div class="subsection-title" style="margin-top: 15px;">Red Flags & Issues</div>
+            ${job.psmData.redFlags.map(flag => `
+              <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 10px; margin: 6px 0; border-radius: 4px;">
+                <strong>${flag.type.toUpperCase()} - ${flag.severity.toUpperCase()}</strong><br>
+                ${flag.description}<br>
+                <em>Status: ${flag.resolved ? '✓ RESOLVED' : '⚠ UNRESOLVED'}</em>
+              </div>
+            `).join('')}
+          ` : ''}
         </div>
         ` : ''}
-
-        <!-- Red Flags -->
-        ${job.psmData && job.psmData.redFlags.length > 0 ? `
-        <div class="section">
-          <div class="section-title">Red Flags</div>
-          ${job.psmData.redFlags.map(flag => `
-            <div class="red-flag">
-              <strong>${flag.type.toUpperCase()} - ${flag.severity.toUpperCase()}</strong><br>
-              ${flag.description}<br>
-              <em>Status: ${flag.resolved ? 'RESOLVED' : 'UNRESOLVED'}</em>
-            </div>
-          `).join('')}
-        </div>
-        ` : ''}
-
-        <!-- Financial Summary -->
-        <div class="section">
-          <div class="section-title">Financial Summary</div>
-          <div class="info-grid">
-            <div class="label">Estimated Total:</div>
-            <div class="value">$${job.financial.estimatedTotal.toLocaleString()}</div>
-            <div class="label">Actual Expenses:</div>
-            <div class="value">$${job.financial.actualExpenses.total.toLocaleString()}</div>
-            <div class="label">Payment Status:</div>
-            <div class="value">${job.financial.paymentStatus.toUpperCase()}</div>
-          </div>
-        </div>
-
-        <!-- Workflow Progress -->
-        <div class="section">
-          <div class="section-title">Workflow Progress</div>
-          <div class="info-grid">
-            <div class="label">Install:</div>
-            <div class="value">${job.workflowPhases.install.status.toUpperCase()}</div>
-            <div class="label">Demo:</div>
-            <div class="value">${job.workflowPhases.demo.status.toUpperCase()}</div>
-            <div class="label">Check Service:</div>
-            <div class="value">${job.workflowPhases.checkService.status.toUpperCase()} (${job.workflowPhases.checkService.visits?.length || 0} visits)</div>
-            <div class="label">Pull:</div>
-            <div class="value">${job.workflowPhases.pull.status.toUpperCase()}</div>
-          </div>
-        </div>
 
         <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 14px;">
           This report was generated by Entrusted Restoration PSM Dashboard<br>
