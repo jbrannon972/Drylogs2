@@ -236,15 +236,16 @@ export const CheckServiceWorkflow: React.FC = () => {
       {/* MAIN CONTENT */}
       <div ref={contentRef} className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="bg-white rounded-lg shadow-md p-6 mb-24">
-          {CurrentStepComponent && checkServiceStep === 'room-readings' && (
-            <CurrentStepComponent
-              job={job}
-              onNext={handleNext}
-              visitNumber={(checkServiceData?.visits?.length || 0) + 1}
-            />
-          )}
-          {CurrentStepComponent && checkServiceStep !== 'room-readings' && (
-            <CurrentStepComponent job={job} onNext={handleNext} />
+          {CurrentStepComponent && (
+            checkServiceStep === 'room-readings' ? (
+              <CurrentStepComponent
+                job={job}
+                onNext={handleNext}
+                {...({ visitNumber: (checkServiceData?.visits?.length || 0) + 1 } as any)}
+              />
+            ) : (
+              <CurrentStepComponent job={job} onNext={handleNext} />
+            )
           )}
         </div>
       </div>
