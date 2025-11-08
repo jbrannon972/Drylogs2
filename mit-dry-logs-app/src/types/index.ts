@@ -661,6 +661,12 @@ export interface Job {
   causeOfLoss: CauseOfLoss;
   jobStatus: JobStatus;
   workflowPhases: WorkflowPhases;
+  workflowData?: {
+    install?: any; // Install workflow data (room assessments, etc.)
+    demo?: any; // Demo workflow data
+    checkService?: any; // Check service workflow data
+    pull?: any; // Pull workflow data
+  };
   rooms: Room[];
   equipment: JobEquipment;
   dryingPlan?: DryingPlan; // NEW: Comprehensive drying plan

@@ -542,6 +542,388 @@ export const PSMDashboard: React.FC = () => {
     }
   };
 
+  const generateInitialInspectionReport = (job: Job, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent navigation to job detail
+
+    // Check if install workflow is completed
+    if (job.workflowPhases.install.status !== 'completed' || !job.workflowData?.install?.roomAssessments) {
+      alert('Install workflow must be completed to generate Initial Inspection Report');
+      return;
+    }
+
+    const roomAssessments = job.workflowData.install.roomAssessments || [];
+    const assessmentDate = job.workflowPhases.install.completedAt
+      ? new Date(job.workflowPhases.install.completedAt.seconds * 1000).toLocaleDateString()
+      : 'N/A';
+
+    // Generate Initial Inspection Report
+    const reportHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Initial Inspection Report - ${job.jobId}</title>
+        <style>
+          @media print {
+            body { margin: 0; padding: 20px; }
+            .no-print { display: none; }
+            .page-break { page-break-after: always; }
+          }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            font-size: 11pt;
+            line-height: 1.6;
+          }
+          .header {
+            border-bottom: 4px solid #ea580c;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+          }
+          .logo-img {
+            max-width: 350px;
+            height: auto;
+            margin: 0 auto 15px auto;
+            display: block;
+          }
+          .report-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #1f2937;
+          }
+          .section {
+            margin-bottom: 25px;
+            break-inside: avoid;
+          }
+          .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background: #374151;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #ea580c;
+          }
+          .subsection-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+            margin: 15px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #d1d5db;
+          }
+          .info-grid {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 8px;
+            line-height: 1.8;
+          }
+          .label {
+            font-weight: 600;
+            color: #4b5563;
+          }
+          .value {
+            color: #1f2937;
+          }
+          .room-box {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background: #f9fafb;
+            break-inside: avoid;
+          }
+          .room-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #ea580c;
+          }
+          .moisture-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10pt;
+          }
+          .moisture-table th {
+            background: #374151;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+          }
+          .moisture-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e5e7eb;
+          }
+          .moisture-table tr:nth-child(even) {
+            background: #f3f4f6;
+          }
+          .dry-standard {
+            background: #dcfce7 !important;
+            font-weight: 600;
+          }
+          .material-removal-box {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+          }
+          .material-removal-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 4px;
+            border-left: 3px solid #ea580c;
+          }
+          .removal-reason {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 12px;
+            border-radius: 4px;
+            margin: 4px 0;
+            font-weight: 600;
+            font-size: 10pt;
+          }
+          .category-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin: 4px 8px 4px 0;
+            font-size: 11pt;
+          }
+          .category-1 { background: #dcfce7; color: #166534; }
+          .category-2 { background: #fef3c7; color: #854d0e; }
+          .category-3 { background: #fee2e2; color: #991b1b; }
+          .class-1 { background: #dbeafe; color: #1e40af; }
+          .class-2 { background: #fef3c7; color: #92400e; }
+          .class-3 { background: #fed7aa; color: #9a3412; }
+          .class-4 { background: #fee2e2; color: #991b1b; }
+          .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 28px;
+            background: #ea580c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+          }
+          .print-button:hover {
+            background: #c2410c;
+          }
+          .highlight-box {
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+          }
+          .installation-type {
+            font-style: italic;
+            color: #6b7280;
+            font-size: 10pt;
+          }
+        </style>
+      </head>
+      <body>
+        <button class="print-button no-print" onclick="window.print()">🖨️ Print Report</button>
+
+        <div class="header">
+          <img src="/Elogo.png" alt="Entrusted Restoration" class="logo-img" />
+          <div class="report-title">INITIAL INSPECTION REPORT</div>
+          <div style="color: #6b7280; margin-top: 8px; font-size: 12pt;">
+            Water Damage Mitigation Assessment<br>
+            Report Generated: ${new Date().toLocaleString()}<br>
+            Assessment Completed: ${assessmentDate}
+          </div>
+        </div>
+
+        <!-- Job & Customer Information -->
+        <div class="section">
+          <div class="section-title">JOB & CUSTOMER INFORMATION</div>
+          <div class="info-grid">
+            <div class="label">Job Number:</div>
+            <div class="value"><strong>${job.jobId}</strong></div>
+            <div class="label">Customer Name:</div>
+            <div class="value">${job.customerInfo.name}</div>
+            <div class="label">Property Address:</div>
+            <div class="value">${job.customerInfo.address}, ${job.customerInfo.city}, ${job.customerInfo.state} ${job.customerInfo.zipCode}</div>
+            <div class="label">Contact Phone:</div>
+            <div class="value">${job.customerInfo.phoneNumber}</div>
+            <div class="label">Insurance Carrier:</div>
+            <div class="value">${job.insuranceInfo.carrierName}</div>
+            <div class="label">Claim Number:</div>
+            <div class="value">${job.insuranceInfo.claimNumber}</div>
+            <div class="label">Adjuster:</div>
+            <div class="value">${job.insuranceInfo.adjusterName} (${job.insuranceInfo.adjusterPhone})</div>
+          </div>
+        </div>
+
+        <!-- Cause of Loss -->
+        <div class="section">
+          <div class="section-title">CAUSE OF LOSS</div>
+          <div class="highlight-box">
+            <div class="info-grid">
+              <div class="label">Loss Type:</div>
+              <div class="value"><strong>${job.causeOfLoss.type}</strong></div>
+              <div class="label">Loss Location:</div>
+              <div class="value">${job.causeOfLoss.location}</div>
+              <div class="label">Date Discovered:</div>
+              <div class="value">${job.causeOfLoss.discoveryDate ? new Date(job.causeOfLoss.discoveryDate.seconds * 1000).toLocaleString() : 'N/A'}</div>
+              <div class="label">Date of Event:</div>
+              <div class="value">${job.causeOfLoss.eventDate ? new Date(job.causeOfLoss.eventDate.seconds * 1000).toLocaleString() : 'N/A'}</div>
+            </div>
+            <div style="margin-top: 15px;">
+              <strong>Description:</strong><br>
+              ${job.causeOfLoss.description}
+            </div>
+          </div>
+        </div>
+
+        <!-- Water Classification -->
+        <div class="section">
+          <div class="section-title">WATER DAMAGE CLASSIFICATION (IICRC S500)</div>
+          <div>
+            <span class="category-badge category-${job.insuranceInfo.categoryOfWater?.includes('1') ? '1' : job.insuranceInfo.categoryOfWater?.includes('2') ? '2' : '3'}">
+              ${job.insuranceInfo.categoryOfWater || 'Category 2'}
+            </span>
+            <span class="category-badge class-${job.equipment?.calculations?.waterClass?.includes('1') ? '1' : job.equipment?.calculations?.waterClass?.includes('2') ? '2' : job.equipment?.calculations?.waterClass?.includes('3') ? '3' : '2'}">
+              ${job.equipment?.calculations?.waterClass || 'Class 2'}
+            </span>
+          </div>
+          <div style="margin-top: 15px; padding: 12px; background: #f3f4f6; border-radius: 6px;">
+            <strong>Category Definitions:</strong><br>
+            • <strong>Category 1:</strong> Clean water from sanitary source<br>
+            • <strong>Category 2:</strong> Gray water with contamination potential<br>
+            • <strong>Category 3:</strong> Black water - grossly contaminated<br><br>
+            <strong>Class Definitions:</strong><br>
+            • <strong>Class 1:</strong> Minimal absorption & evaporation<br>
+            • <strong>Class 2:</strong> Fast evaporation, affects carpet & cushion<br>
+            • <strong>Class 3:</strong> Fastest evaporation, ceiling/walls/insulation/subfloor<br>
+            • <strong>Class 4:</strong> Specialty drying - hardwood/plaster/concrete
+          </div>
+        </div>
+
+        <!-- Room-by-Room Assessment -->
+        <div class="section page-break">
+          <div class="section-title">ROOM-BY-ROOM ASSESSMENT</div>
+          ${roomAssessments.length > 0 ? roomAssessments.map((room: any) => `
+            <div class="room-box">
+              <div class="room-header">${room.name} (${room.type})</div>
+
+              <div class="subsection-title">Room Dimensions</div>
+              <div class="info-grid" style="margin-bottom: 15px;">
+                <div class="label">Dimensions:</div>
+                <div class="value">${room.length}' L × ${room.width}' W × ${room.height}' H</div>
+                <div class="label">Square Footage:</div>
+                <div class="value">${(room.length * room.width).toFixed(2)} sq ft</div>
+                <div class="label">Floor:</div>
+                <div class="value">${room.floor}</div>
+              </div>
+
+              ${room.hasPreexistingDamage ? `
+                <div class="highlight-box" style="background: #fef3c7; border-color: #f59e0b;">
+                  <strong>⚠️ Pre-existing Damage Noted:</strong><br>
+                  ${room.preexistingDamageNotes || 'See photos for details'}
+                  ${room.preexistingDamagePhotos && room.preexistingDamagePhotos.length > 0 ?
+                    `<br><em>${room.preexistingDamagePhotos.length} photo(s) documented</em>` : ''}
+                </div>
+              ` : ''}
+
+              ${room.moistureReadings && room.moistureReadings.length > 0 ? `
+                <div class="subsection-title">Moisture Readings</div>
+                <table class="moisture-table">
+                  <thead>
+                    <tr>
+                      <th>Material</th>
+                      <th>Location</th>
+                      <th>Moisture %</th>
+                      <th>Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${room.moistureReadings.map((reading: any) => `
+                      <tr class="${reading.isDryStandard ? 'dry-standard' : ''}">
+                        <td><strong>${reading.material}</strong></td>
+                        <td>${reading.location || 'N/A'}</td>
+                        <td><strong>${reading.percentage}%</strong></td>
+                        <td>${reading.isDryStandard ? '✓ DRY STANDARD' : 'Moisture Reading'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+                <div style="font-size: 10pt; color: #6b7280; margin-top: 8px;">
+                  <strong>Note:</strong> Dry standard readings (highlighted) establish baseline moisture levels.
+                  Per IICRC S500, materials within 3-4% of dry standard are considered dry.
+                </div>
+              ` : '<em>No moisture readings recorded for this room</em>'}
+
+              ${room.materialsAffected && room.materialsAffected.filter((m: any) => m.removalRequired).length > 0 ? `
+                <div class="subsection-title">Materials Scheduled for Removal</div>
+                <div class="material-removal-box">
+                  <p style="margin: 0 0 10px 0; font-weight: 600;">
+                    The following materials have been identified for removal during demo:
+                  </p>
+                  ${room.materialsAffected.filter((m: any) => m.removalRequired).map((material: any) => `
+                    <div class="material-removal-item">
+                      <strong style="font-size: 12pt;">${material.materialType}</strong>
+                      ${material.installationType && material.installationType !== 'N/A' ?
+                        `<br><span class="installation-type">Installation: ${material.installationType}</span>` : ''}
+                      <br>
+                      <em>Quantity: ${material.squareFootage} ${
+                        material.materialType.includes('Trim') || material.materialType.includes('Casing') || material.materialType.includes('Cabinetry') ?
+                        'linear ft' :
+                        material.materialType.includes('Fixture') || material.materialType.includes('Appliance') || material.materialType.includes('Mirror') ?
+                        'each' : 'sq ft'
+                      }</em><br>
+                      ${material.removalReason ? `
+                        <span class="removal-reason">
+                          Reason: ${material.removalReason.replace(/-/g, ' ').toUpperCase()}
+                        </span>
+                      ` : ''}
+                      ${material.notes ? `<br><em>Notes: ${material.notes}</em>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              ` : '<div style="padding: 15px; background: #dcfce7; border-radius: 6px; color: #166534;"><strong>✓ No materials require removal from this room</strong></div>'}
+            </div>
+          `).join(''): `
+            <div class="highlight-box">
+              <strong>Note:</strong> No room assessments have been completed yet.
+            </div>
+          `}
+        </div>
+
+        <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12pt;">
+          This Initial Inspection Report was generated by Entrusted Restoration<br>
+          For insurance submission and project documentation<br>
+          <strong>Report ID: ${job.jobId}-INITIAL-${Date.now()}</strong>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Open report in new window
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(reportHTML);
+      printWindow.document.close();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -736,6 +1118,16 @@ export const PSMDashboard: React.FC = () => {
                           <Printer className="w-4 h-4" />
                           <span>Print Report</span>
                         </button>
+                        {job.workflowPhases.install.status === 'completed' && job.workflowData?.install?.roomAssessments && (
+                          <button
+                            onClick={(e) => generateInitialInspectionReport(job, e)}
+                            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            title="Generate Initial Inspection Report for insurance submission"
+                          >
+                            <FileText className="w-4 h-4" />
+                            <span>Initial Inspection</span>
+                          </button>
+                        )}
                         <p className="text-sm text-gray-600">
                           {psmData?.psmPhase.daysInPhase || 0} day{psmData?.psmPhase.daysInPhase !== 1 ? 's' : ''} in phase
                         </p>
