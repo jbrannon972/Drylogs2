@@ -659,48 +659,50 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
                   {selectedRoom.moistureReadings.map((reading) => (
                     <div key={reading.id} className="border border-gray-300 rounded-lg p-4 bg-white">
-                      <div className="grid grid-cols-4 gap-4">
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Material</label>
-                          <select
-                            value={reading.material}
-                            onChange={(e) => updateMoistureReading(reading.id, { material: e.target.value as MaterialType })}
-                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                          >
-                            <option>Drywall</option>
-                            <option>Carpet</option>
-                            <option>Pad</option>
-                            <option>Hardwood</option>
-                            <option>Subfloor</option>
-                            <option>Concrete</option>
-                            <option>Baseboard</option>
-                            <option>Insulation</option>
-                          </select>
+                      <div className="flex items-start gap-4">
+                        <div className="flex-1 grid grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Material</label>
+                            <select
+                              value={reading.material}
+                              onChange={(e) => updateMoistureReading(reading.id, { material: e.target.value as MaterialType })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                            >
+                              <option>Drywall</option>
+                              <option>Carpet</option>
+                              <option>Pad</option>
+                              <option>Hardwood</option>
+                              <option>Subfloor</option>
+                              <option>Concrete</option>
+                              <option>Baseboard</option>
+                              <option>Insulation</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Location</label>
+                            <input
+                              type="text"
+                              value={reading.location}
+                              onChange={(e) => updateMoistureReading(reading.id, { location: e.target.value })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                              placeholder="e.g., North wall"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Moisture %</label>
+                            <input
+                              type="number"
+                              value={reading.percentage}
+                              onChange={(e) => updateMoistureReading(reading.id, { percentage: parseFloat(e.target.value) || 0 })}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                              step="0.1"
+                              min="0"
+                              max="100"
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Location</label>
-                          <input
-                            type="text"
-                            value={reading.location}
-                            onChange={(e) => updateMoistureReading(reading.id, { location: e.target.value })}
-                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                            placeholder="e.g., North wall"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Moisture %</label>
-                          <input
-                            type="number"
-                            value={reading.percentage}
-                            onChange={(e) => updateMoistureReading(reading.id, { percentage: parseFloat(e.target.value) || 0 })}
-                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                            step="0.1"
-                            min="0"
-                            max="100"
-                          />
-                        </div>
-                        <div className="flex items-end gap-2">
-                          <label className="flex items-center gap-2 cursor-pointer">
+                        <div className="flex flex-col items-start gap-2 pt-6">
+                          <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
                             <input
                               type="checkbox"
                               checked={reading.isDryStandard}
@@ -712,6 +714,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                           <button
                             onClick={() => deleteMoistureReading(reading.id)}
                             className="p-1 hover:bg-red-50 rounded"
+                            title="Delete reading"
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>
