@@ -186,39 +186,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, ...updates } : r));
   };
 
-  const addMoistureReading = () => {
-    if (!selectedRoom) return;
-
-    const newReading: MoistureReading = {
-      id: `reading-${Date.now()}`,
-      material: 'Drywall - Wall',
-      location: '',
-      percentage: 0,
-      isDryStandard: false,
-      timestamp: new Date(),
-    };
-
-    updateSelectedRoom({
-      moistureReadings: [...selectedRoom.moistureReadings, newReading],
-    });
-  };
-
-  const updateMoistureReading = (readingId: string, updates: Partial<MoistureReading>) => {
-    if (!selectedRoom) return;
-
-    updateSelectedRoom({
-      moistureReadings: selectedRoom.moistureReadings.map(r =>
-        r.id === readingId ? { ...r, ...updates } : r
-      ),
-    });
-  };
-
-  const deleteMoistureReading = (readingId: string) => {
-    if (!selectedRoom) return;
-    updateSelectedRoom({
-      moistureReadings: selectedRoom.moistureReadings.filter(r => r.id !== readingId),
-    });
-  };
+  // NOTE: Old moisture reading functions removed - now using MoistureTabContent component
 
   const updateMaterial = (materialType: MaterialType, updates: Partial<MaterialAffected>) => {
     if (!selectedRoom) return;
