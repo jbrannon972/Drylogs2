@@ -181,11 +181,20 @@ export type MaterialType =
   | 'Sink/Faucet'
   | 'Tub'
   | 'Shower Pan'
-  | 'Appliances'
+  | 'Dishwasher'
+  | 'Refrigerator'
+  | 'Washer'
+  | 'Dryer'
+  | 'Stove/Oven'
+  | 'Microwave'
+  | 'Water Heater'
+  | 'Disposal'
+  | 'Other Appliance'
   | 'Mirror'
   | 'Towel Bars/Accessories'
   // Other
-  | 'Other';
+  | 'Other'
+  | 'Custom'; // For user-defined materials
 
 export type FlooringInstallationType =
   | 'Floating'

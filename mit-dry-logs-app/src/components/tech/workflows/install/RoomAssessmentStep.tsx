@@ -25,12 +25,14 @@ interface MoistureReading {
 
 interface MaterialAffected {
   materialType: MaterialType;
+  customMaterialName?: string; // For 'Custom' material type
   isAffected: boolean;
   squareFootage: number;
   removalRequired: boolean;
   removalReason?: string;
   installationType?: FlooringInstallationType; // For flooring materials only
   notes?: string;
+  id?: string; // Unique ID for custom materials
 }
 
 interface RoomData {
@@ -92,19 +94,22 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   useEffect(() => {
     let needsMigration = false;
     const migratedRooms = rooms.map(room => {
-      // Check if room has old material structure (< 33 materials or has old material names)
-      if (room.materialsAffected.length < 33) {
+      // Check if room has old material structure (< 42 materials or has old material names like 'Appliances')
+      const hasOldAppliances = room.materialsAffected.some(m => m.materialType === 'Appliances' as any);
+      if (room.materialsAffected.length < 42 || hasOldAppliances) {
         needsMigration = true;
+        // Preserve any custom materials that were added
+        const customMaterials = room.materialsAffected.filter(m => m.materialType === 'Custom');
         return {
           ...room,
-          materialsAffected: getDefaultMaterials()
+          materialsAffected: [...getDefaultMaterials(), ...customMaterials]
         };
       }
       return room;
     });
 
     if (needsMigration) {
-      console.log('🔄 Migrating rooms to new material structure');
+      console.log('🔄 Migrating rooms to new material structure (42 materials + appliances)');
       setRooms(migratedRooms);
     }
     // Only run once on mount
@@ -218,6 +223,43 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     });
   };
 
+  const addCustomMaterial = () => {
+    if (!selectedRoom) return;
+
+    const customMaterial: MaterialAffected = {
+      id: `custom-${Date.now()}`,
+      materialType: 'Custom',
+      customMaterialName: '',
+      isAffected: true,
+      squareFootage: 0,
+      removalRequired: true,
+      removalReason: '',
+      notes: '',
+    };
+
+    updateSelectedRoom({
+      materialsAffected: [...selectedRoom.materialsAffected, customMaterial],
+    });
+  };
+
+  const updateCustomMaterial = (id: string, updates: Partial<MaterialAffected>) => {
+    if (!selectedRoom) return;
+
+    updateSelectedRoom({
+      materialsAffected: selectedRoom.materialsAffected.map(m =>
+        m.id === id ? { ...m, ...updates } : m
+      ),
+    });
+  };
+
+  const deleteCustomMaterial = (id: string) => {
+    if (!selectedRoom) return;
+
+    updateSelectedRoom({
+      materialsAffected: selectedRoom.materialsAffected.filter(m => m.id !== id),
+    });
+  };
+
   const handleNext = () => {
     const incompleteRooms = rooms.filter(r => !r.isComplete);
 
@@ -277,7 +319,15 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     { materialType: 'Sink/Faucet', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Tub', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Shower Pan', isAffected: false, squareFootage: 0, removalRequired: false },
-    { materialType: 'Appliances', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Dishwasher', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Refrigerator', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Washer', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Dryer', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Stove/Oven', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Microwave', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Water Heater', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Disposal', isAffected: false, squareFootage: 0, removalRequired: false },
+    { materialType: 'Other Appliance', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Mirror', isAffected: false, squareFootage: 0, removalRequired: false },
     { materialType: 'Towel Bars/Accessories', isAffected: false, squareFootage: 0, removalRequired: false },
 
@@ -772,6 +822,16 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                         <option value="other">Other</option>
                                       </select>
                                     </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                                      <input
+                                        type="text"
+                                        value={material.notes || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="Add any additional details..."
+                                      />
+                                    </div>
                                   </div>
                                 )}
                               </div>
@@ -849,6 +909,16 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                         <option value="other">Other</option>
                                       </select>
                                     </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                                      <input
+                                        type="text"
+                                        value={material.notes || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="Add any additional details..."
+                                      />
+                                    </div>
                                   </div>
                                 </div>
                               )}
@@ -925,6 +995,16 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                         <option value="other">Other</option>
                                       </select>
                                     </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                                      <input
+                                        type="text"
+                                        value={material.notes || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="Add any additional details..."
+                                      />
+                                    </div>
                                   </div>
                                 </div>
                               )}
@@ -999,6 +1079,16 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                         <option value="access">Access Required</option>
                                         <option value="other">Other</option>
                                       </select>
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                                      <input
+                                        type="text"
+                                        value={material.notes || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="Add any additional details..."
+                                      />
                                     </div>
                                   </div>
                                 </div>
@@ -1076,6 +1166,16 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                         <option value="other">Other</option>
                                       </select>
                                     </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                                      <input
+                                        type="text"
+                                        value={material.notes || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="Add any additional details..."
+                                      />
+                                    </div>
                                   </div>
                                 </div>
                               )}
@@ -1151,6 +1251,16 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                         <option value="other">Other</option>
                                       </select>
                                     </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                                      <input
+                                        type="text"
+                                        value={material.notes || ''}
+                                        onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        placeholder="Add any additional details..."
+                                      />
+                                    </div>
                                   </div>
                                 </div>
                               )}
@@ -1170,11 +1280,11 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         <Layers className="w-5 h-5" />
                         Fixtures & Appliances
                         {selectedRoom.materialsAffected.filter(m =>
-                          ['Sink/Faucet', 'Tub', 'Shower Pan', 'Appliances', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType) && m.removalRequired
+                          ['Sink/Faucet', 'Tub', 'Shower Pan', 'Dishwasher', 'Refrigerator', 'Washer', 'Dryer', 'Stove/Oven', 'Microwave', 'Water Heater', 'Disposal', 'Other Appliance', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType) && m.removalRequired
                         ).length > 0 && (
                           <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
                             {selectedRoom.materialsAffected.filter(m =>
-                              ['Sink/Faucet', 'Tub', 'Shower Pan', 'Appliances', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType) && m.removalRequired
+                              ['Sink/Faucet', 'Tub', 'Shower Pan', 'Dishwasher', 'Refrigerator', 'Washer', 'Dryer', 'Stove/Oven', 'Microwave', 'Water Heater', 'Disposal', 'Other Appliance', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType) && m.removalRequired
                             ).length} selected
                           </span>
                         )}
@@ -1184,7 +1294,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                     {expandedCategories.has('fixtures') && (
                       <div className="p-4 space-y-3 bg-white">
                         {selectedRoom.materialsAffected
-                          .filter(m => ['Sink/Faucet', 'Tub', 'Shower Pan', 'Appliances', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType))
+                          .filter(m => ['Sink/Faucet', 'Tub', 'Shower Pan', 'Dishwasher', 'Refrigerator', 'Washer', 'Dryer', 'Stove/Oven', 'Microwave', 'Water Heater', 'Disposal', 'Other Appliance', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType))
                           .map((material) => (
                             <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
                               <label className="flex items-center gap-2 cursor-pointer mb-2">
@@ -1226,6 +1336,16 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                         <option value="other">Other</option>
                                       </select>
                                     </div>
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                                    <input
+                                      type="text"
+                                      value={material.notes || ''}
+                                      onChange={(e) => updateMaterial(material.materialType, { notes: e.target.value })}
+                                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      placeholder="Add any additional details..."
+                                    />
                                   </div>
                                 </div>
                               )}
@@ -1313,6 +1433,122 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                               )}
                             </div>
                           ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CUSTOM MATERIALS SECTION */}
+                  <div className="border-2 border-blue-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory('custom')}
+                      className="w-full px-4 py-3 bg-blue-50 flex items-center justify-between hover:bg-blue-100 transition-colors"
+                    >
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Plus className="w-5 h-5" />
+                        Custom Materials
+                        {selectedRoom.materialsAffected.filter(m => m.materialType === 'Custom').length > 0 && (
+                          <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
+                            {selectedRoom.materialsAffected.filter(m => m.materialType === 'Custom').length} added
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('custom') ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedCategories.has('custom') && (
+                      <div className="p-4 space-y-3 bg-white">
+                        <button
+                          onClick={addCustomMaterial}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        >
+                          <Plus className="w-5 h-5" />
+                          Add Custom Material
+                        </button>
+
+                        {selectedRoom.materialsAffected
+                          .filter(m => m.materialType === 'Custom')
+                          .map((material) => (
+                            <div key={material.id} className="border-2 border-blue-200 rounded-lg p-3 bg-blue-50">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <label className="block text-xs font-medium text-gray-700 mb-1">Material Name</label>
+                                  <input
+                                    type="text"
+                                    value={material.customMaterialName || ''}
+                                    onChange={(e) => updateCustomMaterial(material.id!, { customMaterialName: e.target.value })}
+                                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                    placeholder="e.g., Granite Countertop, Oak Beam, etc."
+                                  />
+                                </div>
+                                <button
+                                  onClick={() => deleteCustomMaterial(material.id!)}
+                                  className="ml-2 p-2 text-red-600 hover:bg-red-50 rounded"
+                                  title="Delete custom material"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+
+                              <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
+                                    <input
+                                      type="number"
+                                      value={material.squareFootage}
+                                      onChange={(e) => updateCustomMaterial(material.id!, { squareFootage: parseFloat(e.target.value) || 0 })}
+                                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                      placeholder="0"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Unit</label>
+                                    <select
+                                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                    >
+                                      <option value="sqft">Square Feet</option>
+                                      <option value="linft">Linear Feet</option>
+                                      <option value="each">Each</option>
+                                    </select>
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 mb-1">Reason for Removal</label>
+                                  <select
+                                    value={material.removalReason || ''}
+                                    onChange={(e) => updateCustomMaterial(material.id!, { removalReason: e.target.value })}
+                                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                  >
+                                    <option value="">Select...</option>
+                                    <option value="saturated">Saturated / Water-logged</option>
+                                    <option value="contaminated">Contaminated (Cat 2/3)</option>
+                                    <option value="visual-contamination">Visual Contamination</option>
+                                    <option value="damaged">Structurally Damaged</option>
+                                    <option value="access">Access Required</option>
+                                    <option value="customer">Customer Request</option>
+                                    <option value="other">Other</option>
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
+                                  <textarea
+                                    value={material.notes || ''}
+                                    onChange={(e) => updateCustomMaterial(material.id!, { notes: e.target.value })}
+                                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                    placeholder="Add details about this custom material..."
+                                    rows={2}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+
+                        {selectedRoom.materialsAffected.filter(m => m.materialType === 'Custom').length === 0 && (
+                          <div className="text-center py-4 text-gray-500 text-sm">
+                            No custom materials added yet. Click the button above to add one.
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
