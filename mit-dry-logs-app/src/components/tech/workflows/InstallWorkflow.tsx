@@ -28,10 +28,8 @@ import { OfficePreparationStep } from './install/OfficePreparationStep';
 import { ArrivalStep } from './install/ArrivalStep';
 import { FrontDoorStep } from './install/FrontDoorStep';
 import { CauseOfLossStep } from './install/CauseOfLossStep';
-import { AddRoomsStep } from './install/AddRoomsStep';
+import { RoomAssessmentStep } from './install/RoomAssessmentStep';
 import { DefineChambersStep } from './install/DefineChambersStep';
-import { AffectedMaterialsStep } from './install/AffectedMaterialsStep';
-import { MoistureMappingStep } from './install/MoistureMappingStep';
 import { PartialDemoStep } from './install/PartialDemoStep';
 import { ScheduleWorkStep } from './install/ScheduleWorkStep';
 import { EquipmentCalcStep } from './install/EquipmentCalcStep';
@@ -89,11 +87,11 @@ const INSTALL_STEPS: StepConfig[] = [
     component: CauseOfLossStep,
   },
   {
-    id: 'add-rooms',
-    title: 'Add Rooms',
-    description: 'Measure and add all rooms',
+    id: 'room-assessment',
+    title: 'Room Assessment',
+    description: 'Measure, moisture map, and assess all rooms',
     icon: <Ruler className="w-5 h-5" />,
-    component: AddRoomsStep,
+    component: RoomAssessmentStep,
   },
   {
     id: 'define-chambers',
@@ -101,20 +99,6 @@ const INSTALL_STEPS: StepConfig[] = [
     description: 'Group rooms into drying zones',
     icon: <Wind className="w-5 h-5" />,
     component: DefineChambersStep,
-  },
-  {
-    id: 'affected-materials',
-    title: 'Materials for Removal',
-    description: 'Document materials to demo per room',
-    icon: <Layers className="w-5 h-5" />,
-    component: AffectedMaterialsStep,
-  },
-  {
-    id: 'moisture-mapping',
-    title: 'Moisture Mapping',
-    description: 'Readings + photos per room',
-    icon: <Droplets className="w-5 h-5" />,
-    component: MoistureMappingStep,
   },
   {
     id: 'partial-demo',

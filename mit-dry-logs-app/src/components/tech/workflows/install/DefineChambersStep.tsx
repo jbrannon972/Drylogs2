@@ -23,7 +23,7 @@ interface RoomData {
 
 export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
-  const rooms: RoomData[] = installData.rooms || [];
+  const rooms: RoomData[] = installData.roomAssessments || [];
 
   const [chambers, setChambers] = useState<DryingChamber[]>([]);
   const [editingChamberId, setEditingChamberId] = useState<string | null>(null);
