@@ -5,10 +5,10 @@
  */
 
 import React, { useState } from 'react';
-import { collection, doc, setDoc, getDocs, deleteDoc, writeBatch, Timestamp } from 'firebase/firestore';
+import { collection, doc, setDoc, getDocs, writeBatch, Timestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Job } from '../../types';
-import { Database, Trash2, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { Database, Loader, CheckCircle, AlertCircle } from 'lucide-react';
 
 export const DataSeedingPage: React.FC = () => {
   const [isSeeding, setIsSeeding] = useState(false);
@@ -16,7 +16,6 @@ export const DataSeedingPage: React.FC = () => {
   const [jobsCreated, setJobsCreated] = useState<number>(0);
   const [error, setError] = useState<string>('');
 
-  // Helper functions
   const daysAgo = (days: number, hours: number = 9) => {
     const date = new Date();
     date.setDate(date.getDate() - days);
@@ -47,203 +46,17 @@ export const DataSeedingPage: React.FC = () => {
   };
 
   const generateComprehensiveJobs = (): Job[] => {
-    // Generate 15 comprehensive jobs across all phases
-    const jobs: Partial<Job>[] = [
-      // JOB 1: Pre-Install
-      {
-        jobId: 'JOB-2024-001',
-        jobStatus: 'Pre-Install',
-        customerInfo: {
-          name: 'Anderson Family',
-          address: '1523 Maple Ave',
-          city: 'Houston',
-          state: 'TX',
-          zipCode: '77001',
-          phoneNumber: '(713) 555-1001',
-          email: 'anderson@email.com',
-          coordinates: { latitude: 29.7604, longitude: -95.3698 },
-        },
-        insuranceInfo: {
-          carrierName: 'State Farm',
-          policyNumber: 'SF-1001',
-          claimNumber: 'CLM-1001',
-          adjusterName: 'Mike Peterson',
-          adjusterPhone: '(800) 555-1001',
-          adjusterEmail: 'mpeterson@statefarm.com',
-          deductible: 1000,
-          estimatedValue: 5000,
-          categoryOfWater: 'Category 1',
-        },
-        causeOfLoss: {
-          type: 'Burst Pipe',
-          description: 'Kitchen sink supply line failed',
-          location: 'Kitchen',
-          discoveryDate: hoursAgo(12),
-          eventDate: hoursAgo(14),
-        },
-        scheduledDate: hoursAgo(-24),
-        psmData: {
-          psmPhase: {
-            status: 'field-complete',
-            assignedPSM: 'Sarah Johnson',
-            daysInPhase: 0,
-            notes: 'New job - install scheduled',
-          },
-          redFlags: [],
-          documentationReview: {
-            photosComplete: false,
-            moistureReadingsComplete: false,
-            equipmentLogsComplete: false,
-            workAuthorizationSigned: false,
-            missingItems: ['Pending job start'],
-            reviewedAt: hoursAgo(10),
-            reviewedBy: 'PSM-001',
-          },
-          adjusterCommunications: [{
-            communicationId: 'comm-001',
-            adjusterName: 'Mike Peterson',
-            contactMethod: 'phone',
-            timestamp: hoursAgo(11),
-            subject: 'Initial claim',
-            summary: 'Coverage confirmed',
-            followUpRequired: false,
-            sentBy: 'office',
-          }],
-          approvalStatus: {
-            scopeApproved: true,
-            scopeApprovedAt: hoursAgo(11),
-            scopeApprovedBy: 'Mike Peterson',
-            estimateSubmitted: false,
-            estimateApproved: false,
-            currentEstimateAmount: 5000,
-            notes: 'Verbal approval',
-          },
-          homeownerCommunications: [],
-          invoice: {
-            invoiceNumber: '',
-            generatedAt: undefined,
-            generatedBy: '',
-            totalAmount: 0,
-            lineItems: [],
-            sentToAdjuster: false,
-            paidInFull: false,
-          },
-        },
-      },
+    const jobs: Job[] = [];
 
-      // JOB 2: Install In Progress
-      {
-        jobId: 'JOB-2024-002',
-        jobStatus: 'Install',
-        customerInfo: {
-          name: 'Chen Residence',
-          address: '4567 Oak St',
-          city: 'Houston',
-          state: 'TX',
-          zipCode: '77002',
-          phoneNumber: '(713) 555-1002',
-          email: 'chen@email.com',
-          coordinates: { latitude: 29.7504, longitude: -95.3598 },
-        },
-        insuranceInfo: {
-          carrierName: 'Farmers',
-          policyNumber: 'FM-1002',
-          claimNumber: 'CLM-1002',
-          adjusterName: 'Lisa Wong',
-          adjusterPhone: '(800) 555-1002',
-          adjusterEmail: 'lwong@farmers.com',
-          deductible: 2500,
-          estimatedValue: 15000,
-          categoryOfWater: 'Category 2',
-        },
-        causeOfLoss: {
-          type: 'Appliance Leak',
-          description: 'Washing machine overflow',
-          location: 'Laundry room',
-          discoveryDate: hoursAgo(8),
-          eventDate: hoursAgo(10),
-        },
-        scheduledDate: hoursAgo(2),
-        workflowPhases: {
-          install: {
-            status: 'in-progress',
-            startedAt: hoursAgo(2),
-            technician: 'tech1',
-            notes: 'On-site setting equipment',
-          },
-          demo: { status: 'pending' },
-          checkService: { status: 'pending', visits: [] },
-          pull: { status: 'pending' },
-        },
-        psmData: {
-          psmPhase: {
-            status: 'field-complete',
-            assignedPSM: 'Sarah Johnson',
-            daysInPhase: 0,
-            notes: 'Active install',
-          },
-          redFlags: [{
-            flagId: 'flag-002',
-            type: 'scope',
-            severity: 'medium',
-            description: 'Possible category upgrade',
-            detectedAt: hoursAgo(2),
-            resolved: false,
-          }],
-          documentationReview: {
-            photosComplete: false,
-            moistureReadingsComplete: false,
-            equipmentLogsComplete: false,
-            workAuthorizationSigned: true,
-            missingItems: ['Photos', 'Readings'],
-            reviewedAt: hoursAgo(1),
-            reviewedBy: 'PSM-001',
-          },
-          adjusterCommunications: [{
-            communicationId: 'comm-002',
-            adjusterName: 'Lisa Wong',
-            contactMethod: 'email',
-            timestamp: hoursAgo(8),
-            subject: 'Emergency authorization',
-            summary: 'Verbal approval received',
-            followUpRequired: true,
-            sentBy: 'tech1',
-          }],
-          approvalStatus: {
-            scopeApproved: true,
-            scopeApprovedAt: hoursAgo(8),
-            scopeApprovedBy: 'Lisa Wong',
-            estimateSubmitted: false,
-            estimateApproved: false,
-            currentEstimateAmount: 15000,
-            notes: 'Formal estimate due 24h',
-          },
-          homeownerCommunications: [],
-          invoice: {
-            invoiceNumber: '',
-            generatedAt: undefined,
-            generatedBy: '',
-            totalAmount: 0,
-            lineItems: [],
-            sentToAdjuster: false,
-            paidInFull: false,
-          },
-        },
-      },
-
-      // Add more jobs (JOB-003 through JOB-015)
-      // For brevity, I'll create a generator function
-    ];
-
-    // Generate remaining jobs programmatically
-    for (let i = 3; i <= 15; i++) {
+    // Generate 15 jobs with correct type structure
+    for (let i = 1; i <= 15; i++) {
       const jobNum = i.toString().padStart(3, '0');
-      const status = ['Demo', 'Check Service', 'Pull', 'Complete'][i % 4] as Job['jobStatus'];
+      const statuses: Job['jobStatus'][] = ['Pre-Install', 'Install', 'Demo', 'Check Service', 'Pull', 'Complete'];
+      const status = statuses[i % statuses.length];
       const daysOld = Math.floor(i / 2);
 
-      jobs.push({
+      const job: Job = {
         jobId: `JOB-2024-${jobNum}`,
-        jobStatus: status,
         customerInfo: {
           name: `Customer ${i}`,
           address: `${1000 + i} Test St`,
@@ -263,53 +76,134 @@ export const DataSeedingPage: React.FC = () => {
           adjusterEmail: `adjuster${i}@insurance.com`,
           deductible: 1000 + (i * 500),
           estimatedValue: 5000 + (i * 2000),
-          categoryOfWater: ['Category 1', 'Category 2', 'Category 3'][i % 3] as Job['insuranceInfo']['categoryOfWater'],
+          categoryOfWater: ['Category 1', 'Category 2', 'Category 3'][i % 3] as any,
         },
         causeOfLoss: {
-          type: ['Burst Pipe', 'Flooding', 'Appliance Leak', 'Sewage Backup'][i % 4] as Job['causeOfLoss']['type'],
+          type: ['Burst Pipe', 'Flooding', 'Appliance Leak', 'Sewage Backup'][i % 4] as any,
           description: `Loss description for job ${i}`,
           location: ['Kitchen', 'Bathroom', 'Basement', 'Attic'][i % 4],
           discoveryDate: daysAgo(daysOld, 8),
           eventDate: daysAgo(daysOld, 6),
         },
-        scheduledDate: daysAgo(daysOld, 9),
+        jobStatus: status,
         workflowPhases: {
           install: {
-            status: 'completed',
-            startedAt: daysAgo(daysOld, 9),
-            completedAt: daysAgo(daysOld, 13),
-            technician: 'tech1',
-            notes: 'Completed install',
+            status: status === 'Pre-Install' ? 'pending' : 'completed',
+            ...(status !== 'Pre-Install' && {
+              startedAt: daysAgo(daysOld, 9),
+              completedAt: daysAgo(daysOld, 13),
+              technician: 'tech1',
+              notes: 'Completed install',
+            }),
           },
           demo: {
-            status: status === 'Demo' || status === 'Check Service' || status === 'Pull' || status === 'Complete' ? 'completed' : 'pending',
-            ...(status !== 'Pre-Install' && status !== 'Install' && {
-              startedAt: daysAgo(daysOld - 1, 10),
-              completedAt: daysAgo(daysOld - 1, 14),
+            status: ['Demo', 'Check Service', 'Pull', 'Complete'].includes(status) ? 'completed' : 'pending',
+            ...(['Demo', 'Check Service', 'Pull', 'Complete'].includes(status) && {
+              startedAt: daysAgo(Math.max(1, daysOld - 1), 10),
+              completedAt: daysAgo(Math.max(1, daysOld - 1), 14),
               technician: 'tech1',
             }),
           },
           checkService: {
-            status: status === 'Check Service' || status === 'Pull' || status === 'Complete' ? 'in-progress' : 'pending',
-            visits: status === 'Check Service' || status === 'Pull' || status === 'Complete' ? [
-              {
-                visitNumber: 1,
-                startedAt: daysAgo(Math.max(1, daysOld - 2), 10),
-                completedAt: daysAgo(Math.max(1, daysOld - 2), 10.5),
-                technician: 'tech1',
-                notes: 'Check service visit',
-                readingsVerified: true,
-              }
-            ] : [],
+            status: ['Check Service', 'Pull', 'Complete'].includes(status) ? 'in-progress' : 'pending',
+            visits: ['Check Service', 'Pull', 'Complete'].includes(status) ? [{
+              visitNumber: 1,
+              startedAt: daysAgo(Math.max(1, daysOld - 2), 10),
+              completedAt: daysAgo(Math.max(1, daysOld - 2), 10.5),
+              technician: 'tech1',
+              notes: 'Check service visit',
+              readingsVerified: true,
+            }] : [],
           },
           pull: {
-            status: status === 'Pull' || status === 'Complete' ? 'completed' : 'pending',
+            status: status === 'Complete' ? 'completed' : 'pending',
             ...(status === 'Complete' && {
               startedAt: daysAgo(1, 10),
               completedAt: daysAgo(1, 11),
               technician: 'tech1',
             }),
           },
+        },
+        rooms: [],
+        equipment: {
+          chambers: [],
+          calculations: {
+            totalAffectedSquareFootage: 100 + (i * 50),
+            totalCubicFootage: 800 + (i * 400),
+            estimatedDryingDays: 3 + (i % 5),
+            recommendedDehumidifierCount: 1 + (i % 3),
+            recommendedAirMoverCount: 2 + (i % 4),
+            recommendedAirScrubberCount: i % 5 === 0 ? 1 : 0,
+            calculationMethod: 'IICRC S500',
+            lastCalculatedAt: daysAgo(Math.floor(i / 2)),
+            calculatedBy: 'tech1',
+            waterClass: ['Class 1', 'Class 2', 'Class 3'][i % 3] as any,
+            waterCategory: ['Category 1', 'Category 2', 'Category 3'][i % 3] as any,
+          },
+        },
+        safetyChecklist: {
+          preArrivalInspection: true,
+          containmentSetup: false,
+          ppeEquipped: true,
+          safetyConesPlaced: true,
+          utilityLocations: {
+            electrical: true,
+            gas: true,
+            water: true,
+            verified: true,
+            verifiedAt: daysAgo(Math.floor(i / 2)),
+          },
+          hazardsIdentified: [],
+        },
+        communication: {
+          groundRulesPresented: true,
+          estimatedTimeline: `${3 + (i % 5)} days`,
+          customerConcerns: [],
+          preExistingConditions: [],
+        },
+        financial: {
+          insuranceDeductible: 1000 + (i * 500),
+          estimatedMaterials: 500 + (i * 200),
+          estimatedLabor: 1500 + (i * 300),
+          estimatedTotal: 5000 + (i * 2000),
+          actualExpenses: {
+            materials: 500 + (i * 200),
+            labor: 1500 + (i * 300),
+            equipment: 200 + (i * 50),
+            total: 2200 + (i * 550),
+          },
+          paymentStatus: status === 'Complete' && i % 2 === 0 ? 'paid' : 'unpaid',
+          paymentMethod: 'insurance',
+          payments: [],
+        },
+        documentation: {
+          matterportScan: {
+            completed: status === 'Complete',
+            ...(status === 'Complete' && {
+              url: `https://matterport.com/scan/${i}`,
+              scanDate: daysAgo(1),
+            }),
+          },
+          certificateOfSatisfaction: {
+            obtained: status === 'Complete',
+            ...(status === 'Complete' && {
+              signedDate: daysAgo(1),
+            }),
+          },
+          dryReleaseWaiver: {
+            needed: false,
+            obtained: false,
+          },
+        },
+        scheduledZone: ['Zone 1', 'Zone 2', 'Zone 3', '2nd Shift'][i % 4] as any,
+        scheduledTechnician: 'tech1',
+        scheduledDate: daysAgo(Math.floor(i / 2) + 1),
+        metadata: {
+          createdAt: daysAgo(Math.floor(i / 2) + 1),
+          createdBy: 'tech1',
+          lastModifiedAt: daysAgo(Math.max(0, Math.floor(i / 3))),
+          lastModifiedBy: 'tech1',
+          version: i + 1,
         },
         psmData: {
           psmPhase: {
@@ -319,150 +213,76 @@ export const DataSeedingPage: React.FC = () => {
             notes: `PSM notes for job ${i}`,
           },
           redFlags: i % 4 === 0 ? [{
-            flagId: `flag-${jobNum}`,
-            type: 'documentation',
+            id: `flag-${jobNum}`,
+            type: 'missing-photos',
             severity: 'medium',
-            description: 'Sample red flag',
+            description: 'Some documentation photos missing',
             detectedAt: daysAgo(daysOld),
             resolved: i % 8 === 0,
           }] : [],
           documentationReview: {
-            photosComplete: i % 3 !== 0,
-            moistureReadingsComplete: i % 3 !== 1,
-            equipmentLogsComplete: i % 3 !== 2,
-            workAuthorizationSigned: true,
-            missingItems: i % 3 === 0 ? ['Photos'] : [],
-            reviewedAt: daysAgo(daysOld),
+            checklist: {
+              allRoomsPhotographed: i % 3 !== 0,
+              moistureReadingsComplete: i % 3 !== 1,
+              equipmentScanned: i % 3 !== 2,
+              demoDocumented: true,
+              customerSignatures: true,
+              matterportCompleted: status === 'Complete',
+            },
+            missingItems: i % 3 === 0 ? ['Room photos'] : [],
             reviewedBy: 'PSM-001',
+            reviewedAt: daysAgo(daysOld),
+            readyForSubmission: i % 2 === 0,
           },
           adjusterCommunications: [{
-            communicationId: `comm-${jobNum}`,
-            adjusterName: `Adjuster ${i}`,
-            contactMethod: 'email',
+            id: `comm-${jobNum}`,
+            communicationType: 'email',
             timestamp: daysAgo(daysOld),
-            subject: 'Claim communication',
-            summary: 'Communication summary',
-            followUpRequired: false,
-            sentBy: 'PSM-001',
+            contactedBy: 'PSM-001',
+            summary: 'Initial claim communication',
+            questionsAsked: ['Coverage confirmation'],
+            answersProvided: ['Coverage confirmed'],
+            nextStep: 'Submit estimate',
           }],
           approvalStatus: {
-            scopeApproved: true,
-            scopeApprovedAt: daysAgo(daysOld),
-            scopeApprovedBy: `Adjuster ${i}`,
-            estimateSubmitted: i > 5,
-            estimateApproved: i > 10,
-            currentEstimateAmount: 5000 + (i * 2000),
-            notes: `Approval notes for job ${i}`,
+            demoScope: i > 5 ? 'approved' : 'pending',
+            demoAmount: {
+              requested: 2000 + (i * 500),
+              approved: i > 10 ? 2000 + (i * 500) : 0,
+              deniedAmount: 0,
+            },
+            equipmentPlan: 'approved',
+            billableItems: {},
+            conditionalApprovals: [],
           },
           homeownerCommunications: [],
           invoice: {
-            invoiceNumber: status === 'Complete' ? `INV-${jobNum}` : '',
-            generatedAt: status === 'Complete' ? daysAgo(1) : undefined,
-            generatedBy: status === 'Complete' ? 'PSM-001' : '',
-            totalAmount: status === 'Complete' ? 5000 + (i * 2000) : 0,
+            generated: status === 'Complete',
+            ...(status === 'Complete' && {
+              generatedAt: daysAgo(1),
+              generatedBy: 'PSM-001',
+              invoiceNumber: `INV-${jobNum}`,
+            }),
             lineItems: status === 'Complete' ? [{
               description: 'Mitigation services',
               quantity: 1,
-              rate: 5000 + (i * 2000),
-              total: 5000 + (i * 2000),
+              unitPrice: 5000 + (i * 2000),
+              totalPrice: 5000 + (i * 2000),
+              approvalStatus: 'approved',
             }] : [],
-            sentToAdjuster: status === 'Complete',
-            paidInFull: status === 'Complete' && i % 2 === 0,
+            subtotal: status === 'Complete' ? 5000 + (i * 2000) : 0,
+            tax: status === 'Complete' ? (5000 + (i * 2000)) * 0.0825 : 0,
+            total: status === 'Complete' ? (5000 + (i * 2000)) * 1.0825 : 0,
+            amountDue: status === 'Complete' && i % 2 !== 0 ? (5000 + (i * 2000)) * 1.0825 : 0,
+            status: status === 'Complete' ? (i % 2 === 0 ? 'paid' : 'approved') : 'draft',
           },
         },
-      });
+      };
+
+      jobs.push(job);
     }
 
-    // Fill in required fields for all jobs
-    return jobs.map((job, index) => ({
-      ...job,
-      rooms: [],
-      equipment: {
-        chambers: [],
-        calculations: {
-          totalAffectedSquareFootage: 100 + (index * 50),
-          totalCubicFootage: 800 + (index * 400),
-          estimatedDryingDays: 3 + (index % 5),
-          recommendedDehumidifierCount: 1 + (index % 3),
-          recommendedAirMoverCount: 2 + (index % 4),
-          recommendedAirScrubberCount: index % 5 === 0 ? 1 : 0,
-          calculationMethod: 'IICRC S500',
-          lastCalculatedAt: daysAgo(Math.floor(index / 2)),
-          calculatedBy: 'tech1',
-          waterClass: ['Class 1', 'Class 2', 'Class 3'][index % 3] as any,
-          waterCategory: job.insuranceInfo?.categoryOfWater || 'Category 1',
-        },
-      },
-      safetyChecklist: {
-        preArrivalInspection: true,
-        containmentSetup: job.insuranceInfo?.categoryOfWater === 'Category 3',
-        ppeEquipped: true,
-        safetyConesPlaced: true,
-        utilityLocations: {
-          electrical: true,
-          gas: true,
-          water: true,
-          verified: true,
-          verifiedAt: daysAgo(Math.floor(index / 2)),
-        },
-        hazardsIdentified: [],
-      },
-      communication: {
-        groundRulesPresented: true,
-        estimatedTimeline: `${3 + (index % 5)} days`,
-        customerConcerns: [],
-        preExistingConditions: [],
-      },
-      financial: {
-        insuranceDeductible: job.insuranceInfo?.deductible || 1000,
-        estimatedMaterials: 500 + (index * 200),
-        estimatedLabor: 1500 + (index * 300),
-        estimatedTotal: job.insuranceInfo?.estimatedValue || 5000,
-        actualExpenses: {
-          materials: 500 + (index * 200),
-          labor: 1500 + (index * 300),
-          equipment: 200 + (index * 50),
-          total: 2200 + (index * 550),
-        },
-        paymentStatus: job.jobStatus === 'Complete' && index % 2 === 0 ? 'paid' : 'unpaid',
-        paymentMethod: 'insurance',
-        payments: [],
-      },
-      documentation: {
-        matterportScan: {
-          completed: job.jobStatus === 'Complete',
-          ...(job.jobStatus === 'Complete' && {
-            url: `https://matterport.com/scan/${index}`,
-            scanDate: daysAgo(1),
-          }),
-        },
-        certificateOfSatisfaction: {
-          obtained: job.jobStatus === 'Complete',
-          ...(job.jobStatus === 'Complete' && {
-            signedDate: daysAgo(1),
-          }),
-        },
-        dryReleaseWaiver: {
-          needed: false,
-          obtained: false,
-        },
-      },
-      scheduledZone: ['Zone 1', 'Zone 2', 'Zone 3', '2nd Shift'][index % 4] as any,
-      scheduledTechnician: 'tech1',
-      metadata: {
-        createdAt: daysAgo(Math.floor(index / 2) + 1),
-        createdBy: 'tech1',
-        lastModifiedAt: daysAgo(Math.max(0, Math.floor(index / 3))),
-        lastModifiedBy: 'tech1',
-        version: index + 1,
-      },
-      workflowPhases: job.workflowPhases || {
-        install: { status: 'pending' },
-        demo: { status: 'pending' },
-        checkService: { status: 'pending', visits: [] },
-        pull: { status: 'pending' },
-      },
-    })) as Job[];
+    return jobs;
   };
 
   const seedDatabase = async () => {
@@ -471,10 +291,8 @@ export const DataSeedingPage: React.FC = () => {
     setJobsCreated(0);
 
     try {
-      // Step 1: Clear existing jobs
       await clearAllJobs();
 
-      // Step 2: Generate and seed new jobs
       setStatus('Generating comprehensive PSM job data...');
       const jobs = generateComprehensiveJobs();
 

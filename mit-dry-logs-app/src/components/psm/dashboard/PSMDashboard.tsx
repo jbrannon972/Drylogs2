@@ -257,14 +257,14 @@ export const PSMDashboard: React.FC = () => {
             <div class="value">${job.psmData.psmPhase.assignedPSM}</div>
             <div class="label">Days in Phase:</div>
             <div class="value">${job.psmData.psmPhase.daysInPhase}</div>
-            <div class="label">Scope Approved:</div>
-            <div class="value">${job.psmData.approvalStatus.scopeApproved ? 'Yes' : 'No'}</div>
-            <div class="label">Estimate Submitted:</div>
-            <div class="value">${job.psmData.approvalStatus.estimateSubmitted ? 'Yes' : 'No'}</div>
-            <div class="label">Estimate Approved:</div>
-            <div class="value">${job.psmData.approvalStatus.estimateApproved ? 'Yes' : 'No'}</div>
-            <div class="label">Current Estimate:</div>
-            <div class="value">$${job.psmData.approvalStatus.currentEstimateAmount.toLocaleString()}</div>
+            <div class="label">Demo Scope:</div>
+            <div class="value">${job.psmData.approvalStatus.demoScope.toUpperCase()}</div>
+            <div class="label">Demo Amount Requested:</div>
+            <div class="value">$${job.psmData.approvalStatus.demoAmount.requested.toLocaleString()}</div>
+            <div class="label">Demo Amount Approved:</div>
+            <div class="value">$${job.psmData.approvalStatus.demoAmount.approved.toLocaleString()}</div>
+            <div class="label">Equipment Plan:</div>
+            <div class="value">${job.psmData.approvalStatus.equipmentPlan.toUpperCase()}</div>
           </div>
         </div>
         ` : ''}
