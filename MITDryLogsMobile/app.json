@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "MIT Dry Logs",
+    "slug": "mit-dry-logs-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FF6B35"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.entrusted.mitdrylogs",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to your camera to capture job site photos and document equipment installations.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to save and upload job documentation.",
+        "NSLocationWhenInUseUsageDescription": "This app needs your location to verify job site arrival and track mileage.",
+        "NSLocationAlwaysUsageDescription": "This app needs your location to track job site visits and equipment placement."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.entrusted.mitdrylogs",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow MIT Dry Logs to access your camera to capture job site photos."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow MIT Dry Logs to use your location to verify job site arrival."
+        }
+      ]
+    ]
+  }
+}
