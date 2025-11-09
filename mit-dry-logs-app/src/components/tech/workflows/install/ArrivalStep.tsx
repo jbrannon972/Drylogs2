@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
-import { Camera, MapPin, Clock } from 'lucide-react';
+import { Camera, MapPin, Clock, CheckCircle } from 'lucide-react';
 import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
@@ -27,11 +27,11 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   const [travelTimeToSite, setTravelTimeToSite] = useState(
     installData.travelTimeToSite || 0
   );
-  const [truckPhoto, setTruckPhoto] = useState<string | null>(
-    installData.truckPhoto || null
+  const [hasTruckPhoto, setHasTruckPhoto] = useState<boolean>(
+    installData.hasTruckPhoto || false
   );
-  const [propertyPhoto, setPropertyPhoto] = useState<string | null>(
-    installData.propertyPhoto || null
+  const [hasPropertyPhoto, setHasPropertyPhoto] = useState<boolean>(
+    installData.hasPropertyPhoto || false
   );
 
   // ULTRAFAULT: Save to workflow store when data changes with debounce
@@ -40,42 +40,44 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
       updateWorkflowData('install', {
         arrivalTime,
         travelTimeToSite,
-        truckPhoto,
-        propertyPhoto,
+        hasTruckPhoto,
+        hasPropertyPhoto,
       });
     }, 100); // 100ms debounce
 
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [arrivalTime, travelTimeToSite, truckPhoto, propertyPhoto]);
+  }, [arrivalTime, travelTimeToSite, hasTruckPhoto, hasPropertyPhoto]);
 
   const handleTruckPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user) {
-      // Queue photo for background upload
-      await queuePhoto(file, job.jobId, 'exterior', 'Exterior', 'arrival');
-
-      // Create preview for immediate display
-      const reader = new FileReader();
-      reader.onload = (e) => setTruckPhoto(e.target?.result as string);
-      reader.readAsDataURL(file);
+    const files = e.target.files;
+    if (files && user) {
+      // Queue all selected photos for background upload
+      for (let i = 0; i < files.length; i++) {
+        await queuePhoto(files[i], job.jobId, 'exterior', 'Exterior', 'arrival');
+      }
+      // Mark as taken
+      setHasTruckPhoto(true);
     }
+    // Reset input to allow selecting same file again
+    e.target.value = '';
   };
 
   const handlePropertyPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user) {
-      // Queue photo for background upload
-      await queuePhoto(file, job.jobId, 'exterior', 'Exterior', 'arrival');
-
-      // Create preview for immediate display
-      const reader = new FileReader();
-      reader.onload = (e) => setPropertyPhoto(e.target?.result as string);
-      reader.readAsDataURL(file);
+    const files = e.target.files;
+    if (files && user) {
+      // Queue all selected photos for background upload
+      for (let i = 0; i < files.length; i++) {
+        await queuePhoto(files[i], job.jobId, 'exterior', 'Exterior', 'arrival');
+      }
+      // Mark as taken
+      setHasPropertyPhoto(true);
     }
+    // Reset input to allow selecting same file again
+    e.target.value = '';
   };
 
-  const canProceed = truckPhoto && propertyPhoto;
+  const canProceed = hasTruckPhoto && hasPropertyPhoto;
 
   return (
     <div className="space-y-6">
@@ -127,27 +129,27 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
           Truck Location Photo *
         </label>
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-          {truckPhoto ? (
-            <div>
-              <img src={truckPhoto} alt="Truck" className="max-h-48 mx-auto mb-2 rounded" />
-              <p className="text-sm text-green-600 font-medium">✓ Photo uploaded</p>
-            </div>
-          ) : (
-            <div>
-              <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-              <label className="btn-primary cursor-pointer inline-block">
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handleTruckPhoto}
-                  className="hidden"
-                />
-                Take Truck Photo
-              </label>
-              <p className="text-xs text-gray-500 mt-2">Required for safety documentation</p>
-            </div>
-          )}
+          <div>
+            {hasTruckPhoto && (
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="text-sm text-green-600 font-medium">Photo queued</span>
+              </div>
+            )}
+            <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+            <label className="btn-primary cursor-pointer inline-block">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleTruckPhoto}
+                className="hidden"
+                multiple
+              />
+              {hasTruckPhoto ? 'Add Another Photo' : 'Take Truck Photo'}
+            </label>
+            <p className="text-xs text-gray-500 mt-2">Required for safety documentation</p>
+          </div>
         </div>
       </div>
 
@@ -157,26 +159,26 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
           Property Exterior Photo *
         </label>
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-          {propertyPhoto ? (
-            <div>
-              <img src={propertyPhoto} alt="Property" className="max-h-48 mx-auto mb-2 rounded" />
-              <p className="text-sm text-green-600 font-medium">✓ Photo uploaded</p>
-            </div>
-          ) : (
-            <div>
-              <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-              <label className="btn-primary cursor-pointer inline-block">
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handlePropertyPhoto}
-                  className="hidden"
-                />
-                Take Property Photo
-              </label>
-            </div>
-          )}
+          <div>
+            {hasPropertyPhoto && (
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="text-sm text-green-600 font-medium">Photo queued</span>
+              </div>
+            )}
+            <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+            <label className="btn-primary cursor-pointer inline-block">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handlePropertyPhoto}
+                className="hidden"
+                multiple
+              />
+              {hasPropertyPhoto ? 'Add Another Photo' : 'Take Property Photo'}
+            </label>
+          </div>
         </div>
       </div>
 
