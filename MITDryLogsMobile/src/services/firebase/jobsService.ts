@@ -1,25 +1,12 @@
 /**
- * Firebase Jobs Service
+ * Firebase Jobs Service - React Native Version
  */
 
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy,
-  limit,
-  onSnapshot,
-  serverTimestamp,
-  Timestamp,
-} from 'firebase/firestore';
-import { db } from '../../config/firebase';
+import firestore from '@react-native-firebase/firestore';
 import { Job, JobStatus, Zone } from '../../types';
+
+// Type alias for compatibility
+type FirebaseFirestoreTypes = typeof firestore;
 
 export const jobsService = {
   /**
@@ -27,7 +14,7 @@ export const jobsService = {
    */
   async getAllJobs(): Promise<Job[]> {
     try {
-      const jobsSnapshot = await getDocs(collection(db, 'jobs'));
+      const jobsSnapshot = await firestore().collection('jobs').get();
       return jobsSnapshot.docs.map((doc) => ({
         ...doc.data(),
         jobId: doc.id,
@@ -43,9 +30,9 @@ export const jobsService = {
    */
   async getJobById(jobId: string): Promise<Job | null> {
     try {
-      const jobDoc = await getDoc(doc(db, 'jobs', jobId));
+      const jobDoc = await firestore().collection('jobs').doc(jobId).get();
 
-      if (!jobDoc.exists()) {
+      if (!jobDoc.exists) {
         return null;
       }
 
@@ -64,13 +51,12 @@ export const jobsService = {
    */
   async getJobsByTechnician(technicianId: string): Promise<Job[]> {
     try {
-      const q = query(
-        collection(db, 'jobs'),
-        where('scheduledTechnician', '==', technicianId),
-        orderBy('scheduledDate', 'desc')
-      );
+      const jobsSnapshot = await firestore()
+        .collection('jobs')
+        .where('scheduledTechnician', '==', technicianId)
+        .orderBy('scheduledDate', 'desc')
+        .get();
 
-      const jobsSnapshot = await getDocs(q);
       return jobsSnapshot.docs.map((doc) => ({
         ...doc.data(),
         jobId: doc.id,
@@ -86,13 +72,12 @@ export const jobsService = {
    */
   async getJobsByZone(zone: Zone): Promise<Job[]> {
     try {
-      const q = query(
-        collection(db, 'jobs'),
-        where('scheduledZone', '==', zone),
-        orderBy('scheduledDate', 'desc')
-      );
+      const jobsSnapshot = await firestore()
+        .collection('jobs')
+        .where('scheduledZone', '==', zone)
+        .orderBy('scheduledDate', 'desc')
+        .get();
 
-      const jobsSnapshot = await getDocs(q);
       return jobsSnapshot.docs.map((doc) => ({
         ...doc.data(),
         jobId: doc.id,
@@ -108,13 +93,12 @@ export const jobsService = {
    */
   async getJobsByStatus(status: JobStatus): Promise<Job[]> {
     try {
-      const q = query(
-        collection(db, 'jobs'),
-        where('jobStatus', '==', status),
-        orderBy('scheduledDate', 'desc')
-      );
+      const jobsSnapshot = await firestore()
+        .collection('jobs')
+        .where('jobStatus', '==', status)
+        .orderBy('scheduledDate', 'desc')
+        .get();
 
-      const jobsSnapshot = await getDocs(q);
       return jobsSnapshot.docs.map((doc) => ({
         ...doc.data(),
         jobId: doc.id,
@@ -133,15 +117,15 @@ export const jobsService = {
       const newJob = {
         ...jobData,
         metadata: {
-          createdAt: serverTimestamp(),
+          createdAt: firestore.FieldValue.serverTimestamp(),
           createdBy: jobData.scheduledTechnician,
-          lastModifiedAt: serverTimestamp(),
+          lastModifiedAt: firestore.FieldValue.serverTimestamp(),
           lastModifiedBy: jobData.scheduledTechnician,
           version: 1,
         },
       };
 
-      const docRef = await addDoc(collection(db, 'jobs'), newJob);
+      const docRef = await firestore().collection('jobs').add(newJob);
 
       return {
         ...newJob,
@@ -158,11 +142,14 @@ export const jobsService = {
    */
   async updateJob(jobId: string, updates: Partial<Job>, userId: string): Promise<void> {
     try {
-      await updateDoc(doc(db, 'jobs', jobId), {
-        ...updates,
-        'metadata.lastModifiedAt': serverTimestamp(),
-        'metadata.lastModifiedBy': userId,
-      });
+      await firestore()
+        .collection('jobs')
+        .doc(jobId)
+        .update({
+          ...updates,
+          'metadata.lastModifiedAt': firestore.FieldValue.serverTimestamp(),
+          'metadata.lastModifiedBy': userId,
+        });
     } catch (error: any) {
       console.error('Update job error:', error);
       throw new Error(error.message || 'Failed to update job');
@@ -174,7 +161,7 @@ export const jobsService = {
    */
   async deleteJob(jobId: string): Promise<void> {
     try {
-      await deleteDoc(doc(db, 'jobs', jobId));
+      await firestore().collection('jobs').doc(jobId).delete();
     } catch (error: any) {
       console.error('Delete job error:', error);
       throw new Error(error.message || 'Failed to delete job');
@@ -186,11 +173,14 @@ export const jobsService = {
    */
   async updateJobStatus(jobId: string, status: JobStatus, userId: string): Promise<void> {
     try {
-      await updateDoc(doc(db, 'jobs', jobId), {
-        jobStatus: status,
-        'metadata.lastModifiedAt': serverTimestamp(),
-        'metadata.lastModifiedBy': userId,
-      });
+      await firestore()
+        .collection('jobs')
+        .doc(jobId)
+        .update({
+          jobStatus: status,
+          'metadata.lastModifiedAt': firestore.FieldValue.serverTimestamp(),
+          'metadata.lastModifiedBy': userId,
+        });
     } catch (error: any) {
       console.error('Update job status error:', error);
       throw new Error(error.message || 'Failed to update job status');
@@ -201,26 +191,31 @@ export const jobsService = {
    * Listen to job changes (realtime)
    */
   subscribeToJob(jobId: string, callback: (job: Job) => void) {
-    return onSnapshot(doc(db, 'jobs', jobId), (doc) => {
-      if (doc.exists()) {
-        callback({
-          ...doc.data(),
-          jobId: doc.id,
-        } as Job);
-      }
-    });
+    return firestore()
+      .collection('jobs')
+      .doc(jobId)
+      .onSnapshot((doc) => {
+        if (doc.exists) {
+          callback({
+            ...doc.data(),
+            jobId: doc.id,
+          } as Job);
+        }
+      });
   },
 
   /**
    * Listen to all jobs (realtime)
    */
   subscribeToJobs(callback: (jobs: Job[]) => void) {
-    return onSnapshot(collection(db, 'jobs'), (snapshot) => {
-      const jobs = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        jobId: doc.id,
-      })) as Job[];
-      callback(jobs);
-    });
+    return firestore()
+      .collection('jobs')
+      .onSnapshot((snapshot) => {
+        const jobs = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          jobId: doc.id,
+        })) as Job[];
+        callback(jobs);
+      });
   },
 };

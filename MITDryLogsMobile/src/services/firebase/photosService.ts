@@ -1,5 +1,8 @@
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
-import { db } from '../../config/firebase';
+/**
+ * Firebase Photos Service - React Native Version
+ */
+
+import firestore from '@react-native-firebase/firestore';
 import { JobPhoto, PhotosByDate, PhotosByRoom } from '../../types/photo';
 
 class PhotosService {
@@ -8,14 +11,12 @@ class PhotosService {
    */
   async getPhotosByJobId(jobId: string): Promise<JobPhoto[]> {
     try {
-      const photosRef = collection(db, 'photos');
-      const q = query(
-        photosRef,
-        where('jobId', '==', jobId),
-        orderBy('timestamp', 'desc')
-      );
+      const snapshot = await firestore()
+        .collection('photos')
+        .where('jobId', '==', jobId)
+        .orderBy('timestamp', 'desc')
+        .get();
 
-      const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),

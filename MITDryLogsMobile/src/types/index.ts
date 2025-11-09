@@ -1,7 +1,10 @@
 // MIT DRY LOGS APP - TypeScript Type Definitions
 // Based on Firebase Schema from MIT_DRY_LOGS_DEVELOPMENT_PLAN.md
 
-import { Timestamp } from 'firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
+
+// Type alias for Firebase Timestamp (React Native)
+type Timestamp = firestore.FirebaseFirestoreTypes.Timestamp;
 
 // ============================================================================
 // USER TYPES
@@ -895,7 +898,7 @@ export interface MoistureReadingFormData {
 }
 
 export interface PhotoUploadData {
-  file: Blob;
+  uri: string; // React Native uses file URIs instead of Blob
   room: string;
   step: PhotoStep;
   caption: string;

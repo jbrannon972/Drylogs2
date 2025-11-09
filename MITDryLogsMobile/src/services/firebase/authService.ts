@@ -1,17 +1,13 @@
 /**
- * Firebase Authentication Service
+ * Firebase Authentication Service - React Native Version
  */
 
-import {
-  signInWithEmailAndPassword,
-  signOut,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  User as FirebaseUser,
-} from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '../../config/firebase';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import { User, UserRole, Zone } from '../../types';
+
+// Type alias for compatibility
+type FirebaseUser = FirebaseAuthTypes.User;
 
 export const authService = {
   /**
@@ -19,23 +15,29 @@ export const authService = {
    */
   async signIn(email: string, password: string): Promise<User> {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await auth().signInWithEmailAndPassword(email, password);
       const firebaseUser = userCredential.user;
 
       // Get user data from Firestore
-      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(firebaseUser.uid)
+        .get();
 
-      if (!userDoc.exists()) {
+      if (!userDoc.exists) {
         throw new Error('User data not found');
       }
 
       const userData = userDoc.data() as User;
 
       // Update last login
-      await updateDoc(doc(db, 'users', firebaseUser.uid), {
-        lastLogin: serverTimestamp(),
-        'metadata.lastActivityAt': serverTimestamp(),
-      });
+      await firestore()
+        .collection('users')
+        .doc(firebaseUser.uid)
+        .update({
+          lastLogin: firestore.FieldValue.serverTimestamp(),
+          'metadata.lastActivityAt': firestore.FieldValue.serverTimestamp(),
+        });
 
       return userData;
     } catch (error: any) {
@@ -49,7 +51,7 @@ export const authService = {
    */
   async signOut(): Promise<void> {
     try {
-      await signOut(auth);
+      await auth().signOut();
     } catch (error: any) {
       console.error('Sign out error:', error);
       throw new Error(error.message || 'Failed to sign out');
@@ -70,7 +72,7 @@ export const authService = {
     }
   ): Promise<User> {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       const firebaseUser = userCredential.user;
 
       const newUser: User = {
@@ -81,8 +83,8 @@ export const authService = {
         role: userData.role,
         zone: userData.zone,
         assignedJobs: [],
-        createdAt: serverTimestamp() as any,
-        lastLogin: serverTimestamp() as any,
+        createdAt: firestore.FieldValue.serverTimestamp() as any,
+        lastLogin: firestore.FieldValue.serverTimestamp() as any,
         isActive: true,
         preferences: {
           notifications: true,
@@ -98,11 +100,14 @@ export const authService = {
           totalJobsCompleted: 0,
           totalEquipmentScans: 0,
           accuracyScore: 100,
-          lastActivityAt: serverTimestamp() as any,
+          lastActivityAt: firestore.FieldValue.serverTimestamp() as any,
         },
       };
 
-      await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+      await firestore()
+        .collection('users')
+        .doc(firebaseUser.uid)
+        .set(newUser);
 
       return newUser;
     } catch (error: any) {
@@ -116,9 +121,12 @@ export const authService = {
    */
   async getCurrentUser(uid: string): Promise<User | null> {
     try {
-      const userDoc = await getDoc(doc(db, 'users', uid));
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(uid)
+        .get();
 
-      if (!userDoc.exists()) {
+      if (!userDoc.exists) {
         return null;
       }
 
@@ -133,7 +141,7 @@ export const authService = {
    * Listen to auth state changes
    */
   onAuthStateChange(callback: (firebaseUser: FirebaseUser | null) => void) {
-    return onAuthStateChanged(auth, callback);
+    return auth().onAuthStateChanged(callback);
   },
 
   /**
@@ -141,10 +149,13 @@ export const authService = {
    */
   async updateUserProfile(uid: string, updates: Partial<User>): Promise<void> {
     try {
-      await updateDoc(doc(db, 'users', uid), {
-        ...updates,
-        'metadata.lastActivityAt': serverTimestamp(),
-      });
+      await firestore()
+        .collection('users')
+        .doc(uid)
+        .update({
+          ...updates,
+          'metadata.lastActivityAt': firestore.FieldValue.serverTimestamp(),
+        });
     } catch (error: any) {
       console.error('Update user profile error:', error);
       throw new Error(error.message || 'Failed to update profile');

@@ -1,9 +1,9 @@
 /**
- * Date Utilities
+ * Date Utilities - React Native Version
  * Safe conversion functions for handling dates from various sources
  */
 
-import { Timestamp } from 'firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
 
 /**
  * Safely converts a value to a JavaScript Date object
@@ -22,7 +22,7 @@ export function toDate(value: any): Date {
 
   // If Timestamp-like object (has seconds and nanoseconds)
   if (value && typeof value === 'object' && 'seconds' in value) {
-    return new Timestamp(value.seconds, value.nanoseconds || 0).toDate();
+    return new firestore.Timestamp(value.seconds, value.nanoseconds || 0).toDate();
   }
 
   // If ISO string or parseable date string

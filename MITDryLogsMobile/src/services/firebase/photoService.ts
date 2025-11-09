@@ -1,17 +1,9 @@
 /**
- * Firebase Photo Storage Service
+ * Firebase Photo Storage Service - React Native Version
  */
 
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-  uploadBytesResumable,
-  UploadTaskSnapshot,
-} from 'firebase/storage';
-import { storage } from '../../config/firebase';
-import { Photo, PhotoStep } from '../../types';
+import storage from '@react-native-firebase/storage';
+import { PhotoStep } from '../../types';
 
 export interface PhotoUploadProgress {
   bytesTransferred: number;
@@ -22,9 +14,14 @@ export interface PhotoUploadProgress {
 export const photoService = {
   /**
    * Upload photo to Firebase Storage
+   * @param uri - Local file URI (from camera or image picker)
+   * @param jobId - Job identifier
+   * @param roomId - Room identifier
+   * @param step - Photo step (before, during, after, etc.)
+   * @param userId - User identifier
    */
   async uploadPhoto(
-    file: Blob | File,
+    uri: string,
     jobId: string,
     roomId: string,
     step: PhotoStep,
@@ -33,10 +30,10 @@ export const photoService = {
     try {
       const timestamp = Date.now();
       const fileName = `${jobId}/${roomId}/${step}_${timestamp}.jpg`;
-      const storageRef = ref(storage, `photos/${fileName}`);
+      const storageRef = storage().ref(`photos/${fileName}`);
 
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
+      await storageRef.putFile(uri);
+      const downloadURL = await storageRef.getDownloadURL();
 
       return downloadURL;
     } catch (error: any) {
@@ -47,9 +44,14 @@ export const photoService = {
 
   /**
    * Upload photo with progress tracking
+   * @param uri - Local file URI (from camera or image picker)
+   * @param jobId - Job identifier
+   * @param roomId - Room identifier
+   * @param step - Photo step
+   * @param onProgress - Progress callback
    */
   uploadPhotoWithProgress(
-    file: Blob | File,
+    uri: string,
     jobId: string,
     roomId: string,
     step: PhotoStep,
@@ -58,13 +60,13 @@ export const photoService = {
     return new Promise((resolve, reject) => {
       const timestamp = Date.now();
       const fileName = `${jobId}/${roomId}/${step}_${timestamp}.jpg`;
-      const storageRef = ref(storage, `photos/${fileName}`);
+      const storageRef = storage().ref(`photos/${fileName}`);
 
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const uploadTask = storageRef.putFile(uri);
 
       uploadTask.on(
         'state_changed',
-        (snapshot: UploadTaskSnapshot) => {
+        (snapshot) => {
           const progress = {
             bytesTransferred: snapshot.bytesTransferred,
             totalBytes: snapshot.totalBytes,
@@ -81,7 +83,7 @@ export const photoService = {
         },
         async () => {
           try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            const downloadURL = await storageRef.getDownloadURL();
             resolve(downloadURL);
           } catch (error: any) {
             reject(new Error(error.message || 'Failed to get download URL'));
@@ -93,11 +95,23 @@ export const photoService = {
 
   /**
    * Delete photo from storage
+   * @param photoUrl - Full URL or storage path
    */
   async deletePhoto(photoUrl: string): Promise<void> {
     try {
-      const photoRef = ref(storage, photoUrl);
-      await deleteObject(photoRef);
+      // If photoUrl is a full URL, extract the path
+      // If it's already a path, use it directly
+      let path = photoUrl;
+      if (photoUrl.includes('firebasestorage.googleapis.com')) {
+        // Extract path from URL (simplified - may need more robust parsing)
+        const matches = photoUrl.match(/photos%2F(.+?)\?/);
+        if (matches && matches[1]) {
+          path = `photos/${decodeURIComponent(matches[1])}`;
+        }
+      }
+
+      const photoRef = storage().ref(path);
+      await photoRef.delete();
     } catch (error: any) {
       console.error('Delete photo error:', error);
       throw new Error(error.message || 'Failed to delete photo');
@@ -119,12 +133,23 @@ export const photoService = {
    *   allowsEditing: true,
    *   aspect: [4, 3],
    * });
+   *
+   * Example with expo-image-manipulator:
+   * import * as ImageManipulator from 'expo-image-manipulator';
+   *
+   * const result = await ImageManipulator.manipulateAsync(
+   *   uri,
+   *   [{ resize: { width: maxWidth } }],
+   *   { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+   * );
+   * return result.uri;
    */
   async compressImage(uri: string, maxWidth: number = 1920, quality: number = 0.8): Promise<string> {
     // TODO: Implement React Native image compression using expo-image-manipulator
     // For now, return the original URI
-    // Install: npm install expo-image-manipulator
+    // Install: npx expo install expo-image-manipulator
     //
+    // Uncomment when ready:
     // import * as ImageManipulator from 'expo-image-manipulator';
     //
     // const result = await ImageManipulator.manipulateAsync(
