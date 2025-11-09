@@ -21,6 +21,8 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
   const [filteredPhotos, setFilteredPhotos] = useState<JobPhoto[]>([]);
   const [roomNames, setRoomNames] = useState<string[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [lightboxPhoto, setLightboxPhoto] = useState<JobPhoto | null>(null);
   const [lightboxPhotos, setLightboxPhotos] = useState<JobPhoto[]>([]);
 
@@ -42,6 +44,16 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
         // Get unique room names
         const rooms = photosService.getRoomNames(sortedPhotos);
         setRoomNames(rooms);
+
+        // Get unique dates (YYYY-MM-DD format)
+        const uniqueDates = Array.from(
+          new Set(
+            sortedPhotos.map(photo =>
+              photo.timestamp.toDate().toISOString().split('T')[0]
+            )
+          )
+        ).sort().reverse(); // Most recent first
+        setAvailableDates(uniqueDates);
       } catch (error) {
         console.error('Error fetching photos:', error);
       } finally {
@@ -52,14 +64,23 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
     fetchPhotos();
   }, [jobId]);
 
-  // Filter photos by room
+  // Filter photos by room and date
   useEffect(() => {
+    let filtered = allPhotos;
+
     if (selectedRoom) {
-      setFilteredPhotos(allPhotos.filter(p => p.roomName === selectedRoom));
-    } else {
-      setFilteredPhotos(allPhotos);
+      filtered = filtered.filter(p => p.roomName === selectedRoom);
     }
-  }, [selectedRoom, allPhotos]);
+
+    if (selectedDate) {
+      filtered = filtered.filter(p => {
+        const photoDate = p.timestamp.toDate().toISOString().split('T')[0];
+        return photoDate === selectedDate;
+      });
+    }
+
+    setFilteredPhotos(filtered);
+  }, [selectedRoom, selectedDate, allPhotos]);
 
   // Group photos by time period
   const getTimeGroup = (timestamp: any): string => {
@@ -159,13 +180,51 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
           </button>
         </div>
 
+        {/* Date Filter - Fixed, scrollable pills */}
+        {availableDates.length > 0 && (
+          <div className="bg-white border-b border-gray-200 px-4 py-2 flex-shrink-0">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              <button
+                onClick={() => setSelectedDate(null)}
+                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
+                  !selectedDate
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                All Dates
+              </button>
+              {availableDates.map(date => {
+                const dateObj = new Date(date + 'T00:00:00');
+                const formatted = dateObj.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                });
+                return (
+                  <button
+                    key={date}
+                    onClick={() => setSelectedDate(date)}
+                    className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
+                      selectedDate === date
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    {formatted}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Room Filter - Fixed, scrollable pills */}
         {roomNames.length > 0 && (
-          <div className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
+          <div className="bg-white border-b border-gray-200 px-4 py-2 flex-shrink-0">
             <div className="flex gap-2 overflow-x-auto scrollbar-hide">
               <button
                 onClick={() => setSelectedRoom(null)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap font-medium transition-all flex-shrink-0 ${
+                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
                   !selectedRoom
                     ? 'bg-entrusted-orange text-white'
                     : 'bg-gray-100 text-gray-700'
@@ -177,7 +236,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
                 <button
                   key={room}
                   onClick={() => setSelectedRoom(room)}
-                  className={`px-4 py-2 rounded-full whitespace-nowrap font-medium transition-all flex-shrink-0 ${
+                  className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
                     selectedRoom === room
                       ? 'bg-entrusted-orange text-white'
                       : 'bg-gray-100 text-gray-700'
@@ -204,15 +263,15 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
                 </div>
 
                 {/* Photos */}
-                <div className="p-2">
+                <div className="p-2 grid grid-cols-2 gap-2">
                   {photos.map(photo => (
                     <div
                       key={photo.id}
                       onClick={() => handlePhotoClick(photo, photos)}
-                      className="bg-white rounded-lg mb-2 overflow-hidden active:bg-gray-50 transition-colors"
+                      className="bg-white rounded-lg overflow-hidden active:opacity-75 transition-opacity"
                     >
                       {/* Photo */}
-                      <div className="aspect-video bg-gray-100 relative">
+                      <div className="aspect-square bg-gray-100 relative">
                         <img
                           src={photo.thumbnailUrl || photo.url}
                           alt={photo.roomName}
@@ -220,35 +279,21 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
                           loading="lazy"
                         />
                         {photo.category && (
-                          <div className="absolute top-2 right-2 px-2 py-1 bg-black bg-opacity-70 text-white text-xs font-medium rounded">
+                          <div className="absolute top-1 right-1 px-1.5 py-0.5 bg-black bg-opacity-70 text-white text-xs font-medium rounded">
                             {photo.category}
                           </div>
                         )}
                       </div>
 
                       {/* Metadata */}
-                      <div className="p-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-bold text-gray-900 truncate">{photo.roomName}</p>
-                            <p className="text-sm text-gray-600 truncate">{photo.uploadedByName}</p>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            <p className="text-sm font-medium text-gray-900">
-                              {photo.timestamp.toDate().toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true,
-                              })}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {photo.timestamp.toDate().toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                              })}
-                            </p>
-                          </div>
-                        </div>
+                      <div className="p-2">
+                        <p className="font-bold text-xs text-gray-900 truncate">{photo.roomName}</p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {photo.timestamp.toDate().toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })}
+                        </p>
                       </div>
                     </div>
                   ))}
