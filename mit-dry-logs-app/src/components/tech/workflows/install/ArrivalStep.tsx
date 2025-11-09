@@ -142,14 +142,13 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
               <input
                 type="file"
                 accept="image/*"
-                capture="environment"
                 multiple
                 onChange={handleTruckPhotosCapture}
                 className="hidden"
               />
             </label>
             <p className="text-xs text-gray-500 mt-2">Required for safety documentation</p>
-            <p className="text-xs text-gray-400 mt-1">Select multiple photos from camera</p>
+            <p className="text-xs text-gray-400 mt-1">Tap to select multiple photos at once</p>
           </div>
         </div>
       </div>
@@ -173,13 +172,12 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
               <input
                 type="file"
                 accept="image/*"
-                capture="environment"
                 multiple
                 onChange={handlePropertyPhotosCapture}
                 className="hidden"
               />
             </label>
-            <p className="text-xs text-gray-400 mt-2">Select multiple photos from camera</p>
+            <p className="text-xs text-gray-400 mt-2">Tap to select multiple photos at once</p>
           </div>
         </div>
       </div>
