@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
 import { Camera, MapPin, Clock } from 'lucide-react';
-import { usePhotos } from '../../../../hooks/usePhotos';
+import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 
@@ -13,7 +13,7 @@ interface ArrivalStepProps {
 
 export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
-  const { uploadPhoto, isUploading } = usePhotos();
+  const { queuePhoto } = useBatchPhotos();
   const { installData, updateWorkflowData } = useWorkflowStore();
 
   // Initialize from saved data or current time
@@ -52,16 +52,26 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   const handleTruckPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && user) {
-      const url = await uploadPhoto(file, job.jobId, 'exterior', 'arrival', user.uid);
-      if (url) setTruckPhoto(url);
+      // Queue photo for background upload
+      await queuePhoto(file, job.jobId, 'exterior', 'Exterior', 'arrival');
+
+      // Create preview for immediate display
+      const reader = new FileReader();
+      reader.onload = (e) => setTruckPhoto(e.target?.result as string);
+      reader.readAsDataURL(file);
     }
   };
 
   const handlePropertyPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && user) {
-      const url = await uploadPhoto(file, job.jobId, 'exterior', 'arrival', user.uid);
-      if (url) setPropertyPhoto(url);
+      // Queue photo for background upload
+      await queuePhoto(file, job.jobId, 'exterior', 'Exterior', 'arrival');
+
+      // Create preview for immediate display
+      const reader = new FileReader();
+      reader.onload = (e) => setPropertyPhoto(e.target?.result as string);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -132,9 +142,8 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
                   capture="environment"
                   onChange={handleTruckPhoto}
                   className="hidden"
-                  disabled={isUploading}
                 />
-                {isUploading ? 'Uploading...' : 'Take Truck Photo'}
+                Take Truck Photo
               </label>
               <p className="text-xs text-gray-500 mt-2">Required for safety documentation</p>
             </div>
@@ -163,9 +172,8 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
                   capture="environment"
                   onChange={handlePropertyPhoto}
                   className="hidden"
-                  disabled={isUploading}
                 />
-                {isUploading ? 'Uploading...' : 'Take Property Photo'}
+                Take Property Photo
               </label>
             </div>
           )}

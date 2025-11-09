@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CheckCircle, MapPin, Clock, Camera, AlertTriangle, Info, ShieldAlert } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
-import { usePhotos } from '../../../../hooks/usePhotos';
+import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 
 interface FrontDoorStepProps {
@@ -12,7 +12,7 @@ interface FrontDoorStepProps {
 export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
-  const { uploadPhoto, isUploading } = usePhotos();
+  const { queuePhoto } = useBatchPhotos();
 
   // ULTRAFAULT: Track last saved state to prevent duplicate saves
   const lastSavedStateRef = useRef<string | null>(null);
@@ -114,8 +114,13 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
   const handleFrontEntrancePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && user) {
-      const url = await uploadPhoto(file, job.jobId, 'front-entrance', 'arrival', user.uid);
-      if (url) setFrontEntrancePhoto(url);
+      // Queue photo for background upload
+      await queuePhoto(file, job.jobId, 'front-entrance', 'Front Entrance', 'arrival');
+
+      // Create preview for immediate display
+      const reader = new FileReader();
+      reader.onload = (e) => setFrontEntrancePhoto(e.target?.result as string);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -163,7 +168,6 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
                 capture="environment"
                 onChange={handleFrontEntrancePhoto}
                 className="hidden"
-                disabled={isUploading}
               />
               Replace Photo
             </label>
@@ -176,10 +180,9 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
               capture="environment"
               onChange={handleFrontEntrancePhoto}
               className="hidden"
-              disabled={isUploading}
             />
             <Camera className="w-4 h-4" />
-            {isUploading ? 'Uploading...' : 'Take Photo of Front Entrance'}
+            Take Photo of Front Entrance
           </label>
         )}
       </div>

@@ -1,9 +1,9 @@
 /**
  * Batch Photo Upload Hook
- * Queue photos and upload them all at once in the background
+ * Queue photos and upload them in the background while user works
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { usePhotoQueueStore } from '../stores/photoQueueStore';
 import { useNotificationStore } from '../stores/notificationStore';
 import { useAuth } from './useAuth';
@@ -31,8 +31,73 @@ export function useBatchPhotos() {
     roomName: string;
   } | null>(null);
 
+  const uploadingRef = useRef(false);
+  const uploadQueueRef = useRef<string[]>([]);
+
   /**
-   * Add photo to queue without uploading
+   * Background upload processor - automatically uploads queued photos
+   */
+  useEffect(() => {
+    const processQueue = async () => {
+      // Skip if already uploading or no queue
+      if (uploadingRef.current || queue.length === 0) return;
+
+      // Find pending photos
+      const pendingPhotos = queue.filter(
+        (photo) =>
+          !uploadProgress[photo.id] ||
+          uploadProgress[photo.id].status === 'pending'
+      );
+
+      if (pendingPhotos.length === 0) return;
+
+      uploadingRef.current = true;
+      setUploading(true);
+
+      // Upload photos one at a time in background
+      for (const photo of pendingPhotos) {
+        try {
+          updateProgress(photo.id, { status: 'uploading', progress: 0 });
+
+          await photoService.uploadPhotoWithProgress(
+            photo.file,
+            photo.jobId,
+            photo.roomId,
+            photo.step,
+            photo.userId,
+            photo.userName,
+            (progress) => {
+              updateProgress(photo.id, {
+                progress: progress.progress,
+                status: 'uploading',
+              });
+            }
+          );
+
+          updateProgress(photo.id, { status: 'completed', progress: 100 });
+
+          // Remove after successful upload
+          setTimeout(() => removeFromQueue(photo.id), 1000);
+        } catch (error: any) {
+          console.error('Background upload error:', error);
+          updateProgress(photo.id, {
+            status: 'failed',
+            error: error.message,
+          });
+        }
+      }
+
+      uploadingRef.current = false;
+      setUploading(false);
+    };
+
+    // Process queue when it changes
+    const timer = setTimeout(processQueue, 500);
+    return () => clearTimeout(timer);
+  }, [queue, uploadProgress, updateProgress, removeFromQueue, setUploading]);
+
+  /**
+   * Add photo to queue and start background upload
    */
   const queuePhoto = useCallback(
     async (
@@ -58,7 +123,7 @@ export function useBatchPhotos() {
           fileToQueue = new File([compressed], file.name, { type: 'image/jpeg' });
         }
 
-        // Add to queue
+        // Add to queue (background upload will start automatically)
         addToQueue({
           file: fileToQueue,
           jobId,
@@ -73,14 +138,14 @@ export function useBatchPhotos() {
         // Set context for batch operations
         setCurrentJobContext({ jobId, roomName });
 
-        // Show subtle confirmation
-        addNotification('info', '📸 Photo Queued', `${getQueueCount() + 1} photos ready to upload`);
+        // Show subtle confirmation - photo will upload in background
+        // No intrusive notification needed
       } catch (error: any) {
         console.error('Error queueing photo:', error);
         addNotification('error', 'Error', 'Failed to queue photo');
       }
     },
-    [user, addToQueue, addNotification, getQueueCount]
+    [user, addToQueue, addNotification]
   );
 
   /**
