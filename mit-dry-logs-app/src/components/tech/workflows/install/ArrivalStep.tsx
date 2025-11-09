@@ -33,6 +33,8 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   const [hasPropertyPhoto, setHasPropertyPhoto] = useState<boolean>(
     installData.hasPropertyPhoto || false
   );
+  const [showTruckBatchInstructions, setShowTruckBatchInstructions] = useState(false);
+  const [showPropertyBatchInstructions, setShowPropertyBatchInstructions] = useState(false);
 
   // ULTRAFAULT: Save to workflow store when data changes with debounce
   useEffect(() => {
@@ -150,7 +152,7 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
           </label>
 
           {/* Select Multiple Button */}
-          <label className="btn-secondary cursor-pointer inline-block w-full">
+          <label className="btn-secondary cursor-pointer inline-block w-full mb-2">
             🖼️ Select from Gallery
             <input
               type="file"
@@ -161,9 +163,37 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
             />
           </label>
 
-          <p className="text-xs text-gray-500 mt-3">
-            Take photos one at a time, or select multiple from gallery
-          </p>
+          {/* Batch Mode Button */}
+          <button
+            onClick={() => setShowTruckBatchInstructions(!showTruckBatchInstructions)}
+            className="w-full px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors"
+          >
+            {showTruckBatchInstructions ? '✕ Hide Instructions' : '📋 Batch Mode Instructions'}
+          </button>
+
+          {/* Batch Mode Instructions */}
+          {showTruckBatchInstructions && (
+            <div className="mt-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg text-left">
+              <h4 className="font-bold text-blue-900 mb-2">📸 Take Multiple Photos at Once:</h4>
+              <ol className="text-sm text-blue-800 space-y-2 list-decimal list-inside">
+                <li className="font-medium">Exit this app (or switch apps)</li>
+                <li className="font-medium">Open your Camera app</li>
+                <li className="font-medium">Take ALL photos you need</li>
+                <li className="font-medium">Come back to this app</li>
+                <li className="font-medium">Tap "🖼️ Select from Gallery" above</li>
+                <li className="font-medium">Multi-select all photos you just took</li>
+              </ol>
+              <p className="text-xs text-blue-600 mt-3 font-medium">
+                ✓ All photos will upload in background while you continue working
+              </p>
+            </div>
+          )}
+
+          {!showTruckBatchInstructions && (
+            <p className="text-xs text-gray-500 mt-3">
+              Take photos one at a time, or select multiple from gallery
+            </p>
+          )}
         </div>
       </div>
 
@@ -194,7 +224,7 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
           </label>
 
           {/* Select Multiple Button */}
-          <label className="btn-secondary cursor-pointer inline-block w-full">
+          <label className="btn-secondary cursor-pointer inline-block w-full mb-2">
             🖼️ Select from Gallery
             <input
               type="file"
@@ -205,9 +235,37 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
             />
           </label>
 
-          <p className="text-xs text-gray-500 mt-3">
-            Take photos one at a time, or select multiple from gallery
-          </p>
+          {/* Batch Mode Button */}
+          <button
+            onClick={() => setShowPropertyBatchInstructions(!showPropertyBatchInstructions)}
+            className="w-full px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors"
+          >
+            {showPropertyBatchInstructions ? '✕ Hide Instructions' : '📋 Batch Mode Instructions'}
+          </button>
+
+          {/* Batch Mode Instructions */}
+          {showPropertyBatchInstructions && (
+            <div className="mt-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg text-left">
+              <h4 className="font-bold text-blue-900 mb-2">📸 Take Multiple Photos at Once:</h4>
+              <ol className="text-sm text-blue-800 space-y-2 list-decimal list-inside">
+                <li className="font-medium">Exit this app (or switch apps)</li>
+                <li className="font-medium">Open your Camera app</li>
+                <li className="font-medium">Take ALL photos you need</li>
+                <li className="font-medium">Come back to this app</li>
+                <li className="font-medium">Tap "🖼️ Select from Gallery" above</li>
+                <li className="font-medium">Multi-select all photos you just took</li>
+              </ol>
+              <p className="text-xs text-blue-600 mt-3 font-medium">
+                ✓ All photos will upload in background while you continue working
+              </p>
+            </div>
+          )}
+
+          {!showPropertyBatchInstructions && (
+            <p className="text-xs text-gray-500 mt-3">
+              Take photos one at a time, or select multiple from gallery
+            </p>
+          )}
         </div>
       </div>
 
