@@ -39,6 +39,7 @@ export const PSMDashboard: React.FC = () => {
   const [showPhotoSelectorModal, setShowPhotoSelectorModal] = useState(false);
   const [reportJobData, setReportJobData] = useState<Job | null>(null);
   const [selectedExteriorPhoto, setSelectedExteriorPhoto] = useState<string>('');
+  const [selectedCauseOfLossPhoto, setSelectedCauseOfLossPhoto] = useState<string>('');
   const [includePhotoGallery, setIncludePhotoGallery] = useState(false);
   const [allJobPhotos, setAllJobPhotos] = useState<any[]>([]);
 
@@ -561,19 +562,30 @@ export const PSMDashboard: React.FC = () => {
     // Fetch all photos for this job
     try {
       const photos = await photosService.getPhotosByJobId(job.jobId);
-      const exteriorPhotos = photos.filter(p => p.category === 'exterior' || p.roomName.toLowerCase().includes('exterior') || p.roomName.toLowerCase().includes('property'));
+      const exteriorPhotos = photos.filter(p =>
+        p.category === 'exterior' ||
+        p.roomName.toLowerCase().includes('exterior') ||
+        p.roomName.toLowerCase().includes('property')
+      );
+      const causeOfLossPhotos = photos.filter(p =>
+        p.category === 'assessment' ||
+        p.roomName.toLowerCase().includes('cause of loss') ||
+        p.roomName.toLowerCase().includes(job.causeOfLoss?.location?.toLowerCase() || 'zzz')
+      );
 
       setAllJobPhotos(photos);
       setReportJobData(job);
       setShowPhotoSelectorModal(true);
 
-      // If no exterior photos, use placeholder
+      // Set defaults if no photos
       if (exteriorPhotos.length === 0) {
         setSelectedExteriorPhoto('');
       }
+      if (causeOfLossPhotos.length === 0) {
+        setSelectedCauseOfLossPhoto('');
+      }
     } catch (error) {
       console.error('Error fetching photos:', error);
-      // Continue without photos
       setAllJobPhotos([]);
       setReportJobData(job);
       setShowPhotoSelectorModal(true);
@@ -610,7 +622,7 @@ export const PSMDashboard: React.FC = () => {
     `).join('');
   };
 
-  const generateReportHTML = (job: Job, exteriorPhotoUrl: string, includePhotos: boolean, allPhotos: any[]) => {
+  const generateReportHTML = (job: Job, exteriorPhotoUrl: string, causeOfLossPhotoUrl: string, includePhotos: boolean, allPhotos: any[]) => {
     const roomAssessments = job.workflowData?.install?.roomAssessments || [];
     const assessmentDate = job.workflowPhases.install.completedAt
       ? new Date(job.workflowPhases.install.completedAt.seconds * 1000).toLocaleDateString()
@@ -843,21 +855,30 @@ export const PSMDashboard: React.FC = () => {
         <!-- Cause of Loss -->
         <div class="section">
           <div class="section-title">CAUSE OF LOSS</div>
-          <div class="highlight-box">
-            <div class="info-grid">
-              <div class="label">Loss Type:</div>
-              <div class="value"><strong>${job.causeOfLoss.type}</strong></div>
-              <div class="label">Loss Location:</div>
-              <div class="value">${job.causeOfLoss.location}</div>
-              <div class="label">Date Discovered:</div>
-              <div class="value">${job.causeOfLoss.discoveryDate ? new Date(job.causeOfLoss.discoveryDate.seconds * 1000).toLocaleString() : 'N/A'}</div>
-              <div class="label">Date of Event:</div>
-              <div class="value">${job.causeOfLoss.eventDate ? new Date(job.causeOfLoss.eventDate.seconds * 1000).toLocaleString() : 'N/A'}</div>
+          <div style="display: flex; gap: 20px; align-items: start;">
+            <div style="flex: 1;">
+              <div class="highlight-box" style="margin: 0;">
+                <div class="info-grid">
+                  <div class="label">Loss Type:</div>
+                  <div class="value"><strong>${job.causeOfLoss.type}</strong></div>
+                  <div class="label">Loss Location:</div>
+                  <div class="value">${job.causeOfLoss.location}</div>
+                  <div class="label">Date Discovered:</div>
+                  <div class="value">${job.causeOfLoss.discoveryDate ? new Date(job.causeOfLoss.discoveryDate.seconds * 1000).toLocaleString() : 'N/A'}</div>
+                  <div class="label">Date of Event:</div>
+                  <div class="value">${job.causeOfLoss.eventDate ? new Date(job.causeOfLoss.eventDate.seconds * 1000).toLocaleString() : 'N/A'}</div>
+                </div>
+                <div style="margin-top: 15px;">
+                  <strong>Description:</strong><br>
+                  ${job.causeOfLoss.description}
+                </div>
+              </div>
             </div>
-            <div style="margin-top: 15px;">
-              <strong>Description:</strong><br>
-              ${job.causeOfLoss.description}
-            </div>
+            ${causeOfLossPhotoUrl ? `
+              <div style="flex: 0 0 300px;">
+                <img src="${causeOfLossPhotoUrl}" alt="Cause of Loss" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 2px solid #ea580c;" />
+              </div>
+            ` : ''}
           </div>
         </div>
 
@@ -976,7 +997,7 @@ export const PSMDashboard: React.FC = () => {
         </div>
 
         ${includePhotos && allPhotos.length > 0 ? `
-          <div class="section page-break">
+          <div class="section" style="page-break-before: always;">
             <div class="section-title">PHOTO DOCUMENTATION</div>
             ${generatePhotoGalleryByRoom(allPhotos)}
           </div>
@@ -995,9 +1016,13 @@ export const PSMDashboard: React.FC = () => {
   const handleReportProceed = (includePhotos: boolean) => {
     if (!reportJobData) return;
 
-    const exteriorPhotos = allJobPhotos.filter(p => p.category === 'exterior' || p.roomName.toLowerCase().includes('exterior') || p.roomName.toLowerCase().includes('property'));
-
-    const reportHTML = generateReportHTML(reportJobData, selectedExteriorPhoto, includePhotos, allJobPhotos);
+    const reportHTML = generateReportHTML(
+      reportJobData,
+      selectedExteriorPhoto,
+      selectedCauseOfLossPhoto,
+      includePhotos,
+      allJobPhotos
+    );
 
     const printWindow = window.open('', '_blank');
     if (printWindow) {
@@ -1009,6 +1034,7 @@ export const PSMDashboard: React.FC = () => {
     setShowPhotoSelectorModal(false);
     setReportJobData(null);
     setSelectedExteriorPhoto('');
+    setSelectedCauseOfLossPhoto('');
     setAllJobPhotos([]);
   };
 
@@ -1241,9 +1267,13 @@ export const PSMDashboard: React.FC = () => {
             setShowPhotoSelectorModal(false);
             setReportJobData(null);
             setAllJobPhotos([]);
+            setSelectedExteriorPhoto('');
+            setSelectedCauseOfLossPhoto('');
           }}
           exteriorPhotos={allJobPhotos.filter(p => p.category === 'exterior' || p.roomName.toLowerCase().includes('exterior') || p.roomName.toLowerCase().includes('property'))}
+          causeOfLossPhotos={allJobPhotos.filter(p => p.category === 'assessment' || p.roomName.toLowerCase().includes('cause of loss') || (reportJobData?.causeOfLoss?.location && p.roomName.toLowerCase().includes(reportJobData.causeOfLoss.location.toLowerCase())))}
           onSelectExterior={(photoUrl) => setSelectedExteriorPhoto(photoUrl)}
+          onSelectCauseOfLoss={(photoUrl) => setSelectedCauseOfLossPhoto(photoUrl)}
           onProceed={handleReportProceed}
         />
       )}
