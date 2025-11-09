@@ -128,28 +128,42 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Truck Location Photo *
         </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-          <div>
-            {hasTruckPhoto && (
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-sm text-green-600 font-medium">Photos queued</span>
-              </div>
-            )}
-            <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-            <label className="btn-primary cursor-pointer inline-block">
-              {hasTruckPhoto ? 'Add More Photos' : 'Take Truck Photos'}
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleTruckPhotosCapture}
-                className="hidden"
-              />
-            </label>
-            <p className="text-xs text-gray-500 mt-2">Required for safety documentation</p>
-            <p className="text-xs text-gray-400 mt-1">Tap to select multiple photos at once</p>
-          </div>
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+          {hasTruckPhoto && (
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-sm text-green-600 font-medium">Photos queued</span>
+            </div>
+          )}
+          <Camera className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+
+          {/* Take Photo Button */}
+          <label className="btn-primary cursor-pointer inline-block w-full mb-2">
+            📷 Take Photo
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleTruckPhotosCapture}
+              className="hidden"
+            />
+          </label>
+
+          {/* Select Multiple Button */}
+          <label className="btn-secondary cursor-pointer inline-block w-full">
+            🖼️ Select from Gallery
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleTruckPhotosCapture}
+              className="hidden"
+            />
+          </label>
+
+          <p className="text-xs text-gray-500 mt-3">
+            Take photos one at a time, or select multiple from gallery
+          </p>
         </div>
       </div>
 
@@ -158,27 +172,42 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Property Exterior Photo *
         </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-          <div>
-            {hasPropertyPhoto && (
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-sm text-green-600 font-medium">Photos queued</span>
-              </div>
-            )}
-            <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-            <label className="btn-primary cursor-pointer inline-block">
-              {hasPropertyPhoto ? 'Add More Photos' : 'Take Property Photos'}
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handlePropertyPhotosCapture}
-                className="hidden"
-              />
-            </label>
-            <p className="text-xs text-gray-400 mt-2">Tap to select multiple photos at once</p>
-          </div>
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+          {hasPropertyPhoto && (
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-sm text-green-600 font-medium">Photos queued</span>
+            </div>
+          )}
+          <Camera className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+
+          {/* Take Photo Button */}
+          <label className="btn-primary cursor-pointer inline-block w-full mb-2">
+            📷 Take Photo
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handlePropertyPhotosCapture}
+              className="hidden"
+            />
+          </label>
+
+          {/* Select Multiple Button */}
+          <label className="btn-secondary cursor-pointer inline-block w-full">
+            🖼️ Select from Gallery
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handlePropertyPhotosCapture}
+              className="hidden"
+            />
+          </label>
+
+          <p className="text-xs text-gray-500 mt-3">
+            Take photos one at a time, or select multiple from gallery
+          </p>
         </div>
       </div>
 
