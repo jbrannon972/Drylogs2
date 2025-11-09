@@ -999,7 +999,7 @@ export const PSMDashboard: React.FC = () => {
 
         ${includePhotos && allPhotos.length > 0 ? `
           <div class="section" style="page-break-before: always;">
-            <div class="section-title">PHOTO DOCUMENTATION</div>
+            <div class="section-title" style="page-break-after: avoid;">PHOTO DOCUMENTATION</div>
             ${generatePhotoGalleryByRoom(allPhotos)}
           </div>
         ` : ''}
