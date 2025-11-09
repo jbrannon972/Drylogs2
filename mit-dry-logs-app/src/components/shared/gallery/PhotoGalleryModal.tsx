@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Images, Loader } from 'lucide-react';
+import { X, Images, Loader, Filter } from 'lucide-react';
 import { JobPhoto } from '../../../types/photo';
 import { photosService } from '../../../services/firebase/photosService';
 import { PhotoLightbox } from './PhotoLightbox';
@@ -25,6 +25,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [lightboxPhoto, setLightboxPhoto] = useState<JobPhoto | null>(null);
   const [lightboxPhotos, setLightboxPhotos] = useState<JobPhoto[]>([]);
+  const [showFilterModal, setShowFilterModal] = useState(false);
 
   // Fetch photos on mount
   useEffect(() => {
@@ -127,6 +128,13 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
     setLightboxPhoto(photo);
   };
 
+  const handleClearFilters = () => {
+    setSelectedDate(null);
+    setSelectedRoom(null);
+  };
+
+  const activeFilterCount = [selectedDate, selectedRoom].filter(Boolean).length;
+
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -172,82 +180,26 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
               <p className="text-xs text-gray-500">{filteredPhotos.length} total</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-all"
-          >
-            <X className="w-6 h-6 text-gray-600" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowFilterModal(true)}
+              className="relative p-2 hover:bg-gray-100 rounded-lg transition-all"
+            >
+              <Filter className="w-6 h-6 text-gray-600" />
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-entrusted-orange text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+            >
+              <X className="w-6 h-6 text-gray-600" />
+            </button>
+          </div>
         </div>
-
-        {/* Date Filter - Fixed, scrollable pills */}
-        {availableDates.length > 0 && (
-          <div className="bg-white border-b border-gray-200 px-4 py-2 flex-shrink-0">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-              <button
-                onClick={() => setSelectedDate(null)}
-                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
-                  !selectedDate
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700'
-                }`}
-              >
-                All Dates
-              </button>
-              {availableDates.map(date => {
-                const dateObj = new Date(date + 'T00:00:00');
-                const formatted = dateObj.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                });
-                return (
-                  <button
-                    key={date}
-                    onClick={() => setSelectedDate(date)}
-                    className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
-                      selectedDate === date
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {formatted}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Room Filter - Fixed, scrollable pills */}
-        {roomNames.length > 0 && (
-          <div className="bg-white border-b border-gray-200 px-4 py-2 flex-shrink-0">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-              <button
-                onClick={() => setSelectedRoom(null)}
-                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
-                  !selectedRoom
-                    ? 'bg-entrusted-orange text-white'
-                    : 'bg-gray-100 text-gray-700'
-                }`}
-              >
-                All Rooms
-              </button>
-              {roomNames.map(room => (
-                <button
-                  key={room}
-                  onClick={() => setSelectedRoom(room)}
-                  className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 ${
-                    selectedRoom === room
-                      ? 'bg-entrusted-orange text-white'
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {room}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Photos List - Scrollable */}
         <div className="flex-1 overflow-y-auto">
@@ -311,6 +263,118 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ jobId, onC
           )}
         </div>
       </div>
+
+      {/* Filter Modal */}
+      {showFilterModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-end sm:items-center justify-center">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md sm:mx-4 max-h-[80vh] flex flex-col animate-slide-up">
+            {/* Filter Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div className="flex items-center gap-2">
+                <Filter className="w-5 h-5 text-entrusted-orange" />
+                <h3 className="font-bold text-gray-900">Filter Photos</h3>
+              </div>
+              <button
+                onClick={() => setShowFilterModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Filter Content */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              {/* Date Filter */}
+              {availableDates.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-sm text-gray-700 mb-3">Date</h4>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setSelectedDate(null)}
+                      className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
+                        !selectedDate
+                          ? 'border-blue-500 bg-blue-50 text-blue-700 font-medium'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      All Dates
+                    </button>
+                    {availableDates.map(date => {
+                      const dateObj = new Date(date + 'T00:00:00');
+                      const formatted = dateObj.toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                      });
+                      return (
+                        <button
+                          key={date}
+                          onClick={() => setSelectedDate(date)}
+                          className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
+                            selectedDate === date
+                              ? 'border-blue-500 bg-blue-50 text-blue-700 font-medium'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          {formatted}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Room Filter */}
+              {roomNames.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-sm text-gray-700 mb-3">Room</h4>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setSelectedRoom(null)}
+                      className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
+                        !selectedRoom
+                          ? 'border-entrusted-orange bg-orange-50 text-orange-700 font-medium'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      All Rooms
+                    </button>
+                    {roomNames.map(room => (
+                      <button
+                        key={room}
+                        onClick={() => setSelectedRoom(room)}
+                        className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
+                          selectedRoom === room
+                            ? 'border-entrusted-orange bg-orange-50 text-orange-700 font-medium'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        {room}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Filter Footer */}
+            <div className="p-4 border-t border-gray-200 flex gap-3">
+              <button
+                onClick={handleClearFilters}
+                className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-all"
+              >
+                Clear All
+              </button>
+              <button
+                onClick={() => setShowFilterModal(false)}
+                className="flex-1 px-4 py-3 bg-entrusted-orange text-white font-bold rounded-lg hover:bg-orange-600 transition-all"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Lightbox */}
       {lightboxPhoto && (
