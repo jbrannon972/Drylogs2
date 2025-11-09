@@ -29,6 +29,7 @@ import { ArrivalStep } from './install/ArrivalStep';
 import { FrontDoorStep } from './install/FrontDoorStep';
 import { CauseOfLossStep } from './install/CauseOfLossStep';
 import { RoomAssessmentStep } from './install/RoomAssessmentStep';
+import { MoistureMonitoringStep } from './install/MoistureMonitoringStep';
 import { DefineChambersStep } from './install/DefineChambersStep';
 import { PartialDemoStep } from './install/PartialDemoStep';
 import { ScheduleWorkStep } from './install/ScheduleWorkStep';
@@ -81,9 +82,16 @@ const INSTALL_STEPS: StepConfig[] = [
   {
     id: 'room-assessment',
     title: 'Room Assessment',
-    description: 'Dimensions, moisture, materials & pre-existing damage',
+    description: 'Dimensions, materials & pre-existing damage',
     icon: <Ruler className="w-5 h-5" />,
     component: RoomAssessmentStep,
+  },
+  {
+    id: 'moisture-monitoring',
+    title: 'Moisture Monitoring',
+    description: 'Set dry standards & track moisture over time',
+    icon: <Droplets className="w-5 h-5" />,
+    component: MoistureMonitoringStep,
   },
   {
     id: 'define-chambers',

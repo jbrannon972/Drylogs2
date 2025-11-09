@@ -302,6 +302,75 @@ export interface MoistureReading {
   isDryStandard?: boolean; // True if this is the baseline reading
 }
 
+// NEW: Monitored Material - tracks a specific material over time across workflows
+export interface MonitoredMaterial {
+  id: string;
+  materialType: MaterialType;
+  location: string; // e.g., "Living Room - North Wall"
+  roomId: string;
+  roomName: string;
+
+  // Dry standard (baseline) reading
+  dryStandard: {
+    percentage: number;
+    photo?: string;
+    recordedAt: Timestamp;
+    recordedBy: string;
+  };
+
+  // Wet readings over time (install, check service visits, pull)
+  wetReadings: {
+    id: string;
+    percentage: number;
+    photo?: string;
+    recordedAt: Timestamp;
+    recordedBy: string;
+    workflowPhase: 'install' | 'check-service' | 'pull';
+    visitNumber?: number; // For check service visits (1, 2, 3, etc.)
+    notes?: string;
+  }[];
+
+  // Current status
+  isDry: boolean; // Has it reached dry standard?
+  lastReading: number; // Most recent moisture %
+  trend: 'drying' | 'stable' | 'increasing'; // Moisture trend
+}
+
+// Helper: Materials that can have moisture readings (excludes appliances, mirrors, etc.)
+export type MonitorableMaterialType =
+  // Flooring
+  | 'Carpet & Pad'
+  | 'Hardwood Flooring'
+  | 'Vinyl/Linoleum Flooring'
+  | 'Tile Flooring'
+  | 'Laminate Flooring'
+  | 'Engineered Flooring'
+  | 'Subfloor'
+  // Drywall
+  | 'Drywall - Wall'
+  | 'Drywall - Ceiling'
+  // Trim & Molding
+  | 'Baseboards'
+  | 'Shoe Molding'
+  | 'Crown Molding'
+  | 'Door Casing'
+  | 'Window Casing'
+  | 'Chair Rail'
+  | 'Other Trim'
+  // Tile & Backsplash
+  | 'Tile Walls'
+  | 'Backsplash'
+  | 'Tub Surround'
+  // Cabinetry & Counters
+  | 'Base Cabinets'
+  | 'Upper Cabinets'
+  | 'Vanity'
+  | 'Countertops'
+  | 'Shelving'
+  // Insulation
+  | 'Insulation - Wall'
+  | 'Insulation - Ceiling/Attic';
+
 export interface Photo {
   photoId: string;
   url: string;
@@ -677,6 +746,7 @@ export interface Job {
     pull?: any; // Pull workflow data
   };
   rooms: Room[];
+  monitoredMaterials: MonitoredMaterial[]; // Materials being tracked for moisture across workflows
   equipment: JobEquipment;
   dryingPlan?: DryingPlan; // NEW: Comprehensive drying plan
   additionalWork?: AdditionalWork; // NEW: General page billable items

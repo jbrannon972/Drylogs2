@@ -295,6 +295,7 @@ export const DataSeedingPage: React.FC = () => {
           },
         },
         rooms: generateRoomData(jobNum, status, daysOld),
+        monitoredMaterials: [],
         equipment: {
           chambers: [],
           calculations: {
