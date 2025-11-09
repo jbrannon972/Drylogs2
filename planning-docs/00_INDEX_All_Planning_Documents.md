@@ -2,9 +2,11 @@
 
 **Location:** `/planning-docs/`
 **Last Updated:** November 9, 2025
-**Total Documents:** 32 files
+**Total Documents:** 33 files
 
 All planning, analysis, and implementation documents have been organized into this folder with clear, numbered filenames for easy navigation.
+
+⭐ **INCLUDES:** MIT Development Prompts Skill (8 specialized development prompts)
 
 ---
 
@@ -91,9 +93,29 @@ All planning, analysis, and implementation documents have been organized into th
 
 ---
 
-## 📚 Reference Documents (File 32)
+## 📚 Reference Documents (Files 32-33)
 
 - **32_REFERENCE_SIMS_HTW_Contract_Draft.pdf** - SIMS-HTW contract draft reference
+- **33_SKILL_MIT_Development_Prompts.skill** - ⭐ **CRITICAL** - Claude Code skill with 8 specialized development prompts
+
+---
+
+## 🎯 MIT Development Prompts Skill (File 33) - IMPORTANT!
+
+The `.skill` file contains **8 specialized development prompts** for MIT Dry Logs development:
+
+1. **ultrathink** - Architecture, system design, technical decisions (Foundation)
+2. **ultraflow** - UX design, mobile-first, user experience refinement
+3. **ultrafault** - Debugging, error handling, system hardening
+4. **ultrafield** - Field workflow design for MIT techs (Core principle: app serves the tech)
+5. **ultraaudit** - Workflow audits, gap analysis, billable capture completeness
+6. **ultradata** - Firebase schema, offline-first architecture, data relationships
+7. **ultratest** - Testing strategy, field failure scenarios, QA approach
+8. **ultraaccountability** - Audit trails, MIT Lead dashboards, decision tracking
+
+**Core Philosophy:** "The app serves the MIT tech, never the other way around"
+
+Use these prompts to guide development decisions, maintain consistency with project principles, and ensure field-first thinking.
 
 ---
 
@@ -168,9 +190,12 @@ All files follow this pattern:
 - **Word Documents:** 2
 - **PDF Files:** 1
 - **Text Files:** 2
+- **Skill Files:** 1 ⭐ (Contains 8 specialized development prompts)
 
-**Total:** 34 files (including this index)
+**Total:** 35 files (including this index)
 
 ---
 
 **All documents are now centrally located in `/planning-docs/` with clear, searchable names!** 🎉
+
+**New Addition:** MIT Development Prompts Skill file with 8 specialized workflows (ultrathink, ultraflow, ultrafault, ultrafield, ultraaudit, ultradata, ultratest, ultraaccountability)
