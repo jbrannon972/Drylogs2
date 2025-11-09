@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
 import { Camera, MapPin, Clock, CheckCircle } from 'lucide-react';
+import { MultiPhotoCapture } from '../../../shared/MultiPhotoCapture';
 import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
@@ -33,6 +34,8 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   const [hasPropertyPhoto, setHasPropertyPhoto] = useState<boolean>(
     installData.hasPropertyPhoto || false
   );
+  const [showTruckCamera, setShowTruckCamera] = useState(false);
+  const [showPropertyCamera, setShowPropertyCamera] = useState(false);
 
   // ULTRAFAULT: Save to workflow store when data changes with debounce
   useEffect(() => {
@@ -49,32 +52,26 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [arrivalTime, travelTimeToSite, hasTruckPhoto, hasPropertyPhoto]);
 
-  const handleTruckPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && user) {
-      // Queue all selected photos for background upload
-      for (let i = 0; i < files.length; i++) {
-        await queuePhoto(files[i], job.jobId, 'exterior', 'Exterior', 'arrival');
+  const handleTruckPhotosCapture = async (files: File[]) => {
+    if (files.length > 0 && user) {
+      // Queue all captured photos for background upload
+      for (const file of files) {
+        await queuePhoto(file, job.jobId, 'exterior', 'Exterior', 'arrival');
       }
       // Mark as taken
       setHasTruckPhoto(true);
     }
-    // Reset input to allow selecting same file again
-    e.target.value = '';
   };
 
-  const handlePropertyPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && user) {
-      // Queue all selected photos for background upload
-      for (let i = 0; i < files.length; i++) {
-        await queuePhoto(files[i], job.jobId, 'exterior', 'Exterior', 'arrival');
+  const handlePropertyPhotosCapture = async (files: File[]) => {
+    if (files.length > 0 && user) {
+      // Queue all captured photos for background upload
+      for (const file of files) {
+        await queuePhoto(file, job.jobId, 'exterior', 'Exterior', 'arrival');
       }
       // Mark as taken
       setHasPropertyPhoto(true);
     }
-    // Reset input to allow selecting same file again
-    e.target.value = '';
   };
 
   const canProceed = hasTruckPhoto && hasPropertyPhoto;
@@ -133,22 +130,18 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
             {hasTruckPhoto && (
               <div className="flex items-center justify-center gap-2 mb-3">
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-sm text-green-600 font-medium">Photo queued</span>
+                <span className="text-sm text-green-600 font-medium">Photos queued</span>
               </div>
             )}
             <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-            <label className="btn-primary cursor-pointer inline-block">
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handleTruckPhoto}
-                className="hidden"
-                multiple
-              />
-              {hasTruckPhoto ? 'Add Another Photo' : 'Take Truck Photo'}
-            </label>
+            <button
+              onClick={() => setShowTruckCamera(true)}
+              className="btn-primary"
+            >
+              {hasTruckPhoto ? 'Add More Photos' : 'Take Truck Photos'}
+            </button>
             <p className="text-xs text-gray-500 mt-2">Required for safety documentation</p>
+            <p className="text-xs text-gray-400 mt-1">Camera stays open - take as many as needed</p>
           </div>
         </div>
       </div>
@@ -163,21 +156,17 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
             {hasPropertyPhoto && (
               <div className="flex items-center justify-center gap-2 mb-3">
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-sm text-green-600 font-medium">Photo queued</span>
+                <span className="text-sm text-green-600 font-medium">Photos queued</span>
               </div>
             )}
             <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-            <label className="btn-primary cursor-pointer inline-block">
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handlePropertyPhoto}
-                className="hidden"
-                multiple
-              />
-              {hasPropertyPhoto ? 'Add Another Photo' : 'Take Property Photo'}
-            </label>
+            <button
+              onClick={() => setShowPropertyCamera(true)}
+              className="btn-primary"
+            >
+              {hasPropertyPhoto ? 'Add More Photos' : 'Take Property Photos'}
+            </button>
+            <p className="text-xs text-gray-400 mt-2">Camera stays open - take as many as needed</p>
           </div>
         </div>
       </div>
@@ -207,6 +196,21 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
             ⚠️ Please upload both truck and property photos to proceed
           </p>
         </div>
+      )}
+
+      {/* Multi-Photo Capture Modals */}
+      {showTruckCamera && (
+        <MultiPhotoCapture
+          onPhotosCapture={handleTruckPhotosCapture}
+          onClose={() => setShowTruckCamera(false)}
+        />
+      )}
+
+      {showPropertyCamera && (
+        <MultiPhotoCapture
+          onPhotosCapture={handlePropertyPhotosCapture}
+          onClose={() => setShowPropertyCamera(false)}
+        />
       )}
     </div>
   );
