@@ -87,12 +87,12 @@ export const photoService = {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
             // Save photo metadata to Firestore
-            await this.savePhotoMetadata({
+            await photoService.savePhotoMetadata({
               url: downloadURL,
               jobId,
               roomId,
               roomName: roomId, // Will be overridden if passed separately
-              category: this.mapStepToCategory(step),
+              category: photoService.mapStepToCategory(step),
               timestamp: Timestamp.now(),
               uploadedBy: userId,
               uploadedByName: userName,
@@ -125,9 +125,10 @@ export const photoService = {
   }): Promise<void> {
     try {
       const photosRef = collection(db, 'photos');
-      await addDoc(photosRef, metadata);
+      const docRef = await addDoc(photosRef, metadata);
+      console.log('✅ Photo metadata saved to Firestore:', docRef.id, metadata);
     } catch (error: any) {
-      console.error('Error saving photo metadata:', error);
+      console.error('❌ Error saving photo metadata:', error);
       // Don't throw - we don't want to fail the upload if metadata save fails
     }
   },
