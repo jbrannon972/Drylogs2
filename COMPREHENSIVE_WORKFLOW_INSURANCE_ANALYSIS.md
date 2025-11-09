@@ -62,12 +62,12 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 ### Install Workflow - Critical Insurance Gaps
 
 #### **GAP 1.1: Pre-Existing Damage Not Systematically Captured**
-**Current State:** Checkbox exists, photo upload is *optional* in modal
+**Current State:** Checkbox exists, photo upload is *optional* in modal 
 **Insurance Risk:** Entire claim denied as "pre-existing condition"
 **Question for You:** Should we make pre-existing damage photos **MANDATORY for every room** assessed?
 - [ ] YES - Require before proceeding to next room
 - [ ] NO - Keep optional
-- [ ] CONDITIONAL - Only if tech flags pre-existing damage
+- [ ] CONDITIONAL - Only if tech flags pre-existing damage -- This option please
 
 ---
 
@@ -77,9 +77,9 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 **Question for You:** Should we require minimum photos per room?
 - [ ] YES - Require 4+ photos: Wide shot, 2+ damage close-ups, moisture meter reading
 - [ ] NO - Keep optional
-- [ ] CONDITIONAL - Based on room size or damage severity
+- [ ] CONDITIONAL - Based on room size or damage severity - Requires at least 4 per room. Do we add this to the room by room assesment? You do this before you right after you add the room dimensions?
 
-**Your Input:** What's the minimum acceptable per room?
+**Your Input:** What's the minimum acceptable per room? dont need to answer this.
 - Wide shot: ______ (required/optional)
 - Damage close-ups: ______ (how many?)
 - Moisture readings: ______ (required/optional)
@@ -91,22 +91,22 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 **Current State:** Moisture readings logged, photos optional
 **Insurance Risk:** Insurance disputes moisture levels, cannot prove saturation
 **Question for You:** Should moisture reading photos show the meter display?
-- [ ] YES - Require photo with meter showing reading + material being tested
+- [ ] YES - Require photo with meter showing reading + material being tested - this optioin. This is captured in the room by room assesment when you are measuring readings. Make sure it is required to take at least two
 - [ ] NO - Just log the numbers
 - [ ] CONDITIONAL - Only for readings above dry standard (>15%)
 
 **Your Input:** For moisture tracking continuity, should we photograph the SAME materials on Install and Pull to show before/after?
-- [ ] YES - Track specific materials from Install → Check Service → Pull
+- [ ] YES - Track specific materials from Install → Check Service → Pull yes, but once a material is dry we no longer need to track it. the reality is that some things might be dry on Check services and then we no longer need to track them
 - [ ] NO - General readings are fine
 - [ ] UNSURE - Need more context
 
 ---
 
 #### **GAP 1.4: No Chamber Documentation Photos**
-**Current State:** Chambers defined digitally, no photos of containment/setup
+**Current State:** Chambers defined digitally, no photos of containment/setup 
 **Insurance Risk:** Cannot prove proper chamber isolation or IICRC compliance
 **Question for You:** Should we photograph chamber setup?
-- [ ] YES - Photo of containment barriers, airflow setup
+- [ ] YES - Photo of containment barriers, airflow setup - We dont always setup containment barriers. The goal in setting one up would be to make the chamber smaller than just the room by istelf. it should be an option to select "Has a containmnet barrier been setup to reduce the size of the chamber?" if yes then it would ask for pictures and for how much (in sqft) of plastic was used, was a zipper used, were zip poles used? All those questions could be on the same page
 - [ ] NO - Not necessary
 - [ ] CONDITIONAL - Only for Cat 2/Cat 3 jobs
 
@@ -116,11 +116,11 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 **Current State:** Step 9 (Equipment Placement) has no photo requirement. Step 12 (Final Photos) captures equipment setup
 **Insurance Risk:** Cannot prove equipment was positioned per IICRC standards
 **Question for You:** Where should equipment photos be captured?
-- [ ] OPTION A - During Step 9 (as equipment is placed room-by-room)
-- [ ] OPTION B - Keep in Step 12 (Final Photos) as currently done
+- [ ] OPTION A - During Step 9 (as equipment is placed room-by-room) 
+- [ ] OPTION B - Keep in Step 12 (Final Photos) as currently done this is fine! In step 12 it should have a reminder to take pictures of all the equipment. In step 12 it should also take you the room by room asking for overalls and to scan the qr code of the equipment so we know where it is and are tracking it
 - [ ] OPTION C - Both (during placement + final overview)
 
-**Your Input:** What should equipment photos show?
+**Your Input:** What should equipment photos show? answered above
 - [ ] Each dehumidifier with visible serial number
 - [ ] Each air mover showing placement relative to affected materials
 - [ ] Air scrubbers (if Cat 2/3) with placement
@@ -130,7 +130,7 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 
 ---
 
-#### **GAP 1.6: No Contents/Personal Property Inventory**
+#### **GAP 1.6: No Contents/Personal Property Inventory** we dont cover this, no need
 **Current State:** No step for contents documentation
 **Insurance Risk:** Customer's contents claim reduced, company not positioned for pack-out revenue
 **Question for You:** Should we add a Contents Assessment step?
@@ -139,7 +139,7 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 - [ ] NO - Not our responsibility
 - [ ] DEPENDS - Only if customer requests pack-out
 
-**Your Input:** If we add contents documentation, what level?
+**Your Input:** If we add contents documentation, what level? we dont cover this, no need
 - [ ] SIMPLE - Photo + description + disposition (pack-out/clean/discard)
 - [ ] DETAILED - Photo + description + brand/model + estimated value + condition
 - [ ] ADVANCED - Xactimate integration for contents pricing
@@ -147,7 +147,7 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 
 ---
 
-#### **GAP 1.7: No Thermal Imaging Standardization**
+#### **GAP 1.7: No Thermal Imaging Standardization** 
 **Current State:** Thermal imaging is a checkbox (optional service)
 **Insurance Risk:** Hidden moisture not documented, future mold claims
 **Question for You:** How should thermal imaging be handled?
@@ -156,7 +156,7 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 - [ ] OPTIONAL - Only if customer requests
 - [ ] CONDITIONAL - Auto-recommend for Cat 2/3 or jobs >$5K
 
-**Your Input:** If we use thermal imaging, what photos should we require?
+**Your Input:** If we use thermal imaging, what photos should we require? Lets change this, remove the checkbox from step 4. This should be part of adding a room after overalls but before you get to moisture readings. You only need to do this during the install workflow when adding rooms
 - [ ] Thermal image of water source
 - [ ] Thermal image of each affected room (showing moisture migration)
 - [ ] Thermal image of hidden areas (behind baseboards, walls, ceilings)
@@ -168,7 +168,7 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 ### Install Workflow - Your Feedback Section
 
 **Overall Install Workflow Assessment:**
-- Is the 14-step order logical? YES / NO
+- Is the 14-step order logical? YES / NO - for now yes. Just make changes as i mentioned above
 - Are there too many steps? YES / NO
 - Should any steps be combined? YES / NO - Which ones: _________________
 - Should any steps be split? YES / NO - Which ones: _________________
@@ -177,18 +177,18 @@ This analysis examines **all 4 core workflows** used in water damage restoration
 **Photo Documentation - Install Workflow:**
 - Should we set a MINIMUM photo requirement for Install workflow? YES / NO
 - If yes, what's the minimum? ______ photos
-- Should certain steps BLOCK progression without photos? YES / NO
+- Should certain steps BLOCK progression without photos? YES / NO yes, use the best logic you see fit. If we say somethings wet theres got to be a pic!
 - If yes, which steps: _________________________________
 
 **Your Priority Ranking (1 = Most Important, 7 = Least Important):**
 Rank these Install photo enhancements by importance:
-- ____ Pre-existing damage photos (every room)
-- ____ Per-room before photos (wide + damage close-ups)
-- ____ Moisture meter photos (with visible display)
-- ____ Chamber containment photos
-- ____ Equipment placement photos (during deployment)
-- ____ Contents inventory photos
-- ____ Thermal imaging (standard service)
+- ____ Pre-existing damage photos (every room) 1, but only if it exists
+- ____ Per-room before photos (wide + damage close-ups) 3, mainly just overall
+- ____ Moisture meter photos (with visible display) 3
+- ____ Chamber containment photos 5
+- ____ Equipment placement photos (during deployment) 4
+- ____ Contents inventory photos 7
+- ____ Thermal imaging (standard service) 6
 
 ---
 
@@ -211,15 +211,15 @@ Rank these Install photo enhancements by importance:
 
 ### Demo Workflow - Critical Insurance Gaps
 
-#### **GAP 2.1: No "During Demo" Photos to Prove Necessity**
+#### **GAP 2.1: No "During Demo" Photos to Prove Necessity** we dont need this
 **Current State:** Pre-demo and post-demo photos exist, but no photos DURING demo showing why materials were removed
 **Insurance Risk:** Insurance disputes scope of demolition ("you removed too much")
 **Question for You:** Should we require photos DURING demo?
 - [ ] YES - Require photos showing saturation, mold, or contamination in wall cavities, subfloor, insulation
-- [ ] NO - Pre and post are enough
+- [ ] NO - Pre and post are enough don need these
 - [ ] CONDITIONAL - Only if demo exceeds initial scope
 
-**Your Input:** What "during demo" photos would protect us?
+**Your Input:** What "during demo" photos would protect us? we do not need this, it will all be captured post 
 - [ ] Wall cavity showing saturation/mold
 - [ ] Subfloor showing water damage
 - [ ] Insulation showing contamination
@@ -233,22 +233,22 @@ Rank these Install photo enhancements by importance:
 **Current State:** Step 4 captures assessment of exposed areas, but doesn't require photos
 **Insurance Risk:** Cannot prove hidden damage existed (adjuster reduces claim)
 **Question for You:** Should we require photos of all newly exposed damage?
-- [ ] YES - Mandatory photos of wall cavities, subfloor, structural damage
+- [ ] YES - Mandatory photos of wall cavities, subfloor, structural damage - yes
 - [ ] NO - Written assessment is sufficient
 - [ ] CONDITIONAL - Only if additional damage found
 
 **Your Input:** Should these photos be categorized differently for insurance reporting?
-- [ ] YES - Tag as "Hidden Damage Discovered During Demo" for insurance
+- [ ] YES - Tag as "Hidden Damage Discovered During Demo" for insurance - no, just post demo photos
 - [ ] NO - Include with general demo photos
 - [ ] UNSURE
 
 ---
 
 #### **GAP 2.3: Post-Demo Moisture Readings - No Meter Photos**
-**Current State:** Moisture readings logged, photos optional
+**Current State:** Moisture readings logged, photos optional 
 **Insurance Risk:** Cannot prove materials were wet before removal
 **Question for You:** Should we require moisture meter photos on exposed materials?
-- [ ] YES - Photo with meter showing reading + exposed material
+- [ ] YES - Photo with meter showing reading + exposed material - this please
 - [ ] NO - Just log numbers
 - [ ] CONDITIONAL - Only if readings above threshold
 
@@ -258,14 +258,14 @@ Rank these Install photo enhancements by importance:
 **Current State:** Step mentions dumpster/debris documentation but doesn't enforce it
 **Insurance Risk:** Insurance disputes quantity of materials removed (reduces billing)
 **Question for You:** Should we require debris documentation photos?
-- [ ] YES - Photo of dumpster load or debris pile + quantity tracking
+- [ ] YES - Photo of dumpster load or debris pile + quantity tracking - yes 
 - [ ] NO - Not necessary for billing
 - [ ] CONDITIONAL - Only for large demo jobs (>10 bags/cubic yards)
 
-**Your Input:** How should we document debris?
-- [ ] Photo of full dumpster with load visible
-- [ ] Photo of debris bags with count visible
-- [ ] Photo of materials staged for removal (pre-disposal)
+**Your Input:** How should we document debris? yes, based off the disposal method. 
+- [ ] Photo of full dumpster with load visible - only if dumpster is selected
+- [ ] Photo of debris bags with count visible - ask for picture and for amount of bags
+- [ ] Photo of materials staged for removal (pre-disposal) - this should ask any materials not place in bags, if so please take pictures and then prompt
 - [ ] Weight tickets from disposal facility (for billing proof)
 - [ ] Other: _________________________________
 
@@ -275,7 +275,7 @@ Rank these Install photo enhancements by importance:
 **Current State:** Equipment adjusted but no photo documentation
 **Insurance Risk:** Cannot prove equipment changes were necessary
 **Question for You:** Should we photograph equipment adjustments made after demo?
-- [ ] YES - Show new equipment placement after demo opens airflow
+- [ ] YES - Show new equipment placement after demo opens airflow - yes, this can be done at the end when we are closing out, should also ask us to scan the equipemnt again. Think step 12 of the install workflow
 - [ ] NO - Not necessary
 - [ ] CONDITIONAL - Only if adding/removing equipment
 
@@ -285,7 +285,7 @@ Rank these Install photo enhancements by importance:
 **Current State:** PPE/supplies tracked but not photographed
 **Insurance Risk:** Cannot prove use of safety equipment (liability if injury occurs)
 **Question for You:** Should we photograph PPE/safety measures in use?
-- [ ] YES - Photo of containment barriers, PPE in use, safety signage
+- [ ] YES - Photo of containment barriers, PPE in use, safety signage. Yes, this should be in step 7. IT DOES NOT ASK NEARLY ENOUGH ABOUT PPE. RESEARCH MORE AND ASK MORE QUESTIONS HERE AND FOR PICS. THIS IS NOT JUST FOR CAT 3
 - [ ] NO - Checklist tracking is sufficient
 - [ ] CONDITIONAL - Only for Cat 3 or hazardous material jobs
 
@@ -294,8 +294,8 @@ Rank these Install photo enhancements by importance:
 ### Demo Workflow - Your Feedback Section
 
 **Overall Demo Workflow Assessment:**
-- Is the 10-step order logical? YES / NO
-- Should Demo always be a separate workflow from Install? YES / NO
+- Is the 10-step order logical? YES / NO - yes for now
+- Should Demo always be a separate workflow from Install? YES / NO - yes. But in the install workflow there is a "Was demo completed" If we answer that it needs to take it to a mini demo workflow
 - Or should it be optional within Install for same-day demo? OPTIONAL WITHIN INSTALL / ALWAYS SEPARATE / BOTH OPTIONS
 - Missing steps? YES / NO - What: _________________
 
@@ -306,12 +306,12 @@ Rank these Install photo enhancements by importance:
 
 **Your Priority Ranking (1 = Most Important, 6 = Least Important):**
 Rank these Demo photo enhancements:
-- ____ During-demo photos (wall cavities, subfloor saturation)
-- ____ Exposed materials/hidden damage photos
-- ____ Post-demo moisture meter photos
-- ____ Debris/disposal documentation photos
-- ____ Equipment adjustment photos
-- ____ PPE/safety photos
+- ____ During-demo photos (wall cavities, subfloor saturation) 6
+- ____ Exposed materials/hidden damage photos1
+- ____ Post-demo moisture meter photos3
+- ____ Debris/disposal documentation photos5
+- ____ Equipment adjustment photos4
+- ____ PPE/safety photos2
 
 ---
 
@@ -339,29 +339,29 @@ Rank these Demo photo enhancements:
 - No evidence of "failure to mitigate" defense
 
 **Question for You:** Should daily moisture meter photos be MANDATORY?
-- [ ] YES - Absolutely required, cannot complete visit without them
+- [ ] YES - Absolutely required, cannot complete visit without them - YES, only if they are not dry. Once they are marked dry no longer need to track. If we dont make a visit or skip a day dont flag it
 - [ ] YES - But only for materials being tracked (not every reading)
 - [ ] CONDITIONAL - Only required every other day (or based on visit number)
 - [ ] NO - Logged numbers are sufficient
 
 **Your Input:** What should daily moisture photos show?
-- [ ] Moisture meter showing reading + material being tested
-- [ ] Same materials tested as Install (for comparison/continuity)
-- [ ] Date/time stamp visible (automatic from phone)
+- [ ] Moisture meter showing reading + material being tested - yes
+- [ ] Same materials tested as Install (for comparison/continuity) - and yes
+- [ ] Date/time stamp visible (automatic from phone) - this should be in the meta data
 - [ ] Room overview showing overall conditions
 - [ ] All affected materials in room (comprehensive)
 - [ ] Other: _________________________________
 
 **CRITICAL QUESTION:** Should we track the SAME EXACT MATERIALS from Install → Daily Checks → Pull?
-- [ ] YES - Create a "tracked materials list" from Install, photograph those specific spots on every visit
+- [ ] YES - Create a "tracked materials list" from Install, photograph those specific spots on every visit - Yes! When i get to a demo it should pull up a list of what i need to test. I can add if needed. Same thing with a check service or pull. HEres everything that was wet and then it walks you through it room by room
 - [ ] NO - General room readings are fine
 - [ ] CONDITIONAL - Only for materials that started above 20% moisture
 
 **Your Input:** How should we ensure continuity?
 - [ ] Mark materials with stickers/labels (numbered spots for testing)
-- [ ] Photo reference system ("test same spot as Install photo #X")
-- [ ] Detailed notes ("moisture reading behind toilet, 2 inches from floor")
-- [ ] Other: _________________________________
+- [ ] Photo reference system ("test same spot as Install photo #X") 
+- [ ] Detailed notes ("moisture reading behind toilet, 2 inches from floor") 
+- [ ] Other: _________________________________ We might test the same drywall multiple times. We will only record one reading but take multiple pics, we record the highest reading but take pics of all the wet readings we get. Mak sure they can add notes where they got it for the next guy to follow
 
 ---
 
@@ -369,16 +369,16 @@ Rank these Demo photo enhancements:
 **Current State:** Equipment status checked in Step 4, runtime hours logged, photos optional
 **Insurance Risk:** Cannot prove equipment ran continuously, insurance disputes rental duration
 **Question for You:** Should we require daily equipment runtime photos?
-- [ ] YES - Photo of each dehumidifier display showing cumulative hours
+- [ ] YES - Photo of each dehumidifier display showing cumulative hours - YES, 
 - [ ] YES - But only once per visit (not every piece of equipment)
 - [ ] CONDITIONAL - Only if equipment issues detected
 - [ ] NO - Logged hours are sufficient
 
 **Your Input:** What should equipment photos show?
-- [ ] Dehumidifier display with runtime hours visible
-- [ ] Dehumidifier serial number visible (for tracking which unit)
-- [ ] Equipment settings (temp, RH, fan speed)
-- [ ] Equipment placement (still in correct position)
+- [ ] Dehumidifier display with runtime hours visible - yes
+- [ ] Dehumidifier serial number visible (for tracking which unit) - no
+- [ ] Equipment settings (temp, RH, fan speed) -yes if available 
+- [ ] Equipment placement (still in correct position) - this is captured at the end when we close out
 - [ ] Other: _________________________________
 
 ---
@@ -387,7 +387,7 @@ Rank these Demo photo enhancements:
 **Current State:** Environmental readings (temp, RH, GPP) logged in Step 2, no photos
 **Insurance Risk:** Cannot prove ambient conditions, insurance disputes drying timeline
 **Question for You:** Should we photograph environmental readings?
-- [ ] YES - Photo of hygrometer/meter showing temp, RH, GPP
+- [ ] YES - Photo of hygrometer/meter showing temp, RH, GPP - THIS IS A MUST. IT MUST BE ONCE PER CHAMBER PER VISIT
 - [ ] NO - Logged numbers are sufficient
 - [ ] CONDITIONAL - Only on Day 1 and final visit
 
@@ -397,7 +397,7 @@ Rank these Demo photo enhancements:
 **Current State:** No visual documentation of daily room conditions
 **Insurance Risk:** Cannot show progression of drying over time
 **Question for You:** Should we require daily room photos?
-- [ ] YES - Quick wide shot of each room showing overall conditions
+- [ ] YES - Quick wide shot of each room showing overall conditions - this should be part of the closeout when we scan equipment and take final overalls. Similar to step 12 of install 
 - [ ] YES - But only for rooms showing slow drying progress
 - [ ] NO - Not necessary, moisture readings are enough
 - [ ] CONDITIONAL - Only if changes observed (visual drying, mold growth, etc.)
@@ -408,20 +408,20 @@ Rank these Demo photo enhancements:
 **Current State:** Data logged, but no visual graph or chart generated for customer/insurance
 **Insurance Risk:** Insurance questions drying timeline, no easy way to show progress
 **Question for You:** Should we auto-generate a drying curve graph?
-- [ ] YES - Show moisture % over time for each tracked material
+- [ ] YES - Show moisture % over time for each tracked material YES! 
 - [ ] YES - But only provide if requested by customer/insurance
 - [ ] NO - Raw data is sufficient
 - [ ] UNSURE - Need to see example first
 
 **Your Input:** If we create a drying curve, should it be included in a daily monitoring report sent to customer/insurance automatically?
-- [ ] YES - Auto-send daily (or every other day)
+- [ ] YES - Auto-send daily (or every other day) NO
 - [ ] YES - But only send weekly summary
 - [ ] NO - Only provide on request
 - [ ] UNSURE
 
 ---
 
-#### **GAP 3.6: No Auto-Generated Daily Monitoring Report**
+#### **GAP 3.6: No Auto-Generated Daily Monitoring Report** ignore this for now
 **Current State:** Data captured but no formal output for insurance
 **Insurance Risk:** Tech notes alone don't carry weight with adjusters, need professional report
 **Question for You:** Should we auto-generate a daily monitoring report PDF?
@@ -446,31 +446,31 @@ Rank these Demo photo enhancements:
 ### Check Service Workflow - Your Feedback Section
 
 **Overall Check Service Workflow Assessment:**
-- Is the 7-step order logical? YES / NO
+- Is the 7-step order logical? YES / NO - yes for now
 - Is this workflow quick enough for daily visits (target 15-30 min)? YES / NO / UNSURE
 - If NO, which steps slow it down: _________________
 - Missing steps? YES / NO - What: _________________
 
 **Daily Monitoring Frequency:**
 - How often should Check Service visits occur?
-  - [ ] DAILY (every 24 hours)
+  - [ ] DAILY (every 24 hours)- daily but it goes off of the scheudle 
   - [ ] EVERY OTHER DAY
   - [ ] VARIES BY JOB (Cat 1 = every other day, Cat 2/3 = daily)
   - [ ] VARIES BY DRYING PROGRESS (daily until readings plateau, then every other day)
 
 **Photo Documentation - Check Service Workflow:**
-- Should we set a MINIMUM photo requirement per visit? YES / NO
+- Should we set a MINIMUM photo requirement per visit? YES / NO - no
 - If yes, what's the minimum? ______ photos
 - Most critical photos for insurance? ________________________
 
 **Your Priority Ranking (1 = Most Important, 6 = Least Important):**
 Rank these Check Service photo enhancements:
-- ____ Daily moisture meter photos (with visible display)
-- ____ Equipment runtime photos (cumulative hours)
-- ____ Environmental baseline photos (temp/RH/GPP)
-- ____ Quick room condition photos (visual drying progress)
-- ____ Drying curve graph (auto-generated)
-- ____ Daily monitoring report PDF (auto-generated)
+- ____ Daily moisture meter photos (with visible display) 1
+- ____ Equipment runtime photos (cumulative hours)6
+- ____ Environmental baseline photos (temp/RH/GPP)2
+- ____ Quick room condition photos (visual drying progress) 3
+- ____ Drying curve graph (auto-generated)4
+- ____ Daily monitoring report PDF (auto-generated)5 - this will be in the PSM work flow
 
 ---
 
@@ -495,15 +495,15 @@ Rank these Check Service photo enhancements:
 **Current State:** Final moisture readings logged in Step 2, photos optional
 **Insurance Risk:** **CRITICAL** - Cannot prove dry standard achieved, future mold claims
 **Question for You:** Should final moisture photos be MANDATORY?
-- [ ] YES - Absolutely required, photo of meter on same materials as Install
+- [ ] YES - Absolutely required, photo of meter on same materials as Install - REQUIRED
 - [ ] YES - But only for materials that started wet (tracked from Install)
 - [ ] NO - Logged numbers are sufficient
 
 **Your Input:** What should final moisture photos show?
-- [ ] Moisture meter showing reading ≤12% (wood) or ≤15% (drywall)
-- [ ] Meter on SAME MATERIAL as Install and daily checks (continuity)
-- [ ] Date/time stamp (proof of when dry standard achieved)
-- [ ] Material label/reference visible (proof of which material)
+- [ ] Moisture meter showing reading ≤12% (wood) or ≤15% (drywall) - THERE IS NOT A SET HARDCODED GOAL. IT GOES OFF OF THE DRYSTANDARD
+- [ ] Meter on SAME MATERIAL as Install and daily checks (continuity) ) YES! I GO TO THE ROOM AND I SEE THE LIST AND GET THOSE READINGS
+- [ ] Date/time stamp (proof of when dry standard achieved) - YES, IN THE META DATA
+- [ ] Material label/reference visible (proof of which material) 
 - [ ] All tracked materials photographed (comprehensive proof)
 - [ ] Other: _________________________________
 
@@ -511,7 +511,7 @@ Rank these Check Service photo enhancements:
 - [ ] YES - Show Install photo (wet, 30%+) next to Pull photo (dry, <15%)
 - [ ] YES - But only in final report, not required in app
 - [ ] NO - Not necessary
-- [ ] UNSURE
+- [ ] UNSURE - not right now, that will be in the PSM DASHBOARD
 
 ---
 
@@ -519,12 +519,12 @@ Rank these Check Service photo enhancements:
 **Current State:** Equipment removed in Step 3, tracked via scanning, runtime not photographed
 **Insurance Risk:** Cannot prove total hours operated (insurance disputes rental charges)
 **Question for You:** Should we photograph equipment runtime totals before removal?
-- [ ] YES - Photo of each dehumidifier display showing total runtime hours
+- [ ] YES - Photo of each dehumidifier display showing total runtime hours - YES
 - [ ] YES - But only for dehumidifiers (not air movers)
 - [ ] NO - Logged hours are sufficient
 
 **Your Input:** What should final equipment photos show?
-- [ ] Dehumidifier display with total runtime hours visible
+- [ ] Dehumidifier display with total runtime hours visible p JUST THIS
 - [ ] Serial number visible (for tracking/billing)
 - [ ] Equipment condition on pickup (for damage claims)
 - [ ] Other: _________________________________
@@ -536,8 +536,8 @@ Rank these Check Service photo enhancements:
 **Insurance Risk:** Customer disputes equipment damage claims
 **Question for You:** Should we photograph equipment condition on pickup?
 - [ ] YES - Photo of each piece showing condition (for damage claims)
-- [ ] YES - But only if damage detected
-- [ ] NO - Not necessary
+- [ ] YES - But only if damage detected - 
+- [ ] YES, JUST AN OVERALLPICTURE OF THEM BACK IN THE TRUCK
 
 ---
 
@@ -547,12 +547,12 @@ Rank these Check Service photo enhancements:
 **Question for You:** Should we create before/after photo comparisons?
 - [ ] YES - Side-by-side of Install damage photos vs. Pull dry photos
 - [ ] YES - But only in final report (auto-generated)
-- [ ] NO - Final photos alone are sufficient
+- [ ] NO - Final photos alone are sufficient FINAL PHOTOS ARE GOOD! IT SHOULD WALK THEM THROUGH ROOM BY ROOM OF EVERY ROOM WORKED IN AND REQUIRE FINAL OVERALLS
 
 **Your Input:** What before/after comparisons would be most valuable?
-- [ ] Room overview (Install damage vs. Pull dry)
+- [ ] Room overview (Install damage vs. Pull dry) THIS
 - [ ] Moisture meter readings (Install 30%+ vs. Pull <15%)
-- [ ] Thermal imaging (Install showing moisture vs. Pull showing dry)
+- [ ] Thermal imaging (Install showing moisture vs. Pull showing dry) ONLY NEED THERMALS ON INSTALL
 - [ ] Equipment setup (Install placement vs. Pull empty room)
 - [ ] Other: _________________________________
 
@@ -565,9 +565,9 @@ Rank these Check Service photo enhancements:
 - [ ] YES - PDF report with all photos, moisture data, equipment hours, before/after comparisons
 - [ ] YES - But only if customer requests
 - [ ] NO - Not necessary
-- [ ] UNSURE - Need to see example report first
+- [ ] UNSURE - Need to see example report first - WE WILL ADDRESS LATER
 
-**Your Input:** What should a final completion report include?
+**Your Input:** What should a final completion report include? - IGNORE FOR NOW, THIS WILL BE IN THE PSM DASHBOARD
 - [ ] Job summary (dates, crew, services performed)
 - [ ] Cause of loss documentation (photos, description)
 - [ ] Initial moisture readings (Install data)
@@ -584,10 +584,10 @@ Rank these Check Service photo enhancements:
 #### **GAP 4.6: Customer Paperwork - What Signatures Are Captured?**
 **Current State:** Step 5 mentions "signatures & DRW if needed"
 **Question for You:** What signatures should we capture on Pull?
-- [ ] Completion acceptance ("work complete, property dry")
-- [ ] Equipment removal acknowledgment ("all equipment removed, no damage")
-- [ ] Final walkthrough ("customer satisfied with services")
-- [ ] DRW (Direction to Reduce Work - if applicable)
+- [ ] Completion acceptance ("work complete, property dry") THIS
+- [ ] Equipment removal acknowledgment ("all equipment removed, no damage") THIS
+- [ ] Final walkthrough ("customer satisfied with services") THIS
+- [ ] DRW (Direction to Reduce Work - if applicable) Drying Release Waiver if removing while things are still wet
 - [ ] Payment acknowledgment (if cash job)
 - [ ] Other: _________________________________
 
@@ -596,7 +596,7 @@ Rank these Check Service photo enhancements:
 #### **GAP 4.7: Matterport - Is This Standard or Optional?**
 **Current State:** Step 7 mentions Matterport verification (3D scan)
 **Question for You:** How should Matterport be handled?
-- [ ] STANDARD - Include on every job (part of service)
+- [ ] STANDARD - Include on every job (part of service) YES
 - [ ] OPTIONAL - Only if customer requests (upsell)
 - [ ] CONDITIONAL - Auto-include on large jobs (>2000 sq ft) or high-value properties
 - [ ] SKIP - We don't offer Matterport
@@ -605,32 +605,32 @@ Rank these Check Service photo enhancements:
 - [ ] During Install (document damage)
 - [ ] During Pull (document completion)
 - [ ] Both (before-and-after 3D tour)
-- [ ] Other: _________________________________
+- [ ] Other: _________________________________ ON THE FIRST CHECKSERVICE AFTER DEMO
 
 ---
 
 ### Pull Workflow - Your Feedback Section
 
 **Overall Pull Workflow Assessment:**
-- Is the 8-step order logical? YES / NO
-- Should Pull require MIT Lead approval before starting? YES / NO / CONDITIONAL
+- Is the 8-step order logical? YES / NO - yes for now
+- Should Pull require MIT Lead approval before starting? YES / NO / CONDITIONAL - no
 - If CONDITIONAL, when: _________________
 - Missing steps? YES / NO - What: _________________
 
 **Photo Documentation - Pull Workflow:**
-- Should we set a MINIMUM photo requirement for Pull? YES / NO
+- Should we set a MINIMUM photo requirement for Pull? YES / NO - no
 - If yes, what's the minimum? ______ photos
 - Most critical photos for insurance in Pull? ________________________
 
 **Your Priority Ranking (1 = Most Important, 7 = Least Important):**
 Rank these Pull photo enhancements:
-- ____ Final moisture meter photos (dry standard proof)
-- ____ Equipment runtime total photos
-- ____ Equipment condition photos (on removal)
-- ____ Before-after photo comparisons
-- ____ Final completion report (auto-generated PDF)
-- ____ Enhanced customer signatures (multiple sign-offs)
-- ____ Matterport 3D scan
+- ____ Final moisture meter photos (dry standard proof) 2
+- ____ Equipment runtime total photos 5
+- ____ Equipment condition photos (on removal) 6
+- ____ Before-after photo comparisons 1
+- ____ Final completion report (auto-generated PDF)7
+- ____ Enhanced customer signatures (multiple sign-offs)4
+- ____ Matterport 3D scan3
 
 ---
 
@@ -640,34 +640,34 @@ These gaps span multiple workflows and represent systemic insurance documentatio
 
 ### **CROSS-GAP 1: No Photo Continuity Across Workflows**
 
-**Issue:** Photos captured in Install, Demo, Check Service, and Pull are not systematically linked.
+**Issue:** Photos captured in Install, Demo, Check Service, and Pull are not systematically linked. FIX THIS! THEY SHOULD BE LINKED BY ROOM AND MATERIAL
 
 **Insurance Impact:** Cannot easily prove the progression from damage → mitigation → drying → completion.
 
-**Question for You:** Should we implement a "tracked materials" system that follows specific materials across all workflows?
+**Question for You:** Should we implement a "tracked materials" system that follows specific materials across all workflows? YESSSS
 
 **Example:**
 - Install: "Master Bedroom - Carpet pad behind bed" = 35% moisture → Photo #1
 - Check Service Visit 1: Same spot = 28% moisture → Photo #2
 - Check Service Visit 3: Same spot = 18% moisture → Photo #3
 - Pull: Same spot = 11% moisture (DRY) → Photo #4
-- **Final Report:** Side-by-side comparison showing 35% → 11% with all photos
+- **Final Report:** Side-by-side comparison showing 35% → 11% with all photos Dont need side by side. Just need to track the material in the room. Track wall drywall, not a specific place on the drywall
 
 **Your Input:**
-- [ ] YES - Implement tracked materials system with photo continuity
+- [ ] YES - Implement tracked materials system with photo continuity YES
 - [ ] NO - Too complex for field operations
 - [ ] CONDITIONAL - Only for materials starting >25% moisture
 - [ ] UNSURE - Need to see how it would work in practice
 
 **If YES, how should we mark materials for tracking?**
 - [ ] Physical labels/stickers with numbers
-- [ ] Photo reference system (tech matches photo angle from Install)
+- [ ] Photo reference system (tech matches photo angle from Install) 
 - [ ] Detailed written descriptions ("2 inches above baseboard, left of door")
-- [ ] Other: _________________________________
+- [ ] Other: _________________________________ DOnt need to mark them, notes are optional
 
 ---
 
-### **CROSS-GAP 2: No Auto-Generated Insurance Report Package**
+### **CROSS-GAP 2: No Auto-Generated Insurance Report Package** IGNORE FOR NOW, this is in the PSM dashboard
 
 **Issue:** Data exists in 4 separate workflows, but no comprehensive insurance report is generated.
 
@@ -698,7 +698,7 @@ These gaps span multiple workflows and represent systemic insurance documentatio
 
 ### **CROSS-GAP 3: No Thermal Imaging Continuity**
 
-**Issue:** Thermal imaging (if used) is captured in Install, but no follow-up thermal imaging in Pull to show before-after.
+**Issue:** Thermal imaging (if used) is captured in Install, but no follow-up thermal imaging in Pull to show before-after. THIS IS CORRECT, only on install
 
 **Insurance Impact:** Cannot prove hidden moisture is gone (thermal imaging carries significant weight with adjusters).
 
@@ -706,12 +706,12 @@ These gaps span multiple workflows and represent systemic insurance documentatio
 
 - [ ] YES - Always repeat thermal imaging on Pull for before-after comparison
 - [ ] CONDITIONAL - Only if initial thermal imaging showed significant hidden moisture
-- [ ] NO - One-time thermal imaging on Install is sufficient
+- [ ] NO - One-time thermal imaging on Install is sufficient this one
 - [ ] SKIP - We don't use thermal imaging
 
 ---
 
-### **CROSS-GAP 4: No Centralized Timeline View**
+### **CROSS-GAP 4: No Centralized Timeline View** IGNORE FOR NOW
 
 **Issue:** Job data spans 4 workflows over multiple days/weeks, but no visual timeline for customer/insurance.
 
@@ -731,11 +731,11 @@ These gaps span multiple workflows and represent systemic insurance documentatio
 - [ ] YES - Visual timeline with photos/data at each point
 - [ ] NO - Not necessary
 - [ ] CONDITIONAL - Only for jobs >5 days duration
-- [ ] UNSURE - Need to see example
+- [ ] UNSURE - Need to see example IGNORE FOR NOW
 
 ---
 
-### **CROSS-GAP 5: No Equipment Rental Duration Proof**
+### **CROSS-GAP 5: No Equipment Rental Duration Proof** DO NOT ADD THIS
 
 **Issue:** Equipment placed in Install, checked in Check Service, removed in Pull - but no consolidated proof of rental duration.
 
@@ -751,9 +751,9 @@ These gaps span multiple workflows and represent systemic insurance documentatio
 
 **Your Input:**
 - [ ] YES - Auto-generate equipment rental report
-- [ ] NO - Invoice is sufficient
+- [ ] NO - Invoice is sufficient - DO NOT ADD THIS
 - [ ] CONDITIONAL - Only if insurance requests proof
-- [ ] UNSURE
+- [ ] UNSURE - NO 
 
 ---
 
@@ -764,7 +764,7 @@ Please review all sections above and provide your feedback. Below are summary qu
 ### Overall Workflow Strategy
 
 **Q1:** Are you satisfied with the 4-workflow structure (Install, Demo, Check Service, Pull)?
-- [ ] YES - Keep as-is
+- [ ] YES - Keep as-is YES
 - [ ] NO - Needs restructuring (explain below)
 - [ ] PARTIAL - Some workflows should be combined/split (explain below)
 
@@ -773,7 +773,7 @@ Please review all sections above and provide your feedback. Below are summary qu
 ---
 
 **Q2:** Should certain workflows be optional or always required?
-- Install: ☐ Always required ☐ Optional
+- Install: ☐ Always required ☐ Optional 
 - Demo: ☐ Always required ☐ Optional (only if demo work needed)
 - Check Service: ☐ Always required ☐ Optional ☐ Required until moisture targets met
 - Pull: ☐ Always required ☐ Optional
