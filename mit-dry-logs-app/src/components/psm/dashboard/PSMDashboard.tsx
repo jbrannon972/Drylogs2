@@ -14,6 +14,8 @@ import {
   Printer,
   Search,
 } from 'lucide-react';
+import { photosService } from '../../../services/firebase/photosService';
+import { ReportPhotoSelector } from '../modals/ReportPhotoSelector';
 
 interface FilterOptions {
   status: PSMPhaseStatus | 'all';
@@ -33,6 +35,12 @@ export const PSMDashboard: React.FC = () => {
     searchText: '',
     severity: 'all',
   });
+
+  const [showPhotoSelectorModal, setShowPhotoSelectorModal] = useState(false);
+  const [reportJobData, setReportJobData] = useState<Job | null>(null);
+  const [selectedExteriorPhoto, setSelectedExteriorPhoto] = useState<string>('');
+  const [includePhotoGallery, setIncludePhotoGallery] = useState(false);
+  const [allJobPhotos, setAllJobPhotos] = useState<any[]>([]);
 
   // PSM sees ALL jobs - they are the bridge to insurance
   // No filtering - PSM needs visibility into every job regardless of phase
@@ -542,22 +550,73 @@ export const PSMDashboard: React.FC = () => {
     }
   };
 
-  const generateInitialInspectionReport = (job: Job, event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent navigation to job detail
+  const generateInitialInspectionReport = async (job: Job, event: React.MouseEvent) => {
+    event.stopPropagation();
 
-    // Check if install workflow is completed
     if (job.workflowPhases.install.status !== 'completed' || !job.workflowData?.install?.roomAssessments) {
       alert('Install workflow must be completed to generate Initial Inspection Report');
       return;
     }
 
-    const roomAssessments = job.workflowData.install.roomAssessments || [];
+    // Fetch all photos for this job
+    try {
+      const photos = await photosService.getPhotosByJobId(job.jobId);
+      const exteriorPhotos = photos.filter(p => p.category === 'exterior' || p.roomName.toLowerCase().includes('exterior') || p.roomName.toLowerCase().includes('property'));
+
+      setAllJobPhotos(photos);
+      setReportJobData(job);
+      setShowPhotoSelectorModal(true);
+
+      // If no exterior photos, use placeholder
+      if (exteriorPhotos.length === 0) {
+        setSelectedExteriorPhoto('');
+      }
+    } catch (error) {
+      console.error('Error fetching photos:', error);
+      // Continue without photos
+      setAllJobPhotos([]);
+      setReportJobData(job);
+      setShowPhotoSelectorModal(true);
+    }
+  };
+
+  const generatePhotoGalleryByRoom = (photos: any[]) => {
+    // Group photos by room
+    const photosByRoom: { [key: string]: any[] } = {};
+    photos.forEach(photo => {
+      const roomName = photo.roomName || 'Uncategorized';
+      if (!photosByRoom[roomName]) {
+        photosByRoom[roomName] = [];
+      }
+      photosByRoom[roomName].push(photo);
+    });
+
+    // Generate HTML for each room
+    return Object.entries(photosByRoom).map(([roomName, roomPhotos]) => `
+      <div class="room-box">
+        <div class="room-header">${roomName}</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+          ${roomPhotos.map(photo => `
+            <div style="break-inside: avoid;">
+              <img src="${photo.url}" alt="${roomName}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;" />
+              <div style="font-size: 9pt; color: #6b7280; margin-top: 4px; text-align: center;">
+                ${photo.timestamp.toDate().toLocaleString()}<br>
+                ${photo.category ? `<em>${photo.category}</em>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  };
+
+  const generateReportHTML = (job: Job, exteriorPhotoUrl: string, includePhotos: boolean, allPhotos: any[]) => {
+    const roomAssessments = job.workflowData?.install?.roomAssessments || [];
     const assessmentDate = job.workflowPhases.install.completedAt
       ? new Date(job.workflowPhases.install.completedAt.seconds * 1000).toLocaleDateString()
       : 'N/A';
 
-    // Generate Initial Inspection Report
-    const reportHTML = `
+    return `
       <!DOCTYPE html>
       <html>
       <head>
@@ -742,12 +801,21 @@ export const PSMDashboard: React.FC = () => {
         <button class="print-button no-print" onclick="window.print()">🖨️ Print Report</button>
 
         <div class="header">
-          <img src="/Elogo.png" alt="Entrusted Restoration" class="logo-img" />
-          <div class="report-title">INITIAL INSPECTION REPORT</div>
-          <div style="color: #6b7280; margin-top: 8px; font-size: 12pt;">
-            Water Damage Mitigation Assessment<br>
-            Report Generated: ${new Date().toLocaleString()}<br>
-            Assessment Completed: ${assessmentDate}
+          <div style="display: flex; justify-content: space-between; align-items: start; border-bottom: 4px solid #ea580c; padding-bottom: 20px; margin-bottom: 30px;">
+            <div style="flex: 1;">
+              <h1 style="font-size: 20px; font-weight: bold; color: #1f2937; margin: 0 0 10px 0;">Entrusted Restoration</h1>
+              <div style="font-size: 22px; font-weight: bold; color: #1f2937; margin: 0 0 5px 0;">INITIAL INSPECTION REPORT</div>
+              <div style="font-size: 14px; color: #6b7280; margin: 0 0 8px 0;">Water Damage Mitigation Assessment</div>
+              <div style="font-size: 11pt; color: #6b7280;">
+                Report Generated: ${new Date().toLocaleString()}<br>
+                Assessment Completed: ${assessmentDate}
+              </div>
+            </div>
+            ${exteriorPhotoUrl ? `
+              <div style="flex: 0 0 300px; margin-left: 20px;">
+                <img src="${exteriorPhotoUrl}" alt="Property Exterior" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid #ea580c;" />
+              </div>
+            ` : ''}
           </div>
         </div>
 
@@ -907,6 +975,13 @@ export const PSMDashboard: React.FC = () => {
           `}
         </div>
 
+        ${includePhotos && allPhotos.length > 0 ? `
+          <div class="section page-break">
+            <div class="section-title">PHOTO DOCUMENTATION</div>
+            ${generatePhotoGalleryByRoom(allPhotos)}
+          </div>
+        ` : ''}
+
         <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12pt;">
           This Initial Inspection Report was generated by Entrusted Restoration<br>
           For insurance submission and project documentation<br>
@@ -915,13 +990,26 @@ export const PSMDashboard: React.FC = () => {
       </body>
       </html>
     `;
+  };
 
-    // Open report in new window
+  const handleReportProceed = (includePhotos: boolean) => {
+    if (!reportJobData) return;
+
+    const exteriorPhotos = allJobPhotos.filter(p => p.category === 'exterior' || p.roomName.toLowerCase().includes('exterior') || p.roomName.toLowerCase().includes('property'));
+
+    const reportHTML = generateReportHTML(reportJobData, selectedExteriorPhoto, includePhotos, allJobPhotos);
+
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(reportHTML);
       printWindow.document.close();
     }
+
+    // Reset state
+    setShowPhotoSelectorModal(false);
+    setReportJobData(null);
+    setSelectedExteriorPhoto('');
+    setAllJobPhotos([]);
   };
 
   return (
@@ -1145,6 +1233,20 @@ export const PSMDashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {showPhotoSelectorModal && (
+        <ReportPhotoSelector
+          isOpen={showPhotoSelectorModal}
+          onClose={() => {
+            setShowPhotoSelectorModal(false);
+            setReportJobData(null);
+            setAllJobPhotos([]);
+          }}
+          exteriorPhotos={allJobPhotos.filter(p => p.category === 'exterior' || p.roomName.toLowerCase().includes('exterior') || p.roomName.toLowerCase().includes('property'))}
+          onSelectExterior={(photoUrl) => setSelectedExteriorPhoto(photoUrl)}
+          onProceed={handleReportProceed}
+        />
+      )}
     </div>
   );
 };
