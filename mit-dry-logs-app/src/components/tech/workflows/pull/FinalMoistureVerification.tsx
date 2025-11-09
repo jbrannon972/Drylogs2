@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, AlertTriangle, Info, Camera, Droplets } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Info, Camera, Droplets, FileText, AlertCircle } from 'lucide-react';
 import { Input } from '../../../shared/Input';
 import { Button } from '../../../shared/Button';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
@@ -8,6 +8,7 @@ import { useAuth } from '../../../../hooks/useAuth';
 import {
   MaterialMoistureTracking,
   MoistureReadingEntry,
+  DryingReleaseWaiver,
   getMoistureTrend,
   isMaterialDry,
 } from '../../../../types';
@@ -55,6 +56,12 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
   const handleAddFinalReading = () => {
     if (!selectedMaterial || !finalReading) {
       alert('Please enter a final moisture reading');
+      return;
+    }
+
+    // PHASE 1: Photo is REQUIRED for final readings
+    if (!photo) {
+      alert('Photo is required! Please take a photo showing the final moisture meter reading and the material.');
       return;
     }
 
@@ -137,17 +144,26 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
 
   return (
     <div className="space-y-6">
-      {/* Instructions */}
+      {/* PHASE 1: Instructions with DRW option */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-medium text-blue-900 mb-1">Final Moisture Verification</h4>
+            <h4 className="font-medium text-blue-900 mb-1">
+              Final Moisture Verification - Tracked Materials List
+            </h4>
             <p className="text-sm text-blue-800">
-              Before pulling equipment, verify that ALL materials are dry. Take final readings at the same
-              locations where initial readings were taken. Materials must be within 2% of dry standard or
-              below 12% moisture to be considered dry per IICRC standards.
+              Before pulling equipment, verify ALL materials from the tracked materials list. Take final readings
+              at the exact same locations as initial readings.
             </p>
+            <p className="text-sm text-blue-800 mt-2">
+              <strong>PHASE 1 Requirements:</strong>
+            </p>
+            <ul className="text-sm text-blue-800 list-disc ml-5 mt-1">
+              <li>Photo REQUIRED for each final reading (meter + material visible)</li>
+              <li>Materials must be within 2% of dry standard or below 12% (IICRC)</li>
+              <li>If pulling equipment while materials still wet, create Drying Release Waiver (DRW)</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -378,6 +394,15 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
                           />
                         </div>
                         <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-2">
+                            <Camera className="w-3 h-3 inline mr-1" />
+                            Photo (Required) *
+                          </label>
+                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 mb-2">
+                            <p className="text-xs text-orange-900">
+                              <strong>REQUIRED:</strong> Final photo must show meter display AND material tested
+                            </p>
+                          </div>
                           {photo ? (
                             <div>
                               <img src={photo} alt="Meter" className="max-h-32 rounded mb-2" />
@@ -395,7 +420,7 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
                               </label>
                             </div>
                           ) : (
-                            <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 w-full justify-center">
+                            <label className="btn-primary cursor-pointer inline-flex items-center gap-2 w-full justify-center">
                               <input
                                 type="file"
                                 accept="image/*"
@@ -405,14 +430,14 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
                                 disabled={isUploading}
                               />
                               <Camera className="w-4 h-4" />
-                              {isUploading ? 'Uploading...' : 'Take Final Photo'}
+                              {isUploading ? 'Uploading...' : 'Take Final Photo (Required)'}
                             </label>
                           )}
                         </div>
                         <Button
                           variant="primary"
                           onClick={handleAddFinalReading}
-                          disabled={!finalReading}
+                          disabled={!finalReading || !photo}
                           className="w-full"
                         >
                           <CheckCircle className="w-4 h-4" />

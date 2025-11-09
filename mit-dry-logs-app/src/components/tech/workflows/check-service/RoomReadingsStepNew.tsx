@@ -60,6 +60,12 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
       return;
     }
 
+    // PHASE 1: Photo is now REQUIRED
+    if (!photo) {
+      alert('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
+      return;
+    }
+
     const readingNum = parseFloat(newReading);
 
     // Create new reading entry
@@ -167,17 +173,26 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
 
   return (
     <div className="space-y-6">
-      {/* Instructions */}
+      {/* PHASE 1: Tracked Materials List Instructions */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-medium text-blue-900 mb-1">Check Service Visit #{visitNumber} - Moisture Readings</h4>
+            <h4 className="font-medium text-blue-900 mb-1">
+              Check Service Visit #{visitNumber} - Tracked Materials List
+            </h4>
             <p className="text-sm text-blue-800">
-              Update readings for all materials that were tracked during install. Return to the same
-              locations to ensure consistent measurement. Materials are dry when within 2% of dry standard
-              or below 12% moisture.
+              Below are all materials tracked from Install workflow. Return to the <strong>exact same locations</strong> to
+              ensure consistent measurement.
             </p>
+            <p className="text-sm text-blue-800 mt-2">
+              <strong>PHASE 1 Requirements:</strong>
+            </p>
+            <ul className="text-sm text-blue-800 list-disc ml-5 mt-1">
+              <li>Photo REQUIRED for each reading (meter + material visible)</li>
+              <li>Materials auto-removed from tracking when they reach dry standard</li>
+              <li>Leave notes for next visit if needed</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -343,6 +358,15 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
                           />
                         </div>
                         <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-2">
+                            <Camera className="w-3 h-3 inline mr-1" />
+                            Photo (Required) *
+                          </label>
+                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 mb-2">
+                            <p className="text-xs text-orange-900">
+                              <strong>REQUIRED:</strong> Photo must show both meter display AND material being tested
+                            </p>
+                          </div>
                           {photo ? (
                             <div>
                               <img src={photo} alt="Meter" className="max-h-32 rounded mb-2" />
@@ -360,7 +384,7 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
                               </label>
                             </div>
                           ) : (
-                            <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 w-full justify-center">
+                            <label className="btn-primary cursor-pointer inline-flex items-center gap-2 w-full justify-center">
                               <input
                                 type="file"
                                 accept="image/*"
@@ -370,14 +394,14 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
                                 disabled={isUploading}
                               />
                               <Camera className="w-4 h-4" />
-                              {isUploading ? 'Uploading...' : 'Take Photo (Optional)'}
+                              {isUploading ? 'Uploading...' : 'Take Photo (Required)'}
                             </label>
                           )}
                         </div>
                         <Button
                           variant="primary"
                           onClick={handleAddReading}
-                          disabled={!newReading}
+                          disabled={!newReading || !photo}
                           className="w-full"
                         >
                           <CheckCircle className="w-4 h-4" />
