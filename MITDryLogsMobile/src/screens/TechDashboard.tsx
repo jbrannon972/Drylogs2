@@ -231,12 +231,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     padding: 16,
-    gap: 12,
   },
   statusCard: {
     flex: 1,
-    minWidth: '45%',
+    minWidth: 140,
     padding: 16,
+    margin: 6,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: '#E5E7EB',
@@ -265,9 +265,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   jobCardContent: {
-    gap: 8,
   },
   jobTitle: {
+    marginBottom: 4,
     fontSize: 18,
     fontWeight: 'bold',
     color: '#111827',
@@ -275,10 +275,12 @@ const styles = StyleSheet.create({
   jobAddress: {
     fontSize: 14,
     color: '#6B7280',
+    marginBottom: 4,
   },
   jobDate: {
     fontSize: 14,
     color: '#6B7280',
+    marginBottom: 8,
   },
   jobFooter: {
     flexDirection: 'row',

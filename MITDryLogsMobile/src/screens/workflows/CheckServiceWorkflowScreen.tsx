@@ -62,9 +62,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   stepsList: {
-    gap: 8,
   },
   step: {
+    marginBottom: 8,
     fontSize: 14,
     color: '#374151',
     paddingVertical: 8,
