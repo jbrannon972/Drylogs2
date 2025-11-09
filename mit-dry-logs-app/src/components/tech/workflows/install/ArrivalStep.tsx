@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
-import { Camera, MapPin, Clock, CheckCircle } from 'lucide-react';
+import { Camera, MapPin, Clock, CheckCircle, X } from 'lucide-react';
 import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
@@ -33,6 +33,8 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
   const [hasPropertyPhoto, setHasPropertyPhoto] = useState<boolean>(
     installData.hasPropertyPhoto || false
   );
+  const [showTruckPhotoModal, setShowTruckPhotoModal] = useState(false);
+  const [showPropertyPhotoModal, setShowPropertyPhotoModal] = useState(false);
 
   // ULTRAFAULT: Save to workflow store when data changes with debounce
   useEffect(() => {
@@ -75,26 +77,6 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
       // Reset input so same files can be selected again
       e.target.value = '';
     }
-  };
-
-  const handleOpenCameraApp = () => {
-    // Show instructions
-    alert(
-      '📸 BATCH MODE:\n\n' +
-      '1. This will open your Camera app\n' +
-      '2. Take ALL the photos you need\n' +
-      '3. Come back to this app\n' +
-      '4. Tap "Select from Gallery"\n' +
-      '5. Multi-select all photos\n\n' +
-      'Photos upload in background ✓'
-    );
-
-    // Attempt to open camera app (works on some devices)
-    // This will fail gracefully if not supported
-    window.location.href = 'camera://';
-
-    // Fallback: if camera:// doesn't work, user manually opens camera
-    // They'll see the alert instructions first
   };
 
   const canProceed = hasTruckPhoto && hasPropertyPhoto;
@@ -157,40 +139,15 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
           )}
           <Camera className="w-10 h-10 text-gray-400 mx-auto mb-3" />
 
-          {/* Take Photo Button */}
-          <label className="btn-primary cursor-pointer inline-block w-full mb-2">
-            📷 Take Photo
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleTruckPhotosCapture}
-              className="hidden"
-            />
-          </label>
-
-          {/* Select Multiple Button */}
-          <label className="btn-secondary cursor-pointer inline-block w-full mb-2">
-            🖼️ Select from Gallery
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleTruckPhotosCapture}
-              className="hidden"
-            />
-          </label>
-
-          {/* Batch Mode Button */}
           <button
-            onClick={handleOpenCameraApp}
-            className="w-full px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors"
+            onClick={() => setShowTruckPhotoModal(true)}
+            className="btn-primary w-full"
           >
-            📸 Open Camera for Batch
+            📷 Add Photos
           </button>
 
           <p className="text-xs text-gray-500 mt-3">
-            Quick shot, batch mode, or select from gallery
+            Required for safety documentation
           </p>
         </div>
       </div>
@@ -209,40 +166,15 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
           )}
           <Camera className="w-10 h-10 text-gray-400 mx-auto mb-3" />
 
-          {/* Take Photo Button */}
-          <label className="btn-primary cursor-pointer inline-block w-full mb-2">
-            📷 Take Photo
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handlePropertyPhotosCapture}
-              className="hidden"
-            />
-          </label>
-
-          {/* Select Multiple Button */}
-          <label className="btn-secondary cursor-pointer inline-block w-full mb-2">
-            🖼️ Select from Gallery
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handlePropertyPhotosCapture}
-              className="hidden"
-            />
-          </label>
-
-          {/* Batch Mode Button */}
           <button
-            onClick={handleOpenCameraApp}
-            className="w-full px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors"
+            onClick={() => setShowPropertyPhotoModal(true)}
+            className="btn-primary w-full"
           >
-            📸 Open Camera for Batch
+            📷 Add Photos
           </button>
 
           <p className="text-xs text-gray-500 mt-3">
-            Quick shot, batch mode, or select from gallery
+            Document property exterior
           </p>
         </div>
       </div>
@@ -271,6 +203,196 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
           <p className="text-sm text-yellow-800">
             ⚠️ Please upload both truck and property photos to proceed
           </p>
+        </div>
+      )}
+
+      {/* Truck Photo Modal */}
+      {showTruckPhotoModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Add Truck Photos</h3>
+                <button
+                  onClick={() => setShowTruckPhotoModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {/* Quick Shot */}
+                <label className="block p-4 border-2 border-gray-200 rounded-xl hover:border-entrusted-orange hover:bg-orange-50 transition-all cursor-pointer active:scale-95">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={(e) => {
+                      handleTruckPhotosCapture(e);
+                      setShowTruckPhotoModal(false);
+                    }}
+                    className="hidden"
+                  />
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Camera className="w-6 h-6 text-entrusted-orange" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-900 mb-1">📷 Quick Shot</h4>
+                      <p className="text-sm text-gray-600">Take one photo, tap again for more</p>
+                    </div>
+                  </div>
+                </label>
+
+                {/* Batch Mode */}
+                <button
+                  onClick={() => {
+                    setShowTruckPhotoModal(false);
+                    alert(
+                      '📸 BATCH MODE:\n\n' +
+                      '1. Exit this app\n' +
+                      '2. Open Camera app\n' +
+                      '3. Take ALL photos needed\n' +
+                      '4. Come back here\n' +
+                      '5. Tap "Add Photos"\n' +
+                      '6. Choose "From Gallery"\n' +
+                      '7. Multi-select photos'
+                    );
+                  }}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all text-left active:scale-95"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">📸</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-900 mb-1">📋 Batch Mode</h4>
+                      <p className="text-sm text-gray-600">Take many photos at once, then upload</p>
+                    </div>
+                  </div>
+                </button>
+
+                {/* From Gallery */}
+                <label className="block p-4 border-2 border-gray-200 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all cursor-pointer active:scale-95">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      handleTruckPhotosCapture(e);
+                      setShowTruckPhotoModal(false);
+                    }}
+                    className="hidden"
+                  />
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">🖼️</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-900 mb-1">📱 From Gallery</h4>
+                      <p className="text-sm text-gray-600">Select multiple existing photos</p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Property Photo Modal */}
+      {showPropertyPhotoModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Add Property Photos</h3>
+                <button
+                  onClick={() => setShowPropertyPhotoModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {/* Quick Shot */}
+                <label className="block p-4 border-2 border-gray-200 rounded-xl hover:border-entrusted-orange hover:bg-orange-50 transition-all cursor-pointer active:scale-95">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={(e) => {
+                      handlePropertyPhotosCapture(e);
+                      setShowPropertyPhotoModal(false);
+                    }}
+                    className="hidden"
+                  />
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Camera className="w-6 h-6 text-entrusted-orange" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-900 mb-1">📷 Quick Shot</h4>
+                      <p className="text-sm text-gray-600">Take one photo, tap again for more</p>
+                    </div>
+                  </div>
+                </label>
+
+                {/* Batch Mode */}
+                <button
+                  onClick={() => {
+                    setShowPropertyPhotoModal(false);
+                    alert(
+                      '📸 BATCH MODE:\n\n' +
+                      '1. Exit this app\n' +
+                      '2. Open Camera app\n' +
+                      '3. Take ALL photos needed\n' +
+                      '4. Come back here\n' +
+                      '5. Tap "Add Photos"\n' +
+                      '6. Choose "From Gallery"\n' +
+                      '7. Multi-select photos'
+                    );
+                  }}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all text-left active:scale-95"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">📸</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-900 mb-1">📋 Batch Mode</h4>
+                      <p className="text-sm text-gray-600">Take many photos at once, then upload</p>
+                    </div>
+                  </div>
+                </button>
+
+                {/* From Gallery */}
+                <label className="block p-4 border-2 border-gray-200 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all cursor-pointer active:scale-95">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      handlePropertyPhotosCapture(e);
+                      setShowPropertyPhotoModal(false);
+                    }}
+                    className="hidden"
+                  />
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">🖼️</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-900 mb-1">📱 From Gallery</h4>
+                      <p className="text-sm text-gray-600">Select multiple existing photos</p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
