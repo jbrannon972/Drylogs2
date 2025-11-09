@@ -105,59 +105,36 @@ export const photoService = {
   },
 
   /**
-   * Compress image before upload (client-side)
+   * Compress image before upload (React Native version)
+   *
+   * NOTE: Web canvas API removed - React Native doesn't support it.
+   * Image compression should be handled by:
+   * - expo-image-picker: Set 'quality' option when picking images
+   * - expo-image-manipulator: For manual compression/resizing
+   * - expo-camera: Set quality in camera options
+   *
+   * Example with expo-image-picker:
+   * const result = await ImagePicker.launchCameraAsync({
+   *   quality: 0.8, // 0-1, lower = more compression
+   *   allowsEditing: true,
+   *   aspect: [4, 3],
+   * });
    */
-  async compressImage(file: File, maxWidth: number = 1920, quality: number = 0.8): Promise<Blob> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+  async compressImage(uri: string, maxWidth: number = 1920, quality: number = 0.8): Promise<string> {
+    // TODO: Implement React Native image compression using expo-image-manipulator
+    // For now, return the original URI
+    // Install: npm install expo-image-manipulator
+    //
+    // import * as ImageManipulator from 'expo-image-manipulator';
+    //
+    // const result = await ImageManipulator.manipulateAsync(
+    //   uri,
+    //   [{ resize: { width: maxWidth } }],
+    //   { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+    // );
+    // return result.uri;
 
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-
-          if (width > maxWidth) {
-            height = (height * maxWidth) / width;
-            width = maxWidth;
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            reject(new Error('Failed to get canvas context'));
-            return;
-          }
-
-          ctx.drawImage(img, 0, 0, width, height);
-
-          canvas.toBlob(
-            (blob) => {
-              if (blob) {
-                resolve(blob);
-              } else {
-                reject(new Error('Failed to compress image'));
-              }
-            },
-            'image/jpeg',
-            quality
-          );
-        };
-
-        img.onerror = () => {
-          reject(new Error('Failed to load image'));
-        };
-      };
-
-      reader.onerror = () => {
-        reject(new Error('Failed to read file'));
-      };
-    });
+    console.warn('Image compression not yet implemented for React Native');
+    return uri;
   },
 };

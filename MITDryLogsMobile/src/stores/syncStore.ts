@@ -1,9 +1,12 @@
 /**
  * Sync Store
  * Manages offline sync queue and network status
+ *
+ * REACT NATIVE VERSION - Uses NetInfo instead of navigator.onLine
  */
 
 import { create } from 'zustand';
+import NetInfo from '@react-native-community/netinfo';
 import { SyncQueueItem, SyncStatus } from '../types';
 
 interface SyncState {
@@ -20,6 +23,7 @@ interface SyncState {
   removeFromQueue: (id: string) => void;
   clearQueue: () => void;
   setLastSyncTime: (time: number) => void;
+  initializeNetworkListener: () => () => void;
 
   // Selectors
   getPendingItems: () => SyncQueueItem[];
@@ -27,7 +31,8 @@ interface SyncState {
 }
 
 export const useSyncStore = create<SyncState>((set, get) => ({
-  isOnline: navigator.onLine,
+  // Default to true, will be updated by NetInfo listener
+  isOnline: true,
   isSyncing: false,
   queue: [],
   lastSyncTime: null,
@@ -65,6 +70,32 @@ export const useSyncStore = create<SyncState>((set, get) => ({
   clearQueue: () => set({ queue: [] }),
 
   setLastSyncTime: (time) => set({ lastSyncTime: time }),
+
+  // Initialize network listener - call this when app starts
+  initializeNetworkListener: () => {
+    // Subscribe to network state changes
+    const unsubscribe = NetInfo.addEventListener(state => {
+      const isConnected = state.isConnected ?? true;
+      set({ isOnline: isConnected });
+
+      // Log network changes for debugging
+      console.log('📡 Network status:', isConnected ? 'Online' : 'Offline');
+
+      // Auto-sync when coming back online
+      if (isConnected && get().queue.length > 0) {
+        console.log('🔄 Network restored, pending sync items:', get().queue.length);
+      }
+    });
+
+    // Fetch initial network state
+    NetInfo.fetch().then(state => {
+      const isConnected = state.isConnected ?? true;
+      set({ isOnline: isConnected });
+      console.log('📡 Initial network status:', isConnected ? 'Online' : 'Offline');
+    });
+
+    return unsubscribe;
+  },
 
   getPendingItems: () =>
     get().queue.filter((item) => item.status === 'pending'),
