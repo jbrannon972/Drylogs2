@@ -491,8 +491,9 @@ export interface DryingChamber {
   airMovers: AirMover[];
   airScrubbers: AirScrubber[];
   ambientReadings: ChamberAmbientReading[]; // Environmental conditions over time
-  hasContainment?: boolean; // Poly barriers for Category 2/3
-  containmentNotes?: string;
+  hasContainment?: boolean; // DEPRECATED: Use containmentBarrier instead
+  containmentNotes?: string; // DEPRECATED: Use containmentBarrier instead
+  containmentBarrier?: ContainmentBarrierSetup; // PHASE 2: Full containment documentation
 }
 
 // NEW: Drying Plan and Goals

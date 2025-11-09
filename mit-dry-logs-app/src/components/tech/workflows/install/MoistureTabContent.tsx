@@ -109,6 +109,12 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
       return;
     }
 
+    // PHASE 1 VALIDATION: Photo is now REQUIRED (must show meter + material visible)
+    if (!photo) {
+      alert('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
+      return;
+    }
+
     const dryStandardNum = parseFloat(dryStandard);
     const wetReadingNum = parseFloat(wetReading);
 
@@ -321,12 +327,17 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             </div>
           </div>
 
-          {/* Photo Upload */}
+          {/* Photo Upload - PHASE 1: Now REQUIRED */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Camera className="w-4 h-4 inline mr-1" />
-              Photo (Optional)
+              Photo (Required) *
             </label>
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+              <p className="text-xs text-orange-900">
+                <strong>REQUIRED:</strong> Photo must clearly show both the moisture meter display AND the material being tested
+              </p>
+            </div>
             {photo ? (
               <div>
                 <img src={photo} alt="Moisture Meter" className="max-h-48 rounded mb-3" />
@@ -383,7 +394,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             <Button
               variant="primary"
               onClick={handleSaveReading}
-              disabled={!location.trim() || !dryStandard || !wetReading}
+              disabled={!location.trim() || !dryStandard || !wetReading || !photo}
               className="flex-1"
             >
               <CheckCircle className="w-4 h-4" />

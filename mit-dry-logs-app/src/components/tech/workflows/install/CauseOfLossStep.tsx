@@ -34,9 +34,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
   const [eventDate, setEventDate] = useState(
     installData.causeOfLoss?.eventDate || new Date().toISOString().split('T')[0]
   );
-  const [thermalImagingUsed, setThermalImagingUsed] = useState(
-    installData.specializedServices?.thermalImaging || false
-  );
+  // PHASE 1: Thermal imaging state removed - now handled in RoomAssessmentStep (per room)
 
   // Cat 3 Biohazard Containment Checklist (OSHA Compliance)
   const [cat3Checklist, setCat3Checklist] = useState({
@@ -67,13 +65,11 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         category: waterCategory,
         determinedAt,
       },
-      specializedServices: {
-        thermalImaging: thermalImagingUsed,
-      },
+      // PHASE 1: specializedServices.thermalImaging removed - now per-room in RoomAssessmentStep
       cat3Containment: waterCategory === 3 ? cat3Checklist : undefined,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, thermalImagingUsed, cat3Checklist, determinedAt]);
+  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, cat3Checklist, determinedAt]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -302,33 +298,8 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         </div>
       </div>
 
-      {/* Specialized Services */}
-      <div className="border border-gray-200 rounded-lg p-4">
-        <h3 className="font-semibold text-gray-900 mb-3">Specialized Services</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Select any specialized services needed for this job. These will be added to the estimate.
-        </p>
-
-        <div className="space-y-3">
-          {/* Thermal Imaging */}
-          <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={thermalImagingUsed}
-                onChange={(e) => setThermalImagingUsed(e.target.checked)}
-                className="w-5 h-5 text-entrusted-orange border-gray-300 rounded focus:ring-entrusted-orange mt-0.5"
-              />
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">Thermal Imaging</p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Use thermal camera to detect hidden moisture behind walls, under floors, or in ceilings. Required for comprehensive moisture mapping.
-                </p>
-              </div>
-            </label>
-          </div>
-        </div>
-      </div>
+      {/* PHASE 1: Thermal imaging moved to RoomAssessmentStep (per room, optional) */}
+      {/* This section has been removed - see RoomAssessmentStep for thermal imaging */}
 
       {/* Water Category Selection */}
       <div>

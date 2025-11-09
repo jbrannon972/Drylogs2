@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { ConfirmModal } from '../../../shared/ConfirmModal';
-import { Wind, Plus, Trash2, Edit2, AlertCircle, Info, CheckCircle } from 'lucide-react';
+import { Wind, Plus, Trash2, Edit2, AlertCircle, Info, CheckCircle, Camera, X } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
-import { DryingChamber } from '../../../../types';
+import { DryingChamber, ContainmentBarrierSetup } from '../../../../types';
+import { usePhotos } from '../../../../hooks/usePhotos';
+import { useAuth } from '../../../../hooks/useAuth';
 import { Timestamp } from 'firebase/firestore';
 
 interface DefineChambersStepProps {
@@ -24,6 +26,8 @@ interface RoomData {
 
 export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
+  const { user } = useAuth();
+  const { uploadPhoto, isUploading } = usePhotos();
   const rooms: RoomData[] = installData.roomAssessments || [];
 
   const [chambers, setChambers] = useState<DryingChamber[]>([]);
@@ -298,19 +302,219 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                 </div>
               </div>
 
-              {/* Containment Option */}
-              <div className="mb-4">
-                <label className="flex items-center gap-2 cursor-pointer">
+              {/* PHASE 2: Containment Barrier Documentation */}
+              <div className="mb-4 border-t pt-4">
+                <label className="flex items-center gap-2 cursor-pointer mb-3">
                   <input
                     type="checkbox"
-                    checked={chamber.hasContainment || false}
-                    onChange={() => toggleContainment(chamber.chamberId)}
+                    checked={chamber.containmentBarrier?.hasBarrier || chamber.hasContainment || false}
+                    onChange={(e) => {
+                      const hasBarrier = e.target.checked;
+                      setChambers(chambers.map(c =>
+                        c.chamberId === chamber.chamberId
+                          ? {
+                              ...c,
+                              containmentBarrier: hasBarrier
+                                ? { hasBarrier: true, photos: [] }
+                                : undefined,
+                              hasContainment: hasBarrier
+                            }
+                          : c
+                      ));
+                    }}
                     className="h-4 w-4 text-orange-600 rounded"
                   />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm font-medium text-gray-900">
                     This chamber has containment barriers (poly sheeting)
                   </span>
                 </label>
+
+                {/* Expanded Containment Documentation */}
+                {chamber.containmentBarrier?.hasBarrier && (
+                  <div className="ml-6 space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h5 className="font-medium text-blue-900 mb-3">Containment Barrier Details</h5>
+
+                    {/* Plastic Square Footage */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Plastic Square Footage (optional)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={chamber.containmentBarrier.plasticSqFt || ''}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || undefined;
+                          setChambers(chambers.map(c =>
+                            c.chamberId === chamber.chamberId
+                              ? {
+                                  ...c,
+                                  containmentBarrier: { ...c.containmentBarrier!, plasticSqFt: value }
+                                }
+                              : c
+                          ));
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        placeholder="e.g., 500"
+                      />
+                    </div>
+
+                    {/* Zipper Door Used */}
+                    <div>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={chamber.containmentBarrier.zipperUsed || false}
+                          onChange={(e) => {
+                            setChambers(chambers.map(c =>
+                              c.chamberId === chamber.chamberId
+                                ? {
+                                    ...c,
+                                    containmentBarrier: { ...c.containmentBarrier!, zipperUsed: e.target.checked }
+                                  }
+                                : c
+                            ));
+                          }}
+                          className="h-4 w-4 text-orange-600 rounded"
+                        />
+                        <span className="text-sm text-gray-700">Zipper door installed</span>
+                      </label>
+                    </div>
+
+                    {/* Zip Poles Used */}
+                    <div>
+                      <label className="flex items-center gap-2 cursor-pointer mb-2">
+                        <input
+                          type="checkbox"
+                          checked={chamber.containmentBarrier.zipPolesUsed || false}
+                          onChange={(e) => {
+                            setChambers(chambers.map(c =>
+                              c.chamberId === chamber.chamberId
+                                ? {
+                                    ...c,
+                                    containmentBarrier: {
+                                      ...c.containmentBarrier!,
+                                      zipPolesUsed: e.target.checked,
+                                      zipPolesCount: e.target.checked ? c.containmentBarrier!.zipPolesCount : undefined
+                                    }
+                                  }
+                                : c
+                            ));
+                          }}
+                          className="h-4 w-4 text-orange-600 rounded"
+                        />
+                        <span className="text-sm text-gray-700">Zip poles used</span>
+                      </label>
+
+                      {/* Zip Poles Count */}
+                      {chamber.containmentBarrier.zipPolesUsed && (
+                        <div className="ml-6">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Number of zip poles
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={chamber.containmentBarrier.zipPolesCount || ''}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value) || undefined;
+                              setChambers(chambers.map(c =>
+                                c.chamberId === chamber.chamberId
+                                  ? {
+                                      ...c,
+                                      containmentBarrier: { ...c.containmentBarrier!, zipPolesCount: value }
+                                    }
+                                  : c
+                              ));
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="e.g., 4"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Containment Photos */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Containment Photos (optional)
+                      </label>
+                      <Button
+                        variant="secondary"
+                        onClick={async () => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*';
+                          input.capture = 'environment';
+                          input.onchange = async (e: any) => {
+                            const file = e.target?.files?.[0];
+                            if (file && user && job) {
+                              try {
+                                const photoUrl = await uploadPhoto(file, job.jobId, chamber.chamberId, 'containment', user.uid);
+                                if (photoUrl) {
+                                  setChambers(chambers.map(c =>
+                                    c.chamberId === chamber.chamberId
+                                      ? {
+                                          ...c,
+                                          containmentBarrier: {
+                                            ...c.containmentBarrier!,
+                                            photos: [...(c.containmentBarrier!.photos || []), photoUrl]
+                                          }
+                                        }
+                                      : c
+                                  ));
+                                }
+                              } catch (error) {
+                                console.error('Error uploading photo:', error);
+                                alert('Failed to upload photo');
+                              }
+                            }
+                          };
+                          input.click();
+                        }}
+                        disabled={isUploading}
+                        className="w-full"
+                      >
+                        <Camera className="w-4 h-4" />
+                        {isUploading ? 'Uploading...' : 'Take Containment Photo'}
+                      </Button>
+
+                      {/* Photo Grid */}
+                      {(chamber.containmentBarrier.photos?.length || 0) > 0 && (
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          {chamber.containmentBarrier.photos?.map((photoUrl, index) => (
+                            <div key={index} className="relative">
+                              <img
+                                src={photoUrl}
+                                alt={`Containment ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-lg border border-gray-300"
+                              />
+                              <button
+                                onClick={() => {
+                                  setChambers(chambers.map(c =>
+                                    c.chamberId === chamber.chamberId
+                                      ? {
+                                          ...c,
+                                          containmentBarrier: {
+                                            ...c.containmentBarrier!,
+                                            photos: c.containmentBarrier!.photos?.filter((_, i) => i !== index)
+                                          }
+                                        }
+                                      : c
+                                  ));
+                                }}
+                                className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Assigned Rooms */}

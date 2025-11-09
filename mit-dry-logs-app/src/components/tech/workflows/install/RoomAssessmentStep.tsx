@@ -58,9 +58,9 @@ interface RoomData {
   // Affected materials
   materialsAffected: MaterialAffected[];
 
-  // Photos
-  overviewPhoto?: string;
-  moisturePhotos: string[];
+  // Photos - Phase 1 Requirements
+  overallPhotos: string[]; // REQUIRED: Minimum 4 (wide shot + damage close-ups)
+  thermalPhotos?: string[]; // OPTIONAL: Thermal imaging (moved from CauseOfLoss)
 
   // Completion tracking
   isComplete: boolean;
@@ -94,26 +94,47 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     height: '8',
   });
 
-  // Migrate old rooms to new material structure
+  // Migrate old rooms to new material structure and new photo structure
   useEffect(() => {
     let needsMigration = false;
     const migratedRooms = rooms.map(room => {
+      let updatedRoom = { ...room };
+
       // Check if room has old material structure (< 42 materials or has old material names like 'Appliances')
       const hasOldAppliances = room.materialsAffected.some(m => m.materialType === 'Appliances' as any);
       if (room.materialsAffected.length < 42 || hasOldAppliances) {
         needsMigration = true;
         // Preserve any custom materials that were added
         const customMaterials = room.materialsAffected.filter(m => m.materialType === 'Custom');
-        return {
-          ...room,
-          materialsAffected: [...getDefaultMaterials(), ...customMaterials]
-        };
+        updatedRoom.materialsAffected = [...getDefaultMaterials(), ...customMaterials];
       }
-      return room;
+
+      // PHASE 1 MIGRATION: Convert old overviewPhoto to overallPhotos array
+      if ('overviewPhoto' in updatedRoom && !(updatedRoom as any).overallPhotos) {
+        needsMigration = true;
+        const oldPhoto = (updatedRoom as any).overviewPhoto;
+        updatedRoom.overallPhotos = oldPhoto ? [oldPhoto] : [];
+        delete (updatedRoom as any).overviewPhoto;
+        console.log('🔄 Migrating room photo structure: overviewPhoto → overallPhotos');
+      }
+
+      // PHASE 1 MIGRATION: Ensure overallPhotos exists
+      if (!updatedRoom.overallPhotos) {
+        needsMigration = true;
+        updatedRoom.overallPhotos = [];
+      }
+
+      // PHASE 1 MIGRATION: Ensure thermalPhotos exists
+      if (!updatedRoom.thermalPhotos) {
+        needsMigration = true;
+        updatedRoom.thermalPhotos = [];
+      }
+
+      return updatedRoom;
     });
 
     if (needsMigration) {
-      console.log('🔄 Migrating rooms to new material structure (42 materials + appliances)');
+      console.log('🔄 Migrating rooms to new structure (Phase 1 photo requirements)');
       setRooms(migratedRooms);
     }
     // Only run once on mount
@@ -160,8 +181,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       preexistingDamagePhotos: [],
       moistureReadings: [],
       materialsAffected: getDefaultMaterials(),
-      overviewPhoto: undefined,
-      moisturePhotos: [],
+      overallPhotos: [], // Phase 1: Minimum 4 required
+      thermalPhotos: [], // Phase 1: Optional thermal imaging
       isComplete: false,
     };
 
@@ -350,6 +371,23 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     // Validation for new completions
     if (selectedRoom.length === 0 || selectedRoom.width === 0) {
       alert('Please enter room dimensions before marking complete');
+      return;
+    }
+
+    // PHASE 1 VALIDATION: Check overall photos (minimum 4 required)
+    if (selectedRoom.overallPhotos.length < 4) {
+      alert(`Please capture at least 4 overall room photos. You currently have ${selectedRoom.overallPhotos.length} photo(s).`);
+      return;
+    }
+
+    // PHASE 1 VALIDATION: Check moisture photos (minimum 2 required per room)
+    const roomMoistureTracking = moistureTracking.filter(t => t.roomId === selectedRoom.id);
+    const totalMoisturePhotos = roomMoistureTracking.reduce((count, tracking) => {
+      return count + tracking.readings.filter(r => r.photo).length;
+    }, 0);
+
+    if (totalMoisturePhotos < 2) {
+      alert(`Please capture at least 2 moisture photos with meter visible. You currently have ${totalMoisturePhotos} moisture photo(s).`);
       return;
     }
 
@@ -556,6 +594,188 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                     <p className="text-sm text-blue-900 mt-1">
                       <strong>Square Footage:</strong> {(selectedRoom.length * selectedRoom.width).toFixed(0)} sq ft
                     </p>
+                  </div>
+
+                  {/* PHASE 1: Overall Room Photos - REQUIRED (4+ minimum) */}
+                  <div className="border-t pt-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Overall Room Photos</h3>
+
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm text-orange-900 font-medium mb-1">
+                            <strong>REQUIRED:</strong> Minimum 4 photos
+                          </p>
+                          <p className="text-sm text-orange-900">
+                            • 1 wide shot showing full room<br />
+                            • 3+ close-ups of visible damage areas
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Button
+                        variant="primary"
+                        onClick={async () => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*';
+                          input.capture = 'environment';
+                          input.onchange = async (e: any) => {
+                            const file = e.target?.files?.[0];
+                            if (file && user && job && selectedRoom) {
+                              try {
+                                const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'overall', user.uid);
+                                if (photoUrl) {
+                                  updateSelectedRoom({
+                                    overallPhotos: [...selectedRoom.overallPhotos, photoUrl],
+                                  });
+                                }
+                              } catch (error) {
+                                console.error('Error uploading photo:', error);
+                                alert('Failed to upload photo');
+                              }
+                            }
+                          };
+                          input.click();
+                        }}
+                        disabled={isUploading}
+                      >
+                        <Camera className="w-4 h-4" />
+                        {isUploading ? 'Uploading...' : 'Take Overall Photo'}
+                      </Button>
+
+                      {selectedRoom.overallPhotos.length > 0 && (
+                        <div>
+                          <div className={`p-3 rounded-lg mb-3 ${
+                            selectedRoom.overallPhotos.length >= 4
+                              ? 'bg-green-50 border border-green-200'
+                              : 'bg-yellow-50 border border-yellow-200'
+                          }`}>
+                            <p className={`text-sm font-medium ${
+                              selectedRoom.overallPhotos.length >= 4 ? 'text-green-900' : 'text-yellow-900'
+                            }`}>
+                              {selectedRoom.overallPhotos.length >= 4 ? (
+                                <>
+                                  <CheckCircle className="w-4 h-4 inline mr-1" />
+                                  {selectedRoom.overallPhotos.length} photos captured - Requirement met!
+                                </>
+                              ) : (
+                                <>
+                                  <AlertCircle className="w-4 h-4 inline mr-1" />
+                                  {selectedRoom.overallPhotos.length} of 4 minimum photos captured
+                                </>
+                              )}
+                            </p>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            {selectedRoom.overallPhotos.map((photoUrl, index) => (
+                              <div key={index} className="relative">
+                                <img
+                                  src={photoUrl}
+                                  alt={`Overall ${index + 1}`}
+                                  className="w-full h-32 object-cover rounded-lg border border-gray-300"
+                                />
+                                <button
+                                  onClick={() => {
+                                    updateSelectedRoom({
+                                      overallPhotos: selectedRoom.overallPhotos.filter((_, i) => i !== index),
+                                    });
+                                  }}
+                                  className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* PHASE 1: Thermal Imaging Photos - OPTIONAL */}
+                  <div className="border-t pt-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Thermal Imaging (Optional)</h3>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-start gap-3">
+                        <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm text-blue-900">
+                            Optional thermal imaging photos to identify hidden moisture or temperature differentials.
+                            This has been moved from the Cause of Loss step to Room Assessment.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Button
+                        variant="secondary"
+                        onClick={async () => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*';
+                          input.capture = 'environment';
+                          input.onchange = async (e: any) => {
+                            const file = e.target?.files?.[0];
+                            if (file && user && job && selectedRoom) {
+                              try {
+                                const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'thermal', user.uid);
+                                if (photoUrl) {
+                                  updateSelectedRoom({
+                                    thermalPhotos: [...(selectedRoom.thermalPhotos || []), photoUrl],
+                                  });
+                                }
+                              } catch (error) {
+                                console.error('Error uploading photo:', error);
+                                alert('Failed to upload photo');
+                              }
+                            }
+                          };
+                          input.click();
+                        }}
+                        disabled={isUploading}
+                      >
+                        <Camera className="w-4 h-4" />
+                        {isUploading ? 'Uploading...' : 'Take Thermal Image'}
+                      </Button>
+
+                      {(selectedRoom.thermalPhotos?.length || 0) > 0 && (
+                        <div>
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                            <p className="text-sm text-blue-900">
+                              <CheckCircle className="w-4 h-4 inline mr-1" />
+                              {selectedRoom.thermalPhotos?.length} thermal image(s) captured
+                            </p>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            {selectedRoom.thermalPhotos?.map((photoUrl, index) => (
+                              <div key={index} className="relative">
+                                <img
+                                  src={photoUrl}
+                                  alt={`Thermal ${index + 1}`}
+                                  className="w-full h-32 object-cover rounded-lg border border-gray-300"
+                                />
+                                <button
+                                  onClick={() => {
+                                    updateSelectedRoom({
+                                      thermalPhotos: selectedRoom.thermalPhotos?.filter((_, i) => i !== index),
+                                    });
+                                  }}
+                                  className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Pre-existing Damage Section */}
