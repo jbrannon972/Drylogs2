@@ -9,7 +9,7 @@ import {
   Trash2,
   Plus
 } from 'lucide-react';
-import { usePhotos } from '../../../../hooks/usePhotos';
+import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import {
   ConstructionMaterialType,
@@ -34,7 +34,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   onUpdate,
 }) => {
   const { user } = useAuth();
-  const { uploadPhoto, isUploading } = usePhotos();
+  const { queuePhoto } = useBatchPhotos();
 
   // Form state
   const [showAddForm, setShowAddForm] = useState(false);
@@ -78,8 +78,13 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && user) {
-      const url = await uploadPhoto(file, job.jobId, roomName, 'assessment', user.uid);
-      if (url) setPhoto(url);
+      // Queue photo instead of uploading immediately
+      await queuePhoto(file, job.jobId, roomId, roomName, 'assessment');
+
+      // Create preview for display
+      const reader = new FileReader();
+      reader.onload = (e) => setPhoto(e.target?.result as string);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -316,7 +321,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                 <img src={photo} alt="Moisture Meter" className="max-h-48 rounded mb-3" />
                 <div className="flex items-center gap-2 mb-3">
                   <CheckCircle className="w-5 h-5 text-green-600" />
-                  <span className="text-sm text-green-600 font-medium">Photo captured</span>
+                  <span className="text-sm text-green-600 font-medium">Photo queued</span>
                 </div>
                 <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 justify-center px-4 py-2">
                   <input
@@ -325,7 +330,6 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                     capture="environment"
                     onChange={handlePhotoUpload}
                     className="hidden"
-                    disabled={isUploading}
                   />
                   <Camera className="w-4 h-4" />
                   Replace Photo
@@ -339,10 +343,9 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                   capture="environment"
                   onChange={handlePhotoUpload}
                   className="hidden"
-                  disabled={isUploading}
                 />
                 <Camera className="w-5 h-5" />
-                {isUploading ? 'Uploading...' : 'Take Photo'}
+                Take Photo
               </label>
             )}
           </div>
