@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useNotificationStore } from '../stores/notificationStore';
 import { useSyncStore } from '../stores/syncStore';
+import { useAuth } from './useAuth';
 import { photoService, PhotoUploadProgress } from '../services/firebase/photoService';
 import { PhotoStep } from '../types';
 
@@ -14,6 +15,7 @@ export function usePhotos() {
   const [uploadProgress, setUploadProgress] = useState<PhotoUploadProgress | null>(null);
   const { addNotification } = useNotificationStore();
   const { isOnline } = useSyncStore();
+  const { user } = useAuth();
 
   const uploadPhoto = async (
     file: Blob | File,
@@ -45,6 +47,8 @@ export function usePhotos() {
         jobId,
         roomId,
         step,
+        userId,
+        user?.displayName || 'Unknown User',
         (progress) => {
           setUploadProgress(progress);
         }

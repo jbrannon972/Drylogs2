@@ -10,7 +10,8 @@ import {
   uploadBytesResumable,
   UploadTaskSnapshot,
 } from 'firebase/storage';
-import { storage } from '../../config/firebase';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { storage, db } from '../../config/firebase';
 import { Photo, PhotoStep } from '../../types';
 
 export interface PhotoUploadProgress {
@@ -46,13 +47,15 @@ export const photoService = {
   },
 
   /**
-   * Upload photo with progress tracking
+   * Upload photo with progress tracking and save metadata to Firestore
    */
   uploadPhotoWithProgress(
     file: Blob | File,
     jobId: string,
     roomId: string,
     step: PhotoStep,
+    userId: string,
+    userName: string,
     onProgress?: (progress: PhotoUploadProgress) => void
   ): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -82,6 +85,20 @@ export const photoService = {
         async () => {
           try {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+            // Save photo metadata to Firestore
+            await this.savePhotoMetadata({
+              url: downloadURL,
+              jobId,
+              roomId,
+              roomName: roomId, // Will be overridden if passed separately
+              category: this.mapStepToCategory(step),
+              timestamp: Timestamp.now(),
+              uploadedBy: userId,
+              uploadedByName: userName,
+              step,
+            });
+
             resolve(downloadURL);
           } catch (error: any) {
             reject(new Error(error.message || 'Failed to get download URL'));
@@ -89,6 +106,47 @@ export const photoService = {
         }
       );
     });
+  },
+
+  /**
+   * Save photo metadata to Firestore
+   */
+  async savePhotoMetadata(metadata: {
+    url: string;
+    jobId: string;
+    roomId?: string;
+    roomName: string;
+    category: string;
+    timestamp: Timestamp;
+    uploadedBy: string;
+    uploadedByName: string;
+    step?: string;
+    notes?: string;
+  }): Promise<void> {
+    try {
+      const photosRef = collection(db, 'photos');
+      await addDoc(photosRef, metadata);
+    } catch (error: any) {
+      console.error('Error saving photo metadata:', error);
+      // Don't throw - we don't want to fail the upload if metadata save fails
+    }
+  },
+
+  /**
+   * Map PhotoStep to PhotoCategory
+   */
+  mapStepToCategory(step: PhotoStep): string {
+    const categoryMap: Record<PhotoStep, string> = {
+      'arrival': 'before',
+      'assessment': 'before',
+      'preexisting': 'before',
+      'pre-demo': 'before',
+      'demo': 'demo',
+      'post-demo': 'progress',
+      'daily-check': 'progress',
+      'final': 'after',
+    };
+    return categoryMap[step] || 'other';
   },
 
   /**
