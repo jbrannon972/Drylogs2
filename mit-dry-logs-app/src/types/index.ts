@@ -350,8 +350,6 @@ export type ConstructionMaterialType =
 export interface MoistureReadingEntry {
   timestamp: string; // ISO string
   moisturePercent: number;
-  temperature: number; // Fahrenheit
-  humidity: number; // Relative humidity %
   photo?: string; // Photo URL
   technicianId: string;
   technicianName: string;

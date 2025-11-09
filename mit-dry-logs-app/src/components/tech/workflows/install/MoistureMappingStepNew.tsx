@@ -51,8 +51,6 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
   const [location, setLocation] = useState('');
   const [dryStandard, setDryStandard] = useState('');
   const [wetReading, setWetReading] = useState('');
-  const [temperature, setTemperature] = useState('70');
-  const [humidity, setHumidity] = useState('50');
   const [photo, setPhoto] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
 
@@ -105,8 +103,6 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
     setLocation('');
     setDryStandard('');
     setWetReading('');
-    setTemperature('70');
-    setHumidity('50');
     setPhoto(null);
     setNotes('');
   };
@@ -124,8 +120,6 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
     const initialReading: MoistureReadingEntry = {
       timestamp: new Date().toISOString(),
       moisturePercent: wetReadingNum,
-      temperature: parseFloat(temperature),
-      humidity: parseFloat(humidity),
       photo: photo || undefined,
       technicianId: user?.uid || 'unknown',
       technicianName: user?.displayName || 'Unknown Tech',
@@ -397,49 +391,21 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
                   Now take a reading from the <strong>affected</strong> area at the location you specified.
                 </p>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Droplets className="w-4 h-4 inline mr-1" />
-                    Wet Reading (%) *
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    placeholder="0.0"
-                    value={wetReading}
-                    onChange={(e) => setWetReading(e.target.value)}
-                    className="text-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Thermometer className="w-4 h-4 inline mr-1" />
-                    Temp (°F)
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={temperature}
-                    onChange={(e) => setTemperature(e.target.value)}
-                  />
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Wind className="w-4 h-4 inline mr-1" />
-                    Humidity (%)
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    value={humidity}
-                    onChange={(e) => setHumidity(e.target.value)}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Droplets className="w-4 h-4 inline mr-1" />
+                  Wet Reading (%) *
+                </label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="100"
+                  placeholder="0.0"
+                  value={wetReading}
+                  onChange={(e) => setWetReading(e.target.value)}
+                  className="text-lg"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

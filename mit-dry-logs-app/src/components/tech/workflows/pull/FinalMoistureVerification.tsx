@@ -30,8 +30,6 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
   // Current material being verified
   const [selectedMaterialId, setSelectedMaterialId] = useState<string | null>(null);
   const [finalReading, setFinalReading] = useState('');
-  const [temperature, setTemperature] = useState('70');
-  const [humidity, setHumidity] = useState('50');
   const [photo, setPhoto] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
 
@@ -66,8 +64,6 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
     const entry: MoistureReadingEntry = {
       timestamp: new Date().toISOString(),
       moisturePercent: readingNum,
-      temperature: parseFloat(temperature),
-      humidity: parseFloat(humidity),
       photo: photo || undefined,
       technicianId: user?.uid || 'unknown',
       technicianName: user?.displayName || 'Unknown Tech',
@@ -100,8 +96,6 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
     // Reset form
     setSelectedMaterialId(null);
     setFinalReading('');
-    setTemperature('70');
-    setHumidity('50');
     setPhoto(null);
     setNotes('');
   };
@@ -358,42 +352,20 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
                     {selectedMaterialId === material.id && (
                       <div className="mt-4 pt-4 border-t-2 border-entrusted-orange space-y-3">
                         <h5 className="font-medium text-gray-900">Final Reading</h5>
-                        <div className="grid grid-cols-3 gap-3">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
-                              <Droplets className="w-3 h-3 inline mr-1" />
-                              Moisture % *
-                            </label>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              min="0"
-                              max="100"
-                              placeholder="0.0"
-                              value={finalReading}
-                              onChange={(e) => setFinalReading(e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Temp (°F)</label>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              value={temperature}
-                              onChange={(e) => setTemperature(e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Humidity (%)</label>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              min="0"
-                              max="100"
-                              value={humidity}
-                              onChange={(e) => setHumidity(e.target.value)}
-                            />
-                          </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">
+                            <Droplets className="w-3 h-3 inline mr-1" />
+                            Moisture % *
+                          </label>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            max="100"
+                            placeholder="0.0"
+                            value={finalReading}
+                            onChange={(e) => setFinalReading(e.target.value)}
+                          />
                         </div>
                         <div>
                           <label className="block text-xs font-medium text-gray-700 mb-1">Notes (Optional)</label>

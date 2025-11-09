@@ -3,13 +3,9 @@ import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
 import {
   Droplets,
-  AlertCircle,
-  Info,
   Camera,
   CheckCircle,
   MapPin,
-  Thermometer,
-  Wind,
   Trash2,
   Plus
 } from 'lucide-react';
@@ -30,9 +26,6 @@ interface MoistureTabContentProps {
   onUpdate: (updatedTracking: MaterialMoistureTracking[]) => void;
 }
 
-// ULTRAFIELD Step States
-type WorkflowStep = 'select-material' | 'location' | 'dry-standard' | 'wet-reading' | 'photo' | 'complete';
-
 export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   job,
   roomId,
@@ -43,15 +36,12 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
 
-  // ULTRAFIELD workflow state
+  // Form state
   const [showAddForm, setShowAddForm] = useState(false);
-  const [workflowStep, setWorkflowStep] = useState<WorkflowStep>('select-material');
   const [currentMaterial, setCurrentMaterial] = useState<ConstructionMaterialType>('Drywall - Wall');
   const [location, setLocation] = useState('');
   const [dryStandard, setDryStandard] = useState('');
   const [wetReading, setWetReading] = useState('');
-  const [temperature, setTemperature] = useState('70');
-  const [humidity, setHumidity] = useState('50');
   const [photo, setPhoto] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
 
@@ -94,33 +84,33 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   };
 
   const resetForm = () => {
-    setWorkflowStep('select-material');
     setCurrentMaterial('Drywall - Wall');
     setLocation('');
     setDryStandard('');
     setWetReading('');
-    setTemperature('70');
-    setHumidity('50');
     setPhoto(null);
     setNotes('');
     setShowAddForm(false);
   };
 
   const handleSaveReading = () => {
-    if (!dryStandard || !wetReading) {
-      alert('Please complete all required fields');
+    if (!location.trim() || !dryStandard || !wetReading) {
+      alert('Please complete all required fields: Material, Location, Dry Standard, and Wet Reading');
       return;
     }
 
     const dryStandardNum = parseFloat(dryStandard);
     const wetReadingNum = parseFloat(wetReading);
 
+    if (isNaN(dryStandardNum) || isNaN(wetReadingNum)) {
+      alert('Please enter valid numbers for moisture readings');
+      return;
+    }
+
     // Create initial reading entry
     const initialReading: MoistureReadingEntry = {
       timestamp: new Date().toISOString(),
       moisturePercent: wetReadingNum,
-      temperature: parseFloat(temperature),
-      humidity: parseFloat(humidity),
       photo: photo || undefined,
       technicianId: user?.uid || 'unknown',
       technicianName: user?.displayName || 'Unknown Tech',
@@ -144,7 +134,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
     };
 
     onUpdate([...moistureTracking, tracking]);
-    setWorkflowStep('complete');
+    resetForm();
   };
 
   const handleDelete = (id: string) => {
@@ -153,32 +143,11 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
     }
   };
 
-  const handleAddAnother = () => {
-    resetForm();
-    setShowAddForm(true);
-    setWorkflowStep('select-material');
-  };
-
   // Get readings for this room only
   const roomReadings = moistureTracking.filter(t => t.roomId === roomId);
 
   return (
-    <div className="max-w-2xl space-y-6">
-      {/* ULTRAFIELD Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h4 className="font-medium text-blue-900 mb-1">ULTRAFIELD Moisture Tracking</h4>
-            <p className="text-sm text-blue-800">
-              Track individual construction materials through the entire job. For each material, establish a
-              dry standard from an unaffected area, then record the wet reading. These will be tracked through
-              all check services until pull.
-            </p>
-          </div>
-        </div>
-      </div>
-
+    <div className="w-full h-full space-y-6">
       {/* Existing Readings */}
       {roomReadings.length > 0 && (
         <div className="space-y-3">
@@ -249,244 +218,107 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
         </div>
       )}
 
-      {/* Add New Reading Form */}
-      {showAddForm && workflowStep !== 'complete' && (
-        <div className="border-2 border-entrusted-orange rounded-lg p-5 bg-orange-50">
-          <h3 className="font-semibold text-gray-900 mb-4">
-            Add Moisture Reading - Step {
-              workflowStep === 'select-material' ? '1' :
-              workflowStep === 'location' ? '2' :
-              workflowStep === 'dry-standard' ? '3' :
-              workflowStep === 'wet-reading' ? '4' :
-              '5'
-            } of 5
+      {/* Add New Reading Form - Full Screen Single Form */}
+      {showAddForm && (
+        <div className="border-2 border-entrusted-orange rounded-lg p-6 bg-orange-50 space-y-5">
+          <h3 className="font-semibold text-gray-900 text-lg mb-4">
+            Add Moisture Reading
           </h3>
 
-          {/* Step 1: Select Material */}
-          {workflowStep === 'select-material' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Construction Material *
-                </label>
-                <select
-                  value={currentMaterial}
-                  onChange={(e) => setCurrentMaterial(e.target.value as ConstructionMaterialType)}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange text-base"
-                >
-                  {CONSTRUCTION_MATERIALS.map((material) => (
-                    <option key={material} value={material}>
-                      {material}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-600 mt-1">
-                  Only construction materials are shown (no appliances or fixtures)
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <Button variant="secondary" onClick={resetForm} className="flex-1">
-                  Cancel
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => setWorkflowStep('location')}
-                  className="flex-1"
-                >
-                  Continue
-                </Button>
-              </div>
-            </div>
-          )}
+          {/* Material Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Construction Material *
+            </label>
+            <select
+              value={currentMaterial}
+              onChange={(e) => setCurrentMaterial(e.target.value as ConstructionMaterialType)}
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange text-base"
+            >
+              {CONSTRUCTION_MATERIALS.map((material) => (
+                <option key={material} value={material}>
+                  {material}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-600 mt-1">
+              Only construction materials are shown (no appliances or fixtures)
+            </p>
+          </div>
 
-          {/* Step 2: Location */}
-          {workflowStep === 'location' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <MapPin className="w-4 h-4 inline mr-1" />
-                  Specific Location *
-                </label>
-                <Input
-                  placeholder="e.g., North wall, 2ft height, grid A3"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="text-base"
-                />
-                <p className="text-xs text-gray-600 mt-1">
-                  Be specific so you can return to the same spot for check services
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <Button variant="secondary" onClick={() => setWorkflowStep('select-material')} className="flex-1">
-                  Back
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => setWorkflowStep('dry-standard')}
-                  disabled={!location.trim()}
-                  className="flex-1"
-                >
-                  Continue
-                </Button>
-              </div>
-            </div>
-          )}
+          {/* Location */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <MapPin className="w-4 h-4 inline mr-1" />
+              Specific Location *
+            </label>
+            <Input
+              placeholder="e.g., North wall, 2ft height, grid A3"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="text-base"
+            />
+            <p className="text-xs text-gray-600 mt-1">
+              Be specific so you can return to the same spot for check services
+            </p>
+          </div>
 
-          {/* Step 3: Dry Standard */}
-          {workflowStep === 'dry-standard' && (
-            <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                <p className="text-sm text-blue-800">
-                  <Info className="w-4 h-4 inline mr-1" />
-                  Take a reading from an <strong>unaffected</strong> area of the same material type
-                  to establish a dry baseline.
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Droplets className="w-4 h-4 inline mr-1" />
-                  Dry Standard Reading (%) *
-                </label>
-                <Input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  placeholder="0.0"
-                  value={dryStandard}
-                  onChange={(e) => setDryStandard(e.target.value)}
-                  className="text-base"
-                />
-              </div>
-              <div className="flex gap-3">
-                <Button variant="secondary" onClick={() => setWorkflowStep('location')} className="flex-1">
-                  Back
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => setWorkflowStep('wet-reading')}
-                  disabled={!dryStandard || parseFloat(dryStandard) < 0}
-                  className="flex-1"
-                >
-                  Continue
-                </Button>
-              </div>
+          {/* Dry Standard and Wet Reading */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Droplets className="w-4 h-4 inline mr-1" />
+                Dry Standard (%) *
+              </label>
+              <Input
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                placeholder="0.0"
+                value={dryStandard}
+                onChange={(e) => setDryStandard(e.target.value)}
+                className="text-base"
+              />
+              <p className="text-xs text-gray-600 mt-1">
+                Reading from unaffected area
+              </p>
             </div>
-          )}
-
-          {/* Step 4: Wet Reading */}
-          {workflowStep === 'wet-reading' && (
-            <div className="space-y-4">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
-                <p className="text-sm text-yellow-800">
-                  <AlertCircle className="w-4 h-4 inline mr-1" />
-                  Now take a reading from the <strong>affected</strong> area at the location you specified.
-                </p>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Droplets className="w-4 h-4 inline mr-1" />
-                    Wet Reading (%) *
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    placeholder="0.0"
-                    value={wetReading}
-                    onChange={(e) => setWetReading(e.target.value)}
-                    className="text-base"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Thermometer className="w-4 h-4 inline mr-1" />
-                    Temp (°F)
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={temperature}
-                    onChange={(e) => setTemperature(e.target.value)}
-                  />
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Wind className="w-4 h-4 inline mr-1" />
-                    Humidity (%)
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    value={humidity}
-                    onChange={(e) => setHumidity(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Notes (Optional)
-                </label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={2}
-                  placeholder="Any observations..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
-                />
-              </div>
-              <div className="flex gap-3">
-                <Button variant="secondary" onClick={() => setWorkflowStep('dry-standard')} className="flex-1">
-                  Back
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => setWorkflowStep('photo')}
-                  disabled={!wetReading || parseFloat(wetReading) < 0}
-                  className="flex-1"
-                >
-                  Continue
-                </Button>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Droplets className="w-4 h-4 inline mr-1" />
+                Wet Reading (%) *
+              </label>
+              <Input
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                placeholder="0.0"
+                value={wetReading}
+                onChange={(e) => setWetReading(e.target.value)}
+                className="text-base"
+              />
+              <p className="text-xs text-gray-600 mt-1">
+                Reading from affected area
+              </p>
             </div>
-          )}
+          </div>
 
-          {/* Step 5: Photo */}
-          {workflowStep === 'photo' && (
-            <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
-                <p className="text-sm text-green-800">
-                  <Camera className="w-4 h-4 inline mr-1" />
-                  Take a photo of the moisture meter display for documentation (optional but recommended)
-                </p>
-              </div>
-              {photo ? (
-                <div>
-                  <img src={photo} alt="Moisture Meter" className="max-h-48 rounded mb-3 mx-auto" />
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-sm text-green-600 font-medium">Photo captured</span>
-                  </div>
-                  <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 w-full justify-center">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      onChange={handlePhotoUpload}
-                      className="hidden"
-                      disabled={isUploading}
-                    />
-                    <Camera className="w-4 h-4" />
-                    Replace Photo
-                  </label>
+          {/* Photo Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Camera className="w-4 h-4 inline mr-1" />
+              Photo (Optional)
+            </label>
+            {photo ? (
+              <div>
+                <img src={photo} alt="Moisture Meter" className="max-h-48 rounded mb-3" />
+                <div className="flex items-center gap-2 mb-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-sm text-green-600 font-medium">Photo captured</span>
                 </div>
-              ) : (
-                <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 w-full justify-center py-8 border-2 border-dashed border-gray-300 hover:border-gray-400">
+                <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 justify-center px-4 py-2">
                   <input
                     type="file"
                     accept="image/*"
@@ -495,39 +327,53 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                     className="hidden"
                     disabled={isUploading}
                   />
-                  <Camera className="w-6 h-6" />
-                  {isUploading ? 'Uploading...' : 'Take Photo (Optional)'}
+                  <Camera className="w-4 h-4" />
+                  Replace Photo
                 </label>
-              )}
-              <div className="flex gap-3">
-                <Button variant="secondary" onClick={() => setWorkflowStep('wet-reading')} className="flex-1">
-                  Back
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={handleSaveReading}
-                  className="flex-1"
-                >
-                  Save Reading
-                </Button>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            ) : (
+              <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 w-full justify-center py-6 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                  disabled={isUploading}
+                />
+                <Camera className="w-5 h-5" />
+                {isUploading ? 'Uploading...' : 'Take Photo'}
+              </label>
+            )}
+          </div>
 
-      {/* Completion State */}
-      {workflowStep === 'complete' && (
-        <div className="border-2 border-green-500 rounded-lg p-5 bg-green-50">
-          <div className="text-center space-y-4">
-            <CheckCircle className="w-16 h-16 mx-auto text-green-600" />
-            <h3 className="text-xl font-bold text-gray-900">Reading Saved!</h3>
-            <p className="text-gray-700">
-              {currentMaterial} at {location} has been added to moisture tracking
-            </p>
-            <Button variant="secondary" onClick={handleAddAnother} className="w-full">
-              <Plus className="w-4 h-4" />
-              Add Another Material
+          {/* Notes */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Notes (Optional)
+            </label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              placeholder="Any observations..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
+            <Button variant="secondary" onClick={resetForm} className="flex-1">
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSaveReading}
+              disabled={!location.trim() || !dryStandard || !wetReading}
+              className="flex-1"
+            >
+              <CheckCircle className="w-4 h-4" />
+              Save Reading
             </Button>
           </div>
         </div>
