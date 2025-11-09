@@ -6,6 +6,7 @@ import { useWorkflowStore } from '../../../stores/workflowStore';
 import { useJobsStore } from '../../../stores/jobsStore';
 import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
+import { ConfirmModal } from '../../shared/ConfirmModal';
 import { WorkflowActionBar } from '../../shared/WorkflowActionBar';
 import { StartPullStep } from './pull/StartPullStep';
 import { FinalMoistureVerification } from './pull/FinalMoistureVerification';
@@ -91,6 +92,7 @@ export const PullWorkflow: React.FC = () => {
   const { getJobById } = useJobsStore();
   const [job, setJob] = useState<any>(null);
   const [showOverview, setShowOverview] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -141,9 +143,11 @@ export const PullWorkflow: React.FC = () => {
   };
 
   const handleExit = () => {
-    if (confirm('Are you sure you want to exit? Progress will be saved.')) {
-      navigate('/tech');
-    }
+    setShowExitConfirm(true);
+  };
+
+  const confirmExit = () => {
+    navigate('/tech');
   };
 
   const progressPercent = Math.round(((currentStepIndex + 1) / PULL_STEPS.length) * 100);
@@ -217,9 +221,7 @@ export const PullWorkflow: React.FC = () => {
             <div className="flex items-center gap-2 text-sm">
               <img src="/Elogo.png" alt="Entrusted" className="h-6 w-auto" />
               <span className="text-gray-400">•</span>
-              <span className="text-gray-700">Step {currentStepIndex + 1}/{PULL_STEPS.length}</span>
-              <span className="text-gray-400">•</span>
-              <span className="text-gray-900 font-medium truncate">{currentStepConfig.title}</span>
+              <span className="text-gray-900 font-medium">{currentStepIndex + 1}/{PULL_STEPS.length}</span>
             </div>
             {/* Thin progress bar */}
             <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
@@ -351,6 +353,17 @@ export const PullWorkflow: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={showExitConfirm}
+        onClose={() => setShowExitConfirm(false)}
+        onConfirm={confirmExit}
+        title="Exit Workflow?"
+        message="Progress will be saved. Are you sure you want to exit?"
+        confirmText="Exit"
+        cancelText="Stay"
+        variant="warning"
+      />
     </div>
   );
 };

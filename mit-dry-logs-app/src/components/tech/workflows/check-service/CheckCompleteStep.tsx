@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle, Clock, Calendar, Info } from 'lucide-react';
 import { Input } from '../../../shared/Input';
+import { ConfirmModal } from '../../../shared/ConfirmModal';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,6 +17,7 @@ export const CheckCompleteStep: React.FC<CheckCompleteStepProps> = ({ job, onNex
   const hours = now.getHours().toString().padStart(2, '0');
   const minutes = now.getMinutes().toString().padStart(2, '0');
   const [departureTime, setDepartureTime] = useState(`${hours}:${minutes}`);
+  const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
 
   React.useEffect(() => {
     updateWorkflowData('checkService', {
@@ -72,10 +74,12 @@ export const CheckCompleteStep: React.FC<CheckCompleteStepProps> = ({ job, onNex
   };
 
   const handleComplete = () => {
-    if (confirm('Complete check service and return to dashboard?')) {
-      // Save all data to job record
-      navigate('/tech');
-    }
+    setShowCompleteConfirm(true);
+  };
+
+  const confirmComplete = () => {
+    // Save all data to job record
+    navigate('/tech');
   };
 
   const progress = getDryingProgress();
@@ -265,6 +269,17 @@ export const CheckCompleteStep: React.FC<CheckCompleteStepProps> = ({ job, onNex
         <Clock className="w-5 h-5 inline mr-2" />
         Clock Out & Complete Visit
       </button>
+
+      {/* Complete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showCompleteConfirm}
+        onClose={() => setShowCompleteConfirm(false)}
+        onConfirm={confirmComplete}
+        title="Complete Check Service?"
+        message="Complete check service and return to dashboard?"
+        confirmText="Complete"
+        variant="info"
+      />
     </div>
   );
 };

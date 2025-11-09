@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
+import { ConfirmModal } from '../../../shared/ConfirmModal';
 import { Plus, Trash2, Home, AlertCircle, Camera, CheckCircle, Info } from 'lucide-react';
 import { RoomType } from '../../../../types';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
@@ -37,6 +38,8 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
   const { uploadPhoto, isUploading } = usePhotos();
   const [rooms, setRooms] = useState<RoomData[]>(installData.rooms || []);
   const [showAddRoom, setShowAddRoom] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
   const [newRoom, setNewRoom] = useState({
     name: '',
     type: 'Bedroom' as RoomType,
@@ -133,8 +136,14 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
   };
 
   const handleDeleteRoom = (id: string) => {
-    if (confirm('Are you sure you want to delete this room?')) {
-      setRooms(rooms.filter(r => r.id !== id));
+    setRoomToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteRoom = () => {
+    if (roomToDelete) {
+      setRooms(rooms.filter(r => r.id !== roomToDelete));
+      setRoomToDelete(null);
     }
   };
 
@@ -513,6 +522,17 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={confirmDeleteRoom}
+        title="Delete Room?"
+        message="Are you sure you want to delete this room? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   );
 };

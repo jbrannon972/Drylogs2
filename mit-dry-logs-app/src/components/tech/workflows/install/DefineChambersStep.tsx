@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
+import { ConfirmModal } from '../../../shared/ConfirmModal';
 import { Wind, Plus, Trash2, Edit2, AlertCircle, Info, CheckCircle } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { DryingChamber } from '../../../../types';
@@ -28,6 +29,8 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
   const [chambers, setChambers] = useState<DryingChamber[]>([]);
   const [editingChamberId, setEditingChamberId] = useState<string | null>(null);
   const [chamberNameInput, setChamberNameInput] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [chamberToDelete, setChamberToDelete] = useState<string | null>(null);
 
   // Auto-create chambers on mount based on floor levels
   useEffect(() => {
@@ -104,8 +107,14 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
       return;
     }
 
-    if (confirm('Are you sure you want to delete this chamber? Rooms will be unassigned.')) {
-      setChambers(chambers.filter(c => c.chamberId !== chamberId));
+    setChamberToDelete(chamberId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteChamber = () => {
+    if (chamberToDelete) {
+      setChambers(chambers.filter(c => c.chamberId !== chamberToDelete));
+      setChamberToDelete(null);
     }
   };
 
@@ -421,6 +430,17 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
           Continue to Equipment Calculations
         </Button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={confirmDeleteChamber}
+        title="Delete Chamber?"
+        message="Are you sure you want to delete this chamber? Rooms will be unassigned."
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   );
 };

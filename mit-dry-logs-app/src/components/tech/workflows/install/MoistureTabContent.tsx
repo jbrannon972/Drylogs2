@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
+import { ConfirmModal } from '../../../shared/ConfirmModal';
 import {
   Droplets,
   Camera,
@@ -44,6 +45,10 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   const [wetReading, setWetReading] = useState('');
   const [photo, setPhoto] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
+
+  // Delete confirmation state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<string | null>(null);
 
   // Construction materials only (no appliances, mirrors, etc.)
   const CONSTRUCTION_MATERIALS: ConstructionMaterialType[] = [
@@ -143,8 +148,14 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Delete this moisture tracking record? This cannot be undone.')) {
-      onUpdate(moistureTracking.filter(t => t.id !== id));
+    setRecordToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    if (recordToDelete) {
+      onUpdate(moistureTracking.filter(t => t.id !== recordToDelete));
+      setRecordToDelete(null);
     }
   };
 
@@ -401,6 +412,17 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
           or below 12% moisture content. Return to the same locations daily for consistent progress tracking.
         </p>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={confirmDelete}
+        title="Delete Moisture Record?"
+        message="Delete this moisture tracking record? This cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   );
 };

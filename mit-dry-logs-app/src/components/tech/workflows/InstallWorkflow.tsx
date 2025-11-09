@@ -6,6 +6,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../shared/Button';
 import { WorkflowActionBar } from '../../shared/WorkflowActionBar';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
+import { ConfirmModal } from '../../shared/ConfirmModal';
 import {
   CheckCircle,
   Circle,
@@ -159,6 +160,8 @@ export const InstallWorkflow: React.FC = () => {
   const [job, setJob] = useState<any>(null);
   const [showStepOverview, setShowStepOverview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showSaveError, setShowSaveError] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -205,7 +208,7 @@ export const InstallWorkflow: React.FC = () => {
       }
     } catch (error) {
       console.error('Error saving workflow data:', error);
-      alert('Failed to save. Please try again.');
+      setShowSaveError(true);
     } finally {
       setIsSaving(false);
     }
@@ -222,11 +225,12 @@ export const InstallWorkflow: React.FC = () => {
     setShowStepOverview(false);
   };
 
-  const handleExit = async () => {
-    const confirmMessage = 'Are you sure you want to exit? Make sure to save your progress first.';
-    if (confirm(confirmMessage)) {
-      navigate('/tech');
-    }
+  const handleExit = () => {
+    setShowExitConfirm(true);
+  };
+
+  const confirmExit = () => {
+    navigate('/tech');
   };
 
   if (!job || !currentStepConfig) {
@@ -260,12 +264,8 @@ export const InstallWorkflow: React.FC = () => {
                 className="h-6 w-auto"
               />
               <span className="text-gray-400">•</span>
-              <span className="text-gray-700">
-                Step {currentStepIndex + 1}/{INSTALL_STEPS.length}
-              </span>
-              <span className="text-gray-400">•</span>
-              <span className="text-gray-900 font-medium truncate">
-                {currentStepConfig.title}
+              <span className="text-gray-900 font-medium">
+                {currentStepIndex + 1}/{INSTALL_STEPS.length}
               </span>
             </div>
             {/* Progress bar - thin */}
@@ -413,6 +413,30 @@ export const InstallWorkflow: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Exit Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showExitConfirm}
+        onClose={() => setShowExitConfirm(false)}
+        onConfirm={confirmExit}
+        title="Exit Workflow?"
+        message="Make sure to save your progress before exiting. Unsaved changes will be lost."
+        confirmText="Exit"
+        cancelText="Stay"
+        variant="warning"
+      />
+
+      {/* Save Error Modal */}
+      <ConfirmModal
+        isOpen={showSaveError}
+        onClose={() => setShowSaveError(false)}
+        onConfirm={() => setShowSaveError(false)}
+        title="Save Failed"
+        message="Unable to save your progress. Please check your connection and try again."
+        confirmText="OK"
+        cancelText="Close"
+        variant="danger"
+      />
     </div>
   );
 };
