@@ -1093,3 +1093,189 @@ export interface PriceDatabase {
   version: number;
   lastUpdated: Timestamp;
 }
+
+// ============================================================================
+// PHOTO DOCUMENTATION ENHANCEMENTS (Phases 1-5)
+// ============================================================================
+
+// Phase 1: Enhanced Photo Requirements
+export interface RoomPhotoRequirements {
+  overallPhotos: string[]; // Minimum 4: wide shot + damage close-ups
+  moisturePhotos: string[]; // Minimum 2 per room with meter visible
+  preExistingPhotos?: string[]; // Only if pre-existing damage flagged
+  thermalPhotos?: string[]; // Optional thermal imaging
+}
+
+export interface MoisturePhotoData {
+  photoUrl: string;
+  materialType: ConstructionMaterialType;
+  moisturePercent: number;
+  timestamp: Timestamp;
+  meterVisible: boolean; // Must show meter display + material
+  notes?: string; // Optional tracking notes for next visit
+}
+
+// Phase 2: Equipment Tracking
+export interface EquipmentPlacement {
+  equipmentId: string;
+  qrCode: string;
+  roomId: string;
+  roomName: string;
+  photoUrl: string;
+  placedAt: Timestamp;
+  runtimeHours: number; // Starting at 0 for install
+}
+
+// Phase 3: Demo Workflow Enhancements
+export type DisposalMethod = 'dumpster' | 'bags' | 'loose-materials' | 'other';
+
+export interface DebrisDocumentation {
+  disposalMethod: DisposalMethod;
+  photos: string[]; // Required based on disposal method
+  quantity?: number; // For bags
+  description?: string; // For loose materials or other
+}
+
+export interface ExposedMaterialPhoto {
+  photoUrl: string;
+  materialType: ConstructionMaterialType;
+  exposureType: 'wall-cavity' | 'subfloor' | 'structural' | 'insulation';
+  timestamp: Timestamp;
+  notes?: string;
+}
+
+export interface PPEDocumentation {
+  respiratorsUsed: boolean;
+  respiratorPhoto?: string;
+  protectiveSuits: boolean;
+  suitPhoto?: string;
+  glovesType?: string;
+  eyeProtection: boolean;
+  containmentBarriers: boolean;
+  containmentPhoto?: string;
+  negativeAirPressure: boolean;
+  negativeAirPhoto?: string;
+  safetySignagePosted: boolean;
+  signagePhoto?: string;
+  otherPPE?: string;
+  ppePhoto?: string; // General PPE in use photo
+  notes?: string;
+}
+
+// Phase 4: Chamber Containment
+export interface ContainmentBarrierSetup {
+  hasBarrier: boolean;
+  photos?: string[];
+  plasticSqFt?: number;
+  zipperUsed?: boolean;
+  zipPolesUsed?: boolean;
+  zipPolesCount?: number;
+}
+
+// Phase 4: Enhanced Signatures
+export type PullSignatureType =
+  | 'completion-acceptance'
+  | 'equipment-removal'
+  | 'final-walkthrough'
+  | 'drying-release-waiver'
+  | 'payment-acknowledgment';
+
+export interface CustomerSignature {
+  type: PullSignatureType;
+  signatureDataUrl: string;
+  signedAt: Timestamp;
+  customerName: string;
+  notes?: string;
+}
+
+// Phase 4: Drying Release Waiver
+export interface DryingReleaseWaiver {
+  materialId: string;
+  roomName: string;
+  materialType: ConstructionMaterialType;
+  finalMoisturePercent: number;
+  dryStandard: number;
+  customerAcceptsRisk: boolean;
+  customerSignature: string; // Signature data URL
+  reasonForEarlyPull: string;
+  photoUrl: string; // Photo of wet material
+  createdAt: Timestamp;
+}
+
+// Phase 5: Matterport Integration
+export interface MatterportScan {
+  scanId: string;
+  scanUrl?: string;
+  capturedDuringWorkflow: 'check-service' | 'manual';
+  capturedAfterDemo: boolean;
+  visitNumber?: number; // Which check service visit
+  capturedAt: Timestamp;
+  capturedBy: string;
+  verified: boolean;
+  verifiedAt?: Timestamp;
+}
+
+// Enhanced Environmental Readings (Phase 2)
+export interface EnvironmentalReading {
+  chamberId: string;
+  chamberName: string;
+  temperature: number;
+  relativeHumidity: number;
+  gpp: number; // Grains per pound
+  photoUrl: string; // Hygrometer showing all readings (REQUIRED)
+  timestamp: Timestamp;
+  technicianId: string;
+}
+
+// Equipment Runtime Documentation (Phase 2)
+export interface EquipmentRuntimePhoto {
+  equipmentId: string;
+  qrCode: string;
+  runtimeHours: number;
+  photoUrl: string; // Display showing runtime hours
+  settings?: {
+    temperature?: number;
+    humidity?: number;
+    fanSpeed?: string;
+  };
+  timestamp: Timestamp;
+  isWorking: boolean;
+  issues?: string;
+}
+
+// Room Closeout Photos (Phase 2)
+export interface RoomCloseoutPhoto {
+  roomId: string;
+  roomName: string;
+  photoUrl: string; // Overall showing current conditions
+  equipmentScanned: string[]; // QR codes of equipment in room
+  changesObserved?: string;
+  timestamp: Timestamp;
+}
+
+// Final Room Photos (Pull - Phase 2)
+export interface FinalRoomPhoto {
+  roomId: string;
+  roomName: string;
+  photoUrl: string; // Overall empty room, dry conditions
+  concerns?: string;
+  timestamp: Timestamp;
+}
+
+// Drying Curve Data (Phase 4)
+export interface DryingCurveDataPoint {
+  date: string; // ISO date string
+  moisturePercent: number;
+  visitNumber?: number;
+  workflow: 'install' | 'check-service' | 'pull';
+}
+
+export interface DryingCurveData {
+  materialId: string;
+  roomName: string;
+  materialType: ConstructionMaterialType;
+  dryStandard: number;
+  dataPoints: DryingCurveDataPoint[];
+  trend: 'improving' | 'stable' | 'worsening';
+  projectedDryDate?: string; // ISO date string
+}
