@@ -9,7 +9,6 @@
 if (__DEV__) {
   const webAPIs = [
     'document',
-    'window',
     'localStorage',
     'sessionStorage',
   ];
@@ -19,11 +18,19 @@ if (__DEV__) {
   webAPIs.forEach(api => {
     Object.defineProperty(globalThis, api, {
       get() {
-        const warning = `⚠️ PLATFORM ERROR: Attempted to access web API '${api}' in React Native!`;
-        if (!warnings.has(warning)) {
-          console.error(warning);
-          console.error('Stack trace:', new Error().stack);
-          warnings.add(warning);
+        // Check stack trace to filter out React DevTools
+        const stack = new Error().stack || '';
+        const isReactDevTools = stack.includes('__REACT_DEVTOOLS') ||
+                                 stack.includes('react-devtools') ||
+                                 stack.includes('installHook');
+
+        if (!isReactDevTools) {
+          const warning = `⚠️ PLATFORM ERROR: Attempted to access web API '${api}' in React Native!`;
+          if (!warnings.has(warning)) {
+            console.error(warning);
+            console.error('Stack trace:', stack);
+            warnings.add(warning);
+          }
         }
         return undefined;
       },
