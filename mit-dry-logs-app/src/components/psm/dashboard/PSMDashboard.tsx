@@ -570,6 +570,7 @@ export const PSMDashboard: React.FC = () => {
       const causeOfLossPhotos = photos.filter(p =>
         p.category === 'assessment' ||
         p.roomName.toLowerCase().includes('cause of loss') ||
+        p.roomName.toLowerCase().includes('cause-of-loss') ||
         p.roomName.toLowerCase().includes(job.causeOfLoss?.location?.toLowerCase() || 'zzz')
       );
 
@@ -1271,7 +1272,7 @@ export const PSMDashboard: React.FC = () => {
             setSelectedCauseOfLossPhoto('');
           }}
           exteriorPhotos={allJobPhotos.filter(p => p.category === 'exterior' || p.roomName.toLowerCase().includes('exterior') || p.roomName.toLowerCase().includes('property'))}
-          causeOfLossPhotos={allJobPhotos.filter(p => p.category === 'assessment' || p.roomName.toLowerCase().includes('cause of loss') || (reportJobData?.causeOfLoss?.location && p.roomName.toLowerCase().includes(reportJobData.causeOfLoss.location.toLowerCase())))}
+          causeOfLossPhotos={allJobPhotos.filter(p => p.category === 'assessment' || p.roomName.toLowerCase().includes('cause of loss') || p.roomName.toLowerCase().includes('cause-of-loss') || (reportJobData?.causeOfLoss?.location && p.roomName.toLowerCase().includes(reportJobData.causeOfLoss.location.toLowerCase())))}
           onSelectExterior={(photoUrl) => setSelectedExteriorPhoto(photoUrl)}
           onSelectCauseOfLoss={(photoUrl) => setSelectedCauseOfLossPhoto(photoUrl)}
           onProceed={handleReportProceed}
