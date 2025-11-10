@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import {
-  CheckCircle, Calendar, Wind, Droplets, AlertCircle, Info
+  CheckCircle, Calendar, Wind, Droplets, AlertCircle, Info, Hammer, Wrench
 } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../../../config/firebase';
 
 interface CommunicatePlanStepProps {
   job: any;
@@ -12,6 +14,7 @@ interface CommunicatePlanStepProps {
 
 export const CommunicatePlanStep: React.FC<CommunicatePlanStepProps> = ({ job, onNext }) => {
   const { installData } = useWorkflowStore();
+  const [subcontractorRequests, setSubcontractorRequests] = useState<any[]>([]);
 
   // Get data from workflow
   const rooms = installData.rooms || installData.roomAssessments || [];
@@ -21,6 +24,31 @@ export const CommunicatePlanStep: React.FC<CommunicatePlanStepProps> = ({ job, o
   const scheduledVisits = installData.scheduledVisits || [];
   const dryingPlan = installData.dryingPlan || {};
   const waterClassification = installData.waterClassification || {};
+  const moistureTracking = installData.moistureTracking || [];
+  const partialDemoDetails = installData.partialDemoDetails || { rooms: [] };
+
+  // AUTO-CALCULATE drying days based on scheduled visits
+  const autoCalculatedDryingDays = scheduledVisits.length > 0
+    ? Math.max(...scheduledVisits.map((v: any) => v.day || 1))
+    : 3;
+
+  // Fetch subcontractor requests
+  useEffect(() => {
+    const fetchSubRequests = async () => {
+      try {
+        const q = query(
+          collection(db, 'subcontractorRequests'),
+          where('jobId', '==', job.jobId)
+        );
+        const snapshot = await getDocs(q);
+        const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setSubcontractorRequests(requests);
+      } catch (error) {
+        console.error('Error fetching subcontractor requests:', error);
+      }
+    };
+    fetchSubRequests();
+  }, [job.jobId]);
 
   return (
     <div className="space-y-6">
@@ -89,6 +117,117 @@ export const CommunicatePlanStep: React.FC<CommunicatePlanStepProps> = ({ job, o
         )}
       </div>
 
+      {/* Room-by-Room Breakdown */}
+      <div className="border-2 border-orange-500 rounded-lg p-4 bg-orange-50">
+        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <Droplets className="w-5 h-5 text-orange-600" />
+          Room-by-Room Work Plan
+        </h3>
+        {rooms.length === 0 ? (
+          <p className="text-sm text-gray-600">No rooms assessed</p>
+        ) : (
+          <div className="space-y-3">
+            {rooms.map((room: any) => {
+              // Get moisture tracking for this room
+              const roomMoisture = moistureTracking.filter((m: any) => m.roomId === room.id);
+
+              // Get demo details for this room
+              const roomDemo = partialDemoDetails.rooms?.find((d: any) => d.roomId === room.id);
+
+              return (
+                <div key={room.id} className="bg-white border border-gray-200 rounded-lg p-3">
+                  <h4 className="font-medium text-gray-900 mb-2">{room.name}</h4>
+
+                  {/* Wet Materials Found */}
+                  <div className="mb-2">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">
+                      <Droplets className="w-3 h-3 inline mr-1" />
+                      Wet Materials:
+                    </p>
+                    {roomMoisture.length === 0 ? (
+                      <p className="text-xs text-gray-500 ml-4">No moisture readings recorded</p>
+                    ) : (
+                      <ul className="text-xs text-gray-600 ml-4 space-y-0.5">
+                        {roomMoisture.map((m: any, idx: number) => {
+                          const lastReading = m.readings[m.readings.length - 1];
+                          const isDry = lastReading.moisturePercent <= m.dryStandard + 2;
+                          return (
+                            <li key={idx}>
+                              • {m.material} - {lastReading.moisturePercent}%
+                              {isDry ? (
+                                <span className="text-green-600 font-medium ml-1">✓ Dry</span>
+                              ) : (
+                                <span className="text-red-600 font-medium ml-1">✗ Wet</span>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Materials to Remove */}
+                  <div className="mb-2">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">
+                      <Hammer className="w-3 h-3 inline mr-1" />
+                      Planned Removal:
+                    </p>
+                    {!roomDemo || roomDemo.materialsRemoved.length === 0 ? (
+                      <p className="text-xs text-gray-500 ml-4">No demo scheduled for this room</p>
+                    ) : (
+                      <ul className="text-xs text-gray-600 ml-4 space-y-0.5">
+                        {roomDemo.materialsRemoved.map((mat: any, idx: number) => (
+                          <li key={idx}>
+                            • {mat.materialType} - {mat.quantity} {mat.unit}
+                            {mat.notes && <span className="text-gray-500"> ({mat.notes})</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Subcontractor Requests */}
+      {subcontractorRequests.length > 0 && (
+        <div className="border border-yellow-400 rounded-lg p-4 bg-yellow-50">
+          <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <Wrench className="w-5 h-5 text-yellow-600" />
+            Subcontractor Requests ({subcontractorRequests.length})
+          </h3>
+          <div className="space-y-2">
+            {subcontractorRequests.map((req: any, idx: number) => (
+              <div key={idx} className="bg-white border border-yellow-200 rounded-lg p-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {req.specialistType === 'Other' ? req.otherSpecialistType : req.specialistType}
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      📍 {req.location}
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {req.issueDescription}
+                    </p>
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded font-medium ${
+                    req.urgency === 'emergency' ? 'bg-red-100 text-red-700' :
+                    req.urgency === 'urgent' ? 'bg-orange-100 text-orange-700' :
+                    'bg-blue-100 text-blue-700'
+                  }`}>
+                    {req.urgency.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Equipment Placed */}
       <div className="border rounded-lg p-4 bg-white">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -143,28 +282,32 @@ export const CommunicatePlanStep: React.FC<CommunicatePlanStepProps> = ({ job, o
         )}
       </div>
 
-      {/* Drying Timeline */}
+      {/* Drying Timeline - AUTO-CALCULATED */}
       <div className="border rounded-lg p-4 bg-white">
-        <h3 className="font-semibold text-gray-900 mb-3">
+        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <Calendar className="w-5 h-5 text-blue-600" />
           Estimated Drying Timeline
         </h3>
         <div className="text-sm">
           <p className="text-gray-600 mb-2">
-            Based on damage class{' '}
-            {dryingPlan.overallClass ? (
-              <span className="font-medium text-gray-900">
-                Class {dryingPlan.overallClass}
+            Based on {scheduledVisits.length > 0 ? 'scheduled work days' : 'damage class'}
+            {dryingPlan.overallClass && (
+              <span className="ml-1">
+                (Class {dryingPlan.overallClass})
               </span>
-            ) : (
-              <span className="text-gray-500">Not set</span>
             )}
           </p>
           <p>
             <span className="text-2xl font-bold text-gray-900">
-              {dryingPlan.estimatedDays || scheduledVisits.length || 3}
+              {autoCalculatedDryingDays}
             </span>
-            <span className="text-gray-600 ml-2">days to dry</span>
+            <span className="text-gray-600 ml-2">days estimated</span>
           </p>
+          {scheduledVisits.length > 0 && (
+            <p className="text-xs text-green-700 mt-2">
+              ✓ Auto-calculated from {scheduledVisits.length} scheduled visit{scheduledVisits.length !== 1 ? 's' : ''}
+            </p>
+          )}
         </div>
       </div>
 
