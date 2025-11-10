@@ -9,6 +9,8 @@ import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import { RoomType, MaterialType, FlooringInstallationType, MaterialMoistureTracking } from '../../../../types';
 import { MoistureTabContent } from './MoistureTabContent';
+import { PhotoCapture } from '../../../shared/PhotoCapture';
+import { useToast } from '../../../../contexts/ToastContext';
 
 interface RoomAssessmentStepProps {
   job: any;
@@ -70,6 +72,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
+  const toast = useToast();
 
   const [rooms, setRooms] = useState<RoomData[]>(installData.roomAssessments || []);
   const [moistureTracking, setMoistureTracking] = useState<MaterialMoistureTracking[]>(
@@ -376,7 +379,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
     // PHASE 1 VALIDATION: Check overall photos (minimum 4 required)
     if (selectedRoom.overallPhotos.length < 4) {
-      alert(`Please capture at least 4 overall room photos. You currently have ${selectedRoom.overallPhotos.length} photo(s).`);
+      toast.warning(`Please capture at least 4 overall room photos. You currently have ${selectedRoom.overallPhotos.length} photo(s).`);
       return;
     }
 
