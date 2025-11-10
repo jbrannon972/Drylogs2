@@ -167,30 +167,14 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
 
   return (
     <div className="space-y-6">
-      {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h4 className="font-medium text-blue-900 mb-1">Document the Water Source</h4>
-            <p className="text-sm text-blue-800">
-              Identify what caused the water damage and determine the water category for proper safety protocols.
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Cause Photo */}
       <div>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-medium text-blue-900 mb-1">Photo of Water Source</h4>
-              <p className="text-sm text-blue-800">
-                Take clear photos showing the source of water damage. Multiple photos help document the full extent.
-              </p>
-            </div>
+          <div>
+            <h4 className="font-medium text-blue-900 mb-1">Document the Water Source</h4>
+            <p className="text-sm text-blue-800">
+              Identify what caused the water damage and determine the water category. Take clear photos showing the source of water damage.
+            </p>
           </div>
         </div>
 

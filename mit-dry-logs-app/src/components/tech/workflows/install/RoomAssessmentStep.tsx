@@ -519,19 +519,6 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               </div>
             )}
           </div>
-
-          {/* Continue Button */}
-          <div className="mt-6">
-            <Button
-              variant="primary"
-              onClick={handleNext}
-              disabled={completedCount !== totalCount || totalCount === 0}
-              className="w-full"
-            >
-              Continue to Define Chambers
-              <ChevronRight className="w-5 h-5" />
-            </Button>
-          </div>
         </div>
       )}
 
