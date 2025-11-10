@@ -34,20 +34,12 @@ export function generateDryingCurve(material: MaterialMoistureTracking): DryingC
     const dryingRate = calculateDryingRate(dataPoints);
     if (dryingRate && dryingRate > 0) {
       const currentMoisture = dataPoints[dataPoints.length - 1].moisturePercent;
-      const daysToD
+      const daysToDry = (currentMoisture - material.dryStandard) / dryingRate;
 
-ry = (currentMoisture - material.dryStandard) / dryingRate;
-
-      if (daysToD
-
-ry > 0 && daysToD
-
-ry < 30) {
+      if (daysToDry > 0 && daysToDry < 30) {
         const lastDate = new Date(dataPoints[dataPoints.length - 1].date);
         const projected = new Date(lastDate);
-        projected.setDate(projected.getDate() + Math.ceil(daysToD
-
-ry));
+        projected.setDate(projected.getDate() + Math.ceil(daysToDry));
         projectedDryDate = projected.toISOString();
       }
     }
