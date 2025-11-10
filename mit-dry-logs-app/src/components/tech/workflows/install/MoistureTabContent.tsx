@@ -90,9 +90,9 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   };
 
   const handleSaveReading = () => {
-    // PHASE 1 VALIDATION: Photo is REQUIRED and must be first
-    if (photos.length === 0) {
-      alert('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
+    // PHASE 1 VALIDATION: 2 Photos are REQUIRED
+    if (photos.length < 2) {
+      alert('2 photos required! Please take: (1) moisture meter display, (2) material being tested. Use gallery to select multiple or tap camera twice.');
       return;
     }
 
@@ -237,7 +237,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
           <div>
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
               <p className="text-xs text-orange-900">
-                <strong>Take photo first!</strong> Frame shot to show moisture meter display AND material surface clearly.
+                <strong>Take 2 photos!</strong> (1) Moisture meter display showing reading, (2) Material surface being tested. Use gallery to select both at once.
               </p>
             </div>
             {user && (
@@ -250,8 +250,8 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                   setPhotos(prev => [...prev, ...urls]);
                 }}
                 uploadedCount={photos.length}
-                label="Moisture Reading Photo *"
-                minimumPhotos={1}
+                label="Moisture Reading Photos *"
+                minimumPhotos={2}
               />
             )}
           </div>
@@ -358,7 +358,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             <Button
               variant="primary"
               onClick={handleSaveReading}
-              disabled={!dryStandard || !wetReading || photos.length === 0}
+              disabled={!dryStandard || !wetReading || photos.length < 2}
               className="flex-1"
             >
               <CheckCircle className="w-4 h-4" />

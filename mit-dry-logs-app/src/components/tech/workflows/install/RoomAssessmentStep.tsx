@@ -419,18 +419,30 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       return;
     }
 
-    // PHASE 1 VALIDATION: Check moisture photos (minimum 2 required per room)
+    // PHASE 1 VALIDATION: Check moisture photos (minimum 1 material tracked)
     const roomMoistureTracking = moistureTracking.filter(t => t.roomId === selectedRoom.id);
-    const totalMoisturePhotos = roomMoistureTracking.reduce((count, tracking) => {
-      return count + tracking.readings.filter(r => r.photo).length;
-    }, 0);
 
-    if (totalMoisturePhotos < 2) {
-      alert(`Please capture at least 2 moisture photos with meter visible. You currently have ${totalMoisturePhotos} moisture photo(s).`);
+    if (roomMoistureTracking.length < 1) {
+      alert(`Please add at least 1 moisture reading for this room. Click the Moisture tab to add moisture readings with photos.`);
       return;
     }
 
+    // PHASE 1 VALIDATION: Check materials marked for removal
+    const materialsMarkedForRemoval = selectedRoom.materialsAffected.filter(m => m.removalRequired).length;
+    if (materialsMarkedForRemoval === 0) {
+      const confirmContinue = window.confirm(
+        `⚠️ No materials marked for removal!\n\nYou haven't selected any construction materials, fixtures, or appliances for removal.\n\nIs this room truly unaffected?\n\nClick OK to continue anyway, or Cancel to review materials.`
+      );
+      if (!confirmContinue) {
+        return;
+      }
+    }
+
     updateSelectedRoom({ isComplete: true });
+
+    // Success feedback
+    alert(`✅ ${selectedRoom.name} marked complete!\n\n${roomMoistureTracking.length} moisture reading(s) captured\n${materialsMarkedForRemoval} material(s) marked for removal\n\nReturning to room list...`);
+
     returnToList();
   };
 
@@ -1768,14 +1780,31 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
           {/* Bottom Button */}
           <div className="border-t border-gray-300 bg-white p-4 sticky bottom-0">
-            <Button
-              variant="primary"
-              onClick={markCompleteAndReturn}
-              className="w-full"
-            >
-              {selectedRoom.isComplete ? 'Return to Room List' : 'Mark Complete & Return'}
-              <ChevronRight className="w-5 h-5" />
-            </Button>
+            <div className="space-y-2">
+              <Button
+                variant="primary"
+                onClick={markCompleteAndReturn}
+                className="w-full"
+              >
+                {selectedRoom.isComplete ? (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    Return to Room List
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    Save & Mark Room Complete
+                  </>
+                )}
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+              <p className="text-xs text-gray-600 text-center">
+                {selectedRoom.isComplete ?
+                  'This room is complete. Click to return to room list.' :
+                  'Validates all required data and saves this room. You can then add more rooms.'}
+              </p>
+            </div>
           </div>
         </div>
       )}

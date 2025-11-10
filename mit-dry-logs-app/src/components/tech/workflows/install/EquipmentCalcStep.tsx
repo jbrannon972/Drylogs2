@@ -58,6 +58,9 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   const [dehumidifierType, setDehumidifierType] = useState<DehumidifierType>('Low Grain Refrigerant (LGR)');
   const [dehumidifierRating, setDehumidifierRating] = useState(200); // PPD
   const [chamberCalculations, setChamberCalculations] = useState<ChamberCalculations[]>([]);
+  const [airMoversAfterDemo, setAirMoversAfterDemo] = useState<Set<string>>(
+    new Set(installData.airMoversAfterDemo || [])
+  );
 
   const lastSavedCalculationsRef = useRef<string | null>(null);
 
@@ -193,8 +196,22 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
           dehumidifierType,
           dehumidifierRating,
         },
+        airMoversAfterDemo: Array.from(airMoversAfterDemo),
       });
     }
+  };
+
+  // Toggle "install after demo" for a chamber's air movers
+  const toggleAirMoversAfterDemo = (chamberId: string) => {
+    setAirMoversAfterDemo(prev => {
+      const next = new Set(prev);
+      if (next.has(chamberId)) {
+        next.delete(chamberId);
+      } else {
+        next.add(chamberId);
+      }
+      return next;
+    });
   };
 
   // Recalculate when settings change
@@ -205,7 +222,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dehumidifierType, dehumidifierRating]);
+  }, [dehumidifierType, dehumidifierRating, airMoversAfterDemo]);
 
   // Recalculate when chambers or rooms change
   useEffect(() => {
@@ -259,11 +276,14 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-medium text-blue-900 mb-1">IICRC Equipment Calculations (Per Chamber)</h4>
+            <h4 className="font-medium text-blue-900 mb-1">IICRC Equipment Calculations</h4>
             <p className="text-sm text-blue-800">
-              Equipment quantities are calculated PER CHAMBER using ANSI/IICRC S500-2021 standards.
-              Each chamber is calculated independently based on its cubic footage and damage class.
+              Equipment calculated using ANSI/IICRC S500-2021 standards:
             </p>
+            <ul className="text-sm text-blue-800 list-disc ml-5 mt-2 space-y-1">
+              <li><strong>Dehumidifiers & Air Scrubbers:</strong> Calculated per chamber based on cubic footage and damage class</li>
+              <li><strong>Air Movers:</strong> Calculated per room based on affected floor and wall areas</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -318,19 +338,13 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="grid grid-cols-2 gap-3 mb-4">
             {/* Dehumidifiers */}
             <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 text-center">
               <Wind className="w-6 h-6 text-blue-600 mx-auto mb-2" />
               <p className="text-3xl font-bold text-blue-900">{calc.dehumidifiers}</p>
               <p className="text-sm text-blue-700 font-medium">Dehumidifiers</p>
-            </div>
-
-            {/* Air Movers */}
-            <div className="bg-orange-100 border-2 border-orange-300 rounded-lg p-4 text-center">
-              <Wind className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-              <p className="text-3xl font-bold text-orange-900">{calc.airMovers}</p>
-              <p className="text-sm text-orange-700 font-medium">Air Movers</p>
+              <p className="text-xs text-blue-600 mt-1">For this chamber</p>
             </div>
 
             {/* Air Scrubbers */}
@@ -348,6 +362,64 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
               <p className={`text-sm font-medium ${
                 calc.airScrubbers > 0 ? 'text-purple-700' : 'text-gray-500'
               }`}>Air Scrubbers</p>
+              <p className={`text-xs mt-1 ${
+                calc.airScrubbers > 0 ? 'text-purple-600' : 'text-gray-500'
+              }`}>For this chamber</p>
+            </div>
+          </div>
+
+          {/* Air Movers - Room by Room Breakdown */}
+          <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-4 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Wind className="w-5 h-5 text-orange-600" />
+                <h4 className="font-bold text-orange-900">Air Movers (By Room)</h4>
+              </div>
+              <div className="bg-orange-200 px-3 py-1 rounded-full">
+                <span className="text-lg font-bold text-orange-900">{calc.airMovers} total</span>
+              </div>
+            </div>
+
+            {/* Installation Timing Option */}
+            <div className="mb-3 bg-yellow-50 border border-yellow-300 rounded-lg p-3">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={airMoversAfterDemo.has(calc.chamberId)}
+                  onChange={() => toggleAirMoversAfterDemo(calc.chamberId)}
+                  className="mt-1 h-4 w-4 text-orange-600 rounded focus:ring-orange-500"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-900">Install after demo</span>
+                    {airMoversAfterDemo.has(calc.chamberId) && (
+                      <span className="px-2 py-0.5 bg-yellow-200 text-yellow-900 text-xs rounded-full font-medium">
+                        SCHEDULED POST-DEMO
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Check if air movers cannot be installed until after demolition is complete. Equipment will be staged for post-demo installation.
+                  </p>
+                </div>
+              </label>
+            </div>
+
+            <div className="space-y-2">
+              {calc.roomPlacements.map((room, idx) => (
+                <div key={idx} className="bg-white border border-orange-200 rounded-lg p-3">
+                  <div className="flex items-start justify-between mb-1">
+                    <span className="font-semibold text-gray-900">{room.roomName}</span>
+                    <span className="text-xl font-bold text-orange-700">{room.total} units</span>
+                  </div>
+                  <p className="text-xs text-gray-600 italic">{room.placement}</p>
+                  <div className="flex gap-3 mt-2 text-xs text-gray-500">
+                    <span>Base: {room.base}</span>
+                    <span>Floor: +{room.floor}</span>
+                    <span>Wall: +{room.wall}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -358,25 +430,10 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
               <p className="text-xs font-mono text-gray-800">{calc.formula}</p>
             </div>
             <div className="bg-white rounded-lg p-3">
-              <p className="text-xs font-medium text-gray-600 mb-1">Air Mover Breakdown:</p>
+              <p className="text-xs font-medium text-gray-600 mb-1">Air Mover Calculation Formula:</p>
               {calc.breakdown.map((line, idx) => (
                 <p key={idx} className="text-xs font-mono text-gray-800">{line}</p>
               ))}
-            </div>
-            {/* Room-by-Room Placement Suggestions */}
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-              <p className="text-xs font-semibold text-orange-900 mb-2">Air Mover Placement (Per Room):</p>
-              <div className="space-y-1">
-                {calc.roomPlacements.map((room, idx) => (
-                  <div key={idx} className="flex items-start justify-between">
-                    <span className="text-xs font-medium text-gray-700">{room.roomName}:</span>
-                    <div className="text-right">
-                      <span className="text-xs font-bold text-orange-700">{room.total} units</span>
-                      <p className="text-xs text-gray-600 italic">{room.placement}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
