@@ -93,7 +93,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   startWorkflow: async (workflow, jobId, userId) => {
     const totalSteps = {
-      install: 13,
+      install: 14, // Updated: Removed "Plan the Job" step (was 15, now 14)
       demo: 10,
       'check-service': 7,
       pull: 8,

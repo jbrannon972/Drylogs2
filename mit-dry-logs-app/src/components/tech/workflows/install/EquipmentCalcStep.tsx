@@ -38,7 +38,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   const { installData, updateWorkflowData } = useWorkflowStore();
 
   const chambers: DryingChamber[] = useMemo(() => installData.chambers || [], [installData.chambers]);
-  const rooms: RoomData[] = useMemo(() => installData.roomAssessments || [], [installData.roomAssessments]);
+  // STANDARDIZED: Use 'rooms' key (with fallback for migration)
+  const rooms: RoomData[] = useMemo(() => installData.rooms || installData.roomAssessments || [], [installData.rooms, installData.roomAssessments]);
   const waterClassification = useMemo(() => installData.waterClassification || {}, [installData.waterClassification]);
   const dryingPlan = useMemo(() => installData.dryingPlan || {}, [installData.dryingPlan]);
 

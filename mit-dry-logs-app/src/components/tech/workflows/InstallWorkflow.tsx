@@ -31,16 +31,16 @@ import { FrontDoorStep } from './install/FrontDoorStep';
 import { CauseOfLossStep } from './install/CauseOfLossStep';
 import { RoomAssessmentStep } from './install/RoomAssessmentStep';
 import { DefineChambersStep } from './install/DefineChambersStep';
-import { PlanJobStep } from './install/PlanJobStep';
+// PlanJobStep removed per user feedback - planning happens in Schedule Work step
 import { PartialDemoStep } from './install/PartialDemoStep';
 import { ScheduleWorkStep } from './install/ScheduleWorkStep';
 import { EquipmentCalcStep } from './install/EquipmentCalcStep';
 import { GeneralBillablesStep } from './install/GeneralBillablesStep';
+import { EquipmentPlacementStep } from './install/EquipmentPlacementStep';
+import { CommunicatePlanStep } from './install/CommunicatePlanStep';
+import { CompleteInstallStep } from './install/CompleteInstallStep';
 import {
-  EquipmentPlaceStep,
-  CommunicatePlanStep,
   FinalPhotosStep,
-  CompleteStep,
 } from './install/StubSteps';
 
 interface StepConfig {
@@ -51,8 +51,8 @@ interface StepConfig {
   component: React.ComponentType<any>;
 }
 
-// REORDERED: Equipment Calc now comes before Partial Demo and Schedule Work
-// This logical flow ensures equipment needs are known before planning work
+// USER FEEDBACK: Removed "Plan the Job" step, reordered per requirements
+// Flow: Assessment → Chambers → Calc → Demo → Place → Billables → Final Photos → Schedule → Communicate → Complete
 const INSTALL_STEPS: StepConfig[] = [
   {
     id: 'office-prep',
@@ -104,13 +104,6 @@ const INSTALL_STEPS: StepConfig[] = [
     component: EquipmentCalcStep,
   },
   {
-    id: 'plan-job',
-    title: 'Plan the Job',
-    description: 'Set drying class and timeline (informed by equipment)',
-    icon: <ClipboardCheck className="w-5 h-5" />,
-    component: PlanJobStep,
-  },
-  {
     id: 'partial-demo',
     title: 'Partial Demo',
     description: 'Demo work during install (optional)',
@@ -120,16 +113,9 @@ const INSTALL_STEPS: StepConfig[] = [
   {
     id: 'equipment-place',
     title: 'Equipment Placement',
-    description: 'Place and scan by room',
+    description: 'Scan & place equipment by chamber/room',
     icon: <Wind className="w-5 h-5" />,
-    component: EquipmentPlaceStep,
-  },
-  {
-    id: 'schedule-work',
-    title: 'Schedule Work',
-    description: 'Plan Day 2+ (demo, checks, pull)',
-    icon: <Calendar className="w-5 h-5" />,
-    component: ScheduleWorkStep,
+    component: EquipmentPlacementStep,
   },
   {
     id: 'general-billables',
@@ -139,25 +125,32 @@ const INSTALL_STEPS: StepConfig[] = [
     component: GeneralBillablesStep,
   },
   {
-    id: 'communicate-plan',
-    title: 'Communicate Plan',
-    description: 'Review with customer',
-    icon: <ClipboardCheck className="w-5 h-5" />,
-    component: CommunicatePlanStep,
-  },
-  {
     id: 'final-photos',
     title: 'Final Photos',
-    description: 'Document setup',
+    description: 'Document equipment setup',
     icon: <Camera className="w-5 h-5" />,
     component: FinalPhotosStep,
   },
   {
+    id: 'schedule-work',
+    title: 'Schedule Work',
+    description: 'Plan Day 2+ visits (demo, checks, pull)',
+    icon: <Calendar className="w-5 h-5" />,
+    component: ScheduleWorkStep,
+  },
+  {
+    id: 'communicate-plan',
+    title: 'Communicate Plan',
+    description: 'Review plan with tech (not sent to customer)',
+    icon: <ClipboardCheck className="w-5 h-5" />,
+    component: CommunicatePlanStep,
+  },
+  {
     id: 'complete',
     title: 'Complete',
-    description: 'Finalize and depart',
+    description: 'Finalize workflow and depart',
     icon: <CheckCircle className="w-5 h-5" />,
-    component: CompleteStep,
+    component: CompleteInstallStep,
   },
 ];
 
