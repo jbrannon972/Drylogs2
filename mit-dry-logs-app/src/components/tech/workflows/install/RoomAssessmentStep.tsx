@@ -161,11 +161,11 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const addRoom = () => {
     // Validation
     if (!newRoomForm.name.trim()) {
-      alert('Please enter a room name');
+      toast.warning('Please enter a room name');
       return;
     }
     if (!newRoomForm.length || !newRoomForm.width) {
-      alert('Please enter room dimensions');
+      toast.warning('Please enter room dimensions');
       return;
     }
 
@@ -263,12 +263,12 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     const incompleteRooms = rooms.filter(r => !r.isComplete);
 
     if (incompleteRooms.length > 0) {
-      alert(`Please complete assessment for ${incompleteRooms.length} room(s)`);
+      toast.warning(`Please complete assessment for ${incompleteRooms.length} room(s)`);
       return;
     }
 
     if (rooms.length === 0) {
-      alert('Please add at least one room');
+      toast.warning('Please add at least one room');
       return;
     }
 
@@ -373,7 +373,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
     // Validation for new completions
     if (selectedRoom.length === 0 || selectedRoom.width === 0) {
-      alert('Please enter room dimensions before marking complete');
+      toast.warning('Please enter room dimensions before marking complete');
       return;
     }
 
@@ -390,7 +390,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     }, 0);
 
     if (totalMoisturePhotos < 2) {
-      alert(`Please capture at least 2 moisture photos with meter visible. You currently have ${totalMoisturePhotos} moisture photo(s).`);
+      toast.warning(`Please capture at least 2 moisture photos with meter visible. You currently have ${totalMoisturePhotos} moisture photo(s).`);
       return;
     }
 
@@ -1843,7 +1843,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                             }
                           } catch (error) {
                             console.error('Error uploading photo:', error);
-                            alert('Failed to upload photo');
+                            toast.error('Failed to upload photo');
                           }
                         }
                       };

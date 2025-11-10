@@ -6,6 +6,7 @@ import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { DryingChamber, ContainmentBarrierSetup } from '../../../../types';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
+import { useToast } from '../../../../contexts/ToastContext';
 import { Timestamp } from 'firebase/firestore';
 
 interface DefineChambersStepProps {
@@ -28,6 +29,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
+  const toast = useToast();
   const rooms: RoomData[] = installData.roomAssessments || [];
 
   const [chambers, setChambers] = useState<DryingChamber[]>([]);
@@ -107,7 +109,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
 
   const deleteChamber = (chamberId: string) => {
     if (chambers.length <= 1) {
-      alert('You must have at least one chamber');
+      toast.warning('You must have at least one chamber');
       return;
     }
 
@@ -129,7 +131,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
 
   const saveChamberName = (chamberId: string) => {
     if (!chamberNameInput.trim()) {
-      alert('Chamber name cannot be empty');
+      toast.warning('Chamber name cannot be empty');
       return;
     }
 
@@ -185,7 +187,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
     const unassignedRooms = allRoomIds.filter(id => !assignedRoomIds.has(id));
 
     if (unassignedRooms.length > 0) {
-      alert(`Please assign all rooms to chambers. ${unassignedRooms.length} room(s) are not assigned.`);
+      toast.warning(`Please assign all rooms to chambers. ${unassignedRooms.length} room(s) are not assigned.`);
       return;
     }
 
@@ -196,7 +198,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
     );
 
     if (chambersWithContainmentNoPhotos.length > 0) {
-      alert(`Containment photos are required! Please add photos for chamber(s): ${chambersWithContainmentNoPhotos.map(c => c.chamberName).join(', ')}`);
+      toast.error(`Containment photos are required! Please add photos for chamber(s): ${chambersWithContainmentNoPhotos.map(c => c.chamberName).join(', ')}`);
       return;
     }
 
@@ -484,7 +486,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                                 }
                               } catch (error) {
                                 console.error('Error uploading photo:', error);
-                                alert('Failed to upload photo');
+                                toast.error('Failed to upload photo');
                               }
                             }
                           };

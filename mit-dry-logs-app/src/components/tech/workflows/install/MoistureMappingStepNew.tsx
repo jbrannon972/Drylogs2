@@ -15,6 +15,7 @@ import {
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
+import { useToast } from '../../../../contexts/ToastContext';
 import {
   ConstructionMaterialType,
   MaterialMoistureTracking,
@@ -34,6 +35,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
+  const toast = useToast();
   const rooms = installData.rooms || [];
 
   // All moisture tracking records
@@ -109,7 +111,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
 
   const handleSaveReading = () => {
     if (!currentRoom || !dryStandard || !wetReading) {
-      alert('Please complete all required fields');
+      toast.warning('Please complete all required fields');
       return;
     }
 

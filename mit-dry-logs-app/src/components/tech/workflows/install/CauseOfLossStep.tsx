@@ -4,6 +4,7 @@ import { Droplets, AlertCircle, Info, Camera, Wrench, CheckCircle } from 'lucide
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
+import { useToast } from '../../../../contexts/ToastContext';
 import { SubcontractorRequestModal, SubcontractorRequestData } from '../../../shared/SubcontractorRequestModal';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
@@ -17,6 +18,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
+  const toast = useToast();
   const [showSubModal, setShowSubModal] = useState(false);
 
   const [causeType, setCauseType] = useState(installData.causeOfLoss?.type || '');
@@ -110,7 +112,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
 
     await addDoc(collection(db, 'subcontractorRequests'), requestData);
 
-    alert('Subcontractor request submitted successfully. MIT Lead will be notified.');
+    toast.success('Subcontractor request submitted successfully. MIT Lead will be notified.');
   };
 
   const causeTypes = [

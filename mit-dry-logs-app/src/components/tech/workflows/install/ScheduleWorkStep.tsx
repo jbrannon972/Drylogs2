@@ -6,6 +6,7 @@ import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { SubcontractorRequestModal, SubcontractorRequestData } from '../../../shared/SubcontractorRequestModal';
 import { useAuth } from '../../../../hooks/useAuth';
 import { usePhotos } from '../../../../hooks/usePhotos';
+import { useToast } from '../../../../contexts/ToastContext';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
 
@@ -29,6 +30,7 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto } = usePhotos();
+  const toast = useToast();
   const [visits, setVisits] = useState<ScheduledVisit[]>(installData.scheduledVisits || []);
   const [estimatedDryingDays, setEstimatedDryingDays] = useState(
     installData.dryingPlan?.estimatedDays || '3'
@@ -69,7 +71,7 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
 
     await addDoc(collection(db, 'subcontractorRequests'), requestData);
 
-    alert('Subcontractor request submitted successfully. MIT Lead will be notified.');
+    toast.success('Subcontractor request submitted successfully. MIT Lead will be notified.');
   };
 
   const addVisit = (type: 'demo' | 'check' | 'pull') => {

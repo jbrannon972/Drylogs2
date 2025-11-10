@@ -5,6 +5,7 @@ import { Input } from '../../../shared/Input';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
+import { useToast } from '../../../../contexts/ToastContext';
 import { ExposedMaterialPhoto, ConstructionMaterialType } from '../../../../types';
 
 interface ExposedMaterialsStepProps {
@@ -16,6 +17,7 @@ export const ExposedMaterialsStep: React.FC<ExposedMaterialsStepProps> = ({ job,
   const { demoData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
+  const toast = useToast();
 
   const [exposedPhotos, setExposedPhotos] = useState<ExposedMaterialPhoto[]>(
     demoData.exposedMaterialPhotos || []
@@ -74,7 +76,7 @@ export const ExposedMaterialsStep: React.FC<ExposedMaterialsStepProps> = ({ job,
           }
         } catch (error) {
           console.error('Error uploading photo:', error);
-          alert('Failed to upload photo');
+          toast.error('Failed to upload photo');
         }
       }
     };
@@ -98,7 +100,7 @@ export const ExposedMaterialsStep: React.FC<ExposedMaterialsStepProps> = ({ job,
 
   const handleNext = () => {
     if (!canProceed()) {
-      alert('Please capture at least 1 photo of exposed materials (wall cavities, subfloor, structural damage, etc.) before proceeding.');
+      toast.warning('Please capture at least 1 photo of exposed materials (wall cavities, subfloor, structural damage, etc.) before proceeding.');
       return;
     }
     onNext();
