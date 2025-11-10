@@ -855,8 +855,8 @@ export const PSMDashboard: React.FC = () => {
         <div class="header">
           <div style="display: flex; justify-content: space-between; align-items: start; border-bottom: 4px solid #ea580c; padding-bottom: 20px; margin-bottom: 30px;">
             <div style="flex: 1;">
-              <h1 style="font-size: 20px; font-weight: bold; color: #1f2937; margin: 0 0 10px 0;">Entrusted Restoration</h1>
-              <div style="font-size: 22px; font-weight: bold; color: #1f2937; margin: 0 0 5px 0;">INITIAL INSPECTION REPORT</div>
+              <img src="${window.location.origin}/Elogo.png" alt="Entrusted Restoration" class="logo-img" />
+              <div style="font-size: 22px; font-weight: bold; color: #1f2937; margin: 15px 0 5px 0;">INITIAL INSPECTION REPORT</div>
               <div style="font-size: 14px; color: #6b7280; margin: 0 0 8px 0;">Water Damage Mitigation Assessment</div>
               <div style="font-size: 11pt; color: #6b7280;">
                 Report Generated: ${new Date().toLocaleString()}<br>
