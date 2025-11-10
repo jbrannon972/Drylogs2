@@ -3,6 +3,9 @@ import { Button } from '../../../shared/Button';
 import { AlertCircle, CheckCircle, Clock, FileText } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { useNavigate } from 'react-router-dom';
+import { jobsService } from '../../../../services/firebase/jobsService';
+import { Timestamp } from 'firebase/firestore';
+import { useAuth } from '../../../../hooks/useAuth';
 
 interface CompleteInstallStepProps {
   job: any;
@@ -10,7 +13,8 @@ interface CompleteInstallStepProps {
 }
 
 export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, onNext }) => {
-  const { installData, updateWorkflowData, completeWorkflow } = useWorkflowStore();
+  const { installData, updateWorkflowData, completeWorkflow, saveWorkflowData } = useWorkflowStore();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   // Validation state
@@ -64,6 +68,11 @@ export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, o
   };
 
   const handleComplete = async () => {
+    if (!user) {
+      alert('Error: User not authenticated');
+      return;
+    }
+
     // Validate workflow
     const errors = validateWorkflow();
 
@@ -73,18 +82,44 @@ export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, o
       return;
     }
 
-    // Save completion data
-    await updateWorkflowData('install', {
-      departureTime,
-      completionNotes: techNotes,
-      completedAt: new Date().toISOString(),
-      workflowStatus: 'completed',
-    });
+    try {
+      // 1. Update completion data in Zustand store
+      await updateWorkflowData('install', {
+        departureTime,
+        completionNotes: techNotes,
+        completedAt: new Date().toISOString(),
+        workflowStatus: 'completed',
+      });
 
-    // Complete workflow and return to dashboard
-    completeWorkflow();
-    alert('✅ Install workflow completed successfully!');
-    navigate('/tech');
+      // 2. CRITICAL: Save workflow data to Firebase
+      await saveWorkflowData();
+      console.log('✅ Workflow data saved to Firebase');
+
+      // 3. CRITICAL: Update job phases to mark install as completed
+      await jobsService.updateJob(
+        job.jobId,
+        {
+          workflowPhases: {
+            ...job.workflowPhases,
+            install: {
+              ...job.workflowPhases.install,
+              status: 'completed',
+              completedAt: Timestamp.now(),
+            },
+          },
+        } as any,
+        user.uid
+      );
+      console.log('✅ Job phases updated - install marked as completed');
+
+      // 4. Clean up local state and return to dashboard
+      completeWorkflow();
+      alert('✅ Install workflow completed successfully!');
+      navigate('/tech');
+    } catch (error) {
+      console.error('❌ Error completing workflow:', error);
+      alert('Error completing workflow. Please try again.');
+    }
   };
 
   return (
