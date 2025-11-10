@@ -13,7 +13,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, doc, setDoc, getDocs, deleteDoc, writeBatch, Timestamp } from 'firebase/firestore';
 import { ref, listAll, deleteObject } from 'firebase/storage';
 import { db, storage } from '../../config/firebase';
-import { Job } from '../../types';
+import { Job, WaterCategory, CauseOfLossType, ApprovalStatus } from '../../types';
 import {
   Database,
   Loader,
@@ -219,10 +219,10 @@ export const DemoAdminPage: React.FC = () => {
             adjusterEmail: 'adjuster@insurance.com',
             deductible: parseInt(csvJob.deductible) || 1000,
             estimatedValue: parseInt(csvJob.contractedAmountTotal) || 5000,
-            categoryOfWater: csvJob.categoryOfWater || 'Category 1',
+            categoryOfWater: (csvJob.categoryOfWater || 'Category 1') as WaterCategory,
           },
           causeOfLoss: {
-            type: csvJob.causeOfLoss || 'Unknown',
+            type: (csvJob.causeOfLoss || 'Other') as CauseOfLossType,
             description: csvJob.specificPromises || '',
             location: csvJob.roomsAffected || 'Multiple rooms',
             discoveryDate: now,
@@ -274,7 +274,7 @@ export const DemoAdminPage: React.FC = () => {
               lastCalculatedAt: now,
               calculatedBy: 'tech1',
               waterClass: 'Class 2',
-              waterCategory: csvJob.categoryOfWater || 'Category 1',
+              waterCategory: (csvJob.categoryOfWater || 'Category 1') as WaterCategory,
             },
           },
           safetyChecklist: {
@@ -323,7 +323,7 @@ export const DemoAdminPage: React.FC = () => {
               obtained: false,
             },
           },
-          scheduledZone: (csvJob.zone || '1') as any,
+          scheduledZone: csvJob.zone === '2' ? 'Zone 2' : csvJob.zone === '3' ? 'Zone 3' : csvJob.zone === '4' ? '2nd Shift' : 'Zone 1',
           scheduledTechnician: csvJob.accountManager || 'tech1',
           scheduledDate: now,
           metadata: {
@@ -357,7 +357,7 @@ export const DemoAdminPage: React.FC = () => {
             },
             adjusterCommunications: [],
             approvalStatus: {
-              demoScope: csvJob.isDemoNeeded === 'true' ? 'pending' : 'not-required',
+              demoScope: (csvJob.isDemoNeeded === 'true' ? 'pending' : 'denied') as ApprovalStatus,
               demoAmount: {
                 requested: 0,
                 approved: 0,
@@ -702,10 +702,10 @@ export const DemoAdminPage: React.FC = () => {
                   {filteredJobs.map(job => {
                     const custom = (job as any).customFields || {};
                     const zoneColor =
-                      job.scheduledZone === '1' ? 'bg-green-100 text-green-800' :
-                      job.scheduledZone === '2' ? 'bg-blue-100 text-blue-800' :
-                      job.scheduledZone === '3' ? 'bg-yellow-100 text-yellow-800' :
-                      job.scheduledZone === '4' ? 'bg-purple-100 text-purple-800' :
+                      job.scheduledZone === 'Zone 1' ? 'bg-green-100 text-green-800' :
+                      job.scheduledZone === 'Zone 2' ? 'bg-blue-100 text-blue-800' :
+                      job.scheduledZone === 'Zone 3' ? 'bg-yellow-100 text-yellow-800' :
+                      job.scheduledZone === '2nd Shift' ? 'bg-purple-100 text-purple-800' :
                       'bg-pink-100 text-pink-800';
 
                     const phaseColor =
@@ -724,7 +724,7 @@ export const DemoAdminPage: React.FC = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="text-sm font-medium text-gray-900">{job.customerInfo.name}</div>
-                          <div className="text-sm text-gray-500">{job.customerInfo.phone}</div>
+                          <div className="text-sm text-gray-500">{job.customerInfo.phoneNumber}</div>
                         </td>
                         <td className="px-4 py-3 text-sm font-mono text-gray-900">{job.jobId}</td>
                         <td className="px-4 py-3">
