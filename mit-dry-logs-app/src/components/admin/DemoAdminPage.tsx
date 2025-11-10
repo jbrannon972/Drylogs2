@@ -190,7 +190,7 @@ export const DemoAdminPage: React.FC = () => {
         const jobId = `DEMO-2024-${(i + 1).toString().padStart(3, '0')}`;
 
         // Parse address
-        const addressParts = csvJob.address.split(',').map(s => s.trim());
+        const addressParts = (csvJob.address || '').split(',').map(s => s.trim());
         const city = addressParts[1] || 'Houston';
         const state = addressParts[2] || 'TX';
         const zip = addressParts[3] || '77000';
@@ -198,13 +198,13 @@ export const DemoAdminPage: React.FC = () => {
         const job = {
           jobId,
           customerInfo: {
-            name: csvJob.clientName,
-            address: addressParts[0] || csvJob.address,
+            name: csvJob.clientName || 'Unknown Customer',
+            address: addressParts[0] || csvJob.address || 'Unknown Address',
             city,
             state,
             zipCode: zip,
-            phoneNumber: csvJob.phone,
-            email: csvJob.email || `${csvJob.clientName.replace(/\s/g, '').toLowerCase()}@email.com`,
+            phoneNumber: csvJob.phone || '(000) 000-0000',
+            email: csvJob.email || `${(csvJob.clientName || 'customer').replace(/\s/g, '').toLowerCase()}@email.com`,
             coordinates: {
               latitude: 29.76 + (i * 0.01),
               longitude: -95.37 - (i * 0.01),
