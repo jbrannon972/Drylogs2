@@ -11,7 +11,8 @@
     "seed": "tsx src/scripts/seedData.ts",
     "seed:proper": "tsx src/scripts/runProperSeed.ts",
     "cleanup": "tsx src/scripts/cleanupJobs.ts",
-    "fix-assignments": "tsx src/scripts/fixJobAssignments.ts"
+    "fix-assignments": "tsx src/scripts/fixJobAssignments.ts",
+    "delete-photos": "tsx src/scripts/deleteAllPhotos.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
