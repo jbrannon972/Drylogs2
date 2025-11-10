@@ -554,7 +554,7 @@ export const PSMDashboard: React.FC = () => {
   const generateInitialInspectionReport = async (job: Job, event: React.MouseEvent) => {
     event.stopPropagation();
 
-    if (job.workflowPhases.install.status !== 'completed' || !job.workflowData?.install?.roomAssessments) {
+    if (job.workflowPhases.install.status !== 'completed' || !job.workflowData?.install?.rooms) {
       alert('Install workflow must be completed to generate Initial Inspection Report');
       return;
     }
@@ -624,7 +624,46 @@ export const PSMDashboard: React.FC = () => {
   };
 
   const generateReportHTML = (job: Job, exteriorPhotoUrl: string, causeOfLossPhotoUrl: string, includePhotos: boolean, allPhotos: any[]) => {
-    const roomAssessments = job.workflowData?.install?.roomAssessments || [];
+    // Map new data structure to old format expected by report template
+    const installData = job.workflowData?.install || {};
+    const rooms = installData.rooms || [];
+    const moistureTracking = installData.moistureTracking || [];
+    const partialDemoDetails = installData.partialDemoDetails || { rooms: [] };
+
+    // Transform new structure to match old roomAssessments format
+    const roomAssessments = rooms.map((room: any) => {
+      // Get moisture readings for this room from new moisture tracking system
+      const roomMoisture = moistureTracking.filter((m: any) => m.roomId === room.id);
+      const moistureReadings = roomMoisture.flatMap((m: any) =>
+        m.readings.map((reading: any) => ({
+          material: m.material,
+          location: m.location || room.name,
+          percentage: reading.moisturePercent,
+          isDryStandard: reading.moisturePercent <= m.dryStandard + 2
+        }))
+      );
+
+      // Get demo details for this room
+      const roomDemo = partialDemoDetails.rooms?.find((d: any) => d.roomId === room.id);
+      const materialsAffected = roomDemo?.materialsRemoved?.map((mat: any) => ({
+        materialType: mat.materialType,
+        installationType: mat.installationType || 'N/A',
+        squareFootage: mat.quantity,
+        removalRequired: true,
+        removalReason: mat.reason || 'water-damage',
+        notes: mat.notes || ''
+      })) || [];
+
+      return {
+        ...room,
+        moistureReadings,
+        materialsAffected,
+        hasPreexistingDamage: room.hasPreexistingDamage || false,
+        preexistingDamageNotes: room.preexistingDamageNotes || '',
+        preexistingDamagePhotos: room.preexistingDamagePhotos || []
+      };
+    });
+
     const assessmentDate = job.workflowPhases.install.completedAt
       ? new Date(job.workflowPhases.install.completedAt.seconds * 1000).toLocaleDateString()
       : 'N/A';
@@ -1233,7 +1272,7 @@ export const PSMDashboard: React.FC = () => {
                           <Printer className="w-4 h-4" />
                           <span>Print Report</span>
                         </button>
-                        {job.workflowPhases.install.status === 'completed' && job.workflowData?.install?.roomAssessments && (
+                        {job.workflowPhases.install.status === 'completed' && job.workflowData?.install?.rooms && (
                           <button
                             onClick={(e) => generateInitialInspectionReport(job, e)}
                             className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
