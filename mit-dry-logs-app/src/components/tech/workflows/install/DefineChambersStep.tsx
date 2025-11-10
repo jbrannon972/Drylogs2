@@ -107,7 +107,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
 
   const deleteChamber = (chamberId: string) => {
     if (chambers.length <= 1) {
-      console.warn('You must have at least one chamber');
+      alert('You must have at least one chamber');
       return;
     }
 
@@ -129,7 +129,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
 
   const saveChamberName = (chamberId: string) => {
     if (!chamberNameInput.trim()) {
-      console.warn('Chamber name cannot be empty');
+      alert('Chamber name cannot be empty');
       return;
     }
 
@@ -185,7 +185,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
     const unassignedRooms = allRoomIds.filter(id => !assignedRoomIds.has(id));
 
     if (unassignedRooms.length > 0) {
-      console.warn(`Please assign all rooms to chambers. ${unassignedRooms.length} room(s) are not assigned.`);
+      alert(`Please assign all rooms to chambers. ${unassignedRooms.length} room(s) are not assigned.`);
       return;
     }
 
@@ -196,7 +196,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
     );
 
     if (chambersWithContainmentNoPhotos.length > 0) {
-      console.error(`Containment photos are required! Please add photos for chamber(s): ${chambersWithContainmentNoPhotos.map(c => c.chamberName).join(', ')}`);
+      alert(`Containment photos are required! Please add photos for chamber(s): ${chambersWithContainmentNoPhotos.map(c => c.chamberName).join(', ')}`);
       return;
     }
 
@@ -484,7 +484,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                                 }
                               } catch (error) {
                                 console.error('Error uploading photo:', error);
-                                console.error('Failed to upload photo');
+                                alert('Failed to upload photo');
                               }
                             }
                           };

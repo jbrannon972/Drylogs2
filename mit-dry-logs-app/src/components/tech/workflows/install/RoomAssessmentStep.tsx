@@ -159,11 +159,11 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const addRoom = () => {
     // Validation
     if (!newRoomForm.name.trim()) {
-      console.warn('Please enter a room name');
+      alert('Please enter a room name');
       return;
     }
     if (!newRoomForm.length || !newRoomForm.width) {
-      console.warn('Please enter room dimensions');
+      alert('Please enter room dimensions');
       return;
     }
 
@@ -261,12 +261,12 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     const incompleteRooms = rooms.filter(r => !r.isComplete);
 
     if (incompleteRooms.length > 0) {
-      console.warn(`Please complete assessment for ${incompleteRooms.length} room(s)`);
+      alert(`Please complete assessment for ${incompleteRooms.length} room(s)`);
       return;
     }
 
     if (rooms.length === 0) {
-      console.warn('Please add at least one room');
+      alert('Please add at least one room');
       return;
     }
 
@@ -371,13 +371,13 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
     // Validation for new completions
     if (selectedRoom.length === 0 || selectedRoom.width === 0) {
-      console.warn('Please enter room dimensions before marking complete');
+      alert('Please enter room dimensions before marking complete');
       return;
     }
 
     // PHASE 1 VALIDATION: Check overall photos (minimum 4 required)
     if (selectedRoom.overallPhotos.length < 4) {
-      console.warn(`Please capture at least 4 overall room photos. You currently have ${selectedRoom.overallPhotos.length} photo(s).`);
+      alert(`Please capture at least 4 overall room photos. You currently have ${selectedRoom.overallPhotos.length} photo(s).`);
       return;
     }
 
@@ -388,7 +388,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     }, 0);
 
     if (totalMoisturePhotos < 2) {
-      console.warn(`Please capture at least 2 moisture photos with meter visible. You currently have ${totalMoisturePhotos} moisture photo(s).`);
+      alert(`Please capture at least 2 moisture photos with meter visible. You currently have ${totalMoisturePhotos} moisture photo(s).`);
       return;
     }
 
@@ -630,7 +630,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                             return photoUrl;
                           } catch (error) {
                             console.error('Error uploading photo:', error);
-                            console.error('Failed to upload photo');
+                            alert('Failed to upload photo');
                             return null;
                           }
                         }
@@ -687,7 +687,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                             return photoUrl;
                           } catch (error) {
                             console.error('Error uploading photo:', error);
-                            console.error('Failed to upload thermal image');
+                            alert('Failed to upload thermal image');
                             return null;
                           }
                         }
@@ -1841,7 +1841,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                             }
                           } catch (error) {
                             console.error('Error uploading photo:', error);
-                            console.error('Failed to upload photo');
+                            alert('Failed to upload photo');
                           }
                         }
                       };

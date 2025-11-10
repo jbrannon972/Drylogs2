@@ -297,7 +297,7 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
                     className="w-full"
                     onClick={() => {
                       // TODO: Navigate to DRW creation step
-                      toast.info('DRW creation will be implemented in next phase. For now, document this decision and proceed with caution.');
+                      alert('DRW creation will be implemented in next phase. For now, document this decision and proceed with caution.');
                     }}
                   >
                     <FileText className="w-4 h-4" />

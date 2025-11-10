@@ -90,7 +90,7 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
 
   const handleAddRoom = () => {
     if (!newRoom.name || !newRoom.length || !newRoom.width) {
-      console.warn('Please fill in room name, length, and width');
+      alert('Please fill in room name, length, and width');
       return;
     }
 

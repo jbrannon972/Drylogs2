@@ -84,7 +84,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
 
   const handleAddRoom = () => {
     if (!currentRoomId) {
-      console.warn('Please select a room');
+      alert('Please select a room');
       return;
     }
 
@@ -93,7 +93,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
 
     // Check if room already exists
     if (demoRooms.find(dr => dr.roomId === currentRoomId)) {
-      console.warn('This room is already added to partial demo');
+      alert('This room is already added to partial demo');
       return;
     }
 

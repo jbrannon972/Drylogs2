@@ -109,7 +109,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
 
   const handleSaveReading = () => {
     if (!currentRoom || !dryStandard || !wetReading) {
-      console.warn('Please complete all required fields');
+      alert('Please complete all required fields');
       return;
     }
 

@@ -30,7 +30,7 @@ export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onN
 
   const handleAddRoom = () => {
     if (!newRoom.name || !newRoom.length || !newRoom.width) {
-      console.warn('Please fill in all required fields');
+      alert('Please fill in all required fields');
       return;
     }
 

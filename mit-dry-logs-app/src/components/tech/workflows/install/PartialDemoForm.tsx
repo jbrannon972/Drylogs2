@@ -48,7 +48,7 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
 
     // Check if room already added
     if (demoRooms.some(dr => dr.roomId === selectedRoomId)) {
-      console.warn('This room has already been added to partial demo');
+      alert('This room has already been added to partial demo');
       return;
     }
 
@@ -134,12 +134,12 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
     // Validation
     for (const room of demoRooms) {
       if (room.materialsRemoved.length === 0) {
-        console.warn(`Please add at least one material removed for ${room.roomName}`);
+        alert(`Please add at least one material removed for ${room.roomName}`);
         return;
       }
       for (const mat of room.materialsRemoved) {
         if (!mat.quantity || mat.quantity <= 0) {
-          console.warn(`Please enter a valid quantity for ${mat.materialType} in ${room.roomName}`);
+          alert(`Please enter a valid quantity for ${mat.materialType} in ${room.roomName}`);
           return;
         }
       }

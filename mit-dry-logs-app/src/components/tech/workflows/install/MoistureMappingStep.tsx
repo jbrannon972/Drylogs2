@@ -66,7 +66,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
 
   const handleAddReading = () => {
     if (!currentRoom || !newReading.moisturePercent) {
-      console.warn('Please fill in moisture percentage');
+      alert('Please fill in moisture percentage');
       return;
     }
 
