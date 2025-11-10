@@ -420,10 +420,11 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 
       {/* IICRC Reference */}
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <p className="text-xs text-gray-600">
-          <strong>IICRC Best Practice:</strong> Materials are considered dry when within 2% of dry standard
-          or below 12% moisture content. Return to the same locations daily for consistent progress tracking.
-        </p>
+        <p className="text-xs font-semibold text-gray-700 mb-2">IICRC Best Practice:</p>
+        <ul className="text-xs text-gray-600 list-disc ml-5 space-y-1">
+          <li>Materials are dry when within 2% of dry standard OR below 12% moisture content</li>
+          <li>Return to the same locations daily for consistent progress tracking</li>
+        </ul>
       </div>
 
       {/* Delete Confirmation Modal */}
