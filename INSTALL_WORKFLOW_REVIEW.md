@@ -76,7 +76,7 @@ useEffect(() => {
 
 ### ✅ YOUR DECISION:
 **Should I implement which fix?**
-- [ ] Option 1: Add updateWorkflowData to dependencies
+- [ ] Option 1: Add updateWorkflowData to dependencies This one please
 - [ ] Option 2: Use ref to prevent unnecessary updates
 - [ ] Option 3: Remove auto-save entirely (manual save only)
 - [ ] Other: _______________
@@ -120,7 +120,7 @@ useEffect(() => {
 5. Room Assessment (dimensions, moisture, materials)
 6. Define Drying Chambers
 7. Equipment Calculation ← MOVE UP
-8. Plan the Job (now informed by equipment needs)
+8. Plan the Job (now informed by equipment needs) 
 9. Partial Demo (optional)
 10. Equipment Placement ← Place the equipment you calculated
 11. Schedule Work ← Plan future visits based on equipment placed
@@ -134,7 +134,19 @@ useEffect(() => {
 **Should we reorder the steps?**
 - [ ] Yes, use the suggested order above
 - [ ] No, keep current order (explain why): _______________
-- [ ] Different order: _______________
+- [ ] Different order: _______________ I like this order but do we even need step 8? arent we planning the job in step 11. if we can get rid of it here is my proposed flow
+
+4. Cause of Loss
+5. Room Assessment (dimensions, moisture, materials)
+6. Define Drying Chambers
+7. Equipment Calculation ← MOVE UP 
+9. Partial Demo (optional)
+10. Equipment Placement ← Place the equipment you calculated
+11. Additional Billable Work
+12. Final Photos
+13. Schedule Work ← Plan future visits based on equipment placed
+14. Communicate Plan
+15. Complete
 
 ---
 
@@ -199,7 +211,7 @@ installData = {
 
 ### ✅ YOUR DECISION:
 **Should I standardize the data keys?**
-- [ ] Yes, use `rooms` as the single source of truth
+- [ ] Yes, use `rooms` as the single source of truth do this, make it smooth
 - [ ] No, keep current structure (explain): _______________
 - [ ] Different approach: _______________
 
@@ -211,10 +223,10 @@ installData = {
 I see a file `AddRoomsStep.tsx` that's NOT in the workflow steps array, but we have `RoomAssessmentStep.tsx` that IS in the workflow.
 
 **Questions:**
-1. Is `AddRoomsStep` deprecated?
+1. Is `AddRoomsStep` deprecated? i believe so
 2. Should room creation happen in:
    - Office Prep (pre-plan rooms)?
-   - Room Assessment (add while assessing)?
+   - Room Assessment (add while assessing)? YES!
    - Separate step?
 
 ### ✅ YOUR DECISION:
@@ -222,7 +234,7 @@ I see a file `AddRoomsStep.tsx` that's NOT in the workflow steps array, but we h
 - [ ] Delete it (not needed)
 - [ ] Add it to workflow before Room Assessment
 - [ ] Merge it into Room Assessment
-- [ ] Other: _______________
+- [ ] Other: _______________ just leave for now but dont use it for anything
 
 ---
 
@@ -240,15 +252,15 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
 ```
 
 ### **What it SHOULD do:**
-1. Show the calculated equipment list from Step 10
-2. Allow scanning equipment QR codes/barcodes
-3. Assign each piece of equipment to a specific room
-4. Take photos of equipment placement
-5. Mark equipment as "in service" in inventory
+1. Show the calculated equipment list from Step 10. This, it should show the equipment needed and what chamber/room to put it into
+2. Allow scanning equipment QR codes/barcodes. Yes
+3. Assign each piece of equipment to a specific room. YES
+4. Take photos of equipment placement. no, we do this with the final pics at the end
+5. Mark equipment as "in service" in inventory. Yes
 
 ### ✅ YOUR DECISION:
 **Equipment Placement implementation priority?**
-- [ ] HIGH - Block everything until this is done
+- [ ] HIGH - Block everything until this is done FIX IT AS ABOVE
 - [ ] MEDIUM - Can test workflow without it
 - [ ] LOW - Manual tracking is fine for now
 - [ ] Notes: _______________
@@ -260,7 +272,7 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
 ### **Current State**
 Step 13 "Communicate Plan" is another stub.
 
-**What it probably should do:**
+**What it probably should do:** JUST STEP 1, no signature needed but tech should review the plan but not send it
 1. Show summary of:
    - Equipment placed
    - Estimated drying time
@@ -268,7 +280,7 @@ Step 13 "Communicate Plan" is another stub.
    - Any demo work needed
    - Customer responsibilities
 2. Get customer signature on work authorization
-3. Provide customer with copy of drying plan
+3. Provide customer with copy of drying plan 
 
 ### **Question:**
 Is this the same as the "Customer Introduction / Front Door" step?
@@ -276,7 +288,7 @@ Is this the same as the "Customer Introduction / Front Door" step?
 ### ✅ YOUR DECISION:
 **What should "Communicate Plan" do?**
 - [ ] Get customer signature on work plan
-- [ ] Just a review screen (no signature needed)
+- [ ] Just a review screen (no signature needed) DO THIS
 - [ ] Merge with another step: _______________
 - [ ] Other: _______________
 
@@ -304,9 +316,9 @@ Pick ONE strategy:
 
 ### ✅ YOUR DECISION:
 **Which save strategy?**
-- [ ] Manual save only (safest)
+- [ ] Manual save only (safest) 
 - [ ] Auto-save on blur only
-- [ ] Auto-save with debounce (fix the loops)
+- [ ] Auto-save with debounce (fix the loops) Do this
 - [ ] Other: _______________
 
 ---
@@ -322,9 +334,9 @@ Different steps have different photo requirements:
 - Final Photos: What's this for?
 
 ### **Questions:**
-1. Can a room be marked "complete" without minimum 4 photos?
-2. Does "Final Photos" mean "after equipment placed" or "after entire job"?
-3. Should Equipment Placement require photos per piece of equipment?
+1. Can a room be marked "complete" without minimum 4 photos? no
+2. Does "Final Photos" mean "after equipment placed" or "after entire job"? after equipment placed, it is finishing the workflow not the njob
+3. Should Equipment Placement require photos per piece of equipment? no
 
 ### ✅ YOUR DECISION:
 **Photo requirements:**
@@ -351,7 +363,7 @@ Different steps have different photo requirements:
 **Do you have a test job I can use?**
 - [ ] Yes - Job ID: _______________
 - [ ] No - I should create one using the seed data
-- [ ] Notes: _______________
+- [ ] Notes: _______________ Ignore this, i will test and provide feedback
 
 ---
 
@@ -369,7 +381,7 @@ The workflow allows jumping to any step from the overview modal (lines 346-405 i
 
 ### ✅ YOUR DECISION:
 **Step navigation rules:**
-- [ ] Free navigation (can skip around)
+- [ ] Free navigation (can skip around)Free navigation but cant complete untill all steps are done. If you try to complete without all steps it should tell you that
 - [ ] Linear only (must go in order)
 - [ ] Smart locks (some steps require previous completion)
 - [ ] Notes: _______________
