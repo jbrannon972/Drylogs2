@@ -10,6 +10,7 @@ import { TechDashboard } from './components/tech/TechDashboard';
 import { LeadDashboard } from './components/lead/LeadDashboard';
 import { LoadingSpinner } from './components/shared/LoadingSpinner';
 import { PhotoUploadIndicator } from './components/shared/PhotoUploadIndicator';
+import { UploadQueueProvider } from './contexts/UploadQueueContext';
 import { InstallWorkflow } from './components/tech/workflows/InstallWorkflow';
 import { DemoWorkflow } from './components/tech/workflows/DemoWorkflow';
 import { CheckServiceWorkflow } from './components/tech/workflows/CheckServiceWorkflow';
@@ -46,11 +47,12 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      {/* Photo Upload Indicator - Shows for MIT Tech users */}
-      {isAuthenticated && user?.role === 'MIT_TECH' && <PhotoUploadIndicator />}
+    <UploadQueueProvider>
+      <BrowserRouter>
+        {/* Photo Upload Indicator - Shows for MIT Tech users */}
+        {isAuthenticated && user?.role === 'MIT_TECH' && <PhotoUploadIndicator />}
 
-      <Routes>
+        <Routes>
         {/* Public Routes */}
         <Route path="/setup" element={<SetupPage />} />
         <Route path="/admin/seed" element={<DataSeedingPage />} />
@@ -191,6 +193,7 @@ function App() {
         />
       </Routes>
     </BrowserRouter>
+    </UploadQueueProvider>
   );
 }
 

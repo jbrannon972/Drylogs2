@@ -7,7 +7,6 @@ import { Button } from '../../shared/Button';
 import { WorkflowActionBar } from '../../shared/WorkflowActionBar';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { ConfirmModal } from '../../shared/ConfirmModal';
-import { UploadQueueProvider } from '../../../contexts/UploadQueueContext';
 import {
   CheckCircle,
   Circle,
@@ -97,18 +96,18 @@ const INSTALL_STEPS: StepConfig[] = [
     component: DefineChambersStep,
   },
   {
-    id: 'equipment-calc',
-    title: 'Equipment Calc & Place',
-    description: 'Calculate equipment & scan/place by chamber',
-    icon: <Wind className="w-5 h-5" />,
-    component: EquipmentCalcStep,
-  },
-  {
     id: 'partial-demo',
     title: 'Partial Demo',
     description: 'Demo work during install (optional)',
     icon: <Layers className="w-5 h-5" />,
     component: PartialDemoStep,
+  },
+  {
+    id: 'equipment-calc',
+    title: 'Equipment Calc & Place',
+    description: 'Calculate equipment & scan/place by chamber',
+    icon: <Wind className="w-5 h-5" />,
+    component: EquipmentCalcStep,
   },
   {
     id: 'general-billables',
@@ -243,9 +242,8 @@ export const InstallWorkflow: React.FC = () => {
   const progressPercent = Math.round(((currentStepIndex + 1) / INSTALL_STEPS.length) * 100);
 
   return (
-    <UploadQueueProvider>
-      <div className="min-h-screen bg-gray-50 pb-20">
-        {/* ULTRAFIELD CONDENSED HEADER - 48px */}
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* ULTRAFIELD CONDENSED HEADER - 48px */}
         <div className="bg-white border-b sticky top-0 z-40">
         <div className="px-3 py-2 flex items-center justify-between">
           {/* Left: Logo + Step info */}
@@ -434,7 +432,6 @@ export const InstallWorkflow: React.FC = () => {
         cancelText="Close"
         variant="danger"
       />
-      </div>
-    </UploadQueueProvider>
+    </div>
   );
 };
