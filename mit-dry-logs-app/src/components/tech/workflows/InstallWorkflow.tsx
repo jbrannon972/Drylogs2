@@ -51,6 +51,8 @@ interface StepConfig {
   component: React.ComponentType<any>;
 }
 
+// REORDERED: Equipment Calc now comes before Partial Demo and Schedule Work
+// This logical flow ensures equipment needs are known before planning work
 const INSTALL_STEPS: StepConfig[] = [
   {
     id: 'office-prep',
@@ -95,9 +97,16 @@ const INSTALL_STEPS: StepConfig[] = [
     component: DefineChambersStep,
   },
   {
+    id: 'equipment-calc',
+    title: 'Equipment Calculation',
+    description: 'IICRC per-room calculations',
+    icon: <Wind className="w-5 h-5" />,
+    component: EquipmentCalcStep,
+  },
+  {
     id: 'plan-job',
     title: 'Plan the Job',
-    description: 'Set drying class and timeline',
+    description: 'Set drying class and timeline (informed by equipment)',
     icon: <ClipboardCheck className="w-5 h-5" />,
     component: PlanJobStep,
   },
@@ -109,25 +118,18 @@ const INSTALL_STEPS: StepConfig[] = [
     component: PartialDemoStep,
   },
   {
-    id: 'schedule-work',
-    title: 'Schedule Work',
-    description: 'Plan Day 2+ (demo, checks, pull)',
-    icon: <Calendar className="w-5 h-5" />,
-    component: ScheduleWorkStep,
-  },
-  {
-    id: 'equipment-calc',
-    title: 'Equipment Calculation',
-    description: 'IICRC per-room calculations',
-    icon: <Wind className="w-5 h-5" />,
-    component: EquipmentCalcStep,
-  },
-  {
     id: 'equipment-place',
     title: 'Equipment Placement',
     description: 'Place and scan by room',
     icon: <Wind className="w-5 h-5" />,
     component: EquipmentPlaceStep,
+  },
+  {
+    id: 'schedule-work',
+    title: 'Schedule Work',
+    description: 'Plan Day 2+ (demo, checks, pull)',
+    icon: <Calendar className="w-5 h-5" />,
+    component: ScheduleWorkStep,
   },
   {
     id: 'general-billables',

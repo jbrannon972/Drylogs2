@@ -28,7 +28,9 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
-  const rooms: RoomData[] = installData.roomAssessments || [];
+
+  // STANDARDIZED: Use 'rooms' key (migrate from old 'roomAssessments')
+  const rooms: RoomData[] = installData.rooms || installData.roomAssessments || [];
 
   const [chambers, setChambers] = useState<DryingChamber[]>([]);
   const [editingChamberId, setEditingChamberId] = useState<string | null>(null);

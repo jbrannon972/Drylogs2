@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '../../../shared/Button';
 import {
   Home, Plus, Trash2, Camera, Droplets, AlertCircle, CheckCircle,
@@ -72,7 +72,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
 
-  const [rooms, setRooms] = useState<RoomData[]>(installData.roomAssessments || []);
+  // STANDARDIZED: Use 'rooms' as single source of truth (migrate from old 'roomAssessments' key)
+  const [rooms, setRooms] = useState<RoomData[]>(installData.rooms || installData.roomAssessments || []);
   const [moistureTracking, setMoistureTracking] = useState<MaterialMoistureTracking[]>(
     installData.moistureTracking || []
   );
@@ -142,17 +143,37 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save to workflow store whenever rooms or moisture tracking change
+  // ULTRAFAULT FIX: Save with ref-based change detection to prevent infinite loop
+  const prevDataRef = useRef({
+    rooms: JSON.stringify(installData.rooms || installData.roomAssessments || []),
+    moistureTracking: JSON.stringify(installData.moistureTracking || [])
+  });
+
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      updateWorkflowData('install', {
-        roomAssessments: rooms,
-        moistureTracking: moistureTracking
-      });
-    }, 300);
-    return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rooms, moistureTracking]);
+    const currentRoomsStr = JSON.stringify(rooms);
+    const currentMoistureStr = JSON.stringify(moistureTracking);
+
+    // Only update if values actually changed from what we loaded from store
+    if (
+      prevDataRef.current.rooms !== currentRoomsStr ||
+      prevDataRef.current.moistureTracking !== currentMoistureStr
+    ) {
+      const timeoutId = setTimeout(() => {
+        // STANDARDIZED: Save to 'rooms' key (not 'roomAssessments')
+        updateWorkflowData('install', {
+          rooms: rooms,
+          moistureTracking: moistureTracking
+        });
+        // Update ref to prevent re-triggering
+        prevDataRef.current = {
+          rooms: currentRoomsStr,
+          moistureTracking: currentMoistureStr
+        };
+      }, 500); // Increased debounce
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [rooms, moistureTracking, updateWorkflowData]);
 
   const selectedRoom = rooms.find(r => r.id === selectedRoomId);
 
