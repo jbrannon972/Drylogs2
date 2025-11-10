@@ -13,7 +13,7 @@ export function generateDryingCurve(material: MaterialMoistureTracking): DryingC
   }));
 
   // Calculate trend based on last 2+ readings
-  let trend: 'improving' | 'stable' | 'worsening' = 'unknown';
+  let trend: 'improving' | 'stable' | 'worsening' | 'unknown' = 'unknown';
   if (dataPoints.length >= 2) {
     const recent = dataPoints[dataPoints.length - 1].moisturePercent;
     const previous = dataPoints[dataPoints.length - 2].moisturePercent;

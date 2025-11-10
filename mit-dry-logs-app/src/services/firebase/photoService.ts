@@ -146,6 +146,11 @@ export const photoService = {
       'post-demo': 'progress',
       'daily-check': 'progress',
       'final': 'after',
+      'overall': 'before', // Phase 1: Room overview photos
+      'thermal': 'before', // Phase 1: Thermal imaging
+      'containment': 'progress', // Phase 2: Containment setup
+      'exposed-material': 'demo', // Phase 3: Exposed materials during demo
+      'check-service': 'progress', // Phase 2: Environmental check
     };
     return categoryMap[step] || 'other';
   },
