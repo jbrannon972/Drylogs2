@@ -22,7 +22,7 @@ export const UploadProgressBadge: React.FC = () => {
   const allComplete = uploading.length === 0 && failed.length === 0 && completed.length > 0;
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-16 left-4 z-50">
       <div className="relative">
         {/* Progress Ring */}
         <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
