@@ -31,6 +31,7 @@ import { FrontDoorStep } from './install/FrontDoorStep';
 import { CauseOfLossStep } from './install/CauseOfLossStep';
 import { RoomAssessmentStep } from './install/RoomAssessmentStep';
 import { DefineChambersStep } from './install/DefineChambersStep';
+import { PlanJobStep } from './install/PlanJobStep';
 import { PartialDemoStep } from './install/PartialDemoStep';
 import { ScheduleWorkStep } from './install/ScheduleWorkStep';
 import { EquipmentCalcStep } from './install/EquipmentCalcStep';
@@ -92,6 +93,13 @@ const INSTALL_STEPS: StepConfig[] = [
     description: 'Group rooms into drying zones',
     icon: <Wind className="w-5 h-5" />,
     component: DefineChambersStep,
+  },
+  {
+    id: 'plan-job',
+    title: 'Plan the Job',
+    description: 'Set drying class and timeline',
+    icon: <ClipboardCheck className="w-5 h-5" />,
+    component: PlanJobStep,
   },
   {
     id: 'partial-demo',
