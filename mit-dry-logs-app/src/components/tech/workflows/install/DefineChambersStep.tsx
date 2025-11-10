@@ -189,6 +189,17 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
       return;
     }
 
+    // Validate: chambers with containment must have photos
+    const chambersWithContainmentNoPhotos = chambers.filter(c =>
+      c.containmentBarrier &&
+      (!c.containmentBarrier.photos || c.containmentBarrier.photos.length === 0)
+    );
+
+    if (chambersWithContainmentNoPhotos.length > 0) {
+      alert(`Containment photos are required! Please add photos for chamber(s): ${chambersWithContainmentNoPhotos.map(c => c.chamberName).join(', ')}`);
+      return;
+    }
+
     // Save chambers to workflow store
     updateWorkflowData('install', {
       chambers: chambers.map(c => ({
@@ -358,6 +369,9 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         placeholder="e.g., 500"
                       />
+                      <p className="text-xs text-gray-600 mt-1">
+                        💡 <strong>Quick calculator:</strong> Each 10'×25' roll = 250 sqft | Roll count × 250 = Total sqft
+                      </p>
                     </div>
 
                     {/* Zipper Door Used */}
@@ -438,8 +452,11 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                     {/* Containment Photos */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Containment Photos (optional)
+                        Containment Photos (Required) *
                       </label>
+                      <p className="text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded p-2 mb-2">
+                        <strong>Required:</strong> Take photos showing the containment barrier setup, plastic sheeting, and zipper doors.
+                      </p>
                       <Button
                         variant="secondary"
                         onClick={async () => {
