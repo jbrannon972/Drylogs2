@@ -2,11 +2,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Camera, Image as ImageIcon, CheckCircle, X } from 'lucide-react';
 import { useUploadQueue } from '../../contexts/UploadQueueContext';
 import { photoService } from '../../services/firebase/photoService';
+import { PhotoStep } from '../../types';
 
 interface UniversalPhotoCaptureProps {
   jobId: string;
   location: string;
-  category: string;
+  category: PhotoStep;
   userId: string;
   onPhotosUploaded: (urls: string[]) => void;
   uploadedCount: number;
