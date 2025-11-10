@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Button } from '../../../shared/Button';
-import { Wind, AlertCircle, Info, Calculator, CheckCircle } from 'lucide-react';
+import { Wind, AlertCircle, Info, Calculator, CheckCircle, QrCode, X, Plus } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { DehumidifierType, DryingChamber } from '../../../../types';
 import { calculateChamberEquipment } from '../../../../utils/iicrcCalculations';
@@ -46,6 +46,15 @@ interface ChamberCalculations {
   roomPlacements: RoomAirMoverPlacement[];
 }
 
+interface PlacedEquipment {
+  id: string;
+  type: 'dehumidifier' | 'air-mover' | 'air-scrubber';
+  serialNumber: string;
+  assignedChamberId: string;
+  placedAt: Date;
+  status: 'in-service';
+}
+
 export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
 
@@ -62,7 +71,19 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     new Set(installData.airMoversAfterDemo || [])
   );
 
+  // Placement state
+  const [placedEquipment, setPlacedEquipment] = useState<PlacedEquipment[]>(
+    installData.placedEquipment || []
+  );
+  const [showScanModal, setShowScanModal] = useState(false);
+  const [scanningFor, setScanningFor] = useState<{
+    type: 'dehumidifier' | 'air-mover' | 'air-scrubber';
+    chamberId: string;
+  } | null>(null);
+  const [manualSerialInput, setManualSerialInput] = useState('');
+
   const lastSavedCalculationsRef = useRef<string | null>(null);
+  const prevPlacedEquipmentRef = useRef<string>(JSON.stringify(installData.placedEquipment || []));
 
   // Perform calculations for all chambers
   const performCalculations = () => {
@@ -213,6 +234,67 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       return next;
     });
   };
+
+  // Equipment placement handlers
+  const openScanner = (type: 'dehumidifier' | 'air-mover' | 'air-scrubber', chamberId: string) => {
+    setScanningFor({ type, chamberId });
+    setShowScanModal(true);
+    setManualSerialInput('');
+  };
+
+  const handleScan = (serialNumber: string) => {
+    if (!scanningFor) return;
+
+    const newEquipment: PlacedEquipment = {
+      id: `equipment-${Date.now()}`,
+      type: scanningFor.type,
+      serialNumber: serialNumber.trim(),
+      assignedChamberId: scanningFor.chamberId,
+      placedAt: new Date(),
+      status: 'in-service',
+    };
+
+    setPlacedEquipment([...placedEquipment, newEquipment]);
+    setShowScanModal(false);
+    setScanningFor(null);
+    setManualSerialInput('');
+  };
+
+  const handleManualAdd = () => {
+    if (!manualSerialInput.trim()) {
+      alert('Please enter a serial number');
+      return;
+    }
+    handleScan(manualSerialInput);
+  };
+
+  const removeEquipment = (id: string) => {
+    if (confirm('Remove this equipment from the job?')) {
+      setPlacedEquipment(placedEquipment.filter(e => e.id !== id));
+    }
+  };
+
+  // Get placed counts for a chamber
+  const getPlacedCounts = (chamberId: string) => {
+    const placed = placedEquipment.filter(e => e.assignedChamberId === chamberId);
+    return {
+      dehumidifiers: placed.filter(e => e.type === 'dehumidifier').length,
+      airMovers: placed.filter(e => e.type === 'air-mover').length,
+      airScrubbers: placed.filter(e => e.type === 'air-scrubber').length,
+    };
+  };
+
+  // Save placed equipment when it changes
+  useEffect(() => {
+    const currentStr = JSON.stringify(placedEquipment);
+    if (prevPlacedEquipmentRef.current !== currentStr) {
+      const timeoutId = setTimeout(() => {
+        updateWorkflowData('install', { placedEquipment });
+        prevPlacedEquipmentRef.current = currentStr;
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [placedEquipment, updateWorkflowData]);
 
   // Recalculate when settings change
   useEffect(() => {
@@ -424,7 +506,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
           </div>
 
           {/* Calculation Details */}
-          <div className="space-y-2">
+          <div className="space-y-2 mb-4">
             <div className="bg-white rounded-lg p-3">
               <p className="text-xs font-medium text-gray-600 mb-1">Dehumidifier Calculation:</p>
               <p className="text-xs font-mono text-gray-800">{calc.formula}</p>
@@ -435,6 +517,121 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 <p key={idx} className="text-xs font-mono text-gray-800">{line}</p>
               ))}
             </div>
+          </div>
+
+          {/* EQUIPMENT PLACEMENT SECTION */}
+          <div className="border-t-2 border-gray-300 pt-4 space-y-4">
+            <h4 className="font-bold text-gray-900 flex items-center gap-2">
+              <QrCode className="w-5 h-5 text-green-600" />
+              Equipment Placement
+            </h4>
+
+            {/* Placement Progress */}
+            {(() => {
+              const placed = getPlacedCounts(calc.chamberId);
+              return (
+                <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {placed.dehumidifiers}/{calc.dehumidifiers}
+                      </div>
+                      <div className="text-xs text-gray-600">Dehumidifiers</div>
+                      {placed.dehumidifiers >= calc.dehumidifiers && (
+                        <CheckCircle className="w-5 h-5 text-green-600 mx-auto mt-1" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {placed.airMovers}/{calc.airMovers}
+                      </div>
+                      <div className="text-xs text-gray-600">Air Movers</div>
+                      {placed.airMovers >= calc.airMovers && (
+                        <CheckCircle className="w-5 h-5 text-green-600 mx-auto mt-1" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {placed.airScrubbers}/{calc.airScrubbers}
+                      </div>
+                      <div className="text-xs text-gray-600">Air Scrubbers</div>
+                      {placed.airScrubbers >= calc.airScrubbers && (
+                        <CheckCircle className="w-5 h-5 text-green-600 mx-auto mt-1" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Quick Add Buttons */}
+            <div className="grid grid-cols-3 gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => openScanner('dehumidifier', calc.chamberId)}
+                className="flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Dehu
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => openScanner('air-mover', calc.chamberId)}
+                className="flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Air Mover
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => openScanner('air-scrubber', calc.chamberId)}
+                className="flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Scrubber
+              </Button>
+            </div>
+
+            {/* Placed Equipment for this Chamber */}
+            {(() => {
+              const chamberEquipment = placedEquipment.filter(e => e.assignedChamberId === calc.chamberId);
+              const typeLabels = {
+                'dehumidifier': '🌬️ Dehumidifier',
+                'air-mover': '💨 Air Mover',
+                'air-scrubber': '🔄 Air Scrubber',
+              };
+
+              return chamberEquipment.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Placed ({chamberEquipment.length})
+                  </p>
+                  <div className="space-y-2">
+                    {chamberEquipment.map(equipment => (
+                      <div
+                        key={equipment.id}
+                        className="flex items-center justify-between p-3 border rounded-lg bg-white"
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900 text-sm">
+                            {typeLabels[equipment.type]}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            S/N: {equipment.serialNumber}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removeEquipment(equipment.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       ))}
@@ -471,9 +668,76 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       <div className="flex justify-between pt-4">
         <div></div>
         <Button variant="primary" onClick={onNext}>
-          Continue to Equipment Placement
+          Continue to Demo
         </Button>
       </div>
+
+      {/* Scan/Manual Entry Modal */}
+      {showScanModal && scanningFor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">
+                Add {scanningFor.type === 'dehumidifier' ? 'Dehumidifier' : scanningFor.type === 'air-mover' ? 'Air Mover' : 'Air Scrubber'}
+              </h3>
+              <button
+                onClick={() => setShowScanModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* QR Scanner Placeholder */}
+            <div className="mb-4 p-8 border-2 border-dashed border-gray-300 rounded-lg text-center bg-gray-50">
+              <QrCode className="w-16 h-16 mx-auto mb-2 text-gray-400" />
+              <p className="text-sm text-gray-600">QR Scanner Would Appear Here</p>
+              <p className="text-xs text-gray-500 mt-1">Use manual entry below for now</p>
+            </div>
+
+            {/* Manual Entry */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Serial Number *
+                </label>
+                <input
+                  type="text"
+                  value={manualSerialInput}
+                  onChange={(e) => setManualSerialInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleManualAdd();
+                    }
+                  }}
+                  placeholder="Enter serial number..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowScanModal(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleManualAdd}
+                  disabled={!manualSerialInput.trim()}
+                  className="flex-1"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  Add Equipment
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

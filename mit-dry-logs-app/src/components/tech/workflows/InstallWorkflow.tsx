@@ -37,7 +37,6 @@ import { PartialDemoStep } from './install/PartialDemoStep';
 import { ScheduleWorkStep } from './install/ScheduleWorkStep';
 import { EquipmentCalcStep } from './install/EquipmentCalcStep';
 import { GeneralBillablesStep } from './install/GeneralBillablesStep';
-import { EquipmentPlacementStep } from './install/EquipmentPlacementStep';
 import { CommunicatePlanStep } from './install/CommunicatePlanStep';
 import { CompleteInstallStep } from './install/CompleteInstallStep';
 import {
@@ -99,8 +98,8 @@ const INSTALL_STEPS: StepConfig[] = [
   },
   {
     id: 'equipment-calc',
-    title: 'Equipment Calculation',
-    description: 'IICRC per-room calculations',
+    title: 'Equipment Calc & Place',
+    description: 'Calculate equipment & scan/place by chamber',
     icon: <Wind className="w-5 h-5" />,
     component: EquipmentCalcStep,
   },
@@ -110,13 +109,6 @@ const INSTALL_STEPS: StepConfig[] = [
     description: 'Demo work during install (optional)',
     icon: <Layers className="w-5 h-5" />,
     component: PartialDemoStep,
-  },
-  {
-    id: 'equipment-place',
-    title: 'Equipment Placement',
-    description: 'Scan & place equipment by chamber/room',
-    icon: <Wind className="w-5 h-5" />,
-    component: EquipmentPlacementStep,
   },
   {
     id: 'general-billables',
