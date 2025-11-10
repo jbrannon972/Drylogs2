@@ -380,12 +380,12 @@ export const DemoAdminPage: React.FC = () => {
           },
           // Custom fields from CSV
           customFields: {
-            referralSource: csvJob.referralSource,
-            referralIndividual: csvJob.referralIndividual,
+            referralSource: csvJob.referralSource || '',
+            referralIndividual: csvJob.referralIndividual || '',
             isDemoNeeded: csvJob.isDemoNeeded === 'true',
             isMoldTestNeeded: csvJob.isMoldTestNeeded === 'true',
-            specificPromises: csvJob.specificPromises,
-            detailedFollowUp: csvJob.detailedFUP,
+            specificPromises: csvJob.specificPromises || '',
+            detailedFollowUp: csvJob.detailedFUP || '',
           },
         } as Job;
 
