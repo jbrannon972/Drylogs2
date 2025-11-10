@@ -3,6 +3,7 @@ import { Camera, Image as ImageIcon, CheckCircle, X } from 'lucide-react';
 import { useUploadQueue } from '../../contexts/UploadQueueContext';
 import { photoService } from '../../services/firebase/photoService';
 import { PhotoStep } from '../../types';
+import { useAuth } from '../../hooks/useAuth';
 
 interface UniversalPhotoCaptureProps {
   jobId: string;
@@ -25,6 +26,7 @@ export const UniversalPhotoCapture: React.FC<UniversalPhotoCaptureProps> = ({
   label,
   minimumPhotos,
 }) => {
+  const { user } = useAuth();
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const { addToQueue, queue, markSuccess, markError, updateProgress } = useUploadQueue();
@@ -53,10 +55,18 @@ export const UniversalPhotoCapture: React.FC<UniversalPhotoCaptureProps> = ({
       const uploadId = uploadIds[i];
 
       try {
-        // Simulate progress (photoService doesn't provide progress callback currently)
-        updateProgress(uploadId, 30);
-
-        const url = await photoService.uploadPhoto(file, jobId, location, category, userId);
+        // Upload with progress tracking AND save metadata to Firestore
+        const url = await photoService.uploadPhotoWithProgress(
+          file,
+          jobId,
+          location, // roomId
+          category,
+          userId,
+          user?.displayName || 'Unknown User',
+          (progress) => {
+            updateProgress(uploadId, progress.progress);
+          }
+        );
 
         if (url) {
           updateProgress(uploadId, 100);

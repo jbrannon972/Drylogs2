@@ -56,7 +56,8 @@ export const photoService = {
     step: PhotoStep,
     userId: string,
     userName: string,
-    onProgress?: (progress: PhotoUploadProgress) => void
+    onProgress?: (progress: PhotoUploadProgress) => void,
+    roomName?: string
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       const timestamp = Date.now();
@@ -91,7 +92,7 @@ export const photoService = {
               url: downloadURL,
               jobId,
               roomId,
-              roomName: roomId, // Will be overridden if passed separately
+              roomName: roomName || roomId, // Use roomName if provided, otherwise use roomId
               category: photoService.mapStepToCategory(step),
               timestamp: Timestamp.now(),
               uploadedBy: userId,

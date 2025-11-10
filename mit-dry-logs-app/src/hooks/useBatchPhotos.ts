@@ -71,7 +71,8 @@ export function useBatchPhotos() {
                 progress: progress.progress,
                 status: 'uploading',
               });
-            }
+            },
+            photo.roomName
           );
 
           updateProgress(photo.id, { status: 'completed', progress: 100 });
@@ -180,7 +181,8 @@ export function useBatchPhotos() {
               progress: progress.progress,
               status: 'uploading',
             });
-          }
+          },
+          photo.roomName
         );
 
         updateProgress(photo.id, { status: 'completed', progress: 100 });
