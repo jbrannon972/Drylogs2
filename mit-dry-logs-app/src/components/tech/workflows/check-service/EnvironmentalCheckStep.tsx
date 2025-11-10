@@ -25,8 +25,9 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
   const [referenceTemp, setReferenceTemp] = useState('');
   const [referenceHumidity, setReferenceHumidity] = useState('');
 
-  // PHASE 2: Hygrometer photo (REQUIRED)
-  const [hygrometerPhoto, setHygrometerPhoto] = useState<string | null>(null);
+  // PHASE 2: Split hygrometer photos (BOTH REQUIRED)
+  const [referenceRoomPhoto, setReferenceRoomPhoto] = useState<string | null>(null);
+  const [outsidePhoto, setOutsidePhoto] = useState<string | null>(null);
 
   React.useEffect(() => {
     updateWorkflowData('checkService', {
@@ -36,17 +37,24 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
         referenceRoom,
         referenceTemp: parseFloat(referenceTemp) || 0,
         referenceHumidity: parseFloat(referenceHumidity) || 0,
-        hygrometerPhoto, // PHASE 2: Include photo
+        referenceRoomPhoto, // PHASE 2: Reference room photo
+        outsidePhoto, // PHASE 2: Outside photo
         timestamp: new Date().toISOString(),
       },
     });
-  }, [outsideTemp, outsideHumidity, referenceRoom, referenceTemp, referenceHumidity, hygrometerPhoto]);
+  }, [outsideTemp, outsideHumidity, referenceRoom, referenceTemp, referenceHumidity, referenceRoomPhoto, outsidePhoto]);
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'reference' | 'outside') => {
     const file = e.target.files?.[0];
     if (file && user && job) {
       const url = await uploadPhoto(file, job.jobId, 'environmental', 'check-service', user.uid);
-      if (url) setHygrometerPhoto(url);
+      if (url) {
+        if (type === 'reference') {
+          setReferenceRoomPhoto(url);
+        } else {
+          setOutsidePhoto(url);
+        }
+      }
     }
   };
 
@@ -86,17 +94,6 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
         </div>
       </div>
 
-      {/* IICRC Standard Reference */}
-      <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-        <h3 className="font-semibold text-gray-900 mb-2">IICRC S500 Standard</h3>
-        <p className="text-sm text-gray-700 mb-2">Ideal Drying Conditions:</p>
-        <ul className="text-sm text-gray-600 space-y-1">
-          <li>• Temperature: 70-75°F</li>
-          <li>• Relative Humidity: 30-60%</li>
-          <li>• Reference room should be unaffected by water damage</li>
-        </ul>
-      </div>
-
       {/* Outside Conditions */}
       <div className="border border-gray-200 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-4">
@@ -104,7 +101,7 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
           <h3 className="font-semibold text-gray-900">Outside Conditions</h3>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Temperature (°F) *
@@ -129,6 +126,53 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
               placeholder="45.0"
             />
           </div>
+        </div>
+
+        {/* Outside Hygrometer Photo - REQUIRED */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            <Camera className="w-4 h-4 inline mr-1" />
+            Outside Hygrometer Photo (Required) *
+          </label>
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+            <p className="text-xs text-orange-900">
+              <strong>REQUIRED:</strong> Photo of hygrometer showing outside conditions (temp & humidity)
+            </p>
+          </div>
+          {outsidePhoto ? (
+            <div>
+              <img src={outsidePhoto} alt="Outside Hygrometer" className="max-h-48 rounded mb-3 border border-gray-300" />
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="text-sm text-green-600 font-medium">Photo captured</span>
+              </div>
+              <label className="btn-secondary cursor-pointer inline-flex items-center gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={(e) => handlePhotoUpload(e, 'outside')}
+                  className="hidden"
+                  disabled={isUploading}
+                />
+                <Camera className="w-4 h-4" />
+                Replace Photo
+              </label>
+            </div>
+          ) : (
+            <label className="btn-primary cursor-pointer inline-flex items-center gap-2 w-full justify-center py-6 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={(e) => handlePhotoUpload(e, 'outside')}
+                className="hidden"
+                disabled={isUploading}
+              />
+              <Camera className="w-5 h-5" />
+              {isUploading ? 'Uploading...' : 'Take Outside Hygrometer Photo'}
+            </label>
+          )}
         </div>
       </div>
 
@@ -181,20 +225,20 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
           </div>
         </div>
 
-        {/* PHASE 2: Hygrometer Photo - REQUIRED */}
+        {/* Reference Room Hygrometer Photo - REQUIRED */}
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             <Camera className="w-4 h-4 inline mr-1" />
-            Hygrometer Photo (Required) *
+            Reference Room Hygrometer Photo (Required) *
           </label>
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
             <p className="text-xs text-orange-900">
-              <strong>REQUIRED:</strong> Photo must clearly show hygrometer displaying all readings (temp, RH, GPP if available)
+              <strong>REQUIRED:</strong> Photo of hygrometer in reference room showing all readings (temp, RH, GPP if available)
             </p>
           </div>
-          {hygrometerPhoto ? (
+          {referenceRoomPhoto ? (
             <div>
-              <img src={hygrometerPhoto} alt="Hygrometer" className="max-h-48 rounded mb-3 border border-gray-300" />
+              <img src={referenceRoomPhoto} alt="Reference Room Hygrometer" className="max-h-48 rounded mb-3 border border-gray-300" />
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
                 <span className="text-sm text-green-600 font-medium">Photo captured</span>
@@ -204,7 +248,7 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
                   type="file"
                   accept="image/*"
                   capture="environment"
-                  onChange={handlePhotoUpload}
+                  onChange={(e) => handlePhotoUpload(e, 'reference')}
                   className="hidden"
                   disabled={isUploading}
                 />
@@ -218,12 +262,12 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
                 type="file"
                 accept="image/*"
                 capture="environment"
-                onChange={handlePhotoUpload}
+                onChange={(e) => handlePhotoUpload(e, 'reference')}
                 className="hidden"
                 disabled={isUploading}
               />
               <Camera className="w-5 h-5" />
-              {isUploading ? 'Uploading...' : 'Take Hygrometer Photo'}
+              {isUploading ? 'Uploading...' : 'Take Reference Room Hygrometer Photo'}
             </label>
           )}
         </div>
@@ -253,16 +297,16 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
         )}
       </div>
 
-      {/* Data Capture Summary - PHASE 2: Include photo requirement */}
+      {/* Data Capture Summary - PHASE 2: Require BOTH photos */}
       {referenceRoom && referenceTemp && referenceHumidity && outsideTemp && outsideHumidity && (
         <div className={`border-2 rounded-lg p-4 ${
-          hygrometerPhoto ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'
+          referenceRoomPhoto && outsidePhoto ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'
         }`}>
-          {hygrometerPhoto ? (
+          {referenceRoomPhoto && outsidePhoto ? (
             <>
               <p className="text-sm text-green-800 font-medium">
                 <CheckCircle className="w-4 h-4 inline mr-1" />
-                Environmental baseline complete with photo
+                Environmental baseline complete with both photos
               </p>
               <p className="text-xs text-green-700 mt-1">
                 All moisture readings will be compared against these conditions
@@ -272,10 +316,12 @@ export const EnvironmentalCheckStep: React.FC<EnvironmentalCheckStepProps> = ({ 
             <>
               <p className="text-sm text-yellow-800 font-medium">
                 <AlertTriangle className="w-4 h-4 inline mr-1" />
-                Photo required to complete environmental baseline
+                Both photos required to complete environmental baseline
               </p>
               <p className="text-xs text-yellow-700 mt-1">
-                Please capture a photo of the hygrometer showing all readings
+                {!referenceRoomPhoto && '• Missing: Reference room hygrometer photo'}
+                {!referenceRoomPhoto && !outsidePhoto && <br />}
+                {!outsidePhoto && '• Missing: Outside hygrometer photo'}
               </p>
             </>
           )}
