@@ -3,6 +3,7 @@ import { CheckCircle, MapPin, Clock, Camera, AlertTriangle, Info, ShieldAlert } 
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
+import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 
 interface FrontDoorStepProps {
   job: any;
@@ -18,8 +19,12 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
   const lastSavedStateRef = useRef<string | null>(null);
 
   // Removed duplicate arrival tracking - it's now in Step 1 (ArrivalStep)
-  const [frontEntrancePhoto, setFrontEntrancePhoto] = useState<string | null>(
-    installData.frontEntrancePhoto || null
+  const [frontEntrancePhotos, setFrontEntrancePhotos] = useState<string[]>(
+    Array.isArray(installData.frontEntrancePhotos)
+      ? installData.frontEntrancePhotos
+      : installData.frontEntrancePhoto
+        ? [installData.frontEntrancePhoto]
+        : []
   );
   const [isAfterHours, setIsAfterHours] = useState(false);
 
@@ -88,7 +93,8 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
 
     const timeoutId = setTimeout(() => {
       const dataToSave = {
-        frontEntrancePhoto,
+        frontEntrancePhotos,
+        frontEntrancePhoto: frontEntrancePhotos[0] || null, // Backward compatibility
         isAfterHours,
         buildingYear,
         asbestosConcern,
@@ -109,26 +115,13 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
 
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [frontEntrancePhoto, isAfterHours, buildingYear, asbestosConcern, leadConcern, vulnerableOccupants]);
-
-  const handleFrontEntrancePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user) {
-      // Queue photo for background upload
-      await queuePhoto(file, job.jobId, 'front-entrance', 'Front Entrance', 'arrival');
-
-      // Create preview for immediate display
-      const reader = new FileReader();
-      reader.onload = (e) => setFrontEntrancePhoto(e.target?.result as string);
-      reader.readAsDataURL(file);
-    }
-  };
+  }, [frontEntrancePhotos, isAfterHours, buildingYear, asbestosConcern, leadConcern, vulnerableOccupants]);
 
   const handleCheck = (key: keyof typeof checklist) => {
     setChecklist(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const allComplete = frontEntrancePhoto && buildingYear && Object.values(checklist).every(v => v);
+  const allComplete = frontEntrancePhotos.length > 0 && buildingYear && Object.values(checklist).every(v => v);
 
   return (
     <div className="space-y-6">
@@ -149,41 +142,31 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
 
       {/* Front Entrance Photo */}
       <div className="border border-gray-200 rounded-lg p-4">
-        <h3 className="font-semibold text-gray-900 mb-3">Front Entrance Photo *</h3>
-        <p className="text-sm text-gray-600 mb-3">
-          Take a photo of the property entrance for documentation.
-        </p>
-
-        {frontEntrancePhoto ? (
-          <div>
-            <img src={frontEntrancePhoto} alt="Front Entrance" className="max-h-48 rounded mb-2" />
-            <div className="flex items-center gap-2 text-green-600 mb-2">
-              <CheckCircle className="w-4 h-4" />
-              <span className="text-sm font-medium">✓ Front entrance documented</span>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-medium text-blue-900 mb-1">Front Entrance Photo</h4>
+              <p className="text-sm text-blue-800">
+                Take a photo of the property entrance for documentation.
+              </p>
             </div>
-            <label className="btn-secondary cursor-pointer inline-block text-sm">
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handleFrontEntrancePhoto}
-                className="hidden"
-              />
-              Replace Photo
-            </label>
           </div>
-        ) : (
-          <label className="btn-primary cursor-pointer inline-flex items-center gap-2">
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFrontEntrancePhoto}
-              className="hidden"
-            />
-            <Camera className="w-4 h-4" />
-            Take Photo of Front Entrance
-          </label>
+        </div>
+
+        {user && (
+          <UniversalPhotoCapture
+            jobId={job.jobId}
+            location="front-entrance"
+            category="arrival"
+            userId={user.uid}
+            onPhotosUploaded={(urls) => {
+              setFrontEntrancePhotos(prev => [...prev, ...urls]);
+            }}
+            uploadedCount={frontEntrancePhotos.length}
+            label="Front Entrance Photos *"
+            minimumPhotos={1}
+          />
         )}
       </div>
 

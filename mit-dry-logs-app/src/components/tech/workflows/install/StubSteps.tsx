@@ -9,6 +9,7 @@ import { useAuth } from '../../../../hooks/useAuth';
 import { photoService } from '../../../../services/firebase/photoService';
 import { Camera, Upload, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '../../../shared/Button';
+import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 
 interface StepProps {
   job: any;
@@ -1002,27 +1003,6 @@ export const FinalPhotosStep: React.FC<StepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
   const { installData, updateWorkflowData } = useWorkflowStore();
   const [finalPhotos, setFinalPhotos] = useState<string[]>(installData.finalPhotos || []);
-  const [uploading, setUploading] = useState(false);
-
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user) {
-      setUploading(true);
-      try {
-        const url = await photoService.uploadPhoto(file, job.jobId, 'final-setup', 'final', user.uid);
-        if (url) {
-          const newPhotos = [...finalPhotos, url];
-          setFinalPhotos(newPhotos);
-          updateWorkflowData('install', { finalPhotos: newPhotos });
-        }
-      } catch (error) {
-        console.error('Photo upload failed:', error);
-        alert('Failed to upload photo. Please try again.');
-      } finally {
-        setUploading(false);
-      }
-    }
-  };
 
   const photoChecklist = [
     'Each room with equipment in place',
@@ -1049,64 +1029,21 @@ export const FinalPhotosStep: React.FC<StepProps> = ({ job, onNext }) => {
         </ul>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Final Setup Photos * (minimum 4)
-        </label>
-        <div className="space-y-3">
-          {finalPhotos.map((photo, index) => (
-            <div key={index} className="relative">
-              <img
-                src={photo}
-                alt={`Final setup ${index + 1}`}
-                className="w-full h-48 object-cover rounded-lg border-2 border-green-500"
-              />
-              <div className="absolute top-2 right-2 bg-green-500 text-white p-2 rounded-full">
-                <CheckCircle className="w-5 h-5" />
-              </div>
-              <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs">
-                Photo {index + 1} of {finalPhotos.length}
-              </div>
-            </div>
-          ))}
-
-          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              {uploading ? (
-                <>
-                  <Upload className="w-8 h-8 mb-2 text-gray-400 animate-bounce" />
-                  <p className="text-sm text-gray-500">Uploading...</p>
-                </>
-              ) : (
-                <>
-                  <Camera className="w-8 h-8 mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-500">
-                    <span className="font-semibold">Tap to capture</span> final setup
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {finalPhotos.length} / 4 minimum photos
-                  </p>
-                </>
-              )}
-            </div>
-            <input
-              type="file"
-              className="hidden"
-              accept="image/*"
-              capture="environment"
-              onChange={handlePhotoUpload}
-              disabled={uploading}
-            />
-          </label>
-        </div>
-      </div>
-
-      {finalPhotos.length < 4 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800">
-            ⚠️ Please upload at least 4 photos documenting the final equipment setup ({4 - finalPhotos.length} more needed).
-          </p>
-        </div>
+      {user && (
+        <UniversalPhotoCapture
+          jobId={job.jobId}
+          location="final-setup"
+          category="final"
+          userId={user.uid}
+          onPhotosUploaded={(urls) => {
+            const newPhotos = [...finalPhotos, ...urls];
+            setFinalPhotos(newPhotos);
+            updateWorkflowData('install', { finalPhotos: newPhotos });
+          }}
+          uploadedCount={finalPhotos.length}
+          label="Final Setup Photos *"
+          minimumPhotos={4}
+        />
       )}
 
       {finalPhotos.length >= 4 && (

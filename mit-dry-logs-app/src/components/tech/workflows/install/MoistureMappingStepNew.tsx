@@ -15,6 +15,7 @@ import {
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
+import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 import {
   ConstructionMaterialType,
   MaterialMoistureTracking,
@@ -51,7 +52,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
   const [location, setLocation] = useState('');
   const [dryStandard, setDryStandard] = useState('');
   const [wetReading, setWetReading] = useState('');
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
 
   // Construction materials only (no appliances, mirrors, etc.)
@@ -89,21 +90,13 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
     updateWorkflowData('install', { moistureTracking });
   }, [moistureTracking]);
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user && currentRoom) {
-      const url = await uploadPhoto(file, job.jobId, currentRoom.name, 'assessment', user.uid);
-      if (url) setPhoto(url);
-    }
-  };
-
   const resetForm = () => {
     setWorkflowStep('select-material');
     setCurrentMaterial('Drywall - Wall');
     setLocation('');
     setDryStandard('');
     setWetReading('');
-    setPhoto(null);
+    setPhotos([]);
     setNotes('');
   };
 
@@ -120,7 +113,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
     const initialReading: MoistureReadingEntry = {
       timestamp: new Date().toISOString(),
       moisturePercent: wetReadingNum,
-      photo: photo || undefined,
+      photo: photos[0] || undefined,
       technicianId: user?.uid || 'unknown',
       technicianName: user?.displayName || 'Unknown Tech',
       workflowPhase: 'install',
@@ -438,46 +431,33 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
           {/* Step 5: Photo */}
           {workflowStep === 'photo' && (
             <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
-                <p className="text-sm text-green-800">
-                  <Camera className="w-4 h-4 inline mr-1" />
-                  Take a photo of the moisture meter display for documentation
-                </p>
-              </div>
-              {photo ? (
-                <div>
-                  <img src={photo} alt="Moisture Meter" className="max-h-48 rounded mb-3 mx-auto" />
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-sm text-green-600 font-medium">Photo captured</span>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-blue-900 mb-1">Photo (Required) *</h4>
+                    <p className="text-sm text-blue-800">
+                      Take photo first! Frame shot to show moisture meter display AND material surface clearly.
+                    </p>
                   </div>
-                  <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 w-full justify-center">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      onChange={handlePhotoUpload}
-                      className="hidden"
-                      disabled={isUploading}
-                    />
-                    <Camera className="w-4 h-4" />
-                    Replace Photo
-                  </label>
                 </div>
-              ) : (
-                <label className="btn-primary cursor-pointer inline-flex items-center gap-2 w-full justify-center py-8">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                    disabled={isUploading}
-                  />
-                  <Camera className="w-6 h-6" />
-                  {isUploading ? 'Uploading...' : 'Take Photo'}
-                </label>
+              </div>
+
+              {user && currentRoom && (
+                <UniversalPhotoCapture
+                  jobId={job.jobId}
+                  location={currentRoom.name}
+                  category="assessment"
+                  userId={user.uid}
+                  onPhotosUploaded={(urls) => {
+                    setPhotos(prev => [...prev, ...urls]);
+                  }}
+                  uploadedCount={photos.length}
+                  label="Moisture Reading Photos *"
+                  minimumPhotos={1}
+                />
               )}
+
               <div className="flex gap-3">
                 <Button variant="secondary" onClick={() => setWorkflowStep('wet-reading')} className="flex-1">
                   Back
@@ -486,6 +466,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
                   variant="primary"
                   onClick={handleSaveReading}
                   className="flex-1"
+                  disabled={photos.length === 0}
                 >
                   Save Reading
                 </Button>
