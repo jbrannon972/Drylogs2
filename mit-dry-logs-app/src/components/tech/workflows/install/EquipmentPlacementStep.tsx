@@ -40,6 +40,15 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
   const [scanningFor, setScanningFor] = useState<'dehumidifier' | 'air-mover' | 'air-scrubber' | null>(null);
   const [manualSerialInput, setManualSerialInput] = useState('');
 
+  // US 3.18 - Initial Dehumidifier Performance Check
+  const [showPerformanceCheck, setShowPerformanceCheck] = useState(false);
+  const [performanceCheckStartTime, setPerformanceCheckStartTime] = useState<Date | null>(
+    installData.performanceCheckStartTime ? new Date(installData.performanceCheckStartTime) : null
+  );
+  const [dehumidifierReadings, setDehumidifierReadings] = useState<any[]>(
+    installData.dehumidifierInitialReadings || []
+  );
+
   // Auto-save with ref-based change detection
   const prevDataRef = useRef({
     placedEquipment: JSON.stringify(installData.placedEquipment || [])
@@ -51,14 +60,25 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
     if (prevDataRef.current.placedEquipment !== currentStr) {
       const timeoutId = setTimeout(() => {
         updateWorkflowData('install', {
-          placedEquipment: placedEquipment
+          placedEquipment: placedEquipment,
+          performanceCheckStartTime,
+          dehumidifierInitialReadings: dehumidifierReadings,
         });
         prevDataRef.current.placedEquipment = currentStr;
       }, 500);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [placedEquipment, updateWorkflowData]);
+  }, [placedEquipment, performanceCheckStartTime, dehumidifierReadings, updateWorkflowData]);
+
+  // US 3.18 - Start timer when dehumidifiers are placed
+  useEffect(() => {
+    const dehumidifiers = placedEquipment.filter(e => e.type === 'dehumidifier');
+    if (dehumidifiers.length > 0 && !performanceCheckStartTime) {
+      // Start the timer
+      setPerformanceCheckStartTime(new Date());
+    }
+  }, [placedEquipment, performanceCheckStartTime]);
 
   // Get equipment counts for selected chamber
   const getEquipmentNeeded = () => {
@@ -322,6 +342,108 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
               • Air Scrubbers: {placedEquipment.filter(e => e.type === 'air-scrubber').length}/{equipmentCalc.total.airScrubbers}
             </p>
           </div>
+        </div>
+      )}
+
+      {/* US 3.18 - Initial Dehumidifier Performance Check */}
+      {performanceCheckStartTime && placedEquipment.filter(e => e.type === 'dehumidifier').length > 0 && (
+        <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-4">
+          <div className="flex items-start gap-3 mb-4">
+            <AlertCircle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-semibold text-orange-900 mb-2">
+                ⏱️ Initial Dehumidifier Performance Check (20-30 minutes)
+              </h4>
+              <p className="text-sm text-orange-800 mb-2">
+                After equipment has run for 20-30 minutes, take initial readings to verify proper operation before leaving the site.
+              </p>
+              <p className="text-xs text-orange-700">
+                Timer started: {performanceCheckStartTime.toLocaleTimeString()}
+              </p>
+            </div>
+          </div>
+
+          <Button
+            variant="primary"
+            onClick={() => setShowPerformanceCheck(!showPerformanceCheck)}
+            className="w-full"
+          >
+            {showPerformanceCheck ? '📝 Hide' : '📝 Record'} Dehumidifier Readings
+          </Button>
+
+          {showPerformanceCheck && (
+            <div className="mt-4 space-y-3 border-t border-orange-300 pt-4">
+              <p className="text-sm font-medium text-orange-900">
+                Take readings from each dehumidifier:
+              </p>
+              {placedEquipment
+                .filter(e => e.type === 'dehumidifier')
+                .map((dehumidifier, index) => {
+                  const reading = dehumidifierReadings.find(r => r.equipmentId === dehumidifier.id);
+                  return (
+                    <div key={dehumidifier.id} className="bg-white rounded-lg p-3 border border-orange-200">
+                      <p className="text-sm font-medium text-gray-900 mb-2">
+                        Dehumidifier #{index + 1} - {dehumidifier.serialNumber}
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        <div>
+                          <label className="block text-gray-600 mb-1">Temp (°F)</label>
+                          <input
+                            type="number"
+                            placeholder="72"
+                            value={reading?.temp || ''}
+                            onChange={(e) => {
+                              const updated = dehumidifierReadings.filter(r => r.equipmentId !== dehumidifier.id);
+                              setDehumidifierReadings([
+                                ...updated,
+                                { ...reading, equipmentId: dehumidifier.id, temp: e.target.value }
+                              ]);
+                            }}
+                            className="w-full px-2 py-1 border border-gray-300 rounded"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-gray-600 mb-1">RH (%)</label>
+                          <input
+                            type="number"
+                            placeholder="45"
+                            value={reading?.rh || ''}
+                            onChange={(e) => {
+                              const updated = dehumidifierReadings.filter(r => r.equipmentId !== dehumidifier.id);
+                              setDehumidifierReadings([
+                                ...updated,
+                                { ...reading, equipmentId: dehumidifier.id, rh: e.target.value }
+                              ]);
+                            }}
+                            className="w-full px-2 py-1 border border-gray-300 rounded"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-gray-600 mb-1">Hours</label>
+                          <input
+                            type="number"
+                            placeholder="0.5"
+                            step="0.1"
+                            value={reading?.hours || ''}
+                            onChange={(e) => {
+                              const updated = dehumidifierReadings.filter(r => r.equipmentId !== dehumidifier.id);
+                              setDehumidifierReadings([
+                                ...updated,
+                                { ...reading, equipmentId: dehumidifier.id, hours: e.target.value }
+                              ]);
+                            }}
+                            className="w-full px-2 py-1 border border-gray-300 rounded"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">
+                        📸 Capture photo of dehumidifier display in Final Photos step
+                      </p>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
         </div>
       )}
 

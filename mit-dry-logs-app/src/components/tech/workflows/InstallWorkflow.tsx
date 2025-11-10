@@ -31,6 +31,7 @@ import { OfficePreparationStep } from './install/OfficePreparationStep';
 import { ArrivalStep } from './install/ArrivalStep';
 import { FrontDoorStep } from './install/FrontDoorStep';
 import { CauseOfLossStep } from './install/CauseOfLossStep';
+import { EnvironmentalBaselineStep } from './install/EnvironmentalBaselineStep';
 import { RoomAssessmentStep } from './install/RoomAssessmentStep';
 import { DefineChambersStep } from './install/DefineChambersStep';
 // PlanJobStep removed per user feedback - planning happens in Schedule Work step
@@ -83,6 +84,13 @@ const INSTALL_STEPS: StepConfig[] = [
     description: 'Source + water category',
     icon: <Droplets className="w-5 h-5" />,
     component: CauseOfLossStep,
+  },
+  {
+    id: 'environmental-baseline',
+    title: 'Environmental Baseline',
+    description: 'Unaffected area dry standards (IICRC)',
+    icon: <Droplets className="w-5 h-5" />,
+    component: EnvironmentalBaselineStep,
   },
   {
     id: 'room-assessment',

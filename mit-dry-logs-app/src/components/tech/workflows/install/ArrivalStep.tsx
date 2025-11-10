@@ -34,6 +34,17 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
     installData.hasPropertyPhoto || false
   );
 
+  // US 3.10 - Exterior Environmental Baseline (IICRC Required)
+  const [exteriorTemp, setExteriorTemp] = useState(
+    installData.exteriorTemp || ''
+  );
+  const [exteriorRH, setExteriorRH] = useState(
+    installData.exteriorRH || ''
+  );
+  const [hasMeterPhoto, setHasMeterPhoto] = useState<boolean>(
+    installData.hasMeterPhoto || false
+  );
+
   // ULTRAFAULT: Save to workflow store when data changes with debounce
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -42,12 +53,15 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
         travelTimeToSite,
         hasTruckPhoto,
         hasPropertyPhoto,
+        exteriorTemp,
+        exteriorRH,
+        hasMeterPhoto,
       });
     }, 100); // 100ms debounce
 
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [arrivalTime, travelTimeToSite, hasTruckPhoto, hasPropertyPhoto]);
+  }, [arrivalTime, travelTimeToSite, hasTruckPhoto, hasPropertyPhoto, exteriorTemp, exteriorRH, hasMeterPhoto]);
 
   const handleTruckPhotosCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -77,7 +91,21 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
     }
   };
 
-  const canProceed = hasTruckPhoto && hasPropertyPhoto;
+  const handleMeterPhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0 && user) {
+      // Queue all captured photos for background upload
+      for (let i = 0; i < files.length; i++) {
+        await queuePhoto(files[i], job.jobId, 'exterior-baseline', 'Environmental Baseline', 'arrival');
+      }
+      // Mark as taken
+      setHasMeterPhoto(true);
+      // Reset input so same files can be selected again
+      e.target.value = '';
+    }
+  };
+
+  const canProceed = hasTruckPhoto && hasPropertyPhoto && exteriorTemp && exteriorRH && hasMeterPhoto;
 
   return (
     <div className="space-y-6">
@@ -120,6 +148,97 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
             min="0"
           />
           <p className="text-xs text-gray-500 mt-1">Drive time from office/home</p>
+        </div>
+      </div>
+
+      {/* US 3.10 - Exterior Environmental Baseline (IICRC Required) */}
+      <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-4">
+        <h3 className="font-semibold text-orange-900 mb-3 flex items-center gap-2">
+          <span>🌡️</span>
+          Exterior Environmental Baseline (IICRC Required)
+        </h3>
+        <p className="text-sm text-orange-800 mb-4">
+          IICRC S500 requires exterior temperature and humidity readings to establish environmental baselines for drying calculations.
+        </p>
+
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Outside Temperature (°F) *
+            </label>
+            <Input
+              type="number"
+              value={exteriorTemp}
+              onChange={(e) => setExteriorTemp(e.target.value)}
+              placeholder="72"
+              step="0.1"
+              min="-50"
+              max="150"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Outside Relative Humidity (%) *
+            </label>
+            <Input
+              type="number"
+              value={exteriorRH}
+              onChange={(e) => setExteriorRH(e.target.value)}
+              placeholder="65"
+              step="0.1"
+              min="0"
+              max="100"
+            />
+          </div>
+        </div>
+
+        {/* Meter Photo */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Photo of Meter Reading *
+          </label>
+          <div className="border-2 border-dashed border-orange-300 rounded-lg p-4 bg-white">
+            {hasMeterPhoto && (
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="text-sm text-green-600 font-medium">Meter photo captured</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Take Photo */}
+              <label className="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange hover:bg-orange-50 transition-all cursor-pointer active:scale-95">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleMeterPhotoCapture}
+                  className="hidden"
+                />
+                <Camera className="w-8 h-8 text-entrusted-orange mb-2" />
+                <span className="text-sm font-bold text-gray-900">Take Photo</span>
+                <span className="text-xs text-gray-500">Camera</span>
+              </label>
+
+              {/* Select Multiple */}
+              <label className="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all cursor-pointer active:scale-95">
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleMeterPhotoCapture}
+                  className="hidden"
+                />
+                <span className="text-2xl mb-2">🖼️</span>
+                <span className="text-sm font-bold text-gray-900">Select Multiple</span>
+                <span className="text-xs text-gray-500">Gallery</span>
+              </label>
+            </div>
+
+            <p className="text-xs text-gray-500 mt-3 text-center">
+              Photo of hygrometer/thermometer display
+            </p>
+          </div>
         </div>
       </div>
 
@@ -242,9 +361,16 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
 
       {!canProceed && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800">
-            ⚠️ Please upload both truck and property photos to proceed
+          <p className="text-sm text-yellow-800 font-semibold mb-2">
+            ⚠️ Required to proceed:
           </p>
+          <ul className="text-sm text-yellow-800 space-y-1 list-disc list-inside">
+            {!exteriorTemp && <li>Outside temperature</li>}
+            {!exteriorRH && <li>Outside relative humidity</li>}
+            {!hasMeterPhoto && <li>Photo of meter reading</li>}
+            {!hasTruckPhoto && <li>Truck location photo</li>}
+            {!hasPropertyPhoto && <li>Property exterior photo</li>}
+          </ul>
         </div>
       )}
     </div>

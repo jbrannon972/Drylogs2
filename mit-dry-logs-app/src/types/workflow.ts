@@ -5,19 +5,20 @@
 
 export type InstallStep =
   | 'office-prep'            // Step 0: Office preparation (optional)
-  | 'arrival'                // Step 1: Property arrival, clock in
+  | 'arrival'                // Step 1: Property arrival, clock in + exterior environmental baseline
   | 'front-door'             // Step 2: Customer intro, ground rules
   | 'cause-of-loss'          // Step 3: Document cause + water category (1/2/3)
-  | 'room-assessment'        // Step 4: Assess ALL rooms (dimensions + moisture + materials + pre-existing)
-  | 'define-chambers'        // Step 5: Define drying chambers and assign rooms
-  | 'plan-job'               // Step 6: Plan the job - set drying class and timeline
-  | 'partial-demo'           // Step 7: Partial demo work during install (optional)
-  | 'schedule-work'          // Step 8: Plan Day 2+ (demo, checks, pull)
-  | 'equipment-calc'         // Step 9: IICRC equipment calculations per chamber
-  | 'equipment-place'        // Step 10: Place and scan equipment by chamber
-  | 'general-billables'      // Step 11: Additional billable work (generals page)
-  | 'communicate-plan'       // Step 12: Customer communication
-  | 'final-photos'           // Step 13: Final documentation
+  | 'environmental-baseline' // Step 4: Unaffected area readings for dry standards (IICRC)
+  | 'room-assessment'        // Step 5: Assess ALL rooms (dimensions + moisture + materials + pre-existing)
+  | 'define-chambers'        // Step 6: Define drying chambers and assign rooms
+  | 'plan-job'               // Step 7: Plan the job - set drying class and timeline (REMOVED from workflow)
+  | 'partial-demo'           // Step 8: Partial demo work during install (optional)
+  | 'schedule-work'          // Step 12: Plan Day 2+ (demo, checks, pull)
+  | 'equipment-calc'         // Step 7: IICRC equipment calculations per chamber
+  | 'equipment-place'        // Step 9: Place and scan equipment by chamber + initial dehumidifier check
+  | 'general-billables'      // Step 10: Additional billable work (generals page)
+  | 'communicate-plan'       // Step 13: Customer communication
+  | 'final-photos'           // Step 11: Final documentation
   | 'complete';              // Step 14: Complete and depart
 
 export type DemoStep =
