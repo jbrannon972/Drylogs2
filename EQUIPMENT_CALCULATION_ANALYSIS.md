@@ -24,7 +24,7 @@
    - Chart factor varies by dehu type and class
    - Example (LGR): `cubicFootage ÷ chartFactor = PPD needed`
 
-3. **AIR SCRUBBERS (per chamber)**
+3. **AIR SCRUBBERS (per chamber)** THIS IS FOR ALL, EVEN CAT 1
    - Only for Category 2 or 3 water
    - 1 per 250 sq ft of affected area
    - Formula: `totalAffectedSqFt ÷ 250`
@@ -66,7 +66,7 @@ Overall Class = Highest class across all rooms
 - ✅ Room type (bedroom, bathroom, etc.)
 - ✅ Materials affected (list: "Drywall - Wall", "Carpet", etc.)
 - ✅ Moisture readings
-- ❌ **MISSING: Affected square footage per surface**
+- ❌ **MISSING: Affected square footage per surface** 
 
 #### Step 6: DefineChambersStep
 - ✅ Groups rooms into chambers
@@ -119,7 +119,7 @@ Overall Class = Highest class across all rooms
 
 ## 💡 SOLUTION OPTIONS
 
-### **Option A: Add Affected Area Fields to RoomAssessmentStep** (RECOMMENDED)
+### **Option A: Add Affected Area Fields to RoomAssessmentStep** (RECOMMENDED) DO THIS!!!
 **Pros:**
 - Keeps workflow simple (no extra step)
 - Data captured at point of room evaluation
@@ -244,7 +244,7 @@ Add to DefineChambersStep or EquipmentCalcStep:
 **Q:** Which approach feels best for your techs?
 - [ ] **A) Add % affected sliders to RoomAssessmentStep** (my recommendation)
 - [ ] **B) Auto-calculate from material selections** (less accurate but faster)
-- [ ] **C) Add dedicated "Affected Area" step** (most accurate but adds a step)
+- [ ] **C) Add dedicated "Affected Area" step** (most accurate but adds a step) DO THIS
 - [ ] **D) Manual class selection** (quick fix but less accurate)
 - [ ] **E) Other idea?** (tell me)
 
@@ -252,32 +252,32 @@ Add to DefineChambersStep or EquipmentCalcStep:
 **Q:** How should techs indicate affected area per surface?
 - [ ] **Percentage sliders** (< 25%, 25-50%, 50-75%, 75-100%)
 - [ ] **Simple buttons** (Small / Medium / Large / Complete)
-- [ ] **Direct sq ft input** (type number)
+- [ ] **Direct sq ft input** (type number) THIS ONE
 - [ ] **Visual diagram** (tap areas on room diagram)
 
 ### 3. When to Calculate Class
 **Q:** When should we calculate the overall damage class?
 - [ ] **Real-time during room assessment** (shows class as you go)
-- [ ] **At DefineChambersStep** (calculates before equipment calc)
-- [ ] **At EquipmentCalcStep** (calculates on-demand)
+- [ ] **At DefineChambersStep** (calculates before equipment calc) AND THIS ONE
+- [ ] **At EquipmentCalcStep** (calculates on-demand) THIS ONE 
 
 ### 4. Default Assumptions
 **Q:** If tech skips affected area input, what should we assume?
 - [ ] **Conservative (25% affected)** → likely Class 1-2
 - [ ] **Moderate (50% affected)** → likely Class 2
 - [ ] **Aggressive (75% affected)** → likely Class 3
-- [ ] **Force input (block progress)** → most accurate
+- [ ] **Force input (block progress)** → most accurate FORCE IT
 
 ### 5. Class Override
 **Q:** Should techs be able to override the calculated class?
-- [ ] **Yes** - show calculated class but allow manual override
+- [ ] **Yes** - show calculated class but allow manual override NO
 - [ ] **No** - always use calculated class (IICRC compliant)
 
 ### 6. Air Mover Detail Level
 **Q:** For air movers per room, do you want:
 - [ ] **Simple total per room** ("3 air movers")
 - [ ] **Breakdown by purpose** ("1 base + 1 floor + 1 wall")
-- [ ] **With placement suggestions** ("Place 2 on floor, 1 on wall")
+- [ ] **With placement suggestions** ("Place 2 on floor, 1 on wall") THIS ONE
 
 ---
 
