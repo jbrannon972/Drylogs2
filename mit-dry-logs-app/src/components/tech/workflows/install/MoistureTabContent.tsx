@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
 import { ConfirmModal } from '../../../shared/ConfirmModal';
+import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 import {
   Droplets,
   Camera,
@@ -10,7 +11,6 @@ import {
   Trash2,
   Plus
 } from 'lucide-react';
-import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import {
   ConstructionMaterialType,
@@ -35,7 +35,6 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   onUpdate,
 }) => {
   const { user } = useAuth();
-  const { queuePhoto } = useBatchPhotos();
 
   // Form state
   const [showAddForm, setShowAddForm] = useState(false);
@@ -43,7 +42,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   const [location, setLocation] = useState('');
   const [dryStandard, setDryStandard] = useState('');
   const [wetReading, setWetReading] = useState('');
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
 
   // Delete confirmation state
@@ -80,32 +79,19 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
     'Shelving',
   ];
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user) {
-      // Queue photo instead of uploading immediately
-      await queuePhoto(file, job.jobId, roomId, roomName, 'assessment');
-
-      // Create preview for display
-      const reader = new FileReader();
-      reader.onload = (e) => setPhoto(e.target?.result as string);
-      reader.readAsDataURL(file);
-    }
-  };
-
   const resetForm = () => {
     setCurrentMaterial('Drywall - Wall');
     setLocation('');
     setDryStandard('');
     setWetReading('');
-    setPhoto(null);
+    setPhotos([]);
     setNotes('');
     setShowAddForm(false);
   };
 
   const handleSaveReading = () => {
     // PHASE 1 VALIDATION: Photo is REQUIRED and must be first
-    if (!photo) {
+    if (photos.length === 0) {
       alert('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
       return;
     }
@@ -127,7 +113,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
     const initialReading: MoistureReadingEntry = {
       timestamp: new Date().toISOString(),
       moisturePercent: wetReadingNum,
-      photo: photo || undefined,
+      photo: photos[0] || undefined,
       technicianId: user?.uid || 'unknown',
       technicianName: user?.displayName || 'Unknown Tech',
       workflowPhase: 'install',
@@ -249,46 +235,24 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 
           {/* Photo Upload - PHASE 1: FIRST and REQUIRED */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Camera className="w-4 h-4 inline mr-1" />
-              Photo (Required) *
-            </label>
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
               <p className="text-xs text-orange-900">
                 <strong>Take photo first!</strong> Frame shot to show moisture meter display AND material surface clearly.
               </p>
             </div>
-            {photo ? (
-              <div>
-                <img src={photo} alt="Moisture Meter" className="max-h-48 rounded mb-3" />
-                <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <span className="text-sm text-green-600 font-medium">Photo queued</span>
-                </div>
-                <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 justify-center px-4 py-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                  />
-                  <Camera className="w-4 h-4" />
-                  Replace Photo
-                </label>
-              </div>
-            ) : (
-              <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 w-full justify-center py-6 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg">
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-                <Camera className="w-5 h-5" />
-                Take Photo
-              </label>
+            {user && (
+              <UniversalPhotoCapture
+                jobId={job.jobId}
+                location={roomName}
+                category="assessment"
+                userId={user.uid}
+                onPhotosUploaded={(urls) => {
+                  setPhotos(prev => [...prev, ...urls]);
+                }}
+                uploadedCount={photos.length}
+                label="Moisture Reading Photo *"
+                minimumPhotos={1}
+              />
             )}
           </div>
 
@@ -394,7 +358,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             <Button
               variant="primary"
               onClick={handleSaveReading}
-              disabled={!dryStandard || !wetReading || !photo}
+              disabled={!dryStandard || !wetReading || photos.length === 0}
               className="flex-1"
             >
               <CheckCircle className="w-4 h-4" />
