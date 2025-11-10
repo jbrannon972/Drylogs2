@@ -10,7 +10,6 @@ import { useAuth } from '../../../../hooks/useAuth';
 import { RoomType, MaterialType, FlooringInstallationType, MaterialMoistureTracking } from '../../../../types';
 import { MoistureTabContent } from './MoistureTabContent';
 import { PhotoCapture } from '../../../shared/PhotoCapture';
-import { useToast } from '../../../../contexts/ToastContext';
 
 interface RoomAssessmentStepProps {
   job: any;
@@ -72,7 +71,6 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
-  const toast = useToast();
 
   const [rooms, setRooms] = useState<RoomData[]>(installData.roomAssessments || []);
   const [moistureTracking, setMoistureTracking] = useState<MaterialMoistureTracking[]>(
@@ -161,11 +159,11 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const addRoom = () => {
     // Validation
     if (!newRoomForm.name.trim()) {
-      toast.warning('Please enter a room name');
+      console.warn('Please enter a room name');
       return;
     }
     if (!newRoomForm.length || !newRoomForm.width) {
-      toast.warning('Please enter room dimensions');
+      console.warn('Please enter room dimensions');
       return;
     }
 
@@ -263,12 +261,12 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     const incompleteRooms = rooms.filter(r => !r.isComplete);
 
     if (incompleteRooms.length > 0) {
-      toast.warning(`Please complete assessment for ${incompleteRooms.length} room(s)`);
+      console.warn(`Please complete assessment for ${incompleteRooms.length} room(s)`);
       return;
     }
 
     if (rooms.length === 0) {
-      toast.warning('Please add at least one room');
+      console.warn('Please add at least one room');
       return;
     }
 
@@ -373,13 +371,13 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
     // Validation for new completions
     if (selectedRoom.length === 0 || selectedRoom.width === 0) {
-      toast.warning('Please enter room dimensions before marking complete');
+      console.warn('Please enter room dimensions before marking complete');
       return;
     }
 
     // PHASE 1 VALIDATION: Check overall photos (minimum 4 required)
     if (selectedRoom.overallPhotos.length < 4) {
-      toast.warning(`Please capture at least 4 overall room photos. You currently have ${selectedRoom.overallPhotos.length} photo(s).`);
+      console.warn(`Please capture at least 4 overall room photos. You currently have ${selectedRoom.overallPhotos.length} photo(s).`);
       return;
     }
 
@@ -390,7 +388,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     }, 0);
 
     if (totalMoisturePhotos < 2) {
-      toast.warning(`Please capture at least 2 moisture photos with meter visible. You currently have ${totalMoisturePhotos} moisture photo(s).`);
+      console.warn(`Please capture at least 2 moisture photos with meter visible. You currently have ${totalMoisturePhotos} moisture photo(s).`);
       return;
     }
 
@@ -632,7 +630,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                             return photoUrl;
                           } catch (error) {
                             console.error('Error uploading photo:', error);
-                            toast.error('Failed to upload photo');
+                            console.error('Failed to upload photo');
                             return null;
                           }
                         }
@@ -689,7 +687,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                             return photoUrl;
                           } catch (error) {
                             console.error('Error uploading photo:', error);
-                            toast.error('Failed to upload thermal image');
+                            console.error('Failed to upload thermal image');
                             return null;
                           }
                         }
@@ -1843,7 +1841,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                             }
                           } catch (error) {
                             console.error('Error uploading photo:', error);
-                            toast.error('Failed to upload photo');
+                            console.error('Failed to upload photo');
                           }
                         }
                       };
