@@ -4,7 +4,7 @@
  * Shows: 📷 2/15 45% during upload, persists after complete
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useBatchPhotos } from '../../hooks/useBatchPhotos';
 import { useUploadQueue } from '../../contexts/UploadQueueContext';
 
@@ -12,18 +12,51 @@ export const HeaderUploadIndicator: React.FC = () => {
   const { queueCount: batchCount, uploadProgress: batchProgress } = useBatchPhotos();
   const { queue: universalQueue } = useUploadQueue();
 
-  // Track if we've ever had uploads (to keep indicator visible)
+  // Track cumulative completed uploads
+  const [totalCompleted, setTotalCompleted] = useState(0);
   const [hasHadUploads, setHasHadUploads] = useState(false);
-  const [totalEverUploaded, setTotalEverUploaded] = useState(0);
+
+  // Track previous states to detect new completions
+  const prevBatchProgress = useRef<Record<string, any>>({});
+  const prevUniversalQueue = useRef<any[]>([]);
 
   // Combine counts from both systems
   const totalCount = batchCount + universalQueue.length;
 
-  // Update upload history
+  // Detect completed uploads and increment cumulative counter
+  useEffect(() => {
+    const batchProgressValues = Object.values(batchProgress);
+
+    // Detect NEW batch photo completions
+    const newBatchCompletions = batchProgressValues.filter(p => {
+      const prevProgress = prevBatchProgress.current[p.id || ''];
+      return p.status === 'completed' && (!prevProgress || prevProgress.status !== 'completed');
+    }).length;
+
+    // Detect NEW universal queue completions
+    const newUniversalCompletions = universalQueue.filter(item => {
+      const prevItem = prevUniversalQueue.current.find(prev => prev.id === item.id);
+      return item.status === 'success' && (!prevItem || prevItem.status !== 'success');
+    }).length;
+
+    // Increment cumulative counter
+    if (newBatchCompletions + newUniversalCompletions > 0) {
+      setTotalCompleted(prev => prev + newBatchCompletions + newUniversalCompletions);
+      setHasHadUploads(true);
+    }
+
+    // Update refs for next comparison
+    prevBatchProgress.current = batchProgressValues.reduce((acc, p) => {
+      if (p.id) acc[p.id] = p;
+      return acc;
+    }, {} as Record<string, any>);
+    prevUniversalQueue.current = [...universalQueue];
+  }, [batchProgress, universalQueue]);
+
+  // Also detect if we currently have uploads in progress
   useEffect(() => {
     if (totalCount > 0) {
       setHasHadUploads(true);
-      setTotalEverUploaded(prev => Math.max(prev, totalCount));
     }
   }, [totalCount]);
 
@@ -58,7 +91,7 @@ export const HeaderUploadIndicator: React.FC = () => {
       <span className="text-lg">📷</span>
       <div className="flex items-center gap-1.5 text-sm">
         <span className="font-bold text-gray-900">
-          {isUploading ? `${completedCount}/${totalCount}` : totalEverUploaded}
+          {isUploading ? `${completedCount}/${totalCount}` : totalCompleted}
         </span>
         {isUploading && (
           <span className="font-medium text-blue-600">
