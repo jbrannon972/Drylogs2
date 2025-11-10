@@ -104,14 +104,14 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   };
 
   const handleSaveReading = () => {
-    if (!location.trim() || !dryStandard || !wetReading) {
-      alert('Please complete all required fields: Material, Location, Dry Standard, and Wet Reading');
+    // PHASE 1 VALIDATION: Photo is REQUIRED and must be first
+    if (!photo) {
+      alert('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
       return;
     }
 
-    // PHASE 1 VALIDATION: Photo is now REQUIRED (must show meter + material visible)
-    if (!photo) {
-      alert('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
+    if (!dryStandard || !wetReading) {
+      alert('Please complete all required fields: Dry Standard and Wet Reading');
       return;
     }
 
@@ -394,7 +394,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             <Button
               variant="primary"
               onClick={handleSaveReading}
-              disabled={!location.trim() || !dryStandard || !wetReading || !photo}
+              disabled={!dryStandard || !wetReading || !photo}
               className="flex-1"
             >
               <CheckCircle className="w-4 h-4" />
