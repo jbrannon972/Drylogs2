@@ -76,7 +76,7 @@ interface RoomData {
 }
 
 export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onNext }) => {
-  const { installData, updateWorkflowData } = useWorkflowStore();
+  const { installData, updateWorkflowData, saveWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
 
@@ -151,7 +151,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // SIMPLE FIX: Save immediately when data changes
+  // ULTRAFAULT FIX: Save to both Zustand AND Firebase
   const prevDataRef = useRef({
     rooms: JSON.stringify(installData.rooms || installData.roomAssessments || []),
     moistureTracking: JSON.stringify(installData.moistureTracking || [])
@@ -166,18 +166,30 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       prevDataRef.current.rooms !== currentRoomsStr ||
       prevDataRef.current.moistureTracking !== currentMoistureStr
     ) {
-      // SAVE IMMEDIATELY - no debounce
+      // 1. Update Zustand store immediately (in-memory)
       updateWorkflowData('install', {
         rooms: rooms,
         moistureTracking: moistureTracking
       });
+
+      // 2. ULTRAFAULT: Also save to Firebase with debounce (2 seconds)
+      const saveTimeout = setTimeout(() => {
+        saveWorkflowData().then(() => {
+          console.log('✅ Auto-saved room data to Firebase');
+        }).catch((error) => {
+          console.error('❌ Auto-save failed:', error);
+        });
+      }, 2000);
+
       // Update ref to prevent re-triggering
       prevDataRef.current = {
         rooms: currentRoomsStr,
         moistureTracking: currentMoistureStr
       };
+
+      return () => clearTimeout(saveTimeout);
     }
-  }, [rooms, moistureTracking, updateWorkflowData]);
+  }, [rooms, moistureTracking, updateWorkflowData, saveWorkflowData]);
 
   const selectedRoom = rooms.find(r => r.id === selectedRoomId);
 
@@ -282,7 +294,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const incompleteRooms = rooms.filter(r => !r.isComplete);
 
     if (incompleteRooms.length > 0) {
@@ -295,7 +307,15 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       return;
     }
 
-    onNext();
+    // ULTRAFAULT FIX: Save to Firebase before continuing
+    try {
+      await saveWorkflowData();
+      console.log('✅ All room data saved to Firebase before continuing');
+      onNext();
+    } catch (error) {
+      console.error('❌ Failed to save room data:', error);
+      alert('Failed to save data. Please try again.');
+    }
   };
 
   const getDefaultMaterials = (): MaterialAffected[] => [
@@ -435,6 +455,13 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     }
 
     updateSelectedRoom({ isComplete: true });
+
+    // ULTRAFAULT FIX: Save to Firebase immediately
+    saveWorkflowData().then(() => {
+      console.log('✅ Room data saved to Firebase');
+    }).catch((error) => {
+      console.error('❌ Failed to save room data:', error);
+    });
 
     // Success feedback
     alert(`✅ ${selectedRoom.name} marked complete!\n\n${roomMoistureTracking.length} moisture reading(s) captured\n${materialsMarkedForRemoval} material(s) marked for removal\n\nReturning to room list...`);
