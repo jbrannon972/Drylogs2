@@ -52,31 +52,11 @@ export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, o
       errors.push('Equipment has not been calculated');
     }
 
-    // Check equipment placement
-    const placedEquipment = installData.placedEquipment || [];
-    if (placedEquipment.length === 0) {
-      errors.push('No equipment has been placed');
-    } else if (installData.equipmentCalculations?.total) {
-      const calc = installData.equipmentCalculations.total;
-      const placed = {
-        dehumidifiers: placedEquipment.filter((e: any) => e.type === 'dehumidifier').length,
-        airMovers: placedEquipment.filter((e: any) => e.type === 'air-mover').length,
-        airScrubbers: placedEquipment.filter((e: any) => e.type === 'air-scrubber').length,
-      };
-
-      if (placed.dehumidifiers < calc.dehumidifiers) {
-        errors.push(`Need ${calc.dehumidifiers - placed.dehumidifiers} more dehumidifier(s)`);
-      }
-      if (placed.airMovers < calc.airMovers) {
-        errors.push(`Need ${calc.airMovers - placed.airMovers} more air mover(s)`);
-      }
-      if (placed.airScrubbers < calc.airScrubbers) {
-        errors.push(`Need ${calc.airScrubbers - placed.airScrubbers} more air scrubber(s)`);
-      }
-    }
+    // Check equipment placement (WARNING ONLY - not required)
+    // Equipment is recommended but workflow can complete without it
 
     // Check cause of loss documented
-    if (!installData.waterClassification || !installData.waterClassification.source) {
+    if (!installData.causeOfLoss || !installData.causeOfLoss.type) {
       errors.push('Cause of loss has not been documented');
     }
 

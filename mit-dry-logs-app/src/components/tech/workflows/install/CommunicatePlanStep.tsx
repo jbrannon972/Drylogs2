@@ -131,8 +131,25 @@ export const CommunicatePlanStep: React.FC<CommunicatePlanStepProps> = ({ job, o
               // Get moisture tracking for this room
               const roomMoisture = moistureTracking.filter((m: any) => m.roomId === room.id);
 
-              // Get demo details for this room
+              // Get demo details from BOTH sources:
+              // 1. From room assessment (materialsAffected where removalRequired: true)
+              // 2. From partial demo step (partialDemoDetails.rooms[].materialsRemoved)
               const roomDemo = partialDemoDetails.rooms?.find((d: any) => d.roomId === room.id);
+              const assessmentMaterials = room.materialsAffected?.filter((m: any) => m.removalRequired) || [];
+              const demoMaterials = roomDemo?.materialsRemoved || [];
+
+              // Combine both sources
+              const allMaterialsToRemove = [
+                ...assessmentMaterials.map((m: any) => ({
+                  materialType: m.customMaterialName || m.materialType,
+                  quantity: m.squareFootage || 0,
+                  unit: m.materialType.includes('Trim') || m.materialType.includes('Casing') ? 'LF' :
+                        m.materialType.includes('Fixture') || m.materialType.includes('Appliance') ? 'EA' : 'SF',
+                  notes: m.notes || '',
+                  source: 'assessment'
+                })),
+                ...demoMaterials.map((m: any) => ({ ...m, source: 'demo' }))
+              ];
 
               return (
                 <div key={room.id} className="bg-white border border-gray-200 rounded-lg p-3">
@@ -166,17 +183,17 @@ export const CommunicatePlanStep: React.FC<CommunicatePlanStepProps> = ({ job, o
                     )}
                   </div>
 
-                  {/* Materials to Remove */}
+                  {/* Materials to Remove - COMBINED from both assessment and demo steps */}
                   <div className="mb-2">
                     <p className="text-xs font-semibold text-gray-700 mb-1">
                       <Hammer className="w-3 h-3 inline mr-1" />
                       Planned Removal:
                     </p>
-                    {!roomDemo || roomDemo.materialsRemoved.length === 0 ? (
+                    {allMaterialsToRemove.length === 0 ? (
                       <p className="text-xs text-gray-500 ml-4">No demo scheduled for this room</p>
                     ) : (
                       <ul className="text-xs text-gray-600 ml-4 space-y-0.5">
-                        {roomDemo.materialsRemoved.map((mat: any, idx: number) => (
+                        {allMaterialsToRemove.map((mat: any, idx: number) => (
                           <li key={idx}>
                             • {mat.materialType} - {mat.quantity} {mat.unit}
                             {mat.notes && <span className="text-gray-500"> ({mat.notes})</span>}
