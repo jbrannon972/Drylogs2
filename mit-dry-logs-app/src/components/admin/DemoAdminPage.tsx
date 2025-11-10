@@ -195,7 +195,7 @@ export const DemoAdminPage: React.FC = () => {
         const state = addressParts[2] || 'TX';
         const zip = addressParts[3] || '77000';
 
-        const job: Job = {
+        const job = {
           jobId,
           customerInfo: {
             name: csvJob.clientName,
@@ -387,7 +387,7 @@ export const DemoAdminPage: React.FC = () => {
             specificPromises: csvJob.specificPromises,
             detailedFollowUp: csvJob.detailedFUP,
           },
-        };
+        } as Job;
 
         const jobRef = doc(db, 'jobs', job.jobId);
         await setDoc(jobRef, job);
