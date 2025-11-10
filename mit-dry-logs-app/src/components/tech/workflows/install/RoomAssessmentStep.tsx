@@ -10,6 +10,7 @@ import { useAuth } from '../../../../hooks/useAuth';
 import { RoomType, MaterialType, FlooringInstallationType, MaterialMoistureTracking } from '../../../../types';
 import { MoistureTabContent } from './MoistureTabContent';
 import { PhotoCapture } from '../../../shared/PhotoCapture';
+import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 
 interface RoomAssessmentStepProps {
   job: any;
@@ -637,42 +638,22 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       </div>
                     </div>
 
-                    <PhotoCapture
-                      contextLabel={`${selectedRoom.name} Overview`}
-                      onPhotoCapture={async (file) => {
-                        if (user && job && selectedRoom) {
-                          try {
-                            const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'overall', user.uid);
-                            if (photoUrl) {
-                              updateSelectedRoom({
-                                overallPhotos: [...selectedRoom.overallPhotos, photoUrl],
-                              });
-                            }
-                            return photoUrl;
-                          } catch (error) {
-                            console.error('Error uploading photo:', error);
-                            alert('Failed to upload photo');
-                            return null;
-                          }
-                        }
-                        return null;
-                      }}
-                      photos={selectedRoom.overallPhotos}
-                      onPhotoDelete={(index) => {
-                        updateSelectedRoom({
-                          overallPhotos: selectedRoom.overallPhotos.filter((_, i) => i !== index),
-                        });
-                      }}
-                      isUploading={isUploading}
-                      minPhotos={4}
-                      photoTips={[
-                        'Wide angle from doorway showing full room',
-                        'Left wall and floor intersection',
-                        'Right wall and floor intersection',
-                        'Affected area close-up'
-                      ]}
-                      showQuickTips={true}
-                    />
+                    {user && (
+                      <UniversalPhotoCapture
+                        jobId={job.jobId}
+                        location={selectedRoom.id}
+                        category="overall"
+                        userId={user.uid}
+                        onPhotosUploaded={(urls) => {
+                          updateSelectedRoom({
+                            overallPhotos: [...selectedRoom.overallPhotos, ...urls],
+                          });
+                        }}
+                        uploadedCount={selectedRoom.overallPhotos.length}
+                        label={`${selectedRoom.name} Overview Photos *`}
+                        minimumPhotos={4}
+                      />
+                    )}
                   </div>
 
                   {/* PHASE 1: Thermal Imaging Photos - OPTIONAL */}
@@ -694,34 +675,21 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       </div>
                     </div>
 
-                    <PhotoCapture
-                      contextLabel={`${selectedRoom.name} Thermal Imaging`}
-                      onPhotoCapture={async (file) => {
-                        if (user && job && selectedRoom) {
-                          try {
-                            const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'thermal', user.uid);
-                            if (photoUrl) {
-                              updateSelectedRoom({
-                                thermalPhotos: [...(selectedRoom.thermalPhotos || []), photoUrl],
-                              });
-                            }
-                            return photoUrl;
-                          } catch (error) {
-                            console.error('Error uploading photo:', error);
-                            alert('Failed to upload thermal image');
-                            return null;
-                          }
-                        }
-                        return null;
-                      }}
-                      photos={selectedRoom.thermalPhotos || []}
-                      onPhotoDelete={(index) => {
-                        updateSelectedRoom({
-                          thermalPhotos: selectedRoom.thermalPhotos?.filter((_, i) => i !== index),
-                        });
-                      }}
-                      isUploading={isUploading}
-                    />
+                    {user && (
+                      <UniversalPhotoCapture
+                        jobId={job.jobId}
+                        location={selectedRoom.id}
+                        category="thermal"
+                        userId={user.uid}
+                        onPhotosUploaded={(urls) => {
+                          updateSelectedRoom({
+                            thermalPhotos: [...(selectedRoom.thermalPhotos || []), ...urls],
+                          });
+                        }}
+                        uploadedCount={selectedRoom.thermalPhotos?.length || 0}
+                        label={`${selectedRoom.name} Thermal Imaging (Optional)`}
+                      />
+                    )}
                   </div>
 
                   {/* Pre-existing Damage Section */}
@@ -1839,65 +1807,21 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Photos of Pre-existing Damage
-                </label>
-                <div className="space-y-3">
-                  <Button
-                    variant="secondary"
-                    onClick={async () => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.accept = 'image/*';
-                      input.capture = 'environment';
-                      input.onchange = async (e: any) => {
-                        const file = e.target?.files?.[0];
-                        if (file && user && job && selectedRoom) {
-                          try {
-                            const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'preexisting', user.uid);
-                            if (photoUrl) {
-                              updateSelectedRoom({
-                                preexistingDamagePhotos: [...selectedRoom.preexistingDamagePhotos, photoUrl],
-                              });
-                            }
-                          } catch (error) {
-                            console.error('Error uploading photo:', error);
-                            alert('Failed to upload photo');
-                          }
-                        }
-                      };
-                      input.click();
+                {user && (
+                  <UniversalPhotoCapture
+                    jobId={job.jobId}
+                    location={selectedRoom.id}
+                    category="preexisting"
+                    userId={user.uid}
+                    onPhotosUploaded={(urls) => {
+                      updateSelectedRoom({
+                        preexistingDamagePhotos: [...selectedRoom.preexistingDamagePhotos, ...urls],
+                      });
                     }}
-                    disabled={isUploading}
-                  >
-                    <Camera className="w-4 h-4" />
-                    {isUploading ? 'Uploading...' : 'Take Photo'}
-                  </Button>
-
-                  {selectedRoom.preexistingDamagePhotos.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3">
-                      {selectedRoom.preexistingDamagePhotos.map((photoUrl, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={photoUrl}
-                            alt={`Pre-existing damage ${index + 1}`}
-                            className="w-full h-32 object-cover rounded-lg border border-gray-300"
-                          />
-                          <button
-                            onClick={() => {
-                              updateSelectedRoom({
-                                preexistingDamagePhotos: selectedRoom.preexistingDamagePhotos.filter((_, i) => i !== index),
-                              });
-                            }}
-                            className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                    uploadedCount={selectedRoom.preexistingDamagePhotos.length}
+                    label="Photos of Pre-existing Damage"
+                  />
+                )}
               </div>
             </div>
 

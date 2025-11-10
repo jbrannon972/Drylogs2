@@ -5,6 +5,7 @@ import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import { SubcontractorRequestModal, SubcontractorRequestData } from '../../../shared/SubcontractorRequestModal';
+import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
 
@@ -22,7 +23,13 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
   const [causeType, setCauseType] = useState(installData.causeOfLoss?.type || '');
   const [causeLocation, setCauseLocation] = useState(installData.causeOfLoss?.location || '');
   const [causeNotes, setCauseNotes] = useState(installData.causeOfLoss?.notes || '');
-  const [causePhoto, setCausePhoto] = useState<string | null>(installData.causeOfLoss?.photo || null);
+  const [causePhotos, setCausePhotos] = useState<string[]>(
+    Array.isArray(installData.causeOfLoss?.photos)
+      ? installData.causeOfLoss.photos
+      : installData.causeOfLoss?.photo
+        ? [installData.causeOfLoss.photo]
+        : []
+  );
   const [waterCategory, setWaterCategory] = useState<1 | 2 | 3 | null>(
     installData.waterClassification?.category || null
   );
@@ -57,7 +64,8 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         type: causeType,
         location: causeLocation,
         notes: causeNotes,
-        photo: causePhoto,
+        photos: causePhotos,
+        photo: causePhotos[0] || null, // Keep backward compatibility
         discoveryDate,
         eventDate,
       },
@@ -69,15 +77,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       cat3Containment: waterCategory === 3 ? cat3Checklist : undefined,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [causeType, causeLocation, causeNotes, causePhoto, waterCategory, discoveryDate, eventDate, cat3Checklist, determinedAt]);
-
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user) {
-      const url = await uploadPhoto(file, job.jobId, 'cause-of-loss', 'assessment', user.uid);
-      if (url) setCausePhoto(url);
-    }
-  };
+  }, [causeType, causeLocation, causeNotes, causePhotos, waterCategory, discoveryDate, eventDate, cat3Checklist, determinedAt]);
 
   const toggleCat3Checklist = (key: keyof typeof cat3Checklist) => {
     setCat3Checklist(prev => ({ ...prev, [key]: !prev[key] }));
@@ -163,7 +163,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
   };
 
   const cat3ChecklistComplete = waterCategory === 3 ? Object.values(cat3Checklist).every(v => v) : true;
-  const isComplete = causeType && causeLocation && causePhoto && waterCategory && cat3ChecklistComplete;
+  const isComplete = causeType && causeLocation && causePhotos.length > 0 && waterCategory && cat3ChecklistComplete;
 
   return (
     <div className="space-y-6">
@@ -182,44 +182,32 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
 
       {/* Cause Photo */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Photo of Cause *
-        </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-          {causePhoto ? (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
-              <img src={causePhoto} alt="Cause of Loss" className="max-h-64 mx-auto mb-2 rounded" />
-              <p className="text-sm text-green-600 font-medium mb-2">✓ Photo uploaded</p>
-              <label className="btn-secondary cursor-pointer inline-block text-sm">
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  disabled={isUploading}
-                />
-                Replace Photo
-              </label>
+              <h4 className="font-medium text-blue-900 mb-1">Photo of Water Source</h4>
+              <p className="text-sm text-blue-800">
+                Take clear photos showing the source of water damage. Multiple photos help document the full extent.
+              </p>
             </div>
-          ) : (
-            <div>
-              <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-              <label className="btn-primary cursor-pointer inline-block">
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  disabled={isUploading}
-                />
-                {isUploading ? 'Uploading...' : 'Take Photo of Water Source'}
-              </label>
-              <p className="text-xs text-gray-500 mt-2">Photo required for insurance claim</p>
-            </div>
-          )}
+          </div>
         </div>
+
+        {user && (
+          <UniversalPhotoCapture
+            jobId={job.jobId}
+            location="cause-of-loss"
+            category="assessment"
+            userId={user.uid}
+            onPhotosUploaded={(urls) => {
+              setCausePhotos(prev => [...prev, ...urls]);
+            }}
+            uploadedCount={causePhotos.length}
+            label="Photos of Cause *"
+            minimumPhotos={1}
+          />
+        )}
       </div>
 
       {/* Cause Type */}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Camera, Info, AlertCircle } from 'lucide-react';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
+import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 
 interface PreDemoPhotosStepProps {
   job: any;
@@ -11,21 +12,10 @@ interface PreDemoPhotosStepProps {
 export const PreDemoPhotosStep: React.FC<PreDemoPhotosStepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
-  const [roomPhotos, setRoomPhotos] = useState<Record<string, string>>({});
-
-  const handlePhotoUpload = async (roomId: string, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user) {
-      const room = job.rooms.find((r: any) => r.roomId === roomId);
-      const url = await uploadPhoto(file, job.jobId, room.roomName, 'pre-demo', user.uid);
-      if (url) {
-        setRoomPhotos(prev => ({ ...prev, [roomId]: url }));
-      }
-    }
-  };
+  const [roomPhotos, setRoomPhotos] = useState<Record<string, string[]>>({});
 
   const affectedRooms = Array.isArray(job?.rooms) ? job.rooms.filter((r: any) => r.affectedStatus === 'affected') : [];
-  const allPhotosTaken = affectedRooms.every((r: any) => roomPhotos[r.roomId]);
+  const allPhotosTaken = affectedRooms.every((r: any) => roomPhotos[r.roomId]?.length > 0);
 
   return (
     <div className="space-y-6">
@@ -52,30 +42,22 @@ export const PreDemoPhotosStep: React.FC<PreDemoPhotosStepProps> = ({ job, onNex
       {affectedRooms.map((room: any) => (
         <div key={room.roomId} className="border border-gray-200 rounded-lg p-4">
           <h3 className="font-semibold text-gray-900 mb-3">{room.roomName}</h3>
-          {roomPhotos[room.roomId] ? (
-            <div>
-              <img
-                src={roomPhotos[room.roomId]}
-                alt={`Pre-demo ${room.roomName}`}
-                className="max-h-64 w-full object-cover rounded mb-3"
-              />
-              <p className="text-sm text-green-600 font-medium">✓ Photo uploaded</p>
-            </div>
-          ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-              <label className="btn-primary cursor-pointer inline-block">
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={(e) => handlePhotoUpload(room.roomId, e)}
-                  className="hidden"
-                  disabled={isUploading}
-                />
-                {isUploading ? 'Uploading...' : `Take Pre-Demo Photo`}
-              </label>
-            </div>
+          {user && (
+            <UniversalPhotoCapture
+              jobId={job.jobId}
+              location={room.roomName}
+              category="pre-demo"
+              userId={user.uid}
+              onPhotosUploaded={(urls) => {
+                setRoomPhotos(prev => ({
+                  ...prev,
+                  [room.roomId]: [...(prev[room.roomId] || []), ...urls]
+                }));
+              }}
+              uploadedCount={roomPhotos[room.roomId]?.length || 0}
+              label={`Pre-Demo Photos for ${room.roomName}`}
+              minimumPhotos={1}
+            />
           )}
         </div>
       ))}
