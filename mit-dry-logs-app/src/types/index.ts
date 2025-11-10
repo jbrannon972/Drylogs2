@@ -208,7 +208,7 @@ export type FlooringInstallationType =
 
 export type MaterialCondition = 'wet' | 'damp' | 'dry';
 export type ReadingType = 'dry-standard' | 'initial' | 'daily' | 'final';
-export type PhotoStep = 'arrival' | 'assessment' | 'preexisting' | 'pre-demo' | 'demo' | 'post-demo' | 'daily-check' | 'final';
+export type PhotoStep = 'arrival' | 'assessment' | 'preexisting' | 'pre-demo' | 'demo' | 'post-demo' | 'daily-check' | 'final' | 'overall' | 'thermal' | 'containment' | 'exposed-material' | 'check-service';
 
 // New: Specific material subtypes for affected areas
 export type FloorMaterialType = 'carpet' | 'hardwood' | 'tile' | 'vinyl' | 'laminate' | 'concrete' | 'other';
@@ -1141,7 +1141,7 @@ export interface ExposedMaterialPhoto {
   photoUrl: string;
   materialType: ConstructionMaterialType;
   exposureType: 'wall-cavity' | 'subfloor' | 'structural' | 'insulation';
-  timestamp: Timestamp;
+  timestamp: string; // ISO date string
   notes?: string;
 }
 
@@ -1277,6 +1277,6 @@ export interface DryingCurveData {
   materialType: ConstructionMaterialType;
   dryStandard: number;
   dataPoints: DryingCurveDataPoint[];
-  trend: 'improving' | 'stable' | 'worsening';
+  trend: 'improving' | 'stable' | 'worsening' | 'unknown';
   projectedDryDate?: string; // ISO date string
 }
