@@ -151,7 +151,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ULTRAFAULT FIX: Save to both Zustand AND Firebase
+  // ULTRAFAULT FIX: Save IMMEDIATELY to Firebase - NO DEBOUNCE
+  // The 2-second debounce was causing data loss when user navigated away quickly
   const prevDataRef = useRef({
     rooms: JSON.stringify(installData.rooms || installData.roomAssessments || []),
     moistureTracking: JSON.stringify(installData.moistureTracking || [])
@@ -166,30 +167,38 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       prevDataRef.current.rooms !== currentRoomsStr ||
       prevDataRef.current.moistureTracking !== currentMoistureStr
     ) {
+      console.log('🔄 RoomAssessmentStep: Data changed, saving IMMEDIATELY');
+
       // 1. Update Zustand store immediately (in-memory)
       updateWorkflowData('install', {
         rooms: rooms,
         moistureTracking: moistureTracking
       });
 
-      // 2. ULTRAFAULT: Also save to Firebase with debounce (2 seconds)
-      const saveTimeout = setTimeout(() => {
-        saveWorkflowData().then(() => {
-          console.log('✅ Auto-saved room data to Firebase');
-        }).catch((error) => {
-          console.error('❌ Auto-save failed:', error);
-        });
-      }, 2000);
+      // 2. ULTRAFAULT: SAVE IMMEDIATELY TO FIREBASE - NO DELAY
+      saveWorkflowData().then(() => {
+        console.log('✅ IMMEDIATE save to Firebase successful');
+      }).catch((error) => {
+        console.error('❌ IMMEDIATE save failed:', error);
+      });
 
       // Update ref to prevent re-triggering
       prevDataRef.current = {
         rooms: currentRoomsStr,
         moistureTracking: currentMoistureStr
       };
-
-      return () => clearTimeout(saveTimeout);
     }
   }, [rooms, moistureTracking, updateWorkflowData, saveWorkflowData]);
+
+  // ULTRAFAULT: Force save on component unmount to catch any pending changes
+  useEffect(() => {
+    return () => {
+      console.log('🚪 RoomAssessmentStep: Component unmounting, forcing final save');
+      saveWorkflowData().catch((error) => {
+        console.error('❌ Unmount save failed:', error);
+      });
+    };
+  }, [saveWorkflowData]);
 
   const selectedRoom = rooms.find(r => r.id === selectedRoomId);
 

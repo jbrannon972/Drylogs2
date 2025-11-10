@@ -643,16 +643,36 @@ export const PSMDashboard: React.FC = () => {
         }))
       );
 
-      // Get demo details for this room
+      // ULTRAFAULT: Get materials marked for removal from BOTH sources
+      // 1. From room assessment (materialsAffected where removalRequired: true)
+      const assessmentMaterials = (room.materialsAffected || [])
+        .filter((m: any) => m.removalRequired)
+        .map((m: any) => ({
+          materialType: m.customMaterialName || m.materialType,
+          installationType: m.installationType || 'N/A',
+          squareFootage: m.squareFootage || 0,
+          removalRequired: true,
+          removalReason: m.removalReason || 'water-damage',
+          notes: m.notes || '',
+          condition: 'Affected',
+          squareFootageAffected: m.squareFootage || 0
+        }));
+
+      // 2. From partial demo step (partialDemoDetails.rooms[].materialsRemoved)
       const roomDemo = partialDemoDetails.rooms?.find((d: any) => d.roomId === room.id);
-      const materialsAffected = roomDemo?.materialsRemoved?.map((mat: any) => ({
+      const demoMaterials = (roomDemo?.materialsRemoved || []).map((mat: any) => ({
         materialType: mat.materialType,
         installationType: mat.installationType || 'N/A',
-        squareFootage: mat.quantity,
+        squareFootage: mat.quantity || 0,
         removalRequired: true,
         removalReason: mat.reason || 'water-damage',
-        notes: mat.notes || ''
-      })) || [];
+        notes: mat.notes || '',
+        condition: 'Affected',
+        squareFootageAffected: mat.quantity || 0
+      }));
+
+      // Combine both sources
+      const materialsAffected = [...assessmentMaterials, ...demoMaterials];
 
       return {
         ...room,
@@ -855,7 +875,7 @@ export const PSMDashboard: React.FC = () => {
         <div class="header">
           <div style="display: flex; justify-content: space-between; align-items: start; border-bottom: 4px solid #ea580c; padding-bottom: 20px; margin-bottom: 30px;">
             <div style="flex: 1;">
-              <img src="${window.location.origin}/Elogo.png" alt="Entrusted Restoration" class="logo-img" />
+              <img src="${window.location.origin}/Elogo.png" alt="Entrusted Restoration" style="max-width: 350px; height: auto; margin: 0 0 15px 0; display: block;" />
               <div style="font-size: 22px; font-weight: bold; color: #1f2937; margin: 15px 0 5px 0;">INITIAL INSPECTION REPORT</div>
               <div style="font-size: 14px; color: #6b7280; margin: 0 0 8px 0;">Water Damage Mitigation Assessment</div>
               <div style="font-size: 11pt; color: #6b7280;">
