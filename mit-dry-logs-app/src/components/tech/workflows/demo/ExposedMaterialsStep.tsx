@@ -20,18 +20,29 @@ export const ExposedMaterialsStep: React.FC<ExposedMaterialsStepProps> = ({ job,
   const [exposedPhotos, setExposedPhotos] = useState<ExposedMaterialPhoto[]>(
     demoData.exposedMaterialPhotos || []
   );
+  const [checklist, setChecklist] = useState({
+    wallCavities: false,
+    subfloor: false,
+    insulation: false,
+    structuralDamage: false,
+  });
 
   const affectedRooms = Array.isArray(job?.rooms) ? job.rooms.filter((r: any) => r.affectedStatus === 'affected') : [];
 
   // Material types mapped to exposure types
-  const materialOptions: { material: ConstructionMaterialType; exposureType: 'wall-cavity' | 'subfloor' | 'structural' | 'insulation' }[] = [
-    { material: 'Drywall - Wall', exposureType: 'wall-cavity' },
-    { material: 'Drywall - Ceiling', exposureType: 'wall-cavity' },
-    { material: 'Subfloor', exposureType: 'subfloor' },
-    { material: 'Insulation - Wall', exposureType: 'insulation' },
-    { material: 'Insulation - Ceiling/Attic', exposureType: 'insulation' },
-    { material: 'Baseboards', exposureType: 'structural' },
-    { material: 'Other Trim', exposureType: 'structural' },
+  const materialOptions: { material: ConstructionMaterialType; exposureType: 'wall-cavity' | 'subfloor' | 'structural' | 'insulation'; label: string; icon: string }[] = [
+    { material: 'Drywall - Wall', exposureType: 'wall-cavity', label: 'Drywall', icon: '🧱' },
+    { material: 'Subfloor', exposureType: 'subfloor', label: 'Subfloor', icon: '🪵' },
+    { material: 'Insulation - Wall', exposureType: 'insulation', label: 'Insulation', icon: '🔶' },
+    { material: 'Other Trim', exposureType: 'structural', label: 'Other', icon: '📦' },
+  ];
+
+  // Preset note options
+  const presetNotes = [
+    'Mold present',
+    'Wet insulation',
+    'Structural damage',
+    'No issues visible',
   ];
 
   useEffect(() => {
@@ -40,7 +51,7 @@ export const ExposedMaterialsStep: React.FC<ExposedMaterialsStepProps> = ({ job,
     });
   }, [exposedPhotos]);
 
-  const handleAddPhoto = async (roomId: string, roomName: string) => {
+  const handleAddPhoto = async (material: ConstructionMaterialType, exposureType: 'wall-cavity' | 'subfloor' | 'structural' | 'insulation') => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -49,13 +60,13 @@ export const ExposedMaterialsStep: React.FC<ExposedMaterialsStepProps> = ({ job,
       const file = e.target?.files?.[0];
       if (file && user && job) {
         try {
-          const photoUrl = await uploadPhoto(file, job.jobId, roomId, 'exposed-material', user.uid);
+          const photoUrl = await uploadPhoto(file, job.jobId, 'demo', 'exposed-material', user.uid);
           if (photoUrl) {
-            // Add placeholder - user will fill in details
+            // Photo auto-tagged with selected material type
             const newPhoto: ExposedMaterialPhoto = {
               photoUrl,
-              materialType: 'Drywall - Wall', // Default
-              exposureType: 'wall-cavity',
+              materialType: material,
+              exposureType: exposureType,
               timestamp: new Date().toISOString(),
               notes: '',
             };
@@ -131,16 +142,70 @@ export const ExposedMaterialsStep: React.FC<ExposedMaterialsStepProps> = ({ job,
         </p>
       </div>
 
-      {/* Add Photo Button */}
-      <Button
-        variant="primary"
-        onClick={() => handleAddPhoto('demo', 'Demo Area')}
-        disabled={isUploading}
-        className="w-full"
-      >
-        <Camera className="w-5 h-5" />
-        {isUploading ? 'Uploading...' : 'Take Exposed Material Photo'}
-      </Button>
+      {/* Demo Checklist */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 className="font-medium text-blue-900 mb-3">Capture photos of:</h4>
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm text-blue-900">
+            <input
+              type="checkbox"
+              checked={checklist.wallCavities}
+              onChange={(e) => setChecklist({ ...checklist, wallCavities: e.target.checked })}
+              className="w-4 h-4 rounded border-blue-300"
+            />
+            <span>Wall cavities (if opened)</span>
+          </label>
+          <label className="flex items-center gap-2 text-sm text-blue-900">
+            <input
+              type="checkbox"
+              checked={checklist.subfloor}
+              onChange={(e) => setChecklist({ ...checklist, subfloor: e.target.checked })}
+              className="w-4 h-4 rounded border-blue-300"
+            />
+            <span>Subfloor (if removed)</span>
+          </label>
+          <label className="flex items-center gap-2 text-sm text-blue-900">
+            <input
+              type="checkbox"
+              checked={checklist.insulation}
+              onChange={(e) => setChecklist({ ...checklist, insulation: e.target.checked })}
+              className="w-4 h-4 rounded border-blue-300"
+            />
+            <span>Insulation (if exposed)</span>
+          </label>
+          <label className="flex items-center gap-2 text-sm text-blue-900">
+            <input
+              type="checkbox"
+              checked={checklist.structuralDamage}
+              onChange={(e) => setChecklist({ ...checklist, structuralDamage: e.target.checked })}
+              className="w-4 h-4 rounded border-blue-300"
+            />
+            <span>Structural damage</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Material-First Photo Buttons */}
+      <div>
+        <h4 className="font-medium text-gray-900 mb-3">Select material type to photograph:</h4>
+        <div className="grid grid-cols-2 gap-3">
+          {materialOptions.map((option) => (
+            <Button
+              key={option.material}
+              variant="secondary"
+              onClick={() => handleAddPhoto(option.material, option.exposureType)}
+              disabled={isUploading}
+              className="h-20 flex flex-col items-center justify-center gap-2"
+            >
+              <span className="text-2xl">{option.icon}</span>
+              <span className="text-sm font-medium">{option.label}</span>
+            </Button>
+          ))}
+        </div>
+        <p className="text-xs text-gray-600 mt-2">
+          Tap a material type to open camera and capture photo
+        </p>
+      </div>
 
       {/* Photos List */}
       {exposedPhotos.length > 0 && (
@@ -167,48 +232,62 @@ export const ExposedMaterialsStep: React.FC<ExposedMaterialsStepProps> = ({ job,
                 {/* Photo Details */}
                 <div className="flex-1 space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Material Type *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Material Type: <span className="font-bold text-gray-900">{photo.materialType}</span>
                     </label>
-                    <select
-                      value={photo.materialType}
-                      onChange={(e) => updatePhoto(index, { materialType: e.target.value as ConstructionMaterialType })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    >
-                      {materialOptions.map((opt) => (
-                        <option key={opt.material} value={opt.material}>
-                          {opt.material}
-                        </option>
-                      ))}
-                    </select>
+                    <p className="text-xs text-gray-600">Auto-tagged when photo was taken</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Preset Notes (select all that apply):
+                    </label>
+                    <div className="space-y-2">
+                      {presetNotes.map((note) => {
+                        const isSelected = photo.notes?.includes(note);
+                        return (
+                          <button
+                            key={note}
+                            onClick={() => {
+                              const currentNotes = photo.notes || '';
+                              let updatedNotes: string;
+                              if (isSelected) {
+                                // Remove note
+                                updatedNotes = currentNotes
+                                  .split(', ')
+                                  .filter((n) => n !== note)
+                                  .join(', ');
+                              } else {
+                                // Add note
+                                updatedNotes = currentNotes
+                                  ? `${currentNotes}, ${note}`
+                                  : note;
+                              }
+                              updatePhoto(index, { notes: updatedNotes });
+                            }}
+                            className={`px-3 py-2 rounded-lg border-2 text-sm font-medium transition-colors ${
+                              isSelected
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+                            }`}
+                          >
+                            {isSelected ? '✓ ' : ''}{note}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Exposure Type *
-                    </label>
-                    <select
-                      value={photo.exposureType}
-                      onChange={(e) => updatePhoto(index, { exposureType: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    >
-                      <option value="wall-cavity">Wall Cavity</option>
-                      <option value="subfloor">Subfloor</option>
-                      <option value="structural">Structural</option>
-                      <option value="insulation">Insulation</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Notes (optional)
+                      Additional Notes (optional)
                     </label>
                     <textarea
                       value={photo.notes || ''}
                       onChange={(e) => updatePhoto(index, { notes: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                       rows={2}
-                      placeholder="Describe what's visible in this photo..."
+                      placeholder="Add any additional observations..."
                     />
                   </div>
                 </div>
