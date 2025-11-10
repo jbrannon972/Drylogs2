@@ -204,11 +204,11 @@ export const PhotoCapture: React.FC<PhotoCaptureProps> = ({
             <span className="text-sm text-red-900">{uploadState.error || 'Upload failed'}</span>
           </div>
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={handleRetry}>
+            <Button variant="secondary" onClick={handleRetry}>
               <RotateCcw className="w-4 h-4" />
               Retry
             </Button>
-            <Button variant="secondary" size="sm" onClick={handleTakePhoto}>
+            <Button variant="secondary" onClick={handleTakePhoto}>
               <Camera className="w-4 h-4" />
               Retake
             </Button>
@@ -302,7 +302,6 @@ export const PhotoCapture: React.FC<PhotoCaptureProps> = ({
           <span className="text-sm">Photo deleted</span>
           <Button
             variant="secondary"
-            size="sm"
             onClick={handleUndo}
           >
             Undo

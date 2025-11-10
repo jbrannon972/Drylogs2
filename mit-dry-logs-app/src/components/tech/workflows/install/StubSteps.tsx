@@ -1004,6 +1004,7 @@ export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => {
 
 export const FinalPhotosStep: React.FC<StepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
+  const toast = useToast();
   const { installData, updateWorkflowData } = useWorkflowStore();
   const [finalPhotos, setFinalPhotos] = useState<string[]>(installData.finalPhotos || []);
   const [uploading, setUploading] = useState(false);
