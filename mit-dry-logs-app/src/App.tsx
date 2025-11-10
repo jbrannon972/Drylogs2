@@ -49,8 +49,8 @@ function App() {
   return (
     <UploadQueueProvider>
       <BrowserRouter>
-        {/* Photo Upload Indicator - Shows for MIT Tech users */}
-        {isAuthenticated && user?.role === 'MIT_TECH' && <PhotoUploadIndicator />}
+        {/* Upload Progress now shown in workflow headers via HeaderUploadIndicator */}
+        {/* Old floating PhotoUploadIndicator removed in favor of header integration */}
 
         <Routes>
         {/* Public Routes */}

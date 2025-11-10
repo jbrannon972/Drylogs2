@@ -38,9 +38,8 @@ import { EquipmentCalcStep } from './install/EquipmentCalcStep';
 import { GeneralBillablesStep } from './install/GeneralBillablesStep';
 import { CommunicatePlanStep } from './install/CommunicatePlanStep';
 import { CompleteInstallStep } from './install/CompleteInstallStep';
-import {
-  FinalPhotosStep,
-} from './install/StubSteps';
+import { FinalPhotosStep } from './install/FinalPhotosStep';
+import { HeaderUploadIndicator } from '../../shared/HeaderUploadIndicator';
 
 interface StepConfig {
   id: InstallStep;
@@ -270,6 +269,11 @@ export const InstallWorkflow: React.FC = () => {
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
+          </div>
+
+          {/* Center: Upload Progress */}
+          <div className="flex-shrink-0 ml-3">
+            <HeaderUploadIndicator />
           </div>
 
           {/* Right: Exit button */}
