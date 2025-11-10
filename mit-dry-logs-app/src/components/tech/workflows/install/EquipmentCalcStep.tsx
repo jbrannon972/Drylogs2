@@ -18,9 +18,20 @@ interface RoomData {
   height: number;
   insetsCubicFt?: number;
   offsetsCubicFt?: number;
-  floorSqFt: number;
-  wallSqFt: number;
-  ceilingSqFt: number;
+  affectedFloorSqFt?: number;
+  affectedWallsSqFt?: number;
+  affectedCeilingSqFt?: number;
+  damageClass?: 1 | 2 | 3 | 4;
+  percentAffected?: number;
+}
+
+interface RoomAirMoverPlacement {
+  roomName: string;
+  total: number;
+  base: number;
+  floor: number;
+  wall: number;
+  placement: string;
 }
 
 interface ChamberCalculations {
@@ -32,6 +43,7 @@ interface ChamberCalculations {
   airScrubbers: number;
   formula: string;
   breakdown: string[];
+  roomPlacements: RoomAirMoverPlacement[];
 }
 
 export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNext }) => {
@@ -41,7 +53,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   // STANDARDIZED: Use 'rooms' key (with fallback for migration)
   const rooms: RoomData[] = useMemo(() => installData.rooms || installData.roomAssessments || [], [installData.rooms, installData.roomAssessments]);
   const waterClassification = useMemo(() => installData.waterClassification || {}, [installData.waterClassification]);
-  const dryingPlan = useMemo(() => installData.dryingPlan || {}, [installData.dryingPlan]);
+  const overallDamageClass = useMemo(() => installData.overallDamageClass || 1, [installData.overallDamageClass]);
 
   const [dehumidifierType, setDehumidifierType] = useState<DehumidifierType>('Low Grain Refrigerant (LGR)');
   const [dehumidifierRating, setDehumidifierRating] = useState(200); // PPD
@@ -74,7 +86,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
         'Desiccant': { 1: 1, 2: 2, 3: 3, 4: 3 },
       };
 
-      const chartFactor = chartFactors[dehumidifierType]?.[dryingPlan.overallClass] || 50;
+      const chartFactor = chartFactors[dehumidifierType]?.[overallDamageClass] || 50;
 
       // Calculate dehumidifiers
       let dehumidifierCount: number;
@@ -90,27 +102,54 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
         dehumidifierFormula = `${cubicFootage.toFixed(0)} cf ÷ ${chartFactor} = ${ppdRequired.toFixed(1)} PPD ÷ ${dehumidifierRating} PPD/unit = ${dehumidifierCount} units`;
       }
 
-      // Calculate air movers
-      const totalWetFloorArea = chamberRooms.reduce((sum, r) => sum + r.floorSqFt, 0);
-      const totalWetWallArea = chamberRooms.reduce((sum, r) => sum + r.wallSqFt, 0);
+      // Calculate air movers per room with placement suggestions
+      const roomPlacements: RoomAirMoverPlacement[] = chamberRooms.map(room => {
+        const floorSqFt = room.affectedFloorSqFt || 0;
+        const wallSqFt = room.affectedWallsSqFt || 0;
 
-      const baseAirMovers = chamberRooms.length; // 1 per room
-      const floorAirMovers = Math.ceil(totalWetFloorArea / 60);
-      const wallAirMovers = Math.ceil(totalWetWallArea / 125);
-      const totalAirMovers = baseAirMovers + floorAirMovers + wallAirMovers;
+        const base = 1; // 1 per affected room
+        const floor = Math.ceil(floorSqFt / 60);
+        const wall = Math.ceil(wallSqFt / 125);
+        const total = base + floor + wall;
+
+        // Generate placement suggestion
+        let placement = '';
+        if (floor > 0 && wall > 0) {
+          placement = `Place ${floor} on floor, ${wall} on walls${base > 0 ? ', 1 general circulation' : ''}`;
+        } else if (floor > 0) {
+          placement = `Place ${floor} on floor${base > 0 ? ', 1 general circulation' : ''}`;
+        } else if (wall > 0) {
+          placement = `Place ${wall} on walls${base > 0 ? ', 1 general circulation' : ''}`;
+        } else if (base > 0) {
+          placement = 'Place 1 for general air circulation';
+        }
+
+        return {
+          roomName: room.name,
+          total,
+          base,
+          floor,
+          wall,
+          placement
+        };
+      });
+
+      const totalWetFloorArea = chamberRooms.reduce((sum, r) => sum + (r.affectedFloorSqFt || 0), 0);
+      const totalWetWallArea = chamberRooms.reduce((sum, r) => sum + (r.affectedWallsSqFt || 0), 0);
+
+      const totalAirMovers = roomPlacements.reduce((sum, p) => sum + p.total, 0);
 
       const airMoverBreakdown = [
-        `Base (${chamberRooms.length} rooms): ${baseAirMovers}`,
-        `Floor (${totalWetFloorArea.toFixed(0)} sf ÷ 60): ${floorAirMovers}`,
-        `Wall (${totalWetWallArea.toFixed(0)} sf ÷ 125): ${wallAirMovers}`,
+        `Base (${chamberRooms.length} rooms): ${roomPlacements.reduce((sum, p) => sum + p.base, 0)}`,
+        `Floor (${totalWetFloorArea.toFixed(0)} sf ÷ 60): ${roomPlacements.reduce((sum, p) => sum + p.floor, 0)}`,
+        `Wall (${totalWetWallArea.toFixed(0)} sf ÷ 125): ${roomPlacements.reduce((sum, p) => sum + p.wall, 0)}`,
       ];
 
-      // Calculate air scrubbers (Category 2 or 3 only)
-      let airScrubberCount = 0;
-      if (waterClassification.category >= 2) {
-        const totalAffectedArea = chamberRooms.reduce((sum, r) => sum + (r.length * r.width), 0);
-        airScrubberCount = Math.ceil(totalAffectedArea / 250);
-      }
+      // Calculate air scrubbers (FOR ALL WATER CATEGORIES)
+      const totalAffectedArea = chamberRooms.reduce((sum, r) =>
+        sum + (r.affectedFloorSqFt || 0) + (r.affectedWallsSqFt || 0) + (r.affectedCeilingSqFt || 0), 0
+      );
+      const airScrubberCount = Math.ceil(totalAffectedArea / 250);
 
       return {
         chamberId: chamber.chamberId,
@@ -121,6 +160,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
         airScrubbers: airScrubberCount,
         formula: dehumidifierFormula,
         breakdown: airMoverBreakdown,
+        roomPlacements,
       };
     });
 
@@ -174,7 +214,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     }, 150);
 
     return () => clearTimeout(timeoutId);
-  }, [chambers, rooms, dryingPlan]);
+  }, [chambers, rooms, overallDamageClass]);
 
   // Validation
   if (chambers.length === 0) {
@@ -188,13 +228,17 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     );
   }
 
-  if (!dryingPlan.overallClass) {
+  if (!overallDamageClass) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
         <AlertCircle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
-        <p className="text-gray-700">
-          Drying plan not found. Please complete the previous "Plan the Job" step first.
+        <p className="text-gray-700 mb-2">
+          Overall damage class not found. Please ensure you have:
         </p>
+        <ul className="text-left text-sm text-gray-600 max-w-md mx-auto space-y-1">
+          <li>• Completed room assessments with affected area inputs</li>
+          <li>• Defined chambers and assigned all rooms</li>
+        </ul>
       </div>
     );
   }
@@ -318,6 +362,21 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
               {calc.breakdown.map((line, idx) => (
                 <p key={idx} className="text-xs font-mono text-gray-800">{line}</p>
               ))}
+            </div>
+            {/* Room-by-Room Placement Suggestions */}
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+              <p className="text-xs font-semibold text-orange-900 mb-2">Air Mover Placement (Per Room):</p>
+              <div className="space-y-1">
+                {calc.roomPlacements.map((room, idx) => (
+                  <div key={idx} className="flex items-start justify-between">
+                    <span className="text-xs font-medium text-gray-700">{room.roomName}:</span>
+                    <div className="text-right">
+                      <span className="text-xs font-bold text-orange-700">{room.total} units</span>
+                      <p className="text-xs text-gray-600 italic">{room.placement}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

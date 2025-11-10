@@ -49,6 +49,13 @@ interface RoomData {
   insetsCubicFt: number;
   offsetsCubicFt: number;
 
+  // Affected areas for equipment calculations
+  affectedFloorSqFt?: number;
+  affectedWallsSqFt?: number;
+  affectedCeilingSqFt?: number;
+  damageClass?: 1 | 2 | 3 | 4;
+  percentAffected?: number;
+
   // Pre-existing damage
   hasPreexistingDamage: boolean;
   preexistingDamageNotes?: string;
@@ -397,6 +404,15 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       return;
     }
 
+    // Affected Area Validation
+    const totalAffectedSqFt = (selectedRoom.affectedFloorSqFt || 0) +
+                             (selectedRoom.affectedWallsSqFt || 0) +
+                             (selectedRoom.affectedCeilingSqFt || 0);
+    if (totalAffectedSqFt === 0) {
+      alert('Please enter affected square footage for floor, walls, or ceiling before marking complete. This is required for equipment calculations.');
+      return;
+    }
+
     // PHASE 1 VALIDATION: Check overall photos (minimum 4 required)
     if (selectedRoom.overallPhotos.length < 4) {
       alert(`Please capture at least 4 overall room photos. You currently have ${selectedRoom.overallPhotos.length} photo(s).`);
@@ -617,6 +633,153 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                     <p className="text-sm text-blue-900 mt-1">
                       <strong>Square Footage:</strong> {(selectedRoom.length * selectedRoom.width).toFixed(0)} sq ft
                     </p>
+                  </div>
+
+                  {/* Affected Area - For Equipment Calculations */}
+                  <div className="border-t pt-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Affected Area *</h3>
+
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm text-orange-900 font-medium">
+                            <strong>REQUIRED:</strong> Enter affected square footage for each surface
+                          </p>
+                          <p className="text-sm text-orange-900 mt-1">
+                            Used to calculate damage class and equipment requirements per IICRC S500
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {selectedRoom.length > 0 && selectedRoom.width > 0 && selectedRoom.height > 0 ? (
+                      <div className="space-y-4">
+                        {/* Calculated Total Surfaces */}
+                        <div className="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                          <p className="text-xs font-semibold text-gray-700 mb-2">Total Surface Areas:</p>
+                          <div className="grid grid-cols-3 gap-3 text-xs">
+                            <div>
+                              <span className="text-gray-600">Floor:</span>
+                              <span className="font-bold ml-1">
+                                {(selectedRoom.length * selectedRoom.width).toFixed(1)} sq ft
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Walls:</span>
+                              <span className="font-bold ml-1">
+                                {(2 * selectedRoom.length * selectedRoom.height + 2 * selectedRoom.width * selectedRoom.height).toFixed(1)} sq ft
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Ceiling:</span>
+                              <span className="font-bold ml-1">
+                                {(selectedRoom.length * selectedRoom.width).toFixed(1)} sq ft
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Affected Square Footage Inputs */}
+                        <div className="grid grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Floor Affected (sq ft) *
+                            </label>
+                            <input
+                              type="number"
+                              value={selectedRoom.affectedFloorSqFt || 0}
+                              onChange={(e) => updateSelectedRoom({ affectedFloorSqFt: parseFloat(e.target.value) || 0 })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                              step="0.1"
+                              min="0"
+                              max={selectedRoom.length * selectedRoom.width}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Walls Affected (sq ft) *
+                            </label>
+                            <input
+                              type="number"
+                              value={selectedRoom.affectedWallsSqFt || 0}
+                              onChange={(e) => updateSelectedRoom({ affectedWallsSqFt: parseFloat(e.target.value) || 0 })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                              step="0.1"
+                              min="0"
+                              max={2 * selectedRoom.length * selectedRoom.height + 2 * selectedRoom.width * selectedRoom.height}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Ceiling Affected (sq ft) *
+                            </label>
+                            <input
+                              type="number"
+                              value={selectedRoom.affectedCeilingSqFt || 0}
+                              onChange={(e) => updateSelectedRoom({ affectedCeilingSqFt: parseFloat(e.target.value) || 0 })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                              step="0.1"
+                              min="0"
+                              max={selectedRoom.length * selectedRoom.width}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Damage Class Calculation */}
+                        {(() => {
+                          const totalSurface = (selectedRoom.length * selectedRoom.width * 2) +
+                                             (selectedRoom.length * selectedRoom.height * 2) +
+                                             (selectedRoom.width * selectedRoom.height * 2);
+                          const totalAffected = (selectedRoom.affectedFloorSqFt || 0) +
+                                              (selectedRoom.affectedWallsSqFt || 0) +
+                                              (selectedRoom.affectedCeilingSqFt || 0);
+                          const percentAffected = totalSurface > 0 ? (totalAffected / totalSurface) * 100 : 0;
+
+                          let damageClass: 1 | 2 | 3 | 4 = 1;
+                          if (percentAffected > 40) {
+                            damageClass = 3;
+                          } else if (percentAffected >= 5) {
+                            damageClass = 2;
+                          }
+
+                          // Update the room with calculated class
+                          if (totalAffected > 0 && selectedRoom.damageClass !== damageClass) {
+                            setTimeout(() => updateSelectedRoom({ damageClass, percentAffected }), 0);
+                          }
+
+                          return totalAffected > 0 ? (
+                            <div className={`border-l-4 rounded-lg p-4 ${
+                              damageClass === 3 ? 'border-red-500 bg-red-50' :
+                              damageClass === 2 ? 'border-yellow-500 bg-yellow-50' :
+                              'border-green-500 bg-green-50'
+                            }`}>
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="font-semibold text-gray-900">
+                                    Damage Class: {damageClass}
+                                  </p>
+                                  <p className="text-sm text-gray-700 mt-1">
+                                    {percentAffected.toFixed(1)}% of total surface area affected ({totalAffected.toFixed(1)} / {totalSurface.toFixed(1)} sq ft)
+                                  </p>
+                                  <p className="text-xs text-gray-600 mt-1">
+                                    {damageClass === 3 ? 'Class 3: Fast evaporation rate (>40% affected)' :
+                                     damageClass === 2 ? 'Class 2: Moderate evaporation rate (5-40% affected)' :
+                                     'Class 1: Slow evaporation rate (<5% affected)'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
+                    ) : (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <p className="text-sm text-yellow-900">
+                          Enter room dimensions first to calculate affected areas
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* PHASE 1: Overall Room Photos - REQUIRED (4+ minimum) */}

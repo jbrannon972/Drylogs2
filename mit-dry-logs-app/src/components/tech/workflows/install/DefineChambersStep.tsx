@@ -202,12 +202,19 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
       return;
     }
 
-    // Save chambers to workflow store
+    // Calculate overall damage class
+    const roomsWithClass = (installData.rooms || []).filter((r: any) => r.damageClass);
+    const overallClass = roomsWithClass.length > 0
+      ? Math.max(...roomsWithClass.map((r: any) => r.damageClass || 1))
+      : 1;
+
+    // Save chambers and overall damage class to workflow store
     updateWorkflowData('install', {
       chambers: chambers.map(c => ({
         ...c,
         assignedRooms: c.assignedRooms,
       })),
+      overallDamageClass: overallClass,
     });
 
     onNext();
@@ -625,6 +632,48 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
           Add more chambers if you need to isolate specific areas (e.g., containment zones, separate floors)
         </p>
       </div>
+
+      {/* Overall Damage Class Calculation */}
+      {(() => {
+        // Calculate overall damage class from all rooms
+        const roomsWithClass = (installData.rooms || []).filter((r: any) => r.damageClass);
+        const overallClass = roomsWithClass.length > 0
+          ? Math.max(...roomsWithClass.map((r: any) => r.damageClass || 1))
+          : null;
+
+        return overallClass !== null ? (
+          <div className={`border-l-4 rounded-lg p-4 ${
+            overallClass === 3 ? 'border-red-500 bg-red-50' :
+            overallClass === 2 ? 'border-yellow-500 bg-yellow-50' :
+            'border-green-500 bg-green-50'
+          }`}>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">
+                Overall Damage Class: {overallClass}
+              </h4>
+              <p className="text-sm text-gray-700">
+                {overallClass === 3 ? 'Class 3: Fast evaporation rate - Greatest amount of water absorption and evaporation load (>40% affected)' :
+                 overallClass === 2 ? 'Class 2: Moderate evaporation rate - Significant absorption and evaporation (5-40% affected)' :
+                 'Class 1: Slow evaporation rate - Minimal absorption and evaporation (<5% affected)'}
+              </p>
+              <p className="text-xs text-gray-600 mt-2">
+                Per IICRC S500: Highest class from all assessed rooms. Used for equipment calculations.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-yellow-900">
+                  <strong>Warning:</strong> No damage class calculated. Make sure affected areas are entered for all rooms in the Room Assessment step.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Summary */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-4">
