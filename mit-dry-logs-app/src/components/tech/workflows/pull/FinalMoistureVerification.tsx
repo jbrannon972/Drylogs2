@@ -5,7 +5,6 @@ import { Button } from '../../../shared/Button';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
-import { useToast } from '../../../../contexts/ToastContext';
 import {
   MaterialMoistureTracking,
   MoistureReadingEntry,
@@ -23,7 +22,6 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
-  const toast = useToast();
 
   // Load moisture tracking from install
   const [moistureTracking, setMoistureTracking] = useState<MaterialMoistureTracking[]>(
@@ -65,13 +63,13 @@ export const FinalMoistureVerification: React.FC<FinalMoistureVerificationProps>
 
   const handleAddFinalReading = () => {
     if (!selectedMaterial || !finalReading) {
-      toast.error('Please enter a final moisture reading');
+      alert('Please enter a final moisture reading');
       return;
     }
 
     // PHASE 1: Photo is REQUIRED for final readings
     if (!photo) {
-      toast.error('Photo is required! Please take a photo showing the final moisture meter reading and the material.');
+      alert('Photo is required! Please take a photo showing the final moisture meter reading and the material.');
       return;
     }
 

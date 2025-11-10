@@ -5,7 +5,6 @@ import { Button } from '../../../shared/Button';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
-import { useToast } from '../../../../contexts/ToastContext';
 import {
   MaterialMoistureTracking,
   MoistureReadingEntry,
@@ -23,7 +22,6 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
   const { installData, checkServiceData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
-  const toast = useToast();
 
   // Load moisture tracking from install
   const [moistureTracking, setMoistureTracking] = useState<MaterialMoistureTracking[]>(
@@ -58,13 +56,13 @@ export const RoomReadingsStepNew: React.FC<RoomReadingsStepNewProps> = ({ job, o
 
   const handleAddReading = () => {
     if (!selectedMaterial || !newReading) {
-      toast.error('Please enter a moisture reading');
+      alert('Please enter a moisture reading');
       return;
     }
 
     // PHASE 1: Photo is now REQUIRED
     if (!photo) {
-      toast.error('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
+      alert('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
       return;
     }
 

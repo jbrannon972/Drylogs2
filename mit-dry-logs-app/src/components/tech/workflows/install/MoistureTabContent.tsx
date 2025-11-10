@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
-import { useToast } from '../../../../contexts/ToastContext';
 import {
   ConstructionMaterialType,
   MaterialMoistureTracking,
@@ -37,7 +36,6 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 }) => {
   const { user } = useAuth();
   const { queuePhoto } = useBatchPhotos();
-  const toast = useToast();
 
   // Form state
   const [showAddForm, setShowAddForm] = useState(false);
@@ -108,12 +106,12 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   const handleSaveReading = () => {
     // PHASE 1 VALIDATION: Photo is REQUIRED and must be first
     if (!photo) {
-      toast.error('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
+      alert('Photo is required! Please take a photo showing the moisture meter display and the material being tested.');
       return;
     }
 
     if (!dryStandard || !wetReading) {
-      toast.error('Please complete all required fields: Dry Standard and Wet Reading');
+      alert('Please complete all required fields: Dry Standard and Wet Reading');
       return;
     }
 
@@ -121,7 +119,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
     const wetReadingNum = parseFloat(wetReading);
 
     if (isNaN(dryStandardNum) || isNaN(wetReadingNum)) {
-      toast.error('Please enter valid numbers for moisture readings');
+      alert('Please enter valid numbers for moisture readings');
       return;
     }
 

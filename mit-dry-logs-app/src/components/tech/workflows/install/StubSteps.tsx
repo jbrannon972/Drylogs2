@@ -6,7 +6,6 @@ import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { EquipmentCalculator } from '../../../shared/EquipmentCalculator';
 import { ChamberCalculationResult } from '../../../../utils/iicrcCalculations';
 import { useAuth } from '../../../../hooks/useAuth';
-import { useToast } from '../../../../contexts/ToastContext';
 import { photoService } from '../../../../services/firebase/photoService';
 import { Camera, Upload, CheckCircle, Clock } from 'lucide-react';
 import { Button } from '../../../shared/Button';
@@ -18,7 +17,6 @@ interface StepProps {
 
 export const PreExistingStep: React.FC<StepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
-  const toast = useToast();
   const { installData, updateWorkflowData } = useWorkflowStore();
   const [hasPreExisting, setHasPreExisting] = useState(installData.hasPreExisting ?? true);
   const [preExistingNotes, setPreExistingNotes] = useState(installData.preExistingNotes || '');
@@ -38,7 +36,7 @@ export const PreExistingStep: React.FC<StepProps> = ({ job, onNext }) => {
         }
       } catch (error) {
         console.error('Photo upload failed:', error);
-        toast.error('Failed to upload photo. Please try again.');
+        alert('Failed to upload photo. Please try again.');
       } finally {
         setUploading(false);
       }
@@ -182,7 +180,6 @@ export const PreExistingStep: React.FC<StepProps> = ({ job, onNext }) => {
 
 export const CauseOfLossStep: React.FC<StepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
-  const toast = useToast();
   const { installData, updateWorkflowData } = useWorkflowStore();
   const [causeType, setCauseType] = useState(installData.causeType || '');
   const [causeDescription, setCauseDescription] = useState(installData.causeDescription || '');
@@ -202,7 +199,7 @@ export const CauseOfLossStep: React.FC<StepProps> = ({ job, onNext }) => {
         }
       } catch (error) {
         console.error('Photo upload failed:', error);
-        toast.error('Failed to upload photo. Please try again.');
+        alert('Failed to upload photo. Please try again.');
       } finally {
         setUploading(false);
       }
@@ -517,7 +514,6 @@ export const EquipmentCalcStep: React.FC<StepProps> = ({ job, onNext }) => {
 };
 
 export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
-  const toast = useToast();
   const { installData, updateWorkflowData } = useWorkflowStore();
   const rooms = installData.rooms || [];
   const equipmentCalc = installData.equipmentCalculation;
@@ -542,7 +538,7 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
 
   const handleAddEquipment = () => {
     if (!currentRoom || !equipmentId.trim()) {
-      toast.warning('Please select a room and enter equipment ID');
+      alert('Please select a room and enter equipment ID');
       return;
     }
 
@@ -1004,7 +1000,6 @@ export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => {
 
 export const FinalPhotosStep: React.FC<StepProps> = ({ job, onNext }) => {
   const { user } = useAuth();
-  const toast = useToast();
   const { installData, updateWorkflowData } = useWorkflowStore();
   const [finalPhotos, setFinalPhotos] = useState<string[]>(installData.finalPhotos || []);
   const [uploading, setUploading] = useState(false);
@@ -1022,7 +1017,7 @@ export const FinalPhotosStep: React.FC<StepProps> = ({ job, onNext }) => {
         }
       } catch (error) {
         console.error('Photo upload failed:', error);
-        toast.error('Failed to upload photo. Please try again.');
+        alert('Failed to upload photo. Please try again.');
       } finally {
         setUploading(false);
       }
@@ -1291,7 +1286,6 @@ export const ReviewStep: React.FC<StepProps> = ({ job, onNext }) => {
 };
 
 export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
-  const toast = useToast();
   const { installData, updateWorkflowData } = useWorkflowStore();
 
   // Get current time as default
@@ -1471,7 +1465,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
 
   const handleFinalize = () => {
     // useEffect will auto-save before navigation
-    toast.success('Install workflow completed successfully! Returning to dashboard...');
+    alert('Install workflow completed successfully! Returning to dashboard...');
     window.location.href = '/tech';
   };
 
