@@ -5,7 +5,6 @@ import { Droplets, AlertCircle, Info, Plus, Trash2, CheckCircle, Camera, AlertTr
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
-import { useToast } from '../../../../contexts/ToastContext';
 import { MaterialType, ReadingType } from '../../../../types';
 
 interface MoistureReading {
@@ -32,7 +31,6 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
-  const toast = useToast();
   const rooms = installData.rooms || [];
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   const [moistureReadings, setMoistureReadings] = useState<MoistureReading[]>(
@@ -68,7 +66,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
 
   const handleAddReading = () => {
     if (!currentRoom || !newReading.moisturePercent) {
-      toast.warning('Please fill in moisture percentage');
+      console.warn('Please fill in moisture percentage');
       return;
     }
 

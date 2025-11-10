@@ -7,7 +7,6 @@ import React, { useState } from 'react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
-import { useToast } from '../../../../contexts/ToastContext';
 import { Button } from '../../../shared/Button';
 import {
   Hammer,
@@ -45,7 +44,6 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { uploadPhoto, isUploading } = usePhotos();
   const { user } = useAuth();
-  const toast = useToast();
 
   const rooms = installData.rooms || [];
   const [demoPerformed, setDemoPerformed] = useState(
@@ -86,7 +84,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
 
   const handleAddRoom = () => {
     if (!currentRoomId) {
-      toast.warning('Please select a room');
+      console.warn('Please select a room');
       return;
     }
 
@@ -95,7 +93,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
 
     // Check if room already exists
     if (demoRooms.find(dr => dr.roomId === currentRoomId)) {
-      toast.warning('This room is already added to partial demo');
+      console.warn('This room is already added to partial demo');
       return;
     }
 

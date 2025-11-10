@@ -4,7 +4,6 @@ import { Input } from '../../../shared/Input';
 import { Plus, Trash2, Home } from 'lucide-react';
 import { Room, RoomType, AffectedStatus } from '../../../../types';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
-import { useToast } from '../../../../contexts/ToastContext';
 
 interface RoomEvaluationStepProps {
   job: any;
@@ -13,7 +12,6 @@ interface RoomEvaluationStepProps {
 
 export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
-  const toast = useToast();
   const [rooms, setRooms] = useState<any[]>(installData.rooms || []);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [newRoom, setNewRoom] = useState({
@@ -32,7 +30,7 @@ export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onN
 
   const handleAddRoom = () => {
     if (!newRoom.name || !newRoom.length || !newRoom.width) {
-      toast.warning('Please fill in all required fields');
+      console.warn('Please fill in all required fields');
       return;
     }
 

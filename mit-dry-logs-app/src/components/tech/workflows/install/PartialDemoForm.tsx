@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Trash2, Plus, X, Camera, AlertCircle } from 'lucide-react';
 import { Button } from '../../../shared/Button';
-import { useToast } from '../../../../contexts/ToastContext';
 
 interface PartialDemoMaterial {
   materialType: string;
@@ -37,7 +36,6 @@ const COMMON_MATERIALS = [
 ];
 
 export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave, initialData }) => {
-  const toast = useToast();
   const [demoRooms, setDemoRooms] = useState<PartialDemoRoom[]>(initialData || []);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState('');
@@ -50,7 +48,7 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
 
     // Check if room already added
     if (demoRooms.some(dr => dr.roomId === selectedRoomId)) {
-      toast.warning('This room has already been added to partial demo');
+      console.warn('This room has already been added to partial demo');
       return;
     }
 
@@ -136,12 +134,12 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
     // Validation
     for (const room of demoRooms) {
       if (room.materialsRemoved.length === 0) {
-        toast.warning(`Please add at least one material removed for ${room.roomName}`);
+        console.warn(`Please add at least one material removed for ${room.roomName}`);
         return;
       }
       for (const mat of room.materialsRemoved) {
         if (!mat.quantity || mat.quantity <= 0) {
-          toast.warning(`Please enter a valid quantity for ${mat.materialType} in ${room.roomName}`);
+          console.warn(`Please enter a valid quantity for ${mat.materialType} in ${room.roomName}`);
           return;
         }
       }

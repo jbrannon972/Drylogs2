@@ -7,7 +7,6 @@ import { RoomType } from '../../../../types';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { usePhotos } from '../../../../hooks/usePhotos';
 import { useAuth } from '../../../../hooks/useAuth';
-import { useToast } from '../../../../contexts/ToastContext';
 
 interface AddRoomsStepProps {
   job: any;
@@ -37,7 +36,6 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
-  const toast = useToast();
   const [rooms, setRooms] = useState<RoomData[]>(installData.rooms || []);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -92,7 +90,7 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
 
   const handleAddRoom = () => {
     if (!newRoom.name || !newRoom.length || !newRoom.width) {
-      toast.warning('Please fill in room name, length, and width');
+      console.warn('Please fill in room name, length, and width');
       return;
     }
 
