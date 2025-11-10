@@ -618,85 +618,42 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      <Button
-                        variant="primary"
-                        onClick={async () => {
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'image/*';
-                          input.capture = 'environment';
-                          input.onchange = async (e: any) => {
-                            const file = e.target?.files?.[0];
-                            if (file && user && job && selectedRoom) {
-                              try {
-                                const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'overall', user.uid);
-                                if (photoUrl) {
-                                  updateSelectedRoom({
-                                    overallPhotos: [...selectedRoom.overallPhotos, photoUrl],
-                                  });
-                                }
-                              } catch (error) {
-                                console.error('Error uploading photo:', error);
-                                alert('Failed to upload photo');
-                              }
+                    <PhotoCapture
+                      contextLabel={`${selectedRoom.name} Overview`}
+                      onPhotoCapture={async (file) => {
+                        if (user && job && selectedRoom) {
+                          try {
+                            const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'overall', user.uid);
+                            if (photoUrl) {
+                              updateSelectedRoom({
+                                overallPhotos: [...selectedRoom.overallPhotos, photoUrl],
+                              });
                             }
-                          };
-                          input.click();
-                        }}
-                        disabled={isUploading}
-                      >
-                        <Camera className="w-4 h-4" />
-                        {isUploading ? 'Uploading...' : 'Take Overall Photo'}
-                      </Button>
-
-                      {selectedRoom.overallPhotos.length > 0 && (
-                        <div>
-                          <div className={`p-3 rounded-lg mb-3 ${
-                            selectedRoom.overallPhotos.length >= 4
-                              ? 'bg-green-50 border border-green-200'
-                              : 'bg-yellow-50 border border-yellow-200'
-                          }`}>
-                            <p className={`text-sm font-medium ${
-                              selectedRoom.overallPhotos.length >= 4 ? 'text-green-900' : 'text-yellow-900'
-                            }`}>
-                              {selectedRoom.overallPhotos.length >= 4 ? (
-                                <>
-                                  <CheckCircle className="w-4 h-4 inline mr-1" />
-                                  {selectedRoom.overallPhotos.length} photos captured - Requirement met!
-                                </>
-                              ) : (
-                                <>
-                                  <AlertCircle className="w-4 h-4 inline mr-1" />
-                                  {selectedRoom.overallPhotos.length} of 4 minimum photos captured
-                                </>
-                              )}
-                            </p>
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            {selectedRoom.overallPhotos.map((photoUrl, index) => (
-                              <div key={index} className="relative">
-                                <img
-                                  src={photoUrl}
-                                  alt={`Overall ${index + 1}`}
-                                  className="w-full h-32 object-cover rounded-lg border border-gray-300"
-                                />
-                                <button
-                                  onClick={() => {
-                                    updateSelectedRoom({
-                                      overallPhotos: selectedRoom.overallPhotos.filter((_, i) => i !== index),
-                                    });
-                                  }}
-                                  className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                            return photoUrl;
+                          } catch (error) {
+                            console.error('Error uploading photo:', error);
+                            toast.error('Failed to upload photo');
+                            return null;
+                          }
+                        }
+                        return null;
+                      }}
+                      photos={selectedRoom.overallPhotos}
+                      onPhotoDelete={(index) => {
+                        updateSelectedRoom({
+                          overallPhotos: selectedRoom.overallPhotos.filter((_, i) => i !== index),
+                        });
+                      }}
+                      isUploading={isUploading}
+                      minPhotos={4}
+                      photoTips={[
+                        'Wide angle from doorway showing full room',
+                        'Left wall and floor intersection',
+                        'Right wall and floor intersection',
+                        'Affected area close-up'
+                      ]}
+                      showQuickTips={true}
+                    />
                   </div>
 
                   {/* PHASE 1: Thermal Imaging Photos - OPTIONAL */}
@@ -707,78 +664,45 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <div className="flex items-start gap-3">
                         <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm text-blue-900">
-                            Optional thermal imaging photos to identify hidden moisture or temperature differentials.
-                            This has been moved from the Cause of Loss step to Room Assessment.
+                          <p className="text-sm text-blue-900 font-medium mb-1">
+                            Optional - Use When Moisture is Hidden
+                          </p>
+                          <p className="text-sm text-blue-800">
+                            • Use thermal imaging if you suspect moisture behind walls, ceilings, or insulation that isn't visible
+                            <br/>• Helps identify hidden moisture patterns and temperature differentials
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      <Button
-                        variant="secondary"
-                        onClick={async () => {
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'image/*';
-                          input.capture = 'environment';
-                          input.onchange = async (e: any) => {
-                            const file = e.target?.files?.[0];
-                            if (file && user && job && selectedRoom) {
-                              try {
-                                const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'thermal', user.uid);
-                                if (photoUrl) {
-                                  updateSelectedRoom({
-                                    thermalPhotos: [...(selectedRoom.thermalPhotos || []), photoUrl],
-                                  });
-                                }
-                              } catch (error) {
-                                console.error('Error uploading photo:', error);
-                                alert('Failed to upload photo');
-                              }
+                    <PhotoCapture
+                      contextLabel={`${selectedRoom.name} Thermal Imaging`}
+                      onPhotoCapture={async (file) => {
+                        if (user && job && selectedRoom) {
+                          try {
+                            const photoUrl = await uploadPhoto(file, job.jobId, selectedRoom.id, 'thermal', user.uid);
+                            if (photoUrl) {
+                              updateSelectedRoom({
+                                thermalPhotos: [...(selectedRoom.thermalPhotos || []), photoUrl],
+                              });
                             }
-                          };
-                          input.click();
-                        }}
-                        disabled={isUploading}
-                      >
-                        <Camera className="w-4 h-4" />
-                        {isUploading ? 'Uploading...' : 'Take Thermal Image'}
-                      </Button>
-
-                      {(selectedRoom.thermalPhotos?.length || 0) > 0 && (
-                        <div>
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                            <p className="text-sm text-blue-900">
-                              <CheckCircle className="w-4 h-4 inline mr-1" />
-                              {selectedRoom.thermalPhotos?.length} thermal image(s) captured
-                            </p>
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            {selectedRoom.thermalPhotos?.map((photoUrl, index) => (
-                              <div key={index} className="relative">
-                                <img
-                                  src={photoUrl}
-                                  alt={`Thermal ${index + 1}`}
-                                  className="w-full h-32 object-cover rounded-lg border border-gray-300"
-                                />
-                                <button
-                                  onClick={() => {
-                                    updateSelectedRoom({
-                                      thermalPhotos: selectedRoom.thermalPhotos?.filter((_, i) => i !== index),
-                                    });
-                                  }}
-                                  className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                            return photoUrl;
+                          } catch (error) {
+                            console.error('Error uploading photo:', error);
+                            toast.error('Failed to upload thermal image');
+                            return null;
+                          }
+                        }
+                        return null;
+                      }}
+                      photos={selectedRoom.thermalPhotos || []}
+                      onPhotoDelete={(index) => {
+                        updateSelectedRoom({
+                          thermalPhotos: selectedRoom.thermalPhotos?.filter((_, i) => i !== index),
+                        });
+                      }}
+                      isUploading={isUploading}
+                    />
                   </div>
 
                   {/* Pre-existing Damage Section */}
