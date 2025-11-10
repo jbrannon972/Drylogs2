@@ -72,7 +72,7 @@ Take a photo of the property entrance for documentation.
 **QUESTION 1**: **Photo Counter vs. Visual Guidance**
 The app tells the tech "4 minimum photos" but doesn't explain *what* those 4 photos should capture. A tech might take 4 random shots just to satisfy the requirement.
 
-**Suggestion**: Add visual guidance showing what the 4 photos should be:
+**Suggestion**: Add visual guidance showing what the 4 photos should be: This can just be a quick list of the suggested shots to take
 - "Photo 1: Wide angle from doorway"
 - "Photo 2: Left wall and floor"
 - "Photo 3: Right wall and floor"
@@ -92,7 +92,7 @@ The current flow requires:
 
 **Friction**: After each photo, the tech has to tap the button again. In a wet, cramped space with gloves on, this adds up.
 
-**Suggestion**: Consider a "Rapid Capture Mode":
+**Suggestion**: Consider a "Rapid Capture Mode": Can this be done using the native ios/android camera? If not can we have two buttons side by side? Take one pic at a time or upload multiple pics from the gallery. 
 - Tap once to enter "Photo Capture Mode"
 - Camera stays open
 - Tech takes 4+ photos in a row
@@ -109,10 +109,10 @@ Currently, a small X button in the corner deletes a photo. No confirmation.
 **Field Scenario**: Tech accidentally taps X while scrolling through photos with wet gloves. Photo deleted. Now they have 3/4 photos and have to retake.
 
 **Suggestion**: Add "Undo" toast notification:
-- "Photo deleted. [Undo]" appears for 5 seconds
+- "Photo deleted. [Undo]" appears for 5 seconds YES
 - Prevents accidental deletion frustration
 
-Alternative: Add confirmation for deletion ("Delete this photo? Yes/No")
+Alternative: Add confirmation for deletion ("Delete this photo? Yes/No") YES
 
 ---
 
@@ -121,7 +121,7 @@ The button shows "Uploading..." but the tech doesn't know if the upload succeede
 
 **Field Scenario**: Weak signal. Photo appears to upload but fails silently. Tech moves on thinking they have 4 photos, but the app only saved 3.
 
-**Suggestion**: Add explicit success/failure feedback:
+**Suggestion**: Add explicit success/failure feedback: We want a samll circle in the top left that shows photos uploading in the back ground, in the center it says 1/5 and a circle around that fills to show overall progress. this stays visible regardless as you go through the workflow
 - ✅ Green checkmark overlay on photo thumbnail when upload succeeds
 - ⚠️ Yellow warning icon if upload pending (offline queue)
 - ❌ Red X if upload failed with retry button
@@ -167,7 +167,7 @@ The instruction says "show moisture meter display AND material being tested" but
 
 **Field Scenario**: Tech takes a photo of just the meter display (close-up). Material isn't visible. Later, adjuster can't verify which material was tested.
 
-**Suggestion**: Add inline example photo:
+**Suggestion**: Add inline example photo: JUST EXPLAIN IT BETTER
 - Show a sample photo with green overlay highlighting "Meter Display" and "Material"
 - Or: Use AR overlay showing where to position meter in frame (if technically feasible)
 
@@ -180,9 +180,9 @@ Current flow: Tech enters dry standard, wet reading, location, *then* takes phot
 
 **Field Scenario**: Tech forgets to take photo until after they've moved to the next material. Now they have to go back.
 
-**Suggestion**: Reorder the form:
-1. **Take Photo First** (validates you're at the material)
-2. Enter location (auto-suggests from photo metadata if possible)
+**Suggestion**: Reorder the form: Good with this!
+1. **Take Photo First** (validates you're at the material) 
+2. Enter location (auto-suggests from photo metadata if possible) Location should be optional, this is more or less a note
 3. Enter dry standard and wet reading
 
 This aligns with the **natural workflow** of testing → documenting → moving on.
@@ -193,9 +193,9 @@ This aligns with the **natural workflow** of testing → documenting → moving 
 If photo upload fails, the tech sees "Failed to upload photo" alert. But there's no retry button—they have to retake the entire photo.
 
 **Suggestion**: Add retry logic:
-- If upload fails, show "Upload Failed. [Retry] [Retake Photo]"
+- If upload fails, show "Upload Failed. [Retry] [Retake Photo]" 
 - Retry button attempts to reupload same file
-- Retake button opens camera again
+- Retake button opens camera again GOOD with it, it should be saving the pics to the phone as well so can they just go back in the gallery and reselect?
 
 This saves time when the issue is network, not photo quality.
 
@@ -216,7 +216,7 @@ Containment is a billable item (plastic sqft, zip poles). Without a photo, how d
 
 **Field Scenario**: Tech sets up 200 sqft of containment, logs it, but doesn't take a photo. Adjuster questions the line item. No proof = no payment.
 
-**Suggestion**: Make containment photo **required IF containment is enabled**:
+**Suggestion**: Make containment photo **required IF containment is enabled**: YES
 - If "Has Containment Barrier" is checked → Photo becomes required
 - Validation message: "Please take a photo showing the containment barrier setup before proceeding."
 
@@ -229,7 +229,7 @@ The app asks for "Plastic Sqft" but doesn't explain how to calculate it.
 
 **Field Scenario**: Tech guesses "200 sqft" because they used 2 rolls. Actual coverage was 280 sqft. Underbilled.
 
-**Suggestion**: Add inline calculator or hint:
+**Suggestion**: Add inline calculator or hint: Can we add the calculator
 - "Hint: Each 10'×25' roll = 250 sqft"
 - Or: "Roll count × 250 = Total sqft"
 - Or: Link to quick reference table
@@ -262,7 +262,7 @@ Current flow:
 
 **Field Scenario**: Tech takes 5 photos of different materials (subfloor, insulation, drywall). After all photos are taken, they have to go back and change dropdowns for 4 of them. Feels like busywork.
 
-**Suggestion**: Prompt material type **before** taking photo:
+**Suggestion**: Prompt material type **before** taking photo: GOOD WITH IT
 - Show material buttons: [Drywall] [Subfloor] [Insulation] [Other]
 - Tech taps material → Camera opens → Photo auto-tagged
 
@@ -270,12 +270,12 @@ This removes **post-capture editing** and aligns with natural workflow.
 
 ---
 
-**QUESTION 12**: **Notes Field - Too Small, Too Easy to Skip**
+**QUESTION 12**: **Notes Field - Too Small, Too Easy to Skip** 
 The notes field is optional and appears below the photo. It's easy to miss.
 
 **Field Scenario**: Tech finds significant mold behind drywall. Takes photo. Forgets to add note. Later, MIT Lead reviews photos and doesn't know the context.
 
-**Suggestion**: Change notes field behavior:
+**Suggestion**: Change notes field behavior: add it! both preset options and free text 
 - After photo upload, show prompt: "Add quick note? (Optional)"
 - Preset options: [Mold Present] [Wet Insulation] [Structural Damage] [No Issues]
 - Or free-text field
@@ -290,7 +290,7 @@ The requirement is 1+ photo, but most demo jobs expose multiple areas (walls, su
 
 **Field Scenario**: Tech takes 1 photo of subfloor, satisfies requirement, moves on. Misses documentation of wet insulation and mold in wall cavity. Adjuster questions later.
 
-**Suggestion**: Change guidance to:
+**Suggestion**: Change guidance to: yes
 - "Minimum 1 photo required - **Capture each type of damage found**"
 - Add checklist prompt:
   - ☐ Wall cavities (if opened)
@@ -327,13 +327,13 @@ The instruction says "Photo must show temp, RH, and GPP" but doesn't explain whe
 - Radio buttons: [Outside] [Reference Room (Unaffected)] [Affected Room]
 - This adds context to the photo
 
-Or: Split into 2 photos:
+Or: Split into 2 photos: Yes, we need both
 - Reference Room Hygrometer Photo (required)
 - Outside Hygrometer Photo (optional if conditions are extreme)
 
 ---
 
-**QUESTION 15**: **Manual Data Entry vs. Photo - Redundant?**
+**QUESTION 15**: **Manual Data Entry vs. Photo - Redundant?** ignore
 The tech has to:
 1. Take photo of hygrometer showing temp/RH
 2. Manually type temp into "Outside Temp" field
@@ -350,7 +350,7 @@ This reminds the tech to be consistent between photo and typed values.
 
 ---
 
-**QUESTION 16**: **IICRC Standard Box - Helpful or Just Noise?**
+**QUESTION 16**: **IICRC Standard Box - Helpful or Just Noise?** just noise, remove
 There's a gray box showing "IICRC S500 Standard: 70-75°F, 30-60% RH."
 
 **Question**: Do techs actually reference this, or do they already know it?
@@ -372,7 +372,7 @@ There's a gray box showing "IICRC S500 Standard: 70-75°F, 30-60% RH."
 
 #### 🔍 Friction Points Observed
 
-**QUESTION 17**: **Same Material, Multiple Visits - Photo Fatigue**
+**QUESTION 17**: **Same Material, Multiple Visits - Photo Fatigue** leave this out for now
 A material might be tracked for 5 visits. Each visit requires a photo of the same baseboard in the same location.
 
 **Field Scenario**: Visit #4. Tech thinks "I already have 3 photos of this baseboard. Do I really need a 4th?" Takes a lazy photo just to satisfy requirement.
@@ -380,14 +380,14 @@ A material might be tracked for 5 visits. Each visit requires a photo of the sam
 **Consideration**: Is photo fatigue reducing photo quality over time?
 
 **Suggestion**: Add context to photo requirement:
-- "Photo shows drying progress over time—adjusters need to see the trend."
+- "Photo shows drying progress over time—adjusters need to see the trend.
 - Or: Show thumbnail of previous photo as reference ("Try to match this angle")
 
 This reminds the tech **why** the photo matters, reducing resentment.
 
 ---
 
-**QUESTION 18**: **Tracked Materials List - Can They Find What They Need?**
+**QUESTION 18**: **Tracked Materials List - Can They Find What They Need?** ignore for now
 If a job has 20+ materials being tracked, the list could get long.
 
 **Field Scenario**: Tech is looking for "Master Bedroom - Baseboard (North Wall)" but it's buried in a list with similar entries.
@@ -431,11 +431,11 @@ The instructions mention "If pulling equipment while materials still wet, create
 - If all Yes → "Create DRW"
 - If any No → "Do not pull equipment—continue drying"
 
-This turns a vague concept into **actionable guidance**.
+This turns a vague concept into **actionable guidance**. Love it, lets make it
 
 ---
 
-**QUESTION 20**: **Final Photo - Same Spot as Initial Photo?**
+**QUESTION 20**: **Final Photo - Same Spot as Initial Photo?** ignore for now
 The instructions say "Take final readings at the exact same locations as initial readings" but the app doesn't help the tech remember where the initial photo was taken.
 
 **Field Scenario**: Visit #1, tech tested baseboard at the left corner. Visit #5 (pull), tech tests baseboard at the right corner. Data is inconsistent.
@@ -453,7 +453,7 @@ The overall status box shows green if all materials are dry, red if any are wet.
 
 **Field Scenario**: Tech has 10 materials. 9 are dry, 1 is still wet. The status box says "NOT ALL MATERIALS DRY" but doesn't highlight which one.
 
-**Suggestion**: Add per-material status icons:
+**Suggestion**: Add per-material status icons: leave off for now. Can we create categories of wet/dry where the materials are nested under the category. When you open a room wet materials are at the top and open and the dry materials are at the bottom and closed but you can open them if needed
 - ✅ Green checkmark next to dry materials
 - ⚠️ Yellow warning next to damp materials (close to dry)
 - ❌ Red X next to wet materials (>2% from dry standard)
@@ -476,7 +476,7 @@ This gives the tech a **visual scan** of what still needs attention.
 
 **Question**: Is this pattern optimized for rapid-fire photo capture?
 
-**Suggestion**: Create a **unified photo capture component** with:
+**Suggestion**: Create a **unified photo capture component** with: We need to do this.
 - Consistent loading states
 - Consistent success/failure feedback
 - Consistent retry logic
@@ -495,7 +495,7 @@ This ensures a **predictable** experience across all workflows.
 
 **Friction**: Browser alerts are jarring and block the entire UI.
 
-**Suggestion**: Replace `alert()` with in-app toasts or banners:
+**Suggestion**: Replace `alert()` with in-app toasts or banners: DO THIS!
 - Top banner: "⚠️ 4 photos required before proceeding"
 - Bottom toast: "❌ Upload failed - [Retry]"
 
@@ -507,7 +507,7 @@ This feels more **native** and less disruptive.
 
 **Observation**: Instructions say "photo must show X and Y" but don't show examples.
 
-**Suggestion**: Add a "Photo Tips" modal accessible from every photo upload screen:
+**Suggestion**: Add a "Photo Tips" modal accessible from every photo upload screen: Dont need example photos, can have quick tips
 - Example good photo (meter + material visible, good lighting)
 - Example bad photo (blurry, meter not readable)
 - Quick tips: "Use flash in dark areas" "Hold meter steady" "Get close to meter display"
@@ -524,7 +524,7 @@ This **educates** techs without adding mandatory steps.
 
 **Current Implementation**: The app uses a photo queue system, but is it visible to the tech?
 
-**Suggestion**: Add persistent offline indicator:
+**Suggestion**: Add persistent offline indicator: Did we fix this with the circle we talked about earlier
 - Top bar: "📶 Offline - 3 photos queued for upload"
 - When online: "✅ 3 photos uploaded successfully"
 
@@ -550,7 +550,7 @@ This gives the tech **confidence** that offline work isn't lost.
 
 **Impact**: Inconsistent button labeling creates friction. Techs have to remember "which photo am I taking?"
 
-**Suggestion**: Align Phase 1-3 buttons with existing pattern:
+**Suggestion**: Align Phase 1-3 buttons with existing pattern: FIX IT
 - "Take Overall Photo" → "Take Photo of [Room Name] Overview"
 - "Take Final Photo (Required)" → "Take Photo of Final Reading"
 - "Take Photo (Required)" → "Take Photo of Moisture Meter Reading"
@@ -571,9 +571,9 @@ This creates **pattern consistency** across the entire app.
 
 **Field Scenario**: Tech takes 4 room photos with their personal camera while walking the property, then opens the app. They have to retake all 4 photos because the app won't accept uploads.
 
-**Suggestion**: Clarify intent:
+**Suggestion**: Clarify intent: 
 - If real-time only: Keep current implementation
-- If flexibility needed: Add "Upload Photo" option alongside "Take Photo"
+- If flexibility needed: Add "Upload Photo" option alongside "Take Photo" DO THIS, BOTH OPTIONS FOR EVERY PHOTO TAKEN
 
 ---
 
@@ -607,7 +607,7 @@ Before pulling equipment:
 
 **Impact**: Checklist format is more **scannable** and feels like actionable steps vs. rules.
 
-**Suggestion**: Apply checklist pattern to instruction boxes where appropriate.
+**Suggestion**: Apply checklist pattern to instruction boxes where appropriate. HAVE IT ALL JUST BE BULLET POINT REMINDERS
 
 ---
 
