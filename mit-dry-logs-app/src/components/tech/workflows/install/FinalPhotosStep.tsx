@@ -85,72 +85,117 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
   const allRoomsComplete = getCompletedRooms() === roomPhotos.length;
 
   return (
-    <div className="space-y-6">
-      {/* Overall Progress */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <p className="text-sm font-medium text-blue-900">
-              📸 Final Photos - Room by Room
-            </p>
-            <p className="text-xs text-blue-700 mt-1">
-              Document equipment placement in each room (minimum 2 photos per room)
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-blue-900">{getTotalPhotos()}</p>
-            <p className="text-xs text-blue-700">Total Photos</p>
-          </div>
+    <div className="space-y-4">
+      {/* Instructions Header */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <p className="text-sm font-medium text-blue-900">
+          📸 Final Photos - Document equipment in each room (minimum 2 photos per room)
+        </p>
+      </div>
+
+      {/* Overall Progress Stats */}
+      <div className="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-lg">
+        <div>
+          <p className="text-sm text-gray-600">Progress</p>
+          <p className="text-lg font-bold text-gray-900">
+            {getCompletedRooms()}/{roomPhotos.length} rooms
+          </p>
         </div>
-        <div className="mt-3">
-          <div className="flex items-center justify-between text-sm mb-1">
-            <span className="text-blue-800">Room Progress</span>
-            <span className="font-bold text-blue-900">
-              {getCompletedRooms()}/{roomPhotos.length} rooms complete
-            </span>
-          </div>
-          <div className="w-full bg-blue-200 rounded-full h-2">
+        <div className="flex-1 mx-6">
+          <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-green-500 h-2 rounded-full transition-all duration-300"
               style={{ width: `${(getCompletedRooms() / roomPhotos.length) * 100}%` }}
             />
           </div>
         </div>
+        <div>
+          <p className="text-sm text-gray-600">Total Photos</p>
+          <p className="text-lg font-bold text-gray-900">{getTotalPhotos()}</p>
+        </div>
       </div>
 
-      {/* Room Navigation */}
-      <div className="bg-white border-2 border-gray-300 rounded-lg p-4">
-        <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="secondary"
-            onClick={handlePreviousRoom}
-            disabled={currentRoomIndex === 0}
-            className="flex items-center gap-2"
-          >
-            <ChevronRight className="w-4 h-4 transform rotate-180" />
-            Previous
-          </Button>
+      {/* Room List Overview - AT TOP */}
+      <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <h4 className="font-semibold text-gray-900 mb-3">All Rooms</h4>
+        <div className="space-y-2">
+          {roomPhotos.map((rp, index) => (
+            <div
+              key={rp.roomId}
+              className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                index === currentRoomIndex
+                  ? 'border-orange-500 bg-orange-50 shadow-sm'
+                  : rp.photos.length >= 2
+                  ? 'border-green-300 bg-green-50 hover:border-green-400'
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+              }`}
+              onClick={() => setCurrentRoomIndex(index)}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                  rp.photos.length >= 2
+                    ? 'bg-green-500 text-white'
+                    : index === currentRoomIndex
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-200 text-gray-600'
+                }`}>
+                  {rp.photos.length >= 2 ? '✓' : index + 1}
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">{rp.roomName}</p>
+                  <p className="text-xs text-gray-600">
+                    {rp.photos.length >= 2 ? (
+                      <span className="text-green-700 font-medium">{rp.photos.length} photos ✓</span>
+                    ) : (
+                      <span>{rp.photos.length}/2 photos</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              {index === currentRoomIndex && (
+                <span className="text-xs font-bold text-orange-600 px-2 py-1 bg-orange-100 rounded">
+                  CURRENT
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
 
-          <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-900">{currentRoom.roomName}</h3>
-            <p className="text-xs text-gray-600">
+      {/* Current Room Photo Capture */}
+      <div className="bg-white border-2 border-orange-500 rounded-lg p-4 shadow-sm">
+        {/* Current Room Header */}
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">{currentRoom.roomName}</h3>
+            <p className="text-xs text-gray-600 mt-0.5">
               Room {currentRoomIndex + 1} of {roomPhotos.length}
             </p>
           </div>
-
-          <Button
-            variant="secondary"
-            onClick={handleNextRoom}
-            disabled={currentRoomIndex === roomPhotos.length - 1}
-            className="flex items-center gap-2"
-          >
-            Next
-            <ChevronRight className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              onClick={handlePreviousRoom}
+              disabled={currentRoomIndex === 0}
+              className="flex items-center gap-1 px-3 py-1.5"
+            >
+              <ChevronRight className="w-4 h-4 transform rotate-180" />
+              Prev
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleNextRoom}
+              disabled={currentRoomIndex === roomPhotos.length - 1}
+              className="flex items-center gap-1 px-3 py-1.5"
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
-        {/* Room Status */}
-        <div className={`p-3 rounded-lg border-2 mb-4 ${
+        {/* Room Status Badge */}
+        <div className={`p-3 rounded-lg border mb-4 ${
           isCurrentRoomComplete
             ? 'bg-green-50 border-green-300'
             : 'bg-yellow-50 border-yellow-300'
@@ -167,7 +212,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
               <>
                 <span className="text-lg">📸</span>
                 <span className="text-sm font-medium text-yellow-900">
-                  {currentRoom.photos.length} of 2 photos captured - {2 - currentRoom.photos.length} more needed
+                  {currentRoom.photos.length}/2 photos - {2 - currentRoom.photos.length} more needed
                 </span>
               </>
             )}
@@ -217,47 +262,6 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
             </div>
           </div>
         )}
-      </div>
-
-      {/* Room List Overview */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-900 mb-3">All Rooms</h4>
-        <div className="space-y-2">
-          {roomPhotos.map((rp, index) => (
-            <div
-              key={rp.roomId}
-              className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                index === currentRoomIndex
-                  ? 'border-orange-500 bg-orange-50'
-                  : rp.photos.length >= 2
-                  ? 'border-green-200 bg-green-50 hover:border-green-300'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
-              }`}
-              onClick={() => setCurrentRoomIndex(index)}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                  rp.photos.length >= 2
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-600'
-                }`}>
-                  {rp.photos.length >= 2 ? '✓' : index + 1}
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">{rp.roomName}</p>
-                  <p className="text-xs text-gray-600">
-                    {rp.photos.length} photo{rp.photos.length !== 1 ? 's' : ''} captured
-                  </p>
-                </div>
-              </div>
-              {index === currentRoomIndex && (
-                <span className="text-xs font-medium text-orange-600 px-2 py-1 bg-orange-100 rounded">
-                  Current
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Completion Status */}
