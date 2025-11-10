@@ -247,6 +247,51 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             Add Moisture Reading
           </h3>
 
+          {/* Photo Upload - PHASE 1: FIRST and REQUIRED */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Camera className="w-4 h-4 inline mr-1" />
+              Photo (Required) *
+            </label>
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+              <p className="text-xs text-orange-900">
+                <strong>Take photo first!</strong> Frame shot to show moisture meter display AND material surface clearly.
+              </p>
+            </div>
+            {photo ? (
+              <div>
+                <img src={photo} alt="Moisture Meter" className="max-h-48 rounded mb-3" />
+                <div className="flex items-center gap-2 mb-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-sm text-green-600 font-medium">Photo queued</span>
+                </div>
+                <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 justify-center px-4 py-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                  <Camera className="w-4 h-4" />
+                  Replace Photo
+                </label>
+              </div>
+            ) : (
+              <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 w-full justify-center py-6 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+                <Camera className="w-5 h-5" />
+                Take Photo
+              </label>
+            )}
+          </div>
+
           {/* Material Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -265,23 +310,6 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             </select>
             <p className="text-xs text-gray-600 mt-1">
               Only construction materials are shown (no appliances or fixtures)
-            </p>
-          </div>
-
-          {/* Location */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <MapPin className="w-4 h-4 inline mr-1" />
-              Specific Location *
-            </label>
-            <Input
-              placeholder="e.g., North wall, 2ft height, grid A3"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="text-base"
-            />
-            <p className="text-xs text-gray-600 mt-1">
-              Be specific so you can return to the same spot for check services
             </p>
           </div>
 
@@ -327,49 +355,21 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             </div>
           </div>
 
-          {/* Photo Upload - PHASE 1: Now REQUIRED */}
+          {/* Location - Now Optional */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Camera className="w-4 h-4 inline mr-1" />
-              Photo (Required) *
+              <MapPin className="w-4 h-4 inline mr-1" />
+              Location Note (Optional)
             </label>
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
-              <p className="text-xs text-orange-900">
-                <strong>REQUIRED:</strong> Photo must clearly show both the moisture meter display AND the material being tested
-              </p>
-            </div>
-            {photo ? (
-              <div>
-                <img src={photo} alt="Moisture Meter" className="max-h-48 rounded mb-3" />
-                <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <span className="text-sm text-green-600 font-medium">Photo queued</span>
-                </div>
-                <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 justify-center px-4 py-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                  />
-                  <Camera className="w-4 h-4" />
-                  Replace Photo
-                </label>
-              </div>
-            ) : (
-              <label className="btn-secondary cursor-pointer inline-flex items-center gap-2 w-full justify-center py-6 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg">
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-                <Camera className="w-5 h-5" />
-                Take Photo
-              </label>
-            )}
+            <Input
+              placeholder="e.g., North wall, 2ft height, grid A3"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="text-base"
+            />
+            <p className="text-xs text-gray-600 mt-1">
+              Optional note to help find this spot on future visits
+            </p>
           </div>
 
           {/* Notes */}
