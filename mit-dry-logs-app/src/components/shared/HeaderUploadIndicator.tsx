@@ -25,11 +25,12 @@ export const HeaderUploadIndicator: React.FC = () => {
 
   // Detect completed uploads and increment cumulative counter
   useEffect(() => {
-    const batchProgressValues = Object.values(batchProgress);
+    // Use Object.entries to get both id and progress object
+    const batchEntries = Object.entries(batchProgress);
 
     // Detect NEW batch photo completions
-    const newBatchCompletions = batchProgressValues.filter(p => {
-      const prevProgress = prevBatchProgress.current[p.id || ''];
+    const newBatchCompletions = batchEntries.filter(([id, p]) => {
+      const prevProgress = prevBatchProgress.current[id];
       return p.status === 'completed' && (!prevProgress || prevProgress.status !== 'completed');
     }).length;
 
@@ -45,11 +46,8 @@ export const HeaderUploadIndicator: React.FC = () => {
       setHasHadUploads(true);
     }
 
-    // Update refs for next comparison
-    prevBatchProgress.current = batchProgressValues.reduce((acc, p) => {
-      if (p.id) acc[p.id] = p;
-      return acc;
-    }, {} as Record<string, any>);
+    // Update refs for next comparison - store as Record<id, progress>
+    prevBatchProgress.current = Object.fromEntries(batchEntries);
     prevUniversalQueue.current = [...universalQueue];
   }, [batchProgress, universalQueue]);
 
