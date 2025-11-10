@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Camera, Image as ImageIcon, CheckCircle, X } from 'lucide-react';
 import { useUploadQueue } from '../../contexts/UploadQueueContext';
 import { photoService } from '../../services/firebase/photoService';
+import { PhotoStep } from '../../types';
 
 interface UniversalPhotoCaptureProps {
   jobId: string;
@@ -55,7 +56,7 @@ export const UniversalPhotoCapture: React.FC<UniversalPhotoCaptureProps> = ({
         // Simulate progress (photoService doesn't provide progress callback currently)
         updateProgress(uploadId, 30);
 
-        const url = await photoService.uploadPhoto(file, jobId, location, category, userId);
+        const url = await photoService.uploadPhoto(file, jobId, location, category as PhotoStep, userId);
 
         if (url) {
           updateProgress(uploadId, 100);
