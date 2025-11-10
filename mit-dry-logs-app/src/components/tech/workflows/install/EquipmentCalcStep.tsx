@@ -51,6 +51,7 @@ interface PlacedEquipment {
   type: 'dehumidifier' | 'air-mover' | 'air-scrubber';
   serialNumber: string;
   assignedChamberId: string;
+  assignedRoomId?: string;
   placedAt: Date;
   status: 'in-service';
 }
@@ -81,6 +82,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     chamberId: string;
   } | null>(null);
   const [manualSerialInput, setManualSerialInput] = useState('');
+  const [selectedRoomId, setSelectedRoomId] = useState<string>('');
 
   const lastSavedCalculationsRef = useRef<string | null>(null);
   const prevPlacedEquipmentRef = useRef<string>(JSON.stringify(installData.placedEquipment || []));
@@ -240,16 +242,29 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     setScanningFor({ type, chamberId });
     setShowScanModal(true);
     setManualSerialInput('');
+    // Pre-select first room in chamber if available
+    const chamber = chambers.find(c => c.chamberId === chamberId);
+    if (chamber && chamber.assignedRooms.length > 0) {
+      setSelectedRoomId(chamber.assignedRooms[0]);
+    } else {
+      setSelectedRoomId('');
+    }
   };
 
   const handleScan = (serialNumber: string) => {
     if (!scanningFor) return;
+
+    if (!selectedRoomId) {
+      alert('Please select a room for this equipment');
+      return;
+    }
 
     const newEquipment: PlacedEquipment = {
       id: `equipment-${Date.now()}`,
       type: scanningFor.type,
       serialNumber: serialNumber.trim(),
       assignedChamberId: scanningFor.chamberId,
+      assignedRoomId: selectedRoomId,
       placedAt: new Date(),
       status: 'in-service',
     };
@@ -258,6 +273,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     setShowScanModal(false);
     setScanningFor(null);
     setManualSerialInput('');
+    setSelectedRoomId('');
   };
 
   const handleManualAdd = () => {
@@ -607,27 +623,35 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                     Placed ({chamberEquipment.length})
                   </p>
                   <div className="space-y-2">
-                    {chamberEquipment.map(equipment => (
-                      <div
-                        key={equipment.id}
-                        className="flex items-center justify-between p-3 border rounded-lg bg-white"
-                      >
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-900 text-sm">
-                            {typeLabels[equipment.type]}
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            S/N: {equipment.serialNumber}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => removeEquipment(equipment.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    {chamberEquipment.map(equipment => {
+                      const equipmentRoom = rooms.find(r => r.id === equipment.assignedRoomId);
+                      return (
+                        <div
+                          key={equipment.id}
+                          className="flex items-center justify-between p-3 border rounded-lg bg-white"
                         >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 text-sm">
+                              {typeLabels[equipment.type]}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              S/N: {equipment.serialNumber}
+                            </div>
+                            {equipmentRoom && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                📍 {equipmentRoom.name}
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => removeEquipment(equipment.id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -664,14 +688,6 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex justify-between pt-4">
-        <div></div>
-        <Button variant="primary" onClick={onNext}>
-          Continue to Demo
-        </Button>
-      </div>
-
       {/* Scan/Manual Entry Modal */}
       {showScanModal && scanningFor && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -697,6 +713,35 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
             {/* Manual Entry */}
             <div className="space-y-4">
+              {/* Room Selection */}
+              {scanningFor && (() => {
+                const chamber = chambers.find(c => c.chamberId === scanningFor.chamberId);
+                const chamberRooms = chamber ? rooms.filter(r => chamber.assignedRooms.includes(r.id)) : [];
+
+                return (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Room Location *
+                    </label>
+                    <select
+                      value={selectedRoomId}
+                      onChange={(e) => setSelectedRoomId(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                    >
+                      <option value="">Select room...</option>
+                      {chamberRooms.map(room => (
+                        <option key={room.id} value={room.id}>
+                          {room.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Which room is this equipment placed in?
+                    </p>
+                  </div>
+                );
+              })()}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Serial Number *
@@ -706,7 +751,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                   value={manualSerialInput}
                   onChange={(e) => setManualSerialInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && selectedRoomId) {
                       handleManualAdd();
                     }
                   }}
@@ -727,7 +772,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 <Button
                   variant="primary"
                   onClick={handleManualAdd}
-                  disabled={!manualSerialInput.trim()}
+                  disabled={!manualSerialInput.trim() || !selectedRoomId}
                   className="flex-1"
                 >
                   <CheckCircle className="w-4 h-4" />

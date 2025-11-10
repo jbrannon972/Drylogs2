@@ -180,45 +180,27 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
     }, 0);
   };
 
-  const handleNext = () => {
-    // Validate: all rooms must be assigned to a chamber
-    const assignedRoomIds = new Set(chambers.flatMap(c => c.assignedRooms));
-    const allRoomIds = rooms.map(r => r.id);
-    const unassignedRooms = allRoomIds.filter(id => !assignedRoomIds.has(id));
+  // Auto-save chambers and calculate overall damage class when data changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Calculate overall damage class
+      const roomsWithClass = (installData.rooms || []).filter((r: any) => r.damageClass);
+      const overallClass = roomsWithClass.length > 0
+        ? Math.max(...roomsWithClass.map((r: any) => r.damageClass || 1))
+        : 1;
 
-    if (unassignedRooms.length > 0) {
-      alert(`Please assign all rooms to chambers. ${unassignedRooms.length} room(s) are not assigned.`);
-      return;
-    }
+      // Save chambers and overall damage class to workflow store
+      updateWorkflowData('install', {
+        chambers: chambers.map(c => ({
+          ...c,
+          assignedRooms: c.assignedRooms,
+        })),
+        overallDamageClass: overallClass,
+      });
+    }, 500);
 
-    // Validate: chambers with containment must have photos
-    const chambersWithContainmentNoPhotos = chambers.filter(c =>
-      c.containmentBarrier &&
-      (!c.containmentBarrier.photos || c.containmentBarrier.photos.length === 0)
-    );
-
-    if (chambersWithContainmentNoPhotos.length > 0) {
-      alert(`Containment photos are required! Please add photos for chamber(s): ${chambersWithContainmentNoPhotos.map(c => c.chamberName).join(', ')}`);
-      return;
-    }
-
-    // Calculate overall damage class
-    const roomsWithClass = (installData.rooms || []).filter((r: any) => r.damageClass);
-    const overallClass = roomsWithClass.length > 0
-      ? Math.max(...roomsWithClass.map((r: any) => r.damageClass || 1))
-      : 1;
-
-    // Save chambers and overall damage class to workflow store
-    updateWorkflowData('install', {
-      chambers: chambers.map(c => ({
-        ...c,
-        assignedRooms: c.assignedRooms,
-      })),
-      overallDamageClass: overallClass,
-    });
-
-    onNext();
-  };
+    return () => clearTimeout(timeoutId);
+  }, [chambers, installData.rooms, updateWorkflowData]);
 
   // Get unassigned rooms
   const getUnassignedRooms = (): RoomData[] => {
@@ -689,18 +671,6 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
             )}
           </div>
         </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex justify-between pt-4">
-        <div></div>
-        <Button
-          variant="primary"
-          onClick={handleNext}
-          disabled={unassignedRooms.length > 0}
-        >
-          Continue to Equipment Calculations
-        </Button>
       </div>
 
       {/* Delete Confirmation Modal */}

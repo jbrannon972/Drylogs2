@@ -540,13 +540,34 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
         <div className="min-h-screen bg-white flex flex-col">
           {/* Header */}
           <div className="border-b border-gray-300 bg-gray-50 p-4">
-            <button
-              onClick={returnToList}
-              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-3"
-            >
-              <ChevronRight className="w-5 h-5 transform rotate-180" />
-              <span>Back to Rooms</span>
-            </button>
+            <div className="flex items-center justify-between mb-3">
+              <button
+                onClick={returnToList}
+                className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+              >
+                <ChevronRight className="w-5 h-5 transform rotate-180" />
+                <span>Back to Rooms</span>
+              </button>
+
+              {/* Save & Mark Complete Button - Moved to Header */}
+              <Button
+                variant="primary"
+                onClick={markCompleteAndReturn}
+                className="flex items-center gap-2"
+              >
+                {selectedRoom.isComplete ? (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    Return to Room List
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    Save & Mark Complete
+                  </>
+                )}
+              </Button>
+            </div>
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">{selectedRoom.name}</h2>
@@ -1778,34 +1799,6 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
             </div>
           </div>
 
-          {/* Bottom Button */}
-          <div className="border-t border-gray-300 bg-white p-4 sticky bottom-0">
-            <div className="space-y-2">
-              <Button
-                variant="primary"
-                onClick={markCompleteAndReturn}
-                className="w-full"
-              >
-                {selectedRoom.isComplete ? (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Return to Room List
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Save & Mark Room Complete
-                  </>
-                )}
-                <ChevronRight className="w-5 h-5" />
-              </Button>
-              <p className="text-xs text-gray-600 text-center">
-                {selectedRoom.isComplete ?
-                  'This room is complete. Click to return to room list.' :
-                  'Validates all required data and saves this room. You can then add more rooms.'}
-              </p>
-            </div>
-          </div>
         </div>
       )}
 
