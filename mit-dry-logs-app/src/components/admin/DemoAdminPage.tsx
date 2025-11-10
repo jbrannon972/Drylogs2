@@ -93,31 +93,191 @@ export const DemoAdminPage: React.FC = () => {
       const text = event.target?.result as string;
       const parsed = parseCSV(text);
       setCSVData(parsed);
-      setStatus(`✅ Loaded ${parsed.length} jobs from CSV - ready to seed`);
+
+      // Log first job for debugging
+      if (parsed.length > 0) {
+        console.log('📊 Sample CSV Job (first entry):', parsed[0]);
+        console.log('✅ Customer Name:', parsed[0].clientName || 'NOT FOUND');
+        console.log('✅ Phone:', parsed[0].phone || 'NOT FOUND');
+        console.log('✅ Address:', parsed[0].address || 'NOT FOUND');
+      }
+
+      setStatus(`✅ Loaded ${parsed.length} jobs from CSV - ready to seed. Check console for sample data.`);
     };
     reader.readAsText(file);
   };
 
+  // Helper function to properly parse CSV line with quoted fields
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+
+      if (char === '"') {
+        // Handle escaped quotes ("")
+        if (inQuotes && line[i + 1] === '"') {
+          current += '"';
+          i++; // Skip next quote
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        result.push(current);
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+
+    result.push(current);
+    return result;
+  };
+
   const parseCSV = (csvText: string): CSVJob[] => {
-    const lines = csvText.split('\n');
-    const headers = lines[0].split(',');
+    const lines = csvText.split('\n').filter(line => line.trim());
+    if (lines.length === 0) return [];
+
+    const headers = parseCSVLine(lines[0]);
     const csvJobs: CSVJob[] = [];
+
+    // Create a mapping from various possible header names to expected property names
+    const headerMapping: { [key: string]: keyof CSVJob } = {
+      // Client Name variations
+      'clientname': 'clientName',
+      'client': 'clientName',
+      'customername': 'clientName',
+      'customer': 'clientName',
+      'name': 'clientName',
+
+      // Address variations
+      'address': 'address',
+      'streetaddress': 'address',
+      'street': 'address',
+
+      // Phone variations
+      'phone': 'phone',
+      'phonenumber': 'phone',
+      'telephone': 'phone',
+      'tel': 'phone',
+      'contact': 'phone',
+
+      // Email variations
+      'email': 'email',
+      'emailaddress': 'email',
+
+      // Referral Source
+      'referralsource': 'referralSource',
+      'source': 'referralSource',
+      'leadsource': 'referralSource',
+
+      // Referral Individual
+      'referralindividual': 'referralIndividual',
+      'referredby': 'referralIndividual',
+      'referral': 'referralIndividual',
+
+      // Account Manager
+      'accountmanager': 'accountManager',
+      'am': 'accountManager',
+      'manager': 'accountManager',
+
+      // Damage Consultant
+      'damageconsultant': 'damageConsultant',
+      'consultant': 'damageConsultant',
+      'adjuster': 'damageConsultant',
+
+      // Zone
+      'zone': 'zone',
+      'servicezone': 'zone',
+
+      // Category of Water
+      'categoryofwater': 'categoryOfWater',
+      'watercategory': 'categoryOfWater',
+      'category': 'categoryOfWater',
+
+      // Rooms Affected
+      'roomsaffected': 'roomsAffected',
+      'rooms': 'roomsAffected',
+      'affectedrooms': 'roomsAffected',
+
+      // Cause of Loss
+      'causeofloss': 'causeOfLoss',
+      'cause': 'causeOfLoss',
+      'losstype': 'causeOfLoss',
+
+      // Cause of Loss Status
+      'causeoflossstatus': 'causeOfLossStatus',
+      'lossstatus': 'causeOfLossStatus',
+
+      // Demo Needed
+      'isdemoneeded': 'isDemoNeeded',
+      'demoneeded': 'isDemoNeeded',
+      'demo': 'isDemoNeeded',
+
+      // Mold Test Needed
+      'ismoldtestneeded': 'isMoldTestNeeded',
+      'moldtest': 'isMoldTestNeeded',
+      'moldtestneeded': 'isMoldTestNeeded',
+
+      // Claim Number
+      'claimnumber': 'claimNumber',
+      'claim': 'claimNumber',
+
+      // Carrier Name
+      'carriername': 'carrierName',
+      'carrier': 'carrierName',
+      'insurance': 'carrierName',
+      'insurancecompany': 'carrierName',
+
+      // Deductible
+      'deductible': 'deductible',
+
+      // Contracted Amount
+      'contractedamounttotal': 'contractedAmountTotal',
+      'contractamount': 'contractedAmountTotal',
+      'total': 'contractedAmountTotal',
+      'estimatedvalue': 'contractedAmountTotal',
+
+      // Claim Filed
+      'claimfiled': 'claimFiled',
+      'filed': 'claimFiled',
+
+      // Specific Promises
+      'specificpromises': 'specificPromises',
+      'promises': 'specificPromises',
+      'notes': 'specificPromises',
+
+      // Detailed FUP
+      'detailedfup': 'detailedFUP',
+      'fup': 'detailedFUP',
+      'followup': 'detailedFUP',
+      'detailedfollowup': 'detailedFUP',
+    };
 
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i];
       if (!line.trim()) continue;
 
-      const values = line.split(',');
+      const values = parseCSVLine(line);
       const job: any = {};
 
       headers.forEach((header, index) => {
-        const key = header
+        // Normalize the header: lowercase, remove spaces/special chars
+        const normalizedHeader = header
           .trim()
+          .toLowerCase()
           .replace(/\s+/g, '')
           .replace(/[()]/g, '')
           .replace(/\?/g, '')
           .replace(/\//g, '');
-        job[key] = values[index]?.trim() || '';
+
+        // Map to the expected property name
+        const mappedKey = headerMapping[normalizedHeader] || normalizedHeader;
+        // Remove quotes and trim the value
+        const value = (values[index] || '').trim().replace(/^["']|["']$/g, '');
+        job[mappedKey] = value;
       });
 
       csvJobs.push(job as CSVJob);
