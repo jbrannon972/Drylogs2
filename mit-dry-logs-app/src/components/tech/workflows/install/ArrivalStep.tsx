@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
-import { Camera, MapPin, Clock, CheckCircle } from 'lucide-react';
+import { Camera, MapPin, Clock, CheckCircle, Image as ImageIcon } from 'lucide-react';
 import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
@@ -160,7 +160,7 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
                 onChange={handleTruckPhotosCapture}
                 className="hidden"
               />
-              <span className="text-2xl mb-2">🖼️</span>
+              <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
               <span className="text-sm font-bold text-gray-900">Select Multiple</span>
               <span className="text-xs text-gray-500">Gallery</span>
             </label>
@@ -209,7 +209,7 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job, onNext }) => {
                 onChange={handlePropertyPhotosCapture}
                 className="hidden"
               />
-              <span className="text-2xl mb-2">🖼️</span>
+              <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
               <span className="text-sm font-bold text-gray-900">Select Multiple</span>
               <span className="text-xs text-gray-500">Gallery</span>
             </label>
