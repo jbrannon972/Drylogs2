@@ -35,18 +35,40 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
   );
   const [showSubModal, setShowSubModal] = useState(false);
 
-  // Auto-save with debounce to prevent infinite loop
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      updateWorkflowData('install', {
-        scheduledVisits: visits,
-        estimatedDryingDays: parseInt(estimatedDryingDays),
-      });
-    }, 300); // 300ms debounce
+  // ULTRAFAULT FIX: Use ref to prevent infinite loop by tracking previous values
+  const prevDataRef = useRef({
+    visits: JSON.stringify(installData.scheduledVisits || []),
+    days: installData.dryingPlan?.estimatedDays || '3'
+  });
 
-    return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visits, estimatedDryingDays]);
+  // Auto-save only when data actually changes
+  useEffect(() => {
+    const currentVisitsStr = JSON.stringify(visits);
+    const currentDays = estimatedDryingDays;
+
+    // Only update if values actually changed from what we loaded from store
+    if (
+      prevDataRef.current.visits !== currentVisitsStr ||
+      prevDataRef.current.days !== currentDays
+    ) {
+      const timeoutId = setTimeout(() => {
+        updateWorkflowData('install', {
+          scheduledVisits: visits,
+          dryingPlan: {
+            ...installData.dryingPlan,
+            estimatedDays: parseInt(estimatedDryingDays) || 3,
+          },
+        });
+        // Update ref to prevent re-triggering
+        prevDataRef.current = {
+          visits: currentVisitsStr,
+          days: currentDays
+        };
+      }, 500); // Increased debounce
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [visits, estimatedDryingDays, updateWorkflowData, installData.dryingPlan]);
 
   const handleSubcontractorRequest = async (data: SubcontractorRequestData) => {
     if (!user) return;
