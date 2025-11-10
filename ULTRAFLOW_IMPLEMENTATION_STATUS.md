@@ -55,14 +55,18 @@
 - Location optional (note field)
 - Better photo framing instructions
 
-**Current Status**: Component identified, form structure understood
+**Current Status**: Validation updated, field reordering remaining
+
+**Completed** (`70cf963`):
+- ✅ Changed location from required to optional in validation
+- ✅ Updated save button disabled state (removed location requirement)
+- ✅ Photo validation check moved to top (validates first)
 
 **Remaining Work**:
-1. Reorder form fields (photo first)
-2. Change location from required to optional
-3. Update validation logic
-4. Improve photo instructions: "Frame shot to show moisture meter display AND material surface clearly"
-5. Integrate PhotoCapture component (optional)
+1. Reorder JSX form fields (photo first in DOM order)
+2. Update location label: "Specific Location *" → "Location Note (Optional)"
+3. Improve photo instructions: "Frame shot to show moisture meter display AND material surface clearly"
+4. Optional: Integrate PhotoCapture component for consistency
 
 ---
 
@@ -197,8 +201,13 @@ New:
 
 **Total Tasks**: 14
 **Completed**: 4 (29%)
-**In Progress**: 1 (7%)
+**In Progress**: 1 (75% done - validation complete, UI reordering remaining)
 **Pending**: 9 (64%)
+
+**Lines of Code**:
+- Foundation components: ~500 LOC
+- RoomAssessment updates: ~70 LOC net reduction (simplified with PhotoCapture)
+- MoistureTab validation: 6 lines changed
 
 ---
 
