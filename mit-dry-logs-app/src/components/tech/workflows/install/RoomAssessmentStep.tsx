@@ -151,7 +151,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ULTRAFAULT FIX: Save with ref-based change detection to prevent infinite loop
+  // SIMPLE FIX: Save immediately when data changes
   const prevDataRef = useRef({
     rooms: JSON.stringify(installData.rooms || installData.roomAssessments || []),
     moistureTracking: JSON.stringify(installData.moistureTracking || [])
@@ -166,20 +166,16 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       prevDataRef.current.rooms !== currentRoomsStr ||
       prevDataRef.current.moistureTracking !== currentMoistureStr
     ) {
-      const timeoutId = setTimeout(() => {
-        // STANDARDIZED: Save to 'rooms' key (not 'roomAssessments')
-        updateWorkflowData('install', {
-          rooms: rooms,
-          moistureTracking: moistureTracking
-        });
-        // Update ref to prevent re-triggering
-        prevDataRef.current = {
-          rooms: currentRoomsStr,
-          moistureTracking: currentMoistureStr
-        };
-      }, 500); // Increased debounce
-
-      return () => clearTimeout(timeoutId);
+      // SAVE IMMEDIATELY - no debounce
+      updateWorkflowData('install', {
+        rooms: rooms,
+        moistureTracking: moistureTracking
+      });
+      // Update ref to prevent re-triggering
+      prevDataRef.current = {
+        rooms: currentRoomsStr,
+        moistureTracking: currentMoistureStr
+      };
     }
   }, [rooms, moistureTracking, updateWorkflowData]);
 
