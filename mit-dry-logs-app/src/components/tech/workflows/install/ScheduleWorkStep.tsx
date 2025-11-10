@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
 import { Calendar, Clock, AlertCircle, Info, Plus, Trash2, Wrench } from 'lucide-react';
@@ -35,11 +35,17 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
   );
   const [showSubModal, setShowSubModal] = useState(false);
 
+  // Auto-save with debounce to prevent infinite loop
   useEffect(() => {
-    updateWorkflowData('install', {
-      scheduledVisits: visits,
-      estimatedDryingDays: parseInt(estimatedDryingDays),
-    });
+    const timeoutId = setTimeout(() => {
+      updateWorkflowData('install', {
+        scheduledVisits: visits,
+        estimatedDryingDays: parseInt(estimatedDryingDays),
+      });
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visits, estimatedDryingDays]);
 
   const handleSubcontractorRequest = async (data: SubcontractorRequestData) => {
