@@ -17,11 +17,12 @@
 - Review job details
 - Click Continue
 
-**Step 2: Arrival**
-- Enter arrival time
-- Take photos of truck and property exterior
-- **NEW:** Record exterior environmental baseline (temp, RH%, meter photo)
-- Click Continue
+**Step 2: Arrival (3 tabs: Arrival | Photos | Environmental)**
+- **Arrival Tab:** Enter arrival time, travel time, complete safety checklist
+- **Photos Tab:** Take truck & property exterior photos
+- **Environmental Tab:** Record exterior baseline (temp, RH%, meter photo)
+- Checkmarks appear on completed tabs
+- Click Continue when all tabs complete
 
 **Step 3: Customer Introduction**
 - Complete checklist (intro, walkthrough, utilities)
@@ -45,7 +46,7 @@
 - For each room:
   - **Basic Info:** Enter name, dimensions, affected areas
   - **Moisture:** Add readings and photos
-  - **Materials:** Check boxes for materials to remove
+  - **Materials:** Tap material cards to select (not checkboxes - full card is tappable)
   - **Pre-existing:** Document any prior damage
   - **Photos:** Take 4+ room photos
 - Save room and repeat for all rooms
@@ -72,9 +73,11 @@
 **Step 11: Final Photos + Equipment Performance (UPDATED)**
 - **For each room:**
   - **Photos Tab:** Take 4+ photos of equipment setup
-  - **Equipment Tab:** Record dehumidifier & air mover performance
-    - Dehumidifiers: Inlet/outlet temp & RH, amperage, photo
-    - Air Movers: Running status, amperage
+  - **Equipment Tab:** Expand/collapse equipment cards (one at a time)
+    - Dehumidifiers: Inlet/outlet temp & RH, running status, photo
+    - Air Movers: Running status only
+    - Use Previous/Next buttons to navigate between equipment
+    - Checkmarks appear on completed equipment
 - Complete all rooms before continuing
 
 **Step 12: Schedule**

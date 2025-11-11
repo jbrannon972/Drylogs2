@@ -1011,19 +1011,23 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                           .map((material) => {
                             const isFlooringType = material.materialType !== 'Subfloor';
                             return (
-                              <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                                <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                  <input
-                                    type="checkbox"
-                                    checked={material.removalRequired}
-                                    onChange={(e) => updateMaterial(material.materialType, {
-                                      removalRequired: e.target.checked,
-                                      isAffected: e.target.checked
-                                    })}
-                                    className="h-4 w-4 text-orange-600"
-                                  />
+                              <div key={material.materialType} className="space-y-2">
+                                <button
+                                  onClick={() => updateMaterial(material.materialType, {
+                                    removalRequired: !material.removalRequired,
+                                    isAffected: !material.removalRequired
+                                  })}
+                                  className={`
+                                    w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                    active:scale-95 flex items-center justify-between
+                                    ${material.removalRequired
+                                      ? 'border-entrusted-orange bg-orange-100'
+                                      : 'border-gray-300 bg-white hover:border-gray-400'}
+                                  `}
+                                >
                                   <span className="font-medium text-gray-900">{material.materialType}</span>
-                                </label>
+                                  {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
+                                </button>
                                 {material.removalRequired && (
                                   <div className="ml-6 space-y-3 mt-3">
                                     <div className="grid grid-cols-2 gap-3">
@@ -1119,19 +1123,23 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         {selectedRoom.materialsAffected
                           .filter(m => ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType))
                           .map((material) => (
-                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                              <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                <input
-                                  type="checkbox"
-                                  checked={material.removalRequired}
-                                  onChange={(e) => updateMaterial(material.materialType, {
-                                    removalRequired: e.target.checked,
-                                    isAffected: e.target.checked
-                                  })}
-                                  className="h-4 w-4 text-orange-600"
-                                />
+                            <div key={material.materialType} className="space-y-2">
+                              <button
+                                onClick={() => updateMaterial(material.materialType, {
+                                  removalRequired: !material.removalRequired,
+                                  isAffected: !material.removalRequired
+                                })}
+                                className={`
+                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  active:scale-95 flex items-center justify-between
+                                  ${material.removalRequired
+                                    ? 'border-entrusted-orange bg-orange-100'
+                                    : 'border-gray-300 bg-white hover:border-gray-400'}
+                                `}
+                              >
                                 <span className="font-medium text-gray-900">{material.materialType}</span>
-                              </label>
+                                {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
+                              </button>
                               {material.removalRequired && (
                                 <div className="ml-6 space-y-3 mt-3">
                                   <div className="grid grid-cols-2 gap-3">
@@ -1206,19 +1214,23 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         {selectedRoom.materialsAffected
                           .filter(m => ['Baseboards', 'Shoe Molding', 'Crown Molding', 'Door Casing', 'Window Casing', 'Chair Rail', 'Other Trim'].includes(m.materialType))
                           .map((material) => (
-                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                              <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                <input
-                                  type="checkbox"
-                                  checked={material.removalRequired}
-                                  onChange={(e) => updateMaterial(material.materialType, {
-                                    removalRequired: e.target.checked,
-                                    isAffected: e.target.checked
-                                  })}
-                                  className="h-4 w-4 text-orange-600"
-                                />
+                            <div key={material.materialType} className="space-y-2">
+                              <button
+                                onClick={() => updateMaterial(material.materialType, {
+                                  removalRequired: !material.removalRequired,
+                                  isAffected: !material.removalRequired
+                                })}
+                                className={`
+                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  active:scale-95 flex items-center justify-between
+                                  ${material.removalRequired
+                                    ? 'border-entrusted-orange bg-orange-100'
+                                    : 'border-gray-300 bg-white hover:border-gray-400'}
+                                `}
+                              >
                                 <span className="font-medium text-gray-900">{material.materialType}</span>
-                              </label>
+                                {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
+                              </button>
                               {material.removalRequired && (
                                 <div className="ml-6 space-y-3 mt-3">
                                   <div className="grid grid-cols-2 gap-3">
@@ -1292,19 +1304,23 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         {selectedRoom.materialsAffected
                           .filter(m => ['Tile Walls', 'Backsplash', 'Tub Surround'].includes(m.materialType))
                           .map((material) => (
-                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                              <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                <input
-                                  type="checkbox"
-                                  checked={material.removalRequired}
-                                  onChange={(e) => updateMaterial(material.materialType, {
-                                    removalRequired: e.target.checked,
-                                    isAffected: e.target.checked
-                                  })}
-                                  className="h-4 w-4 text-orange-600"
-                                />
+                            <div key={material.materialType} className="space-y-2">
+                              <button
+                                onClick={() => updateMaterial(material.materialType, {
+                                  removalRequired: !material.removalRequired,
+                                  isAffected: !material.removalRequired
+                                })}
+                                className={`
+                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  active:scale-95 flex items-center justify-between
+                                  ${material.removalRequired
+                                    ? 'border-entrusted-orange bg-orange-100'
+                                    : 'border-gray-300 bg-white hover:border-gray-400'}
+                                `}
+                              >
                                 <span className="font-medium text-gray-900">{material.materialType}</span>
-                              </label>
+                                {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
+                              </button>
                               {material.removalRequired && (
                                 <div className="ml-6 space-y-3 mt-3">
                                   <div className="grid grid-cols-2 gap-3">
@@ -1377,19 +1393,23 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         {selectedRoom.materialsAffected
                           .filter(m => ['Base Cabinets', 'Upper Cabinets', 'Vanity', 'Countertops', 'Shelving'].includes(m.materialType))
                           .map((material) => (
-                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                              <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                <input
-                                  type="checkbox"
-                                  checked={material.removalRequired}
-                                  onChange={(e) => updateMaterial(material.materialType, {
-                                    removalRequired: e.target.checked,
-                                    isAffected: e.target.checked
-                                  })}
-                                  className="h-4 w-4 text-orange-600"
-                                />
+                            <div key={material.materialType} className="space-y-2">
+                              <button
+                                onClick={() => updateMaterial(material.materialType, {
+                                  removalRequired: !material.removalRequired,
+                                  isAffected: !material.removalRequired
+                                })}
+                                className={`
+                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  active:scale-95 flex items-center justify-between
+                                  ${material.removalRequired
+                                    ? 'border-entrusted-orange bg-orange-100'
+                                    : 'border-gray-300 bg-white hover:border-gray-400'}
+                                `}
+                              >
                                 <span className="font-medium text-gray-900">{material.materialType}</span>
-                              </label>
+                                {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
+                              </button>
                               {material.removalRequired && (
                                 <div className="ml-6 space-y-3 mt-3">
                                   <div className="grid grid-cols-2 gap-3">
@@ -1463,19 +1483,23 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         {selectedRoom.materialsAffected
                           .filter(m => ['Insulation - Wall', 'Insulation - Ceiling/Attic'].includes(m.materialType))
                           .map((material) => (
-                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                              <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                <input
-                                  type="checkbox"
-                                  checked={material.removalRequired}
-                                  onChange={(e) => updateMaterial(material.materialType, {
-                                    removalRequired: e.target.checked,
-                                    isAffected: e.target.checked
-                                  })}
-                                  className="h-4 w-4 text-orange-600"
-                                />
+                            <div key={material.materialType} className="space-y-2">
+                              <button
+                                onClick={() => updateMaterial(material.materialType, {
+                                  removalRequired: !material.removalRequired,
+                                  isAffected: !material.removalRequired
+                                })}
+                                className={`
+                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  active:scale-95 flex items-center justify-between
+                                  ${material.removalRequired
+                                    ? 'border-entrusted-orange bg-orange-100'
+                                    : 'border-gray-300 bg-white hover:border-gray-400'}
+                                `}
+                              >
                                 <span className="font-medium text-gray-900">{material.materialType}</span>
-                              </label>
+                                {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
+                              </button>
                               {material.removalRequired && (
                                 <div className="ml-6 space-y-3 mt-3">
                                   <div className="grid grid-cols-2 gap-3">
@@ -1548,19 +1572,23 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         {selectedRoom.materialsAffected
                           .filter(m => ['Sink/Faucet', 'Tub', 'Shower Pan', 'Dishwasher', 'Refrigerator', 'Washer', 'Dryer', 'Stove/Oven', 'Microwave', 'Water Heater', 'Disposal', 'Other Appliance', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType))
                           .map((material) => (
-                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                              <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                <input
-                                  type="checkbox"
-                                  checked={material.removalRequired}
-                                  onChange={(e) => updateMaterial(material.materialType, {
-                                    removalRequired: e.target.checked,
-                                    isAffected: e.target.checked
-                                  })}
-                                  className="h-4 w-4 text-orange-600"
-                                />
+                            <div key={material.materialType} className="space-y-2">
+                              <button
+                                onClick={() => updateMaterial(material.materialType, {
+                                  removalRequired: !material.removalRequired,
+                                  isAffected: !material.removalRequired
+                                })}
+                                className={`
+                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  active:scale-95 flex items-center justify-between
+                                  ${material.removalRequired
+                                    ? 'border-entrusted-orange bg-orange-100'
+                                    : 'border-gray-300 bg-white hover:border-gray-400'}
+                                `}
+                              >
                                 <span className="font-medium text-gray-900">{material.materialType}</span>
-                              </label>
+                                {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
+                              </button>
                               {material.removalRequired && (
                                 <div className="ml-6 space-y-3 mt-3">
                                   <div className="grid grid-cols-2 gap-3">
@@ -1629,19 +1657,23 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         {selectedRoom.materialsAffected
                           .filter(m => m.materialType === 'Other')
                           .map((material) => (
-                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                              <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                <input
-                                  type="checkbox"
-                                  checked={material.removalRequired}
-                                  onChange={(e) => updateMaterial(material.materialType, {
-                                    removalRequired: e.target.checked,
-                                    isAffected: e.target.checked
-                                  })}
-                                  className="h-4 w-4 text-orange-600"
-                                />
+                            <div key={material.materialType} className="space-y-2">
+                              <button
+                                onClick={() => updateMaterial(material.materialType, {
+                                  removalRequired: !material.removalRequired,
+                                  isAffected: !material.removalRequired
+                                })}
+                                className={`
+                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  active:scale-95 flex items-center justify-between
+                                  ${material.removalRequired
+                                    ? 'border-entrusted-orange bg-orange-100'
+                                    : 'border-gray-300 bg-white hover:border-gray-400'}
+                                `}
+                              >
                                 <span className="font-medium text-gray-900">{material.materialType}</span>
-                              </label>
+                                {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
+                              </button>
                               {material.removalRequired && (
                                 <div className="ml-6 space-y-3 mt-3">
                                   <div>

@@ -3,7 +3,7 @@ import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { useAuth } from '../../../../hooks/useAuth';
 import { Button } from '../../../shared/Button';
 import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
-import { CheckCircle, ChevronRight, Camera, AlertTriangle, Info } from 'lucide-react';
+import { CheckCircle, ChevronRight, Camera, AlertTriangle, Info, ChevronDown } from 'lucide-react';
 
 interface FinalPhotosStepProps {
   job: any;
@@ -25,7 +25,6 @@ interface DehumidifierPerformance {
   outletTemp: number | null;
   outletRH: number | null;
   isRunning: boolean;
-  amperage: number | null;
   photoUrl?: string;
 }
 
@@ -34,7 +33,6 @@ interface AirMoverPerformance {
   serialNumber: string;
   model: string;
   isRunning: boolean;
-  amperage: number | null;
 }
 
 interface RoomEquipmentPerformance {
@@ -86,7 +84,6 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
         outletTemp: null,
         outletRH: null,
         isRunning: false,
-        amperage: null,
         photoUrl: undefined,
       })) || [];
 
@@ -95,7 +92,6 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
         serialNumber: am.serialNumber,
         model: am.model,
         isRunning: false,
-        amperage: null,
       })) || [];
 
       return {
@@ -110,6 +106,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
   const [equipmentPerformance, setEquipmentPerformance] = useState<RoomEquipmentPerformance[]>(initializeEquipmentPerformance);
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'photos' | 'equipment'>('photos');
+  const [expandedEquipmentId, setExpandedEquipmentId] = useState<string | null>(null);
 
   // ULTRAFAULT: Auto-save IMMEDIATELY to Firebase (no debounce)
   const prevDataRef = useRef({
@@ -226,6 +223,51 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
     if (dehum.inletRH === null || dehum.outletRH === null) return false;
     // Warn if outlet RH is within 5% of inlet RH (not removing moisture effectively)
     return Math.abs(dehum.inletRH - dehum.outletRH) < 5;
+  };
+
+  // Check if dehumidifier is complete
+  const isDehumidifierComplete = (dehum: DehumidifierPerformance): boolean => {
+    return (
+      dehum.inletTemp !== null &&
+      dehum.inletRH !== null &&
+      dehum.outletTemp !== null &&
+      dehum.outletRH !== null &&
+      dehum.isRunning &&
+      dehum.photoUrl !== undefined
+    );
+  };
+
+  // Check if air mover is complete
+  const isAirMoverComplete = (mover: AirMoverPerformance): boolean => {
+    return mover.isRunning;
+  };
+
+  // Get all equipment for current room in order (dehumidifiers first, then air movers)
+  const getAllEquipment = () => {
+    const dehumidifiers = currentEquipment.dehumidifiers.map(d => ({ ...d, type: 'dehumidifier' as const }));
+    const airMovers = currentEquipment.airMovers.map(am => ({ ...am, type: 'airmover' as const }));
+    return [...dehumidifiers, ...airMovers];
+  };
+
+  // Navigate to previous equipment
+  const handlePreviousEquipment = () => {
+    const allEquipment = getAllEquipment();
+    const currentIndex = allEquipment.findIndex(eq => eq.equipmentId === expandedEquipmentId);
+    if (currentIndex > 0) {
+      setExpandedEquipmentId(allEquipment[currentIndex - 1].equipmentId);
+    }
+  };
+
+  // Navigate to next equipment and mark current as complete
+  const handleMarkCompleteAndNext = () => {
+    const allEquipment = getAllEquipment();
+    const currentIndex = allEquipment.findIndex(eq => eq.equipmentId === expandedEquipmentId);
+    if (currentIndex < allEquipment.length - 1) {
+      setExpandedEquipmentId(allEquipment[currentIndex + 1].equipmentId);
+    } else {
+      // Last equipment - just collapse
+      setExpandedEquipmentId(null);
+    }
   };
 
   if (rooms.length === 0) {
@@ -486,7 +528,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
         )}
 
         {activeTab === 'equipment' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Equipment Performance */}
             {currentEquipment.dehumidifiers.length === 0 && currentEquipment.airMovers.length === 0 ? (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
@@ -495,30 +537,64 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
             ) : (
               <>
                 {/* Dehumidifiers */}
-                {currentEquipment.dehumidifiers.length > 0 && (
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Dehumidifiers</h4>
-                    <div className="space-y-4">
-                      {currentEquipment.dehumidifiers.map((dehum) => (
-                        <div key={dehum.equipmentId} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
-                          <div className="flex items-center justify-between mb-3">
-                            <div>
-                              <p className="font-medium text-gray-900">{dehum.model}</p>
-                              <p className="text-xs text-gray-600">S/N: {dehum.serialNumber}</p>
-                            </div>
-                            <label className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
-                                checked={dehum.isRunning}
-                                onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { isRunning: e.target.checked })}
-                                className="h-4 w-4 text-orange-600 rounded"
-                              />
-                              <span className="text-sm font-medium text-gray-700">Running</span>
-                            </label>
-                          </div>
+                {currentEquipment.dehumidifiers.map((dehum, index) => {
+                  const isExpanded = expandedEquipmentId === dehum.equipmentId;
+                  const isComplete = isDehumidifierComplete(dehum);
+                  const hasWarning = isDehumidifierWarning(dehum);
+                  const allEquipment = getAllEquipment();
+                  const equipmentIndex = allEquipment.findIndex(eq => eq.equipmentId === dehum.equipmentId);
+                  const isFirst = equipmentIndex === 0;
+                  const isLast = equipmentIndex === allEquipment.length - 1;
 
-                          {isDehumidifierWarning(dehum) && (
-                            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-2 mb-3 flex items-start gap-2">
+                  return (
+                    <div
+                      key={dehum.equipmentId}
+                      className={`border-2 rounded-lg transition-all ${
+                        isExpanded
+                          ? 'border-blue-400 bg-blue-50'
+                          : isComplete
+                          ? 'border-green-300 bg-gray-50'
+                          : 'border-gray-300 bg-white'
+                      }`}
+                    >
+                      {/* Card Header */}
+                      <div
+                        className="p-3 cursor-pointer flex items-center justify-between"
+                        onClick={() => setExpandedEquipmentId(isExpanded ? null : dehum.equipmentId)}
+                      >
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="text-lg">
+                            {isComplete ? '✓' : isExpanded ? '▼' : '→'}
+                          </span>
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">
+                              Dehumidifier {index + 1} (S/N: {dehum.serialNumber})
+                            </p>
+                            <p className="text-xs text-gray-600">{dehum.model}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {hasWarning && !isExpanded && (
+                            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-medium">
+                              ⚠️ Warning
+                            </span>
+                          )}
+                          {isComplete && !isExpanded && (
+                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-medium">
+                              Completed
+                            </span>
+                          )}
+                          {!isComplete && !isExpanded && (
+                            <span className="text-xs text-gray-500">Tap to expand</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Card Content - Expanded */}
+                      {isExpanded && (
+                        <div className="px-3 pb-3 space-y-3">
+                          {hasWarning && (
+                            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-2 flex items-start gap-2">
                               <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
                               <p className="text-xs text-yellow-900">
                                 <strong>Warning:</strong> Inlet and outlet RH are similar. Unit may not be removing moisture effectively.
@@ -528,7 +604,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
 
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">Inlet Temp (°F)</label>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Inlet Temperature (°F)</label>
                               <input
                                 type="number"
                                 step="0.1"
@@ -552,7 +628,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
                               />
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">Outlet Temp (°F)</label>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Outlet Temperature (°F)</label>
                               <input
                                 type="number"
                                 step="0.1"
@@ -575,22 +651,23 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
                                 placeholder="45.0"
                               />
                             </div>
-                            <div className="col-span-2">
-                              <label className="block text-xs font-medium text-gray-700 mb-1">Amperage Draw</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={dehum.amperage ?? ''}
-                                onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { amperage: e.target.value ? parseFloat(e.target.value) : null })}
-                                className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                                placeholder="12.5"
-                              />
-                            </div>
                           </div>
 
-                          {/* Dehumidifier Photo */}
-                          <div className="mt-3">
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Photo of Readings (Optional)</label>
+                          <div>
+                            <label className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={dehum.isRunning}
+                                onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { isRunning: e.target.checked })}
+                                className="h-4 w-4 text-orange-600 rounded"
+                              />
+                              <span className="text-sm font-medium text-gray-700">Running</span>
+                            </label>
+                          </div>
+
+                          {/* Photo */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Photo:</label>
                             {dehum.photoUrl ? (
                               <div className="relative">
                                 <img
@@ -598,6 +675,12 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
                                   alt="Dehumidifier readings"
                                   className="w-full h-32 object-cover rounded-lg border border-gray-300"
                                 />
+                                <button
+                                  onClick={() => updateDehumidifierPerformance(dehum.equipmentId, { photoUrl: undefined })}
+                                  className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs"
+                                >
+                                  Remove
+                                </button>
                               </div>
                             ) : (
                               <Button
@@ -610,7 +693,6 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
                                   input.onchange = async (e: any) => {
                                     const file = e.target?.files?.[0];
                                     if (file && user) {
-                                      // For simplicity, we'll use a simple file reader to convert to base64
                                       const reader = new FileReader();
                                       reader.onload = (event) => {
                                         const photoUrl = event.target?.result as string;
@@ -621,31 +703,91 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
                                   };
                                   input.click();
                                 }}
-                                className="w-full text-sm"
+                                className="w-full text-sm flex items-center justify-center gap-2"
                               >
                                 <Camera className="w-4 h-4" />
-                                Take Photo of Readings
+                                Take Photo
                               </Button>
                             )}
                           </div>
+
+                          {/* Navigation Buttons */}
+                          <div className="flex gap-2 pt-2 border-t border-gray-300">
+                            {!isFirst && (
+                              <Button
+                                variant="secondary"
+                                onClick={handlePreviousEquipment}
+                                className="flex-1"
+                              >
+                                Previous
+                              </Button>
+                            )}
+                            <Button
+                              variant="primary"
+                              onClick={handleMarkCompleteAndNext}
+                              className="flex-1"
+                            >
+                              {isLast ? 'Mark Complete' : 'Mark Complete & Next'}
+                            </Button>
+                          </div>
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
-                )}
+                  );
+                })}
 
                 {/* Air Movers */}
-                {currentEquipment.airMovers.length > 0 && (
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Air Movers</h4>
-                    <div className="space-y-3">
-                      {currentEquipment.airMovers.map((mover) => (
-                        <div key={mover.equipmentId} className="border border-gray-300 rounded-lg p-3 bg-gray-50">
-                          <div className="flex items-center justify-between mb-2">
-                            <div>
-                              <p className="font-medium text-gray-900">{mover.model}</p>
-                              <p className="text-xs text-gray-600">S/N: {mover.serialNumber}</p>
-                            </div>
+                {currentEquipment.airMovers.map((mover, index) => {
+                  const isExpanded = expandedEquipmentId === mover.equipmentId;
+                  const isComplete = isAirMoverComplete(mover);
+                  const allEquipment = getAllEquipment();
+                  const equipmentIndex = allEquipment.findIndex(eq => eq.equipmentId === mover.equipmentId);
+                  const isFirst = equipmentIndex === 0;
+                  const isLast = equipmentIndex === allEquipment.length - 1;
+
+                  return (
+                    <div
+                      key={mover.equipmentId}
+                      className={`border-2 rounded-lg transition-all ${
+                        isExpanded
+                          ? 'border-blue-400 bg-blue-50'
+                          : isComplete
+                          ? 'border-green-300 bg-gray-50'
+                          : 'border-gray-300 bg-white'
+                      }`}
+                    >
+                      {/* Card Header */}
+                      <div
+                        className="p-3 cursor-pointer flex items-center justify-between"
+                        onClick={() => setExpandedEquipmentId(isExpanded ? null : mover.equipmentId)}
+                      >
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="text-lg">
+                            {isComplete ? '✓' : isExpanded ? '▼' : '→'}
+                          </span>
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">
+                              Air Mover {index + 1} (S/N: {mover.serialNumber})
+                            </p>
+                            <p className="text-xs text-gray-600">{mover.model}</p>
+                          </div>
+                        </div>
+                        <div>
+                          {isComplete && !isExpanded && (
+                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-medium">
+                              Completed
+                            </span>
+                          )}
+                          {!isComplete && !isExpanded && (
+                            <span className="text-xs text-gray-500">Tap to expand</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Card Content - Expanded */}
+                      {isExpanded && (
+                        <div className="px-3 pb-3 space-y-3">
+                          <div>
                             <label className="flex items-center gap-2">
                               <input
                                 type="checkbox"
@@ -656,22 +798,31 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
                               <span className="text-sm font-medium text-gray-700">Running</span>
                             </label>
                           </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Amperage Draw</label>
-                            <input
-                              type="number"
-                              step="0.1"
-                              value={mover.amperage ?? ''}
-                              onChange={(e) => updateAirMoverPerformance(mover.equipmentId, { amperage: e.target.value ? parseFloat(e.target.value) : null })}
-                              className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                              placeholder="2.5"
-                            />
+
+                          {/* Navigation Buttons */}
+                          <div className="flex gap-2 pt-2 border-t border-gray-300">
+                            {!isFirst && (
+                              <Button
+                                variant="secondary"
+                                onClick={handlePreviousEquipment}
+                                className="flex-1"
+                              >
+                                Previous
+                              </Button>
+                            )}
+                            <Button
+                              variant="primary"
+                              onClick={handleMarkCompleteAndNext}
+                              className="flex-1"
+                            >
+                              {isLast ? 'Mark Complete' : 'Mark Complete & Next'}
+                            </Button>
                           </div>
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
-                )}
+                  );
+                })}
               </>
             )}
           </div>
