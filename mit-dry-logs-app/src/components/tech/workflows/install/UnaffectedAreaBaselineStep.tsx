@@ -760,7 +760,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                       <UniversalPhotoCapture
                         jobId={job.jobId}
                         location={selectedRoom.id}
-                        category="baseline-overall"
+                        category="assessment"
                         userId={user.uid}
                         onPhotosUploaded={(urls) => {
                           updateSelectedRoom({
