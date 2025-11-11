@@ -28,8 +28,10 @@ interface RoomData {
 interface UnaffectedReading {
   id: string;
   roomName: string;
+  floor?: string;
   temperature: string;
   relativeHumidity: string;
+  assignedToChamber?: string; // Optional chamber assignment
   materialReadings: {
     material: string;
     reading: string;
@@ -94,8 +96,10 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
     const newReading: UnaffectedReading = {
       id: 'unaffected-' + new Date().getTime(),
       roomName: '',
+      floor: '1st Floor',
       temperature: '',
       relativeHumidity: '',
+      assignedToChamber: undefined,
       materialReadings: [],
     };
     setUnaffectedReadings([...unaffectedReadings, newReading]);
@@ -384,30 +388,30 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
         {showUnaffectedSection && (
           <div className="p-4 pt-0 space-y-4">
             <div className="bg-white border border-orange-200 rounded-lg p-3 text-sm text-gray-700">
-              <p className="mb-2">
-                <strong>IICRC S500 Best Practice:</strong> Take readings from unaffected rooms (not damaged by water)
-                to establish accurate dry standards.
-              </p>
-              <p className="text-xs text-gray-600">
-                Select dry rooms and capture temp, RH, and material moisture readings. These serve as your baseline
-                for determining when affected materials reach dry status.
-              </p>
-            </div>
-
-            {unaffectedReadings.length === 0 ? (
-              <div className="text-center py-6 bg-white rounded-lg border-2 border-dashed border-orange-300">
-                <Droplets className="w-12 h-12 text-orange-400 mx-auto mb-3" />
-                <p className="text-gray-600 mb-4">No unaffected rooms added yet</p>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="mb-2">
+                    <strong>IICRC S500 Best Practice:</strong> Take readings from unaffected rooms (not damaged by water)
+                    to establish accurate dry standards.
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    Select dry rooms and capture temp, RH, and material moisture readings (optional). These serve as your baseline
+                    for determining when affected materials reach dry status.
+                  </p>
+                </div>
                 <Button
                   type="button"
-                  variant="primary"
+                  variant="secondary"
                   onClick={addUnaffectedRoom}
+                  className="flex-shrink-0"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Unaffected Room
+                  Add Room
                 </Button>
               </div>
-            ) : (
+            </div>
+
+            {unaffectedReadings.length > 0 && (
               <div className="space-y-3">
                 {unaffectedReadings.map((reading, index) => (
                   <div
@@ -427,16 +431,34 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                       </button>
                     </div>
 
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Room Name *
-                      </label>
-                      <Input
-                        type="text"
-                        value={reading.roomName}
-                        onChange={(e) => updateUnaffectedReading(reading.id, 'roomName', e.target.value)}
-                        placeholder="e.g., Master Bedroom, Hall Closet"
-                      />
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Room Name *
+                        </label>
+                        <Input
+                          type="text"
+                          value={reading.roomName}
+                          onChange={(e) => updateUnaffectedReading(reading.id, 'roomName', e.target.value)}
+                          placeholder="e.g., Master Bedroom, Hall Closet"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Floor *
+                        </label>
+                        <select
+                          value={reading.floor || '1st Floor'}
+                          onChange={(e) => updateUnaffectedReading(reading.id, 'floor', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:border-entrusted-orange"
+                        >
+                          <option value="Basement">Basement</option>
+                          <option value="1st Floor">1st Floor</option>
+                          <option value="2nd Floor">2nd Floor</option>
+                          <option value="3rd Floor">3rd Floor</option>
+                          <option value="Attic">Attic</option>
+                        </select>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mb-4">
@@ -468,10 +490,31 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                       </div>
                     </div>
 
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Assign to Chamber (Optional)
+                      </label>
+                      <select
+                        value={reading.assignedToChamber || ''}
+                        onChange={(e) => updateUnaffectedReading(reading.id, 'assignedToChamber', e.target.value || undefined)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:border-entrusted-orange"
+                      >
+                        <option value="">No chamber assigned</option>
+                        {chambers.map(c => (
+                          <option key={c.chamberId} value={c.chamberId}>
+                            {c.chamberName}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-gray-600 mt-1">
+                        Optional: Assign this unaffected room to a chamber for organization
+                      </p>
+                    </div>
+
                     <div className="border-t pt-4">
                       <div className="flex items-center justify-between mb-3">
                         <label className="text-sm font-medium text-gray-700">
-                          Material Moisture Readings *
+                          Material Moisture Readings (Optional)
                         </label>
                         <button
                           type="button"
@@ -544,16 +587,6 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                     </div>
                   </div>
                 ))}
-
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={addUnaffectedRoom}
-                  className="w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Another Unaffected Room
-                </Button>
               </div>
             )}
           </div>
