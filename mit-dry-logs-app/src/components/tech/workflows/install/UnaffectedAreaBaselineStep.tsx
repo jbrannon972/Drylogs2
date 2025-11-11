@@ -50,6 +50,11 @@ interface RoomData {
   offsetsCubicFt: number;
   isBaseline: boolean; // NEW: Mark as baseline/dry standard room
 
+  // Environmental readings - REQUIRED for baseline
+  temperature?: number; // Room temperature in °F
+  relativeHumidity?: number; // Room RH in %
+  meterPhotos: string[]; // Photos of meter readings showing temp/RH
+
   // Affected areas for equipment calculations
   affectedFloorSqFt?: number;
   affectedWallsSqFt?: number;
@@ -57,20 +62,20 @@ interface RoomData {
   damageClass?: 1 | 2 | 3 | 4;
   percentAffected?: number;
 
-  // Pre-existing damage
+  // Pre-existing damage - OPTIONAL
   hasPreexistingDamage: boolean;
   preexistingDamageNotes?: string;
   preexistingDamagePhotos: string[];
 
-  // Moisture readings
+  // Moisture readings - OPTIONAL
   moistureReadings: MoistureReading[];
 
-  // Affected materials
+  // Affected materials - kept for compatibility but not used
   materialsAffected: MaterialAffected[];
 
-  // Photos - Phase 1 Requirements
-  overallPhotos: string[]; // REQUIRED: Minimum 4 (wide shot + damage close-ups)
-  thermalPhotos?: string[]; // OPTIONAL: Thermal imaging (moved from CauseOfLoss)
+  // Photos - OPTIONAL
+  overallPhotos: string[]; // OPTIONAL: Overall room photos
+  thermalPhotos?: string[]; // OPTIONAL: Thermal imaging
 
   // Completion tracking
   isComplete: boolean;
@@ -91,11 +96,8 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(
     rooms.length > 0 ? rooms[0].id : null
   );
-  const [activeTab, setActiveTab] = useState<'info' | 'moisture' | 'materials'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'moisture'>('info');
   const [showPreexistingModal, setShowPreexistingModal] = useState(false);
-
-  // Material category expansion state
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set()); // Default: All collapsed
 
   // New room form
   const [newRoomForm, setNewRoomForm] = useState({
@@ -147,6 +149,22 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
       if (!updatedRoom.thermalPhotos) {
         needsMigration = true;
         updatedRoom.thermalPhotos = [];
+      }
+
+      // SIMPLIFICATION MIGRATION: Ensure meterPhotos exists
+      if (!updatedRoom.meterPhotos) {
+        needsMigration = true;
+        updatedRoom.meterPhotos = [];
+      }
+
+      // SIMPLIFICATION MIGRATION: Ensure environmental readings exist
+      if (updatedRoom.temperature === undefined) {
+        needsMigration = true;
+        updatedRoom.temperature = undefined;
+      }
+      if (updatedRoom.relativeHumidity === undefined) {
+        needsMigration = true;
+        updatedRoom.relativeHumidity = undefined;
       }
 
       return updatedRoom;
@@ -236,13 +254,16 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
       insetsCubicFt: 0,
       offsetsCubicFt: 0,
       isBaseline: true, // NEW: Mark as baseline room
+      temperature: undefined, // REQUIRED: To be filled in
+      relativeHumidity: undefined, // REQUIRED: To be filled in
+      meterPhotos: [], // REQUIRED: Meter reading photos
       hasPreexistingDamage: false,
       preexistingDamageNotes: '',
       preexistingDamagePhotos: [],
       moistureReadings: [],
-      materialsAffected: getDefaultMaterials(),
-      overallPhotos: [], // Phase 1: Minimum 4 required
-      thermalPhotos: [], // Phase 1: Optional thermal imaging
+      materialsAffected: getDefaultMaterials(), // Kept for compatibility but not used
+      overallPhotos: [], // OPTIONAL: Overall room photos
+      thermalPhotos: [], // OPTIONAL: Thermal imaging
       isComplete: false,
     };
 
@@ -267,54 +288,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
     setRooms(rooms.map(r => r.id === selectedRoomId ? { ...r, ...updates } : r));
   };
 
-  // NOTE: Old moisture reading functions removed - now using MoistureTabContent component
-
-  const updateMaterial = (materialType: MaterialType, updates: Partial<MaterialAffected>) => {
-    if (!selectedRoom) return;
-
-    updateSelectedRoom({
-      materialsAffected: selectedRoom.materialsAffected.map(m =>
-        m.materialType === materialType ? { ...m, ...updates } : m
-      ),
-    });
-  };
-
-  const addCustomMaterial = () => {
-    if (!selectedRoom) return;
-
-    const customMaterial: MaterialAffected = {
-      id: `custom-${Date.now()}`,
-      materialType: 'Custom',
-      customMaterialName: '',
-      isAffected: true,
-      squareFootage: 0,
-      removalRequired: true,
-      removalReason: '',
-      notes: '',
-    };
-
-    updateSelectedRoom({
-      materialsAffected: [...selectedRoom.materialsAffected, customMaterial],
-    });
-  };
-
-  const updateCustomMaterial = (id: string, updates: Partial<MaterialAffected>) => {
-    if (!selectedRoom) return;
-
-    updateSelectedRoom({
-      materialsAffected: selectedRoom.materialsAffected.map(m =>
-        m.id === id ? { ...m, ...updates } : m
-      ),
-    });
-  };
-
-  const deleteCustomMaterial = (id: string) => {
-    if (!selectedRoom) return;
-
-    updateSelectedRoom({
-      materialsAffected: selectedRoom.materialsAffected.filter(m => m.id !== id),
-    });
-  };
+  // NOTE: Material functions removed - Materials tab has been removed from baseline step
 
   const handleNext = async () => {
     const incompleteRooms = rooms.filter(r => !r.isComplete);
@@ -403,17 +377,6 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
   const completedCount = rooms.filter(r => r.isComplete).length;
   const totalCount = rooms.length;
 
-  // Toggle category expansion
-  const toggleCategory = (category: string) => {
-    const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(category)) {
-      newExpanded.delete(category);
-    } else {
-      newExpanded.add(category);
-    }
-    setExpandedCategories(newExpanded);
-  };
-
   // View state: 'list' | 'detail' | 'add'
   const [viewMode, setViewMode] = useState<'list' | 'detail' | 'add'>('list');
 
@@ -437,23 +400,29 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
       return;
     }
 
-    // Validation for new completions
-    if (selectedRoom.length === 0 || selectedRoom.width === 0) {
-      alert('Please enter room dimensions before marking complete');
+    // SIMPLIFIED VALIDATION: Check only required fields
+    if (!selectedRoom.name) {
+      alert('Please enter a room name before marking complete');
       return;
     }
 
-    // PHASE 1 VALIDATION: Check overall photos (minimum 2 required for baseline)
-    if (selectedRoom.overallPhotos.length < 2) {
-      alert(`Please capture at least 2 overall room photos. You currently have ${selectedRoom.overallPhotos.length} photo(s).`);
+    if (selectedRoom.length === 0 || selectedRoom.width === 0 || selectedRoom.height === 0) {
+      alert('Please enter all room dimensions (length, width, height) before marking complete');
       return;
     }
 
-    // PHASE 1 VALIDATION: Check moisture photos (minimum 1 material tracked)
-    const roomMoistureTracking = moistureTracking.filter(t => t.roomId === selectedRoom.id);
+    if (!selectedRoom.temperature) {
+      alert('Please enter room temperature before marking complete');
+      return;
+    }
 
-    if (roomMoistureTracking.length < 1) {
-      alert(`Please add at least 1 baseline moisture reading for this unaffected area. Click the Moisture tab to add moisture readings with photos.`);
+    if (!selectedRoom.relativeHumidity) {
+      alert('Please enter room relative humidity before marking complete');
+      return;
+    }
+
+    if (selectedRoom.meterPhotos.length < 1) {
+      alert('Please capture at least 1 meter reading photo showing temperature and relative humidity');
       return;
     }
 
@@ -467,7 +436,8 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
     });
 
     // Success feedback
-    alert(`✅ ${selectedRoom.name} (baseline) marked complete!\n\n${roomMoistureTracking.length} baseline moisture reading(s) captured\n\nReturning to area list...`);
+    const roomMoistureTracking = moistureTracking.filter(t => t.roomId === selectedRoom.id);
+    alert(`✅ ${selectedRoom.name} (baseline) marked complete!\n\nTemp: ${selectedRoom.temperature}°F, RH: ${selectedRoom.relativeHumidity}%\n${roomMoistureTracking.length} moisture reading(s) (optional)\n\nReturning to area list...`);
 
     returnToList();
   };
@@ -658,18 +628,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                 }`}
               >
                 <Droplets className="w-4 h-4 inline mr-2" />
-                Baseline Moisture ({moistureTracking.filter(t => t.roomId === selectedRoom.id).length})
-              </button>
-              <button
-                onClick={() => setActiveTab('materials')}
-                className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-                  activeTab === 'materials'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <Layers className="w-4 h-4 inline mr-2" />
-                Materials
+                Moisture (Optional) ({moistureTracking.filter(t => t.roomId === selectedRoom.id).length})
               </button>
             </div>
           </div>
@@ -688,69 +647,121 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                           This is a baseline/dry standard area
                         </p>
                         <p className="text-sm text-blue-800">
-                          Record dimensions and moisture readings from this unaffected room to establish normal levels.
-                          Do NOT mark materials for removal in baseline areas.
+                          Record environmental conditions (temp/RH) and dimensions from this unaffected room to establish normal levels per IICRC S500.
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Length (ft)</label>
-                      <input
-                        type="number"
-                        value={selectedRoom.length}
-                        onChange={(e) => updateSelectedRoom({ length: parseFloat(e.target.value) || 0 })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                        step="0.5"
-                      />
+                  {/* Room Dimensions - REQUIRED */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Room Dimensions *</h3>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Length (ft) *</label>
+                        <input
+                          type="number"
+                          value={selectedRoom.length}
+                          onChange={(e) => updateSelectedRoom({ length: parseFloat(e.target.value) || 0 })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          step="0.5"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Width (ft) *</label>
+                        <input
+                          type="number"
+                          value={selectedRoom.width}
+                          onChange={(e) => updateSelectedRoom({ width: parseFloat(e.target.value) || 0 })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          step="0.5"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Height (ft) *</label>
+                        <input
+                          type="number"
+                          value={selectedRoom.height}
+                          onChange={(e) => updateSelectedRoom({ height: parseFloat(e.target.value) || 0 })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          step="0.5"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Width (ft)</label>
-                      <input
-                        type="number"
-                        value={selectedRoom.width}
-                        onChange={(e) => updateSelectedRoom({ width: parseFloat(e.target.value) || 0 })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                        step="0.5"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Height (ft)</label>
-                      <input
-                        type="number"
-                        value={selectedRoom.height}
-                        onChange={(e) => updateSelectedRoom({ height: parseFloat(e.target.value) || 0 })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                        step="0.5"
-                      />
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                      <p className="text-sm text-blue-900">
+                        <strong>Cubic Footage:</strong> {(selectedRoom.length * selectedRoom.width * selectedRoom.height).toFixed(0)} cf
+                      </p>
+                      <p className="text-sm text-blue-900 mt-1">
+                        <strong>Square Footage:</strong> {(selectedRoom.length * selectedRoom.width).toFixed(0)} sq ft
+                      </p>
                     </div>
                   </div>
 
+                  {/* Environmental Readings - REQUIRED */}
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm text-blue-900">
-                      <strong>Cubic Footage:</strong> {(selectedRoom.length * selectedRoom.width * selectedRoom.height).toFixed(0)} cf
-                    </p>
-                    <p className="text-sm text-blue-900 mt-1">
-                      <strong>Square Footage:</strong> {(selectedRoom.length * selectedRoom.width).toFixed(0)} sq ft
-                    </p>
+                    <h4 className="font-medium text-blue-900 mb-3">Environmental Readings *</h4>
+                    <p className="text-xs text-blue-700 mb-3">Record dry standard conditions for this unaffected area</p>
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium text-blue-900 mb-1">Room Temperature (°F) *</label>
+                        <input
+                          type="number"
+                          value={selectedRoom.temperature || ''}
+                          onChange={(e) => updateSelectedRoom({ temperature: parseFloat(e.target.value) || undefined })}
+                          className="w-full px-3 py-2 border border-blue-300 rounded-lg"
+                          step="0.1"
+                          placeholder="e.g., 72"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-blue-900 mb-1">Room Relative Humidity (%) *</label>
+                        <input
+                          type="number"
+                          value={selectedRoom.relativeHumidity || ''}
+                          onChange={(e) => updateSelectedRoom({ relativeHumidity: parseFloat(e.target.value) || undefined })}
+                          className="w-full px-3 py-2 border border-blue-300 rounded-lg"
+                          step="0.1"
+                          placeholder="e.g., 45"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Meter Reading Photo - REQUIRED */}
+                    <div>
+                      <label className="block text-sm font-medium text-blue-900 mb-2">Meter Reading Photo *</label>
+                      <p className="text-xs text-blue-700 mb-2">Capture meter display showing temperature and RH readings</p>
+                      {user && (
+                        <UniversalPhotoCapture
+                          jobId={job.jobId}
+                          location={selectedRoom.id}
+                          category="assessment"
+                          userId={user.uid}
+                          onPhotosUploaded={(urls) => {
+                            updateSelectedRoom({
+                              meterPhotos: [...selectedRoom.meterPhotos, ...urls],
+                            });
+                          }}
+                          uploadedCount={selectedRoom.meterPhotos.length}
+                          label="Meter Reading Photo *"
+                          minimumPhotos={1}
+                        />
+                      )}
+                    </div>
                   </div>
 
-                  {/* PHASE 1: Overall Room Photos - REQUIRED (2+ minimum for baseline) */}
+                  {/* Overall Room Photos - OPTIONAL */}
                   <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Overall Room Photos</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Overall Room Photos (Optional)</h3>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
                       <div className="flex items-start gap-3">
-                        <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <Info className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm text-blue-900 font-medium mb-1">
-                            <strong>REQUIRED:</strong> Minimum 2 photos for baseline area
-                          </p>
-                          <p className="text-sm text-blue-800">
-                            • Wide shot showing the dry, unaffected condition<br />
-                            • Additional angle showing typical materials/surfaces
+                          <p className="text-sm text-gray-700">
+                            Optional: Capture wide shots showing the dry, unaffected condition of this baseline area
                           </p>
                         </div>
                       </div>
@@ -768,22 +779,22 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                           });
                         }}
                         uploadedCount={selectedRoom.overallPhotos.length}
-                        label={`${selectedRoom.name} Baseline Photos *`}
-                        minimumPhotos={2}
+                        label={`${selectedRoom.name} Overall Photos (Optional)`}
+                        minimumPhotos={0}
                       />
                     )}
                   </div>
 
-                  {/* Pre-existing Damage Section (typically not applicable for baseline) */}
+                  {/* Pre-existing Damage Section - OPTIONAL */}
                   <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Pre-existing Damage</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Pre-existing Damage (Optional)</h3>
 
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
                       <div className="flex items-start gap-3">
                         <Info className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm text-gray-700">
-                            Document any pre-existing damage in this baseline area.
+                            Optional: Document any pre-existing damage in this baseline area.
                             Note: Baseline areas should ideally be completely unaffected and dry.
                           </p>
                         </div>
@@ -833,16 +844,16 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
               {activeTab === 'moisture' && (
                 <div>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
                     <div className="flex items-start gap-3">
-                      <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <Info className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-sm text-blue-900 font-medium mb-1">
-                          Baseline Moisture Readings
+                        <p className="text-sm text-gray-700 font-medium mb-1">
+                          Moisture Readings (Optional)
                         </p>
-                        <p className="text-sm text-blue-800">
-                          Record normal moisture levels in similar materials as affected areas.
-                          These readings establish your "dry standard" per IICRC S500.
+                        <p className="text-sm text-gray-600">
+                          Optional: Record normal moisture levels in similar materials as affected areas.
+                          These readings can establish your "dry standard" per IICRC S500, but are not required for completion.
                         </p>
                       </div>
                     </div>
@@ -854,135 +865,6 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                     moistureTracking={moistureTracking}
                     onUpdate={setMoistureTracking}
                   />
-                </div>
-              )}
-
-              {activeTab === 'materials' && (
-                <div className="max-w-4xl space-y-4">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <div className="flex items-start gap-3">
-                      <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-blue-900 font-medium mb-1">
-                          Baseline Materials Reference
-                        </p>
-                        <p className="text-sm text-blue-800">
-                          Use this to document what materials exist in this unaffected area.
-                          DO NOT mark materials for removal in baseline areas - this is for reference only.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Materials Present</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Document materials present in this baseline area. This helps ensure you're comparing similar materials.
-                    </p>
-                  </div>
-
-                  {/* FLOORING CATEGORY */}
-                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleCategory('flooring')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
-                        <Layers className="w-5 h-5" />
-                        Flooring
-                        {selectedRoom.materialsAffected.filter(m =>
-                          ['Carpet & Pad', 'Hardwood Flooring', 'Vinyl/Linoleum Flooring', 'Tile Flooring', 'Laminate Flooring', 'Engineered Flooring', 'Subfloor'].includes(m.materialType) && m.isAffected
-                        ).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
-                            {selectedRoom.materialsAffected.filter(m =>
-                              ['Carpet & Pad', 'Hardwood Flooring', 'Vinyl/Linoleum Flooring', 'Tile Flooring', 'Laminate Flooring', 'Engineered Flooring', 'Subfloor'].includes(m.materialType) && m.isAffected
-                            ).length} present
-                          </span>
-                        )}
-                      </span>
-                      <ChevronRight className={`w-5 h-5 text-gray-500 transition-transform ${
-                        expandedCategories.has('flooring') ? 'transform rotate-90' : ''
-                      }`} />
-                    </button>
-                    {expandedCategories.has('flooring') && (
-                      <div className="p-4 space-y-3 bg-white">
-                        {selectedRoom.materialsAffected
-                          .filter(m => ['Carpet & Pad', 'Hardwood Flooring', 'Vinyl/Linoleum Flooring', 'Tile Flooring', 'Laminate Flooring', 'Engineered Flooring', 'Subfloor'].includes(m.materialType))
-                          .map((material) => (
-                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                              <label className="flex items-center gap-3 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={material.isAffected}
-                                  onChange={(e) => updateMaterial(material.materialType, { isAffected: e.target.checked })}
-                                  className="h-5 w-5 text-blue-600 rounded"
-                                />
-                                <span className="font-medium text-gray-900">{material.materialType}</span>
-                              </label>
-                              {material.isAffected && (
-                                <div className="ml-8 mt-2">
-                                  <p className="text-xs text-blue-600 mb-1">Material present in this baseline area</p>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* DRYWALL CATEGORY */}
-                  <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleCategory('drywall')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
-                        <Layers className="w-5 h-5" />
-                        Drywall
-                        {selectedRoom.materialsAffected.filter(m =>
-                          ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType) && m.isAffected
-                        ).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
-                            {selectedRoom.materialsAffected.filter(m =>
-                              ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType) && m.isAffected
-                            ).length} present
-                          </span>
-                        )}
-                      </span>
-                      <ChevronRight className={`w-5 h-5 text-gray-500 transition-transform ${
-                        expandedCategories.has('drywall') ? 'transform rotate-90' : ''
-                      }`} />
-                    </button>
-                    {expandedCategories.has('drywall') && (
-                      <div className="p-4 space-y-3 bg-white">
-                        {selectedRoom.materialsAffected
-                          .filter(m => ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType))
-                          .map((material) => (
-                            <div key={material.materialType} className="border border-gray-200 rounded-lg p-3">
-                              <label className="flex items-center gap-3 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={material.isAffected}
-                                  onChange={(e) => updateMaterial(material.materialType, { isAffected: e.target.checked })}
-                                  className="h-5 w-5 text-blue-600 rounded"
-                                />
-                                <span className="font-medium text-gray-900">{material.materialType}</span>
-                              </label>
-                              {material.isAffected && (
-                                <div className="ml-8 mt-2">
-                                  <p className="text-xs text-blue-600 mb-1">Material present in this baseline area</p>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Note: Other categories can be added similarly */}
-                  <p className="text-sm text-gray-500 italic mt-4">
-                    Additional material categories available. Expand categories above to mark materials present.
-                  </p>
                 </div>
               )}
             </div>

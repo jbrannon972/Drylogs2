@@ -36,10 +36,12 @@
 
 **Step 5: Unaffected Area Baseline (NEW - IICRC S500)**
 - Add 1-2 unaffected/dry rooms for baseline comparison
-- For each baseline room:
-  - **Basic Info:** Name, dimensions
-  - **Moisture:** Record dry standard readings
-  - **Photos:** Take 2+ photos
+- For each baseline room (2 tabs: Info | Moisture):
+  - **Info Tab (Required):**
+    - Room name and dimensions
+    - Room temperature (°F) and RH%
+    - Meter reading photo
+  - **Moisture Tab (Optional):** Moisture readings if desired
 - These establish "dry standards" for comparison
 
 **Step 6: Room Assessment**
