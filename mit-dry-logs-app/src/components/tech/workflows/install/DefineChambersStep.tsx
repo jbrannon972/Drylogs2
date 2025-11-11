@@ -29,8 +29,10 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
 
-  // STANDARDIZED: Use 'rooms' key (migrate from old 'roomAssessments')
-  const rooms: RoomData[] = installData.rooms || installData.roomAssessments || [];
+  // COMBINED: Include both affected rooms AND unaffected baseline rooms
+  const affectedRooms: RoomData[] = installData.rooms || installData.roomAssessments || [];
+  const baselineRooms: RoomData[] = installData.environmentalBaseline?.unaffectedAreas || [];
+  const rooms: RoomData[] = [...affectedRooms, ...baselineRooms];
 
   const [chambers, setChambers] = useState<DryingChamber[]>([]);
   const [editingChamberId, setEditingChamberId] = useState<string | null>(null);
@@ -202,6 +204,11 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
     return () => clearTimeout(timeoutId);
   }, [chambers, installData.rooms, updateWorkflowData]);
 
+  // Helper: Check if room is a baseline (unaffected) room
+  const isBaselineRoom = (roomId: string): boolean => {
+    return baselineRooms.some(r => r.id === roomId);
+  };
+
   // Get unassigned rooms
   const getUnassignedRooms = (): RoomData[] => {
     const assignedRoomIds = new Set(chambers.flatMap(c => c.assignedRooms));
@@ -218,9 +225,15 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Define Drying Chambers</h4>
-            <p className="text-sm text-blue-800">
+            <p className="text-sm text-blue-800 mb-2">
               Chambers are grouped areas where equipment works together. We've created chambers based on floor levels.
               You can rename them, reassign rooms, or add more chambers as needed.
+            </p>
+            <p className="text-sm text-blue-800">
+              <span className="inline-block px-2 py-0.5 bg-sky-600 text-white text-xs rounded-full font-medium mr-1">
+                Baseline
+              </span>
+              rooms are unaffected areas for dry standard comparison. These can be assigned to chambers or left unassigned.
             </p>
           </div>
         </div>
@@ -532,30 +545,44 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                   <p className="text-sm text-gray-500 italic">No rooms assigned to this chamber</p>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
-                    {chamberRooms.map(room => (
-                      <div
-                        key={room.id}
-                        className="bg-blue-50 border border-blue-200 rounded-lg p-2 flex items-center justify-between"
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-blue-900">{room.name}</p>
-                          <p className="text-xs text-blue-700">
-                            {room.length}' × {room.width}' × {room.height}'
-                          </p>
-                        </div>
-                        <select
-                          value={chamber.chamberId}
-                          onChange={(e) => assignRoomToChamber(room.id, e.target.value)}
-                          className="text-xs px-2 py-1 border border-gray-300 rounded"
+                    {chamberRooms.map(room => {
+                      const isBaseline = isBaselineRoom(room.id);
+                      return (
+                        <div
+                          key={room.id}
+                          className={`${
+                            isBaseline ? 'bg-sky-50 border-sky-200' : 'bg-blue-50 border-blue-200'
+                          } border rounded-lg p-2 flex items-center justify-between`}
                         >
-                          {chambers.map(c => (
-                            <option key={c.chamberId} value={c.chamberId}>
-                              Move to {c.chamberName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    ))}
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className={`text-sm font-medium ${isBaseline ? 'text-sky-900' : 'text-blue-900'}`}>
+                                {room.name}
+                              </p>
+                              {isBaseline && (
+                                <span className="px-2 py-0.5 bg-sky-600 text-white text-xs rounded-full font-medium">
+                                  Baseline
+                                </span>
+                              )}
+                            </div>
+                            <p className={`text-xs ${isBaseline ? 'text-sky-700' : 'text-blue-700'}`}>
+                              {room.length}' × {room.width}' × {room.height}'
+                            </p>
+                          </div>
+                          <select
+                            value={chamber.chamberId}
+                            onChange={(e) => assignRoomToChamber(room.id, e.target.value)}
+                            className="text-xs px-2 py-1 border border-gray-300 rounded"
+                          >
+                            {chambers.map(c => (
+                              <option key={c.chamberId} value={c.chamberId}>
+                                Move to {c.chamberName}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -577,26 +604,36 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {unassignedRooms.map(room => (
-              <div
-                key={room.id}
-                className="bg-white border border-yellow-300 rounded-lg p-2"
-              >
-                <p className="text-sm font-medium text-gray-900 mb-1">{room.name}</p>
-                <select
-                  onChange={(e) => assignRoomToChamber(room.id, e.target.value)}
-                  className="text-xs w-full px-2 py-1 border border-gray-300 rounded"
-                  defaultValue=""
+            {unassignedRooms.map(room => {
+              const isBaseline = isBaselineRoom(room.id);
+              return (
+                <div
+                  key={room.id}
+                  className="bg-white border border-yellow-300 rounded-lg p-2"
                 >
-                  <option value="" disabled>Assign to chamber...</option>
-                  {chambers.map(c => (
-                    <option key={c.chamberId} value={c.chamberId}>
-                      {c.chamberName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm font-medium text-gray-900">{room.name}</p>
+                    {isBaseline && (
+                      <span className="px-2 py-0.5 bg-sky-600 text-white text-xs rounded-full font-medium">
+                        Baseline
+                      </span>
+                    )}
+                  </div>
+                  <select
+                    onChange={(e) => assignRoomToChamber(room.id, e.target.value)}
+                    className="text-xs w-full px-2 py-1 border border-gray-300 rounded"
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Assign to chamber...</option>
+                    {chambers.map(c => (
+                      <option key={c.chamberId} value={c.chamberId}>
+                        {c.chamberName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

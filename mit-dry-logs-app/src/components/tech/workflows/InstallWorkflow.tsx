@@ -20,6 +20,7 @@ import {
   ClipboardCheck,
   Layers,
   Calendar,
+  Thermometer,
   X
 } from 'lucide-react';
 import { InstallStep } from '../../../types/workflow';
@@ -29,6 +30,7 @@ import { OfficePreparationStep } from './install/OfficePreparationStep';
 import { ArrivalStep } from './install/ArrivalStep';
 import { FrontDoorStep } from './install/FrontDoorStep';
 import { CauseOfLossStep } from './install/CauseOfLossStep';
+import { UnaffectedAreaBaselineStep } from './install/UnaffectedAreaBaselineStep';
 import { RoomAssessmentStep } from './install/RoomAssessmentStep';
 import { DefineChambersStep } from './install/DefineChambersStep';
 // PlanJobStep removed per user feedback - planning happens in Schedule Work step
@@ -79,6 +81,13 @@ const INSTALL_STEPS: StepConfig[] = [
     description: 'Source + water category',
     icon: <Droplets className="w-5 h-5" />,
     component: CauseOfLossStep,
+  },
+  {
+    id: 'unaffected-baseline',
+    title: 'Unaffected Area Baseline',
+    description: 'Dry standard readings (IICRC S500)',
+    icon: <Thermometer className="w-5 h-5" />,
+    component: UnaffectedAreaBaselineStep,
   },
   {
     id: 'room-assessment',

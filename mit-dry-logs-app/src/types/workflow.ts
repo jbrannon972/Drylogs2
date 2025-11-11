@@ -4,21 +4,22 @@
  */
 
 export type InstallStep =
-  | 'office-prep'            // Step 0: Office preparation (optional)
-  | 'arrival'                // Step 1: Property arrival, clock in
-  | 'front-door'             // Step 2: Customer intro, ground rules
-  | 'cause-of-loss'          // Step 3: Document cause + water category (1/2/3)
-  | 'room-assessment'        // Step 4: Assess ALL rooms (dimensions + moisture + materials + pre-existing)
-  | 'define-chambers'        // Step 5: Define drying chambers and assign rooms
-  | 'plan-job'               // Step 6: Plan the job - set drying class and timeline
-  | 'partial-demo'           // Step 7: Partial demo work during install (optional)
-  | 'schedule-work'          // Step 8: Plan Day 2+ (demo, checks, pull)
-  | 'equipment-calc'         // Step 9: IICRC equipment calculations per chamber
-  | 'equipment-place'        // Step 10: Place and scan equipment by chamber
-  | 'general-billables'      // Step 11: Additional billable work (generals page)
-  | 'communicate-plan'       // Step 12: Customer communication
-  | 'final-photos'           // Step 13: Final documentation
-  | 'complete';              // Step 14: Complete and depart
+  | 'office-prep'            // Step 1: Office preparation (optional)
+  | 'arrival'                // Step 2: Property arrival, clock in
+  | 'front-door'             // Step 3: Customer intro, ground rules
+  | 'cause-of-loss'          // Step 4: Document cause + water category (1/2/3)
+  | 'unaffected-baseline'    // Step 5: Unaffected area baseline (IICRC S500 dry standard)
+  | 'room-assessment'        // Step 6: Assess ALL affected rooms (dimensions + moisture + materials + pre-existing)
+  | 'define-chambers'        // Step 7: Define drying chambers and assign rooms
+  | 'plan-job'               // Step 8: Plan the job - set drying class and timeline
+  | 'partial-demo'           // Step 9: Partial demo work during install (optional)
+  | 'schedule-work'          // Step 10: Plan Day 2+ (demo, checks, pull)
+  | 'equipment-calc'         // Step 11: IICRC equipment calculations per chamber
+  | 'equipment-place'        // Step 12: Place and scan equipment by chamber
+  | 'general-billables'      // Step 13: Additional billable work (generals page)
+  | 'communicate-plan'       // Step 14: Customer communication
+  | 'final-photos'           // Step 15: Final documentation
+  | 'complete';              // Step 16: Complete and depart
 
 export type DemoStep =
   | 'clock-in'                // Step 1: Arrival & clock in

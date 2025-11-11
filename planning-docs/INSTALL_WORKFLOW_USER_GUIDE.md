@@ -19,7 +19,8 @@
 
 **Step 2: Arrival**
 - Enter arrival time
-- Take photo of front door
+- Take photos of truck and property exterior
+- **NEW:** Record exterior environmental baseline (temp, RH%, meter photo)
 - Click Continue
 
 **Step 3: Customer Introduction**
@@ -32,7 +33,15 @@
 - Take photos of damage
 - Click Continue
 
-**Step 5: Room Assessment**
+**Step 5: Unaffected Area Baseline (NEW - IICRC S500)**
+- Add 1-2 unaffected/dry rooms for baseline comparison
+- For each baseline room:
+  - **Basic Info:** Name, dimensions
+  - **Moisture:** Record dry standard readings
+  - **Photos:** Take 2+ photos
+- These establish "dry standards" for comparison
+
+**Step 6: Room Assessment**
 - For each room:
   - **Basic Info:** Enter name, dimensions, affected areas
   - **Moisture:** Add readings and photos
@@ -41,38 +50,43 @@
   - **Photos:** Take 4+ room photos
 - Save room and repeat for all rooms
 
-**Step 6: Drying Chambers**
+**Step 7: Drying Chambers**
 - Create chambers (e.g., "Chamber 1")
-- Assign rooms to each chamber
+- Assign affected and baseline rooms to chambers
+- Baseline rooms marked with badge
 - Save chambers
 
-**Step 7: Partial Demo (Optional)**
+**Step 8: Partial Demo (Optional)**
 - If doing demo work, log materials removed
 - Take demo photos
 - Skip if no demo
 
-**Step 8: Equipment**
+**Step 9: Equipment**
 - Review calculated equipment needs
 - (Optional) Scan and place equipment in rooms
 
-**Step 9: Billable Work (Optional)**
+**Step 10: Billable Work (Optional)**
 - Add any extra services performed
 - Skip if none
 
-**Step 10: Final Photos**
-- Take 4+ photos of equipment setup
-- Click Continue
+**Step 11: Final Photos + Equipment Performance (UPDATED)**
+- **For each room:**
+  - **Photos Tab:** Take 4+ photos of equipment setup
+  - **Equipment Tab:** Record dehumidifier & air mover performance
+    - Dehumidifiers: Inlet/outlet temp & RH, amperage, photo
+    - Air Movers: Running status, amperage
+- Complete all rooms before continuing
 
-**Step 11: Schedule**
+**Step 12: Schedule**
 - Add future monitoring visits
 - Set dates and visit types
 - Save schedule
 
-**Step 12: Communicate Plan**
+**Step 13: Communicate Plan**
 - Review on-screen plan with customer
 - Click Continue
 
-**Step 13: Complete**
+**Step 14: Complete**
 - Enter departure time
 - Add tech notes (optional)
 - Click **Complete Install Workflow**
