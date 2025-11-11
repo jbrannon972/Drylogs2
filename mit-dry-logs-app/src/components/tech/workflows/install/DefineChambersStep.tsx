@@ -217,6 +217,10 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
 
   const unassignedRooms = getUnassignedRooms();
 
+  // Separate unassigned rooms into affected vs baseline
+  const unassignedAffectedRooms = unassignedRooms.filter(r => !isBaselineRoom(r.id));
+  const unassignedBaselineRooms = unassignedRooms.filter(r => isBaselineRoom(r.id));
+
   return (
     <div className="space-y-6">
       {/* Instructions */}
@@ -591,49 +595,81 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
         })}
       </div>
 
-      {/* Unassigned Rooms (if any) */}
-      {unassignedRooms.length > 0 && (
+      {/* Unassigned AFFECTED Rooms (if any) - REQUIRED */}
+      {unassignedAffectedRooms.length > 0 && (
         <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-5">
           <div className="flex items-start gap-3 mb-3">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-medium text-yellow-900 mb-1">Unassigned Rooms</h4>
+              <h4 className="font-medium text-yellow-900 mb-1">Unassigned Affected Rooms</h4>
               <p className="text-sm text-yellow-800">
-                These rooms are not assigned to any chamber. Please assign them before continuing.
+                These affected rooms must be assigned to a chamber before continuing.
               </p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {unassignedRooms.map(room => {
-              const isBaseline = isBaselineRoom(room.id);
-              return (
-                <div
-                  key={room.id}
-                  className="bg-white border border-yellow-300 rounded-lg p-2"
+            {unassignedAffectedRooms.map(room => (
+              <div
+                key={room.id}
+                className="bg-white border border-yellow-300 rounded-lg p-2"
+              >
+                <p className="text-sm font-medium text-gray-900 mb-1">{room.name}</p>
+                <select
+                  onChange={(e) => assignRoomToChamber(room.id, e.target.value)}
+                  className="text-xs w-full px-2 py-1 border border-gray-300 rounded"
+                  defaultValue=""
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-medium text-gray-900">{room.name}</p>
-                    {isBaseline && (
-                      <span className="px-2 py-0.5 bg-sky-600 text-white text-xs rounded-full font-medium">
-                        Baseline
-                      </span>
-                    )}
-                  </div>
-                  <select
-                    onChange={(e) => assignRoomToChamber(room.id, e.target.value)}
-                    className="text-xs w-full px-2 py-1 border border-gray-300 rounded"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>Assign to chamber...</option>
-                    {chambers.map(c => (
-                      <option key={c.chamberId} value={c.chamberId}>
-                        {c.chamberName}
-                      </option>
-                    ))}
-                  </select>
+                  <option value="" disabled>Assign to chamber...</option>
+                  {chambers.map(c => (
+                    <option key={c.chamberId} value={c.chamberId}>
+                      {c.chamberName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Unassigned BASELINE Rooms (if any) - OPTIONAL */}
+      {unassignedBaselineRooms.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
+          <div className="flex items-start gap-3 mb-3">
+            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-medium text-blue-900 mb-1">Unassigned Baseline Rooms (Optional)</h4>
+              <p className="text-sm text-blue-800">
+                These baseline rooms can be assigned to chambers if needed for comparison, or left unassigned.
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {unassignedBaselineRooms.map(room => (
+              <div
+                key={room.id}
+                className="bg-white border border-blue-200 rounded-lg p-2"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-medium text-gray-900">{room.name}</p>
+                  <span className="px-2 py-0.5 bg-sky-600 text-white text-xs rounded-full font-medium">
+                    Baseline
+                  </span>
                 </div>
-              );
-            })}
+                <select
+                  onChange={(e) => assignRoomToChamber(room.id, e.target.value)}
+                  className="text-xs w-full px-2 py-1 border border-gray-300 rounded"
+                  defaultValue=""
+                >
+                  <option value="" disabled>Assign to chamber (optional)...</option>
+                  {chambers.map(c => (
+                    <option key={c.chamberId} value={c.chamberId}>
+                      {c.chamberName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -701,10 +737,18 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
           <div>
             <h4 className="font-medium text-green-900 mb-1">Chamber Summary</h4>
             <p className="text-sm text-green-800">
-              <strong>{chambers.length}</strong> chamber(s) defined with <strong>{rooms.length}</strong> total room(s)
+              <strong>{chambers.length}</strong> chamber(s) defined with <strong>{affectedRooms.length}</strong> affected room(s)
+              {baselineRooms.length > 0 && (
+                <> and <strong>{baselineRooms.length}</strong> baseline room(s)</>
+              )}
             </p>
-            {unassignedRooms.length === 0 && (
-              <p className="text-sm text-green-700 mt-1">✓ All rooms are assigned to chambers</p>
+            {unassignedAffectedRooms.length === 0 && (
+              <p className="text-sm text-green-700 mt-1">✓ All affected rooms are assigned to chambers</p>
+            )}
+            {unassignedBaselineRooms.length > 0 && (
+              <p className="text-sm text-blue-700 mt-1">
+                ℹ {unassignedBaselineRooms.length} baseline room(s) unassigned (optional)
+              </p>
             )}
           </div>
         </div>
