@@ -105,7 +105,6 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
 
   const [equipmentPerformance, setEquipmentPerformance] = useState<RoomEquipmentPerformance[]>(initializeEquipmentPerformance);
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState<'photos' | 'equipment'>('photos');
   const [expandedEquipmentId, setExpandedEquipmentId] = useState<string | null>(null);
 
   // ULTRAFAULT: Auto-save IMMEDIATELY to Firebase (no debounce)
@@ -168,14 +167,12 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
   const handleNextRoom = () => {
     if (currentRoomIndex < roomPhotos.length - 1) {
       setCurrentRoomIndex(currentRoomIndex + 1);
-      setActiveTab('photos'); // Reset to photos tab when switching rooms
     }
   };
 
   const handlePreviousRoom = () => {
     if (currentRoomIndex > 0) {
       setCurrentRoomIndex(currentRoomIndex - 1);
-      setActiveTab('photos'); // Reset to photos tab when switching rooms
     }
   };
 
@@ -350,7 +347,6 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
                 }`}
                 onClick={() => {
                   setCurrentRoomIndex(index);
-                  setActiveTab('photos');
                 }}
               >
                 <div className="flex items-center gap-3">
@@ -447,88 +443,12 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-200 mb-4">
-          <button
-            onClick={() => setActiveTab('photos')}
-            className={`flex-1 py-2 px-4 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'photos'
-                ? 'border-orange-500 text-orange-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <Camera className="w-4 h-4" />
-              <span>Photos ({currentRoom.photos.length}/4)</span>
-              {hasPhotos && <CheckCircle className="w-4 h-4 text-green-600" />}
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('equipment')}
-            className={`flex-1 py-2 px-4 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'equipment'
-                ? 'border-orange-500 text-orange-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <span>Equipment ({currentEquipment.dehumidifiers.length + currentEquipment.airMovers.length})</span>
-              {hasEquipmentData && <CheckCircle className="w-4 h-4 text-green-600" />}
-            </div>
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        {activeTab === 'photos' && (
+        {/* Single Scroll View - Equipment Readings First, Then Photos */}
+        <div className="space-y-6">
+          {/* Equipment Performance Section */}
           <div>
-            {/* Photo Upload */}
-            {user && (
-              <div className="mb-4">
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
-                  <p className="text-xs text-orange-900">
-                    <strong>Capture equipment in place:</strong> Show dehumidifiers, air movers, air scrubbers, and overall room setup (minimum 4 photos)
-                  </p>
-                </div>
-                <UniversalPhotoCapture
-                  jobId={job.jobId}
-                  location={currentRoom.roomName}
-                  category="final"
-                  userId={user.uid}
-                  onPhotosUploaded={handlePhotosUploaded}
-                  uploadedCount={currentRoom.photos.length}
-                  label={`${currentRoom.roomName} Final Photos *`}
-                  minimumPhotos={4}
-                />
-              </div>
-            )}
-
-            {/* Preview captured photos */}
-            {currentRoom.photos.length > 0 && (
-              <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">
-                  Captured Photos ({currentRoom.photos.length})
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {currentRoom.photos.map((photo, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={photo}
-                        alt={`${currentRoom.roomName} photo ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg border-2 border-green-500"
-                      />
-                      <div className="absolute top-1 right-1 bg-green-500 text-white px-2 py-0.5 rounded text-xs font-bold">
-                        #{index + 1}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'equipment' && (
-          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Equipment Performance</h3>
+            <div className="space-y-3">
             {/* Equipment Performance */}
             {currentEquipment.dehumidifiers.length === 0 && currentEquipment.airMovers.length === 0 ? (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
@@ -826,7 +746,51 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
               </>
             )}
           </div>
-        )}
+          </div>
+
+          {/* Final Photos Section */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Final Photos</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Take at least 4 photos showing the equipment setup and room condition
+            </p>
+
+            {/* Photo Capture */}
+            <UniversalPhotoCapture
+              jobId={job.jobId}
+              stepId="final-photos"
+              photoType={`final-${currentRoom.roomId}`}
+              label={`${currentRoom.roomName} Final Photos`}
+              onPhotosUploaded={handlePhotosUploaded}
+              minimumPhotos={4}
+            />
+
+            {/* Photo Preview Grid */}
+            {currentRoom.photos.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">
+                  Captured Photos ({currentRoom.photos.length})
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {currentRoom.photos.map((photoUrl, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={photoUrl}
+                        alt={`Final photo ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg border border-gray-300"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded-lg flex items-center justify-center">
+                        <span className="text-white font-medium opacity-0 group-hover:opacity-100">
+                          Photo {index + 1}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Completion Status */}
