@@ -34,24 +34,12 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
     installData.waterClassification?.category || null
   );
 
-  // New fields
-  const [discoveryDate, setDiscoveryDate] = useState(
-    installData.causeOfLoss?.discoveryDate || new Date().toISOString().split('T')[0]
-  );
+  // Event Date - when water event occurred
   const [eventDate, setEventDate] = useState(
     installData.causeOfLoss?.eventDate || new Date().toISOString().split('T')[0]
   );
   // PHASE 1: Thermal imaging state removed - now handled in RoomAssessmentStep (per room)
-
-  // Cat 3 Biohazard Containment Checklist (OSHA Compliance)
-  const [cat3Checklist, setCat3Checklist] = useState({
-    ppeConfirmed: installData.cat3Containment?.ppeConfirmed || false,
-    containmentBarriers: installData.cat3Containment?.containmentBarriers || false,
-    negativeAirSetup: installData.cat3Containment?.negativeAirSetup || false,
-    wasteContainment: installData.cat3Containment?.wasteContainment || false,
-    crossContaminationPrevention: installData.cat3Containment?.crossContaminationPrevention || false,
-    customerNotified: installData.cat3Containment?.customerNotified || false,
-  });
+  // PHASE 1: Cat 3 checklist simplified to reminder-only (detailed checklist moved to Demo workflow)
 
   // Timestamp - initialized once and never changes (prevents infinite loop)
   const [determinedAt] = useState(() =>
@@ -66,7 +54,6 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         notes: causeNotes,
         photos: causePhotos,
         photo: causePhotos[0] || null, // Keep backward compatibility
-        discoveryDate,
         eventDate,
       },
       waterClassification: {
@@ -74,14 +61,10 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         determinedAt,
       },
       // PHASE 1: specializedServices.thermalImaging removed - now per-room in RoomAssessmentStep
-      cat3Containment: waterCategory === 3 ? cat3Checklist : undefined,
+      // PHASE 1: cat3Containment removed - detailed checklist moved to Demo workflow
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [causeType, causeLocation, causeNotes, causePhotos, waterCategory, discoveryDate, eventDate, cat3Checklist, determinedAt]);
-
-  const toggleCat3Checklist = (key: keyof typeof cat3Checklist) => {
-    setCat3Checklist(prev => ({ ...prev, [key]: !prev[key] }));
-  };
+  }, [causeType, causeLocation, causeNotes, causePhotos, waterCategory, eventDate, determinedAt]);
 
   const handleSubcontractorRequest = async (data: SubcontractorRequestData) => {
     if (!user) return;
@@ -162,8 +145,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
     return '';
   };
 
-  const cat3ChecklistComplete = waterCategory === 3 ? Object.values(cat3Checklist).every(v => v) : true;
-  const isComplete = causeType && causeLocation && causePhotos.length > 0 && waterCategory && cat3ChecklistComplete;
+  const isComplete = causeType && causeLocation && causePhotos.length > 0 && waterCategory;
 
   return (
     <div className="space-y-6">
@@ -241,33 +223,19 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         />
       </div>
 
-      {/* Timeline */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Discovery Date *
-          </label>
-          <input
-            type="date"
-            value={discoveryDate}
-            onChange={(e) => setDiscoveryDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:outline-none"
-          />
-          <p className="text-xs text-gray-500 mt-1">When the damage was first noticed</p>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Event Date
-          </label>
-          <input
-            type="date"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
-            max={new Date().toISOString().split('T')[0]}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:outline-none"
-          />
-          <p className="text-xs text-gray-500 mt-1">When the water event occurred (if known)</p>
-        </div>
+      {/* Event Date */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Event Date
+        </label>
+        <input
+          type="date"
+          value={eventDate}
+          onChange={(e) => setEventDate(e.target.value)}
+          max={new Date().toISOString().split('T')[0]}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:outline-none"
+        />
+        <p className="text-xs text-gray-500 mt-1">When the water event occurred (if known)</p>
       </div>
 
       {/* PHASE 1: Thermal imaging moved to RoomAssessmentStep (per room, optional) */}
@@ -336,168 +304,36 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         </div>
       )}
 
-      {/* Category 3 Biohazard Containment Checklist (OSHA Compliance) */}
+      {/* Category 3 Safety Reminders (Simplified) */}
       {waterCategory === 3 && (
-        <div className="border-2 border-red-500 rounded-lg p-4 bg-red-50">
+        <div className="border-2 border-red-500 rounded-lg p-5 bg-red-50">
           <div className="flex items-start gap-3 mb-4">
             <AlertCircle className="w-6 h-6 flex-shrink-0 mt-0.5 text-red-600" />
             <div className="flex-1">
-              <h4 className="font-bold text-red-900 mb-1">🚨 CATEGORY 3 BIOHAZARD - OSHA CONTAINMENT REQUIRED</h4>
-              <p className="text-sm text-red-800 mb-3">
-                Sewage/black water contains pathogens (E. coli, Hepatitis A, etc.). OSHA requires strict containment protocols.
-                Complete ALL checklist items before starting work.
+              <h4 className="font-bold text-red-900 text-lg mb-2">🚨 Category 3 Biohazard Alert</h4>
+              <p className="text-sm text-red-800 mb-4">
+                Grossly contaminated water (sewage, toilet overflow, rising flood water). Contains dangerous pathogens.
+                <strong> OSHA compliance required before starting work.</strong>
               </p>
-            </div>
-          </div>
 
-          <div className="bg-white border border-red-300 rounded-lg p-4">
-            <h5 className="font-semibold text-gray-900 mb-3">Containment Protocol Checklist *</h5>
-            <p className="text-xs text-gray-600 mb-4">
-              All items must be completed for OSHA compliance and worker safety.
-            </p>
+              <div className="bg-white border border-red-300 rounded-lg p-4">
+                <h5 className="font-semibold text-gray-900 mb-3">Safety Reminders:</h5>
+                <ul className="text-sm text-red-900 space-y-2">
+                  <li>• <strong>Enhanced PPE Required:</strong> N95/P100 respirator, Tyvek suit, double gloves, goggles, rubber boots</li>
+                  <li>• <strong>Containment Barriers:</strong> Plastic sheeting seals, negative air pressure, HEPA filtration</li>
+                  <li>• <strong>Biohazard Disposal:</strong> Red bags for contaminated materials, no mixing with regular waste</li>
+                  <li>• <strong>Cross-Contamination Prevention:</strong> Boot wash station, hand sanitizer, tool decontamination</li>
+                  <li>• <strong>Customer Notification:</strong> Explain health risks, keep pets/children away from work zone</li>
+                  <li>• <strong>Emergency Protocol:</strong> If exposed, seek immediate medical attention and notify supervisor</li>
+                </ul>
+              </div>
 
-            <div className="space-y-3">
-              {/* PPE Confirmed */}
-              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={cat3Checklist.ppeConfirmed}
-                  onChange={() => toggleCat3Checklist('ppeConfirmed')}
-                  className="mt-1 w-5 h-5"
-                />
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">1. Enhanced PPE Confirmed</p>
-                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
-                    <li>• Nitrile gloves (double layer recommended)</li>
-                    <li>• N95 or P100 respirator (not surgical mask)</li>
-                    <li>• Tyvek suit or waterproof protective clothing</li>
-                    <li>• Safety goggles or face shield</li>
-                    <li>• Rubber boots (no cloth shoes)</li>
-                  </ul>
-                </div>
-              </label>
-
-              {/* Containment Barriers */}
-              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={cat3Checklist.containmentBarriers}
-                  onChange={() => toggleCat3Checklist('containmentBarriers')}
-                  className="mt-1 w-5 h-5"
-                />
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">2. Containment Barriers Installed</p>
-                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
-                    <li>• Plastic sheeting (6-mil minimum) sealing work area</li>
-                    <li>• Critical barriers (doorways, HVAC vents, adjacent rooms)</li>
-                    <li>• Floor protection in transit paths</li>
-                    <li>• Dedicated entry/exit point marked</li>
-                  </ul>
-                </div>
-              </label>
-
-              {/* Negative Air Setup */}
-              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={cat3Checklist.negativeAirSetup}
-                  onChange={() => toggleCat3Checklist('negativeAirSetup')}
-                  className="mt-1 w-5 h-5"
-                />
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">3. Negative Air Pressure Established</p>
-                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
-                    <li>• Air scrubbers with HEPA filtration running</li>
-                    <li>• Exhaust vented outside (not to unaffected areas)</li>
-                    <li>• Negative pressure prevents contamination spread</li>
-                    <li>• Verify air flows INTO work area (not out)</li>
-                  </ul>
-                </div>
-              </label>
-
-              {/* Waste Containment */}
-              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={cat3Checklist.wasteContainment}
-                  onChange={() => toggleCat3Checklist('wasteContainment')}
-                  className="mt-1 w-5 h-5"
-                />
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">4. Biohazard Waste Disposal Plan</p>
-                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
-                    <li>• Red biohazard bags for contaminated materials</li>
-                    <li>• Separate containers for sharps/hard debris</li>
-                    <li>• Designated disposal area outside work zone</li>
-                    <li>• Do NOT mix with regular construction waste</li>
-                  </ul>
-                </div>
-              </label>
-
-              {/* Cross-Contamination Prevention */}
-              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={cat3Checklist.crossContaminationPrevention}
-                  onChange={() => toggleCat3Checklist('crossContaminationPrevention')}
-                  className="mt-1 w-5 h-5"
-                />
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">5. Cross-Contamination Prevention</p>
-                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
-                    <li>• Shoe covers or boot wash station at exit</li>
-                    <li>• Hand sanitizer/wash station accessible</li>
-                    <li>• No food/drink in work area</li>
-                    <li>• Tools/equipment decontaminated before removal</li>
-                  </ul>
-                </div>
-              </label>
-
-              {/* Customer Notification */}
-              <label className="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={cat3Checklist.customerNotified}
-                  onChange={() => toggleCat3Checklist('customerNotified')}
-                  className="mt-1 w-5 h-5"
-                />
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">6. Customer Notification Complete</p>
-                  <ul className="text-sm text-gray-600 mt-1 space-y-0.5 ml-4">
-                    <li>• Explained biohazard risks and health concerns</li>
-                    <li>• Advised to avoid contaminated areas</li>
-                    <li>• Pets/children must be kept away from work zone</li>
-                    <li>• Provided timeline for safe re-entry</li>
-                  </ul>
-                </div>
-              </label>
-            </div>
-
-            {/* Completion Status */}
-            {Object.values(cat3Checklist).every(v => v) ? (
-              <div className="mt-4 bg-green-50 border border-green-300 rounded-lg p-3 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <p className="text-sm font-medium text-green-800">
-                  ✓ All containment protocols confirmed. Safe to proceed with Cat 3 work.
+              <div className="mt-4 bg-red-100 border border-red-300 rounded-lg p-3">
+                <p className="text-xs text-red-900 font-medium">
+                  ⚠️ OSHA Violation Risk: Failure to follow Cat 3 protocols can result in fines up to $15,625 per violation.
                 </p>
               </div>
-            ) : (
-              <div className="mt-4 bg-yellow-50 border border-yellow-300 rounded-lg p-3 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-yellow-600" />
-                <p className="text-sm font-medium text-yellow-800">
-                  Complete all checklist items before starting Cat 3 biohazard work (
-                  {Object.values(cat3Checklist).filter(v => v).length}/6 completed)
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Emergency Contact */}
-          <div className="mt-4 bg-red-100 border border-red-300 rounded-lg p-3">
-            <p className="text-xs text-red-900">
-              <strong>OSHA Violation Risk:</strong> Failure to follow Cat 3 protocols can result in fines up to $15,625 per violation.
-              In case of exposure (skin contact, ingestion), seek immediate medical attention and report to MIT Lead.
-            </p>
+            </div>
           </div>
         </div>
       )}
