@@ -420,155 +420,121 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
       {/* Per-Chamber Calculations */}
       {chamberCalculations.map((calc, index) => (
-        <div key={calc.chamberId} className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
+        <div key={calc.chamberId} className="border-2 border-gray-300 rounded-lg p-2 bg-gray-50">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Wind className="w-5 h-5 text-orange-600" />
-              {calc.chamberName}
-            </h3>
-            <div className="text-sm text-gray-600">
-              {calc.cubicFootage.toFixed(0)} cubic feet
+            <h3 className="text-base font-bold text-gray-900">{calc.chamberName}</h3>
+            <div className="text-xs text-gray-600">
+              {calc.cubicFootage.toFixed(0)} cf
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2 mb-2">
             {/* Dehumidifiers */}
-            <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-3 text-center">
-              <Wind className="w-5 h-5 text-blue-600 mx-auto mb-2" />
-              <p className="text-3xl font-bold text-blue-900">{calc.dehumidifiers}</p>
-              <p className="text-sm text-blue-700 font-medium">Dehumidifiers</p>
-              <p className="text-xs text-blue-600 mt-1">For this chamber</p>
+            <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-2 text-center">
+              <p className="text-2xl font-bold text-blue-900">{calc.dehumidifiers}</p>
+              <p className="text-xs text-blue-700">Dehumidifiers</p>
             </div>
 
             {/* Air Scrubbers */}
-            <div className={`rounded-lg p-3 text-center ${
+            <div className={`rounded-lg p-2 text-center ${
               calc.airScrubbers > 0
                 ? 'bg-purple-100 border-2 border-purple-300'
                 : 'bg-gray-100 border-2 border-gray-300'
             }`}>
-              <Wind className={`w-5 h-5 mx-auto mb-2 ${
-                calc.airScrubbers > 0 ? 'text-purple-600' : 'text-gray-400'
-              }`} />
-              <p className={`text-3xl font-bold ${
+              <p className={`text-2xl font-bold ${
                 calc.airScrubbers > 0 ? 'text-purple-900' : 'text-gray-500'
               }`}>{calc.airScrubbers}</p>
-              <p className={`text-sm font-medium ${
+              <p className={`text-xs ${
                 calc.airScrubbers > 0 ? 'text-purple-700' : 'text-gray-500'
               }`}>Air Scrubbers</p>
-              <p className={`text-xs mt-1 ${
-                calc.airScrubbers > 0 ? 'text-purple-600' : 'text-gray-500'
-              }`}>For this chamber</p>
             </div>
           </div>
 
           {/* Air Movers - Room by Room Breakdown */}
-          <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-3 mb-2">
+          <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-2 mb-2">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Wind className="w-5 h-5 text-orange-600" />
-                <h4 className="font-bold text-orange-900">Air Movers (By Room)</h4>
-              </div>
-              <div className="bg-orange-200 px-3 py-1 rounded-full">
-                <span className="text-lg font-bold text-orange-900">{calc.airMovers} total</span>
+              <h4 className="text-sm font-bold text-orange-900">Air Movers</h4>
+              <div className="bg-orange-200 px-2 py-0.5 rounded-full">
+                <span className="text-base font-bold text-orange-900">{calc.airMovers} total</span>
               </div>
             </div>
 
             {/* Installation Timing Option */}
-            <div className="mb-2 bg-yellow-50 border border-yellow-300 rounded-lg p-3">
-              <label className="flex items-start gap-2 cursor-pointer">
+            <div className="mb-2 bg-yellow-50 border border-yellow-300 rounded p-2">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={airMoversAfterDemo.has(calc.chamberId)}
                   onChange={() => toggleAirMoversAfterDemo(calc.chamberId)}
-                  className="mt-1 h-4 w-4 text-orange-600 rounded focus:ring-orange-500"
+                  className="h-4 w-4 text-orange-600 rounded focus:ring-orange-500"
                 />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900">Install after demo</span>
-                    {airMoversAfterDemo.has(calc.chamberId) && (
-                      <span className="px-2 py-0.5 bg-yellow-200 text-yellow-900 text-xs rounded-full font-medium">
-                        SCHEDULED POST-DEMO
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    Check if air movers cannot be installed until after demolition is complete. Equipment will be staged for post-demo installation.
-                  </p>
-                </div>
+                <span className="text-sm font-medium text-gray-900">Install after demo</span>
+                {airMoversAfterDemo.has(calc.chamberId) && (
+                  <span className="px-2 py-0.5 bg-yellow-200 text-yellow-900 text-xs rounded-full">
+                    POST-DEMO
+                  </span>
+                )}
               </label>
             </div>
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               {calc.roomPlacements.map((room, idx) => (
-                <div key={idx} className="bg-white border border-orange-200 rounded-lg p-3">
-                  <div className="flex items-start justify-between mb-1">
-                    <span className="font-semibold text-gray-900">{room.roomName}</span>
-                    <span className="text-xl font-bold text-orange-700">{room.total} units</span>
-                  </div>
-                  <p className="text-xs text-gray-600 italic">{room.placement}</p>
-                  <div className="flex gap-2 mt-2 text-xs text-gray-500">
-                    <span>Base: {room.base}</span>
-                    <span>Floor: +{room.floor}</span>
-                    <span>Wall: +{room.wall}</span>
+                <div key={idx} className="bg-white border border-orange-200 rounded p-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-900">{room.roomName}</span>
+                    <span className="text-lg font-bold text-orange-700">{room.total}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Calculation Details */}
-          <div className="space-y-2 mb-2">
-            <div className="bg-white rounded-lg p-3">
-              <p className="text-xs font-medium text-gray-600 mb-1">Dehumidifier Calculation:</p>
-              <p className="text-xs font-mono text-gray-800">{calc.formula}</p>
+          {/* Calculation Details - Collapsed by default */}
+          <details className="mb-2">
+            <summary className="cursor-pointer text-xs text-gray-600 hover:text-gray-900 p-2 bg-white rounded">
+              Show calculation details
+            </summary>
+            <div className="space-y-2 mt-2">
+              <div className="bg-white rounded p-2">
+                <p className="text-xs font-medium text-gray-600">Dehumidifier:</p>
+                <p className="text-xs font-mono text-gray-800">{calc.formula}</p>
+              </div>
+              <div className="bg-white rounded p-2">
+                <p className="text-xs font-medium text-gray-600">Air Movers:</p>
+                {calc.breakdown.map((line, idx) => (
+                  <p key={idx} className="text-xs font-mono text-gray-800">{line}</p>
+                ))}
+              </div>
             </div>
-            <div className="bg-white rounded-lg p-3">
-              <p className="text-xs font-medium text-gray-600 mb-1">Air Mover Calculation Formula:</p>
-              {calc.breakdown.map((line, idx) => (
-                <p key={idx} className="text-xs font-mono text-gray-800">{line}</p>
-              ))}
-            </div>
-          </div>
+          </details>
 
           {/* EQUIPMENT PLACEMENT SECTION - ROOM-BASED */}
-          <div className="border-t-2 border-gray-300 pt-4 space-y-4">
-            <h4 className="font-bold text-gray-900 flex items-center gap-2">
-              <QrCode className="w-5 h-5 text-green-600" />
-              Equipment Placement (By Room)
-            </h4>
+          <div className="border-t border-gray-300 pt-2 space-y-2">
+            <h4 className="text-sm font-bold text-gray-900">Equipment Placement</h4>
 
             {/* Placement Progress - Chamber Level Summary */}
             {(() => {
               const placed = getPlacedCounts(calc.chamberId);
               return (
-                <div className="bg-white border-2 border-gray-200 rounded-lg p-3">
+                <div className="bg-white border border-gray-200 rounded p-2">
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-gray-900">
+                      <div className="text-lg font-bold text-gray-900">
                         {placed.dehumidifiers}/{calc.dehumidifiers}
                       </div>
-                      <div className="text-xs text-gray-600">Dehumidifiers</div>
-                      {placed.dehumidifiers >= calc.dehumidifiers && (
-                        <CheckCircle className="w-5 h-5 text-green-600 mx-auto mt-1" />
-                      )}
+                      <div className="text-xs text-gray-600">Dehus</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-gray-900">
+                      <div className="text-lg font-bold text-gray-900">
                         {placed.airMovers}/{calc.airMovers}
                       </div>
-                      <div className="text-xs text-gray-600">Air Movers</div>
-                      {placed.airMovers >= calc.airMovers && (
-                        <CheckCircle className="w-5 h-5 text-green-600 mx-auto mt-1" />
-                      )}
+                      <div className="text-xs text-gray-600">Movers</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-gray-900">
+                      <div className="text-lg font-bold text-gray-900">
                         {placed.airScrubbers}/{calc.airScrubbers}
                       </div>
-                      <div className="text-xs text-gray-600">Air Scrubbers</div>
-                      {placed.airScrubbers >= calc.airScrubbers && (
-                        <CheckCircle className="w-5 h-5 text-green-600 mx-auto mt-1" />
-                      )}
+                      <div className="text-xs text-gray-600">Scrubbers</div>
                     </div>
                   </div>
                 </div>
@@ -576,35 +542,35 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
             })()}
 
             {/* ROOM-BY-ROOM PLACEMENT */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               {(() => {
                 const chamber = chambers.find(c => c.chamberId === calc.chamberId);
                 const chamberRooms = chamber ? rooms.filter(r => chamber.assignedRooms.includes(r.id)) : [];
                 const typeLabels = {
-                  'dehumidifier': '🌬️ Dehu',
-                  'air-mover': '💨 Air Mover',
-                  'air-scrubber': '🔄 Scrubber',
+                  'dehumidifier': 'Dehu',
+                  'air-mover': 'Mover',
+                  'air-scrubber': 'Scrub',
                 };
 
                 return chamberRooms.map(room => {
                   const roomEquipment = placedEquipment.filter(e => e.assignedRoomId === room.id);
 
                   return (
-                    <div key={room.id} className="bg-white border-2 border-gray-300 rounded-lg p-3">
+                    <div key={room.id} className="bg-white border border-gray-300 rounded p-2">
                       {/* Room Header */}
                       <div className="flex items-center justify-between mb-2">
-                        <h5 className="font-semibold text-gray-900">{room.name}</h5>
-                        <span className="text-xs text-gray-500">
-                          {roomEquipment.length} placed
-                        </span>
+                        <h5 className="text-sm font-medium text-gray-900">{room.name}</h5>
+                        {roomEquipment.length > 0 && (
+                          <span className="text-xs text-gray-500">{roomEquipment.length}</span>
+                        )}
                       </div>
 
                       {/* Inline Add Buttons - Three buttons per room */}
-                      <div className="grid grid-cols-3 gap-2 mb-2">
+                      <div className="grid grid-cols-3 gap-1 mb-2">
                         <Button
                           variant="secondary"
                           onClick={() => openScanner('dehumidifier', calc.chamberId, room.id)}
-                          className="flex items-center justify-center gap-1 text-sm py-2"
+                          className="text-xs"
                         >
                           <Plus className="w-3 h-3" />
                           Dehu
@@ -612,42 +578,38 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                         <Button
                           variant="secondary"
                           onClick={() => openScanner('air-scrubber', calc.chamberId, room.id)}
-                          className="flex items-center justify-center gap-1 text-sm py-2"
+                          className="text-xs"
                         >
                           <Plus className="w-3 h-3" />
-                          Scrubber
+                          Scrub
                         </Button>
                         <Button
                           variant="secondary"
                           onClick={() => openScanner('air-mover', calc.chamberId, room.id)}
-                          className="flex items-center justify-center gap-1 text-sm py-2"
+                          className="text-xs"
                         >
                           <Plus className="w-3 h-3" />
-                          Air Mover
+                          Mover
                         </Button>
                       </div>
 
                       {/* Placed Equipment in this Room */}
                       {roomEquipment.length > 0 && (
-                        <div className="space-y-2 pt-3 border-t border-gray-200">
+                        <div className="space-y-1 pt-2 border-t border-gray-200">
                           {roomEquipment.map(equipment => (
                             <div
                               key={equipment.id}
-                              className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                              className="flex items-center justify-between p-1 bg-gray-50 rounded text-xs"
                             >
                               <div className="flex-1">
-                                <div className="font-medium text-gray-900 text-sm">
-                                  {typeLabels[equipment.type]}
-                                </div>
-                                <div className="text-xs text-gray-600">
-                                  S/N: {equipment.serialNumber}
-                                </div>
+                                <span className="font-medium text-gray-900">{typeLabels[equipment.type]}</span>
+                                <span className="text-gray-600 ml-1">#{equipment.serialNumber}</span>
                               </div>
                               <button
                                 onClick={() => removeEquipment(equipment.id)}
-                                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                className="p-1 text-red-600 hover:bg-red-50 rounded"
                               >
-                                <X className="w-4 h-4" />
+                                <X className="w-3 h-3" />
                               </button>
                             </div>
                           ))}
