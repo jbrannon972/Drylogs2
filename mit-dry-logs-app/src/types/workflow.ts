@@ -5,8 +5,8 @@
 
 export type InstallStep =
   | 'office-prep'            // Step 1: Office preparation (optional)
-  | 'arrival'                // Step 2: Property arrival, clock in
-  | 'front-door'             // Step 3: Customer intro, ground rules
+  | 'arrival'                // Step 2: Property arrival, photos, property age & EPA hazards
+  | 'environmental-baseline' // Step 3: Outside temp, humidity & hygrometer photos
   | 'cause-of-loss'          // Step 4: Document cause + water category (1/2/3)
   | 'unaffected-baseline'    // Step 5: Unaffected area baseline (IICRC S500 dry standard)
   | 'room-assessment'        // Step 6: Assess ALL affected rooms (dimensions + moisture + materials + pre-existing)

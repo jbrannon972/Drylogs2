@@ -28,7 +28,7 @@ import { InstallStep } from '../../../types/workflow';
 // Import step components
 import { OfficePreparationStep } from './install/OfficePreparationStep';
 import { ArrivalStep } from './install/ArrivalStep';
-import { FrontDoorStep } from './install/FrontDoorStep';
+import { EnvironmentalBaselineStep } from './install/EnvironmentalBaselineStep';
 import { CauseOfLossStep } from './install/CauseOfLossStep';
 import { UnaffectedAreaBaselineStep } from './install/UnaffectedAreaBaselineStep';
 import { RoomAssessmentStep } from './install/RoomAssessmentStep';
@@ -64,16 +64,16 @@ const INSTALL_STEPS: StepConfig[] = [
   {
     id: 'arrival',
     title: 'Property Arrival',
-    description: 'Clock in and document arrival',
+    description: 'Photos, property age & EPA hazards',
     icon: <Home className="w-5 h-5" />,
     component: ArrivalStep,
   },
   {
-    id: 'front-door',
-    title: 'Customer Introduction',
-    description: 'Ground rules and walkthrough',
-    icon: <ClipboardCheck className="w-5 h-5" />,
-    component: FrontDoorStep,
+    id: 'environmental-baseline',
+    title: 'Environmental Baseline',
+    description: 'Outside temp, humidity & readings',
+    icon: <Thermometer className="w-5 h-5" />,
+    component: EnvironmentalBaselineStep,
   },
   {
     id: 'cause-of-loss',
