@@ -754,14 +754,20 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
                   {/* Overall Room Photos - OPTIONAL */}
                   <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Overall Room Photos (Optional)</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Notable Items Photos *</h3>
 
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                       <div className="flex items-start gap-3">
-                        <Info className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
+                        <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm text-gray-700">
-                            Optional: Capture wide shots showing the dry, unaffected condition of this baseline area
+                          <p className="text-sm text-blue-800 font-medium mb-1">
+                            Required: Take 2 photos of things that stand out in this room
+                          </p>
+                          <p className="text-xs text-blue-700">
+                            Examples: Pre-existing damage, very dirty areas, scratched doors, cracked tiles, stains, marks
+                          </p>
+                          <p className="text-xs text-blue-700 mt-1">
+                            <strong>Purpose:</strong> Liability protection for adjacent rooms - documents condition before work begins
                           </p>
                         </div>
                       </div>
@@ -779,41 +785,59 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                           });
                         }}
                         uploadedCount={selectedRoom.overallPhotos.length}
-                        label={`${selectedRoom.name} Overall Photos (Optional)`}
-                        minimumPhotos={0}
+                        label={`${selectedRoom.name} Notable Items`}
+                        minimumPhotos={2}
                       />
                     )}
                   </div>
 
-                  {/* Pre-existing Damage Section - OPTIONAL */}
+                  {/* Pre-existing Damage Section - REQUIRED */}
                   <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Pre-existing Damage (Optional)</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Pre-existing Damage *</h3>
 
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                       <div className="flex items-start gap-3">
-                        <Info className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
+                        <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm text-gray-700">
-                            Optional: Document any pre-existing damage in this baseline area.
-                            Note: Baseline areas should ideally be completely unaffected and dry.
+                          <p className="text-sm text-blue-800 font-medium">
+                            Required: Does this room have any pre-existing damage or notable conditions?
+                          </p>
+                          <p className="text-xs text-blue-700 mt-1">
+                            This protects against false claims after work is completed
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <label className="flex items-center gap-3 cursor-pointer mb-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedRoom.hasPreexistingDamage}
-                        onChange={(e) => updateSelectedRoom({ hasPreexistingDamage: e.target.checked })}
-                        className="h-5 w-5 text-blue-600 rounded"
-                      />
-                      <span className="text-base font-medium text-gray-900">
-                        This area has pre-existing damage
-                      </span>
-                    </label>
+                    <div className="space-y-3 mb-4">
+                      <label className="flex items-center gap-3 cursor-pointer p-3 border-2 rounded-lg hover:bg-gray-50 transition-colors" style={{ borderColor: selectedRoom.hasPreexistingDamage === true ? '#f97316' : '#d1d5db' }}>
+                        <input
+                          type="radio"
+                          name={`preexisting-${selectedRoom.id}`}
+                          checked={selectedRoom.hasPreexistingDamage === true}
+                          onChange={() => updateSelectedRoom({ hasPreexistingDamage: true })}
+                          className="h-5 w-5 text-orange-600"
+                        />
+                        <span className="text-base font-medium text-gray-900">
+                          Yes - This room has pre-existing damage
+                        </span>
+                      </label>
 
-                    {selectedRoom.hasPreexistingDamage && (
+                      <label className="flex items-center gap-3 cursor-pointer p-3 border-2 rounded-lg hover:bg-gray-50 transition-colors" style={{ borderColor: selectedRoom.hasPreexistingDamage === false ? '#10b981' : '#d1d5db' }}>
+                        <input
+                          type="radio"
+                          name={`preexisting-${selectedRoom.id}`}
+                          checked={selectedRoom.hasPreexistingDamage === false}
+                          onChange={() => updateSelectedRoom({ hasPreexistingDamage: false })}
+                          className="h-5 w-5 text-green-600"
+                        />
+                        <span className="text-base font-medium text-gray-900">
+                          No - This room is clean with no notable damage
+                        </span>
+                      </label>
+                    </div>
+
+                    {selectedRoom.hasPreexistingDamage === true && (
                       <div className="space-y-4">
                         <Button
                           variant="primary"
@@ -836,6 +860,15 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                             )}
                           </div>
                         )}
+                      </div>
+                    )}
+
+                    {selectedRoom.hasPreexistingDamage === false && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <p className="text-sm text-green-900">
+                          <CheckCircle className="w-4 h-4 inline mr-1" />
+                          ✓ Room documented as clean with no pre-existing damage
+                        </p>
                       </div>
                     )}
                   </div>
