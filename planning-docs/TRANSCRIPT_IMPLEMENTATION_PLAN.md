@@ -17,7 +17,7 @@
 
 ---
 
-## 1. Workflow Steps Restructuring
+## 1. Workflow Steps Restructuring DO IT
 
 ### Current vs. Proposed Step Count
 - **Current:** 14 steps (with tabs in some steps)
@@ -141,13 +141,13 @@
 - **NEW:** Multiple readings per material based on equipment placement
 
 #### New Workflow
-1. **Readings per Fan Rule:**
+1. **Readings per Fan Rule:** This shouldnt require one per fan. It is just making sure that we can take multiple readings on the sam material in the room and it will all be tacked as the same material
    - One moisture reading per air mover location
    - Example: 5 fans in room = 4 drywall readings + 2 flooring readings
    - Corresponds to equipment placement for drying curve tracking
 
 2. **Physical Labeling System:**
-   - Use numbered tape/stickers on walls (like garage sale stickers)
+   - Use numbered tape/stickers on walls (like garage sale stickers) Numbered tape
    - Tech writes numbers on wall for each reading location
    - Photos capture the numbered locations
    - Check service techs can easily find same spots
@@ -181,8 +181,8 @@
    ```
 
 3. **Display Format:**
-   - Show readings as list grouped by material
-   - Each reading shows: Material name, Reading value, Location number/note, Photo thumbnail
+   - Show readings as list grouped by material. It shows the highest reading you click on it and it dropdowns and shows all the readings for that room
+   - Each reading shows: Material name, Reading value, Location number/note, Photo thumbnail. Make the thumbnail small and in line. You click on it to see the whole picture
    - Dry standard shown once at top of each material group
 
 #### No Moisture Map/Diagram Needed
@@ -202,7 +202,7 @@
 
 #### Visual Improvements Needed
 1. **Make headers visually distinct from materials:**
-   - Headers: Larger, different color, bold
+   - Headers: Larger, different color, bold. Not larger than they are, so really make the others smaller
    - Materials: Smaller font, different background color
    - More items visible at once
 
@@ -349,7 +349,7 @@ BEDROOM - Air Movers Needed: 2
   [Add Air Mover] ← Click here
 ```
 
-**Workflow:**
+**Workflow:** THIS IS OFF, Each room has three inline buttons to add a dehu, airscrubber, or airmovers in that room so you never have to pick the room
 1. Click "Add Dehumidifier" (knows it's Chamber A)
 2. Dropdown: "Which room in Chamber A?" (Kitchen, Bedroom, etc.)
 3. Scan dehumidifier
@@ -410,7 +410,7 @@ Format each line item:
 - Reduces end-of-job data entry burden
 - Prevents forgetting items
 
-#### Future Enhancement
+#### Future Enhancement. CAN WE TRY TO ADD THIS NOW AS A QUICK ACTION???
 - AI voice-to-text: "Add billable item: floor protection, 200 square feet"
 - Photo recognition: Auto-detect what item is in photo
 - For now: Manual entry is acceptable
@@ -518,7 +518,7 @@ Buttons to add:
 - Adds professionalism and transparency
 - Some customers highly value digital documentation
 
-#### Supervisor Review Feature
+#### Supervisor Review Feature - IGNORE THIS
 - **Add button:** "Submit for Supervisor Review"
 - **Purpose:** Gives homeowner confidence ("my supervisor will review this")
 - **Implementation options:**
@@ -725,7 +725,7 @@ Buttons to add:
 **Question:** What physical labeling system should we recommend?
 
 **Options:**
-1. Numbered tape (write numbers on blue painter's tape)
+1. Numbered tape (write numbers on blue painter's tape) THIS ONE
 2. Pre-printed numbered stickers (garage sale stickers)
 3. Color-coded dots
 4. Combination (numbers + colors)
@@ -744,7 +744,7 @@ Buttons to add:
 
 **Context:** Robert mentioned needing ability to move equipment between rooms
 
-**Question:** Is this needed for INSTALL workflow, or only for Check Service/Demo/Pull?
+**Question:** Is this needed for INSTALL workflow, or only for Check Service/Demo/Pull? NOT NEEDED FOR INSTALL
 
 **Current plan:** Only build for Check Service/Demo/Pull (not Install)
 
@@ -754,7 +754,7 @@ Buttons to add:
 
 ### 5.3 Supervisor Review Requirements
 
-**Question:** Should "Submit for Supervisor Review" be:
+**Question:** Should "Submit for Supervisor Review" be: IGNORE FO NOW
 
 - [ ] **Option A:** Fake button for customer confidence only
 - [ ] **Option B:** Tracked but non-blocking (supervisor sees it, job proceeds)
@@ -771,7 +771,7 @@ Buttons to add:
 
 ### 5.4 Voice-to-Text Priority
 
-**Question:** How important is voice-to-text for notes fields?
+**Question:** How important is voice-to-text for notes fields? CAN WE DO IT NOW?
 
 **Context:**
 - Mentioned as future enhancement
@@ -797,10 +797,10 @@ Buttons to add:
 ```
 
 **Questions:**
-- Should Notes be inline text field or modal?
-- Should Photo be required or optional per item?
-- Should Quantity be text input or +/- buttons?
-- Do we need Unit selection (sq ft, linear ft, each, etc.)?
+- Should Notes be inline text field or modal? YES
+- Should Photo be required or optional per item? Requried, with an option to ignore but must be recorded
+- Should Quantity be text input or +/- buttons? text
+- Do we need Unit selection (sq ft, linear ft, each, etc.)? no
 
 **Decision needed:** ________________
 
@@ -810,7 +810,7 @@ Buttons to add:
 
 **Question:** When exactly should equipment be placed during install?
 
-**Current assumption:** During Step 12 (Equipment Calculation) right after calculating needs
+**Current assumption:** During Step 12 (Equipment Calculation) right after calculating needs yes
 
 **Alternative:** Move to end during final walkthrough (Step 14)
 
@@ -835,7 +835,7 @@ Buttons to add:
 **Current:** "1-2 photos of things that stand out"
 
 **Clarify:**
-- Minimum: 1 or 2?
+- Minimum: 1 or 2? 2
 - Maximum: Set a limit?
 - Allow skip if nothing notable?
 
@@ -845,28 +845,28 @@ Buttons to add:
 
 ## 6. Out of Scope Items
 
-### 6.1 Moisture Map / Floor Plan Diagram
+### 6.1 Moisture Map / Floor Plan Diagram IGNORE
 - **Not building** - confirmed explicitly
 - Rely on photos + numbered labels instead
 - If needed for invoicing, PSM creates manually using Matterport
 
-### 6.2 Demo Workflow (for now)
+### 6.2 Demo Workflow (for now) IGNORE
 - **Defer until Install workflow complete**
 - Partial demo in Install workflow is placeholder
 - Will import/reuse components after Demo workflow built
 
-### 6.3 Check Service Workflow
+### 6.3 Check Service Workflow IGNORE
 - **Not discussed in detail**
 - Wait until Install and Demo are solid
 - Should be easier to build after Install is done
 
-### 6.4 Pull Workflow
+### 6.4 Pull Workflow IGNORE
 - **Not discussed in detail**
 - Wait until other workflows complete
 
-### 6.5 Advanced AI Features
+### 6.5 Advanced AI Features 
 - Photo recognition (auto-identify materials)
-- Voice-to-text notes (maybe include basic version)
+- Voice-to-text notes (maybe include basic version) COULD WE DO THIS!
 - Intelligent auto-suggestions
 - Automated reports
 
