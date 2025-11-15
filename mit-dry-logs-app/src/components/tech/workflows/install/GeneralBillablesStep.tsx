@@ -7,7 +7,9 @@ import {
   Trash2,
   HardHat,
   FileText,
-  Info
+  Info,
+  Mic,
+  MicOff
 } from 'lucide-react';
 
 interface BillableItem {
@@ -139,6 +141,80 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
     }
   ]);
 
+  // Voice-to-text state
+  const [recordingItem, setRecordingItem] = useState<{ categoryId: string; itemId: string } | null>(null);
+  const [recognition, setRecognition] = useState<any>(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = true;
+      recognitionInstance.interimResults = true;
+      recognitionInstance.lang = 'en-US';
+
+      recognitionInstance.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        if (recordingItem && finalTranscript) {
+          const { categoryId, itemId } = recordingItem;
+          const category = categories.find(c => c.id === categoryId);
+          const item = category?.items.find(i => i.id === itemId);
+          if (item) {
+            const newNotes = item.notes + (item.notes ? ' ' : '') + finalTranscript.trim();
+            updateItem(categoryId, itemId, 'notes', newNotes);
+          }
+        }
+      };
+
+      recognitionInstance.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setRecordingItem(null);
+      };
+
+      recognitionInstance.onend = () => {
+        setRecordingItem(null);
+      };
+
+      setRecognition(recognitionInstance);
+    }
+  }, []);
+
+  const toggleVoiceRecording = (categoryId: string, itemId: string) => {
+    if (!recognition) {
+      alert('Voice recognition is not supported in your browser. Please use Chrome, Safari, or Edge.');
+      return;
+    }
+
+    if (recordingItem?.categoryId === categoryId && recordingItem?.itemId === itemId) {
+      // Stop recording
+      recognition.stop();
+      setRecordingItem(null);
+    } else {
+      // Start recording
+      if (recordingItem) {
+        recognition.stop();
+      }
+      setRecordingItem({ categoryId, itemId });
+      try {
+        recognition.start();
+      } catch (error) {
+        console.error('Error starting recognition:', error);
+      }
+    }
+  };
+
   const updateItem = (categoryId: string, itemId: string, field: keyof BillableItem, value: any) => {
     setCategories(prev => prev.map(cat => {
       if (cat.id === categoryId) {
@@ -256,17 +332,41 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
                           </span>
                         </div>
 
-                        {/* Notes */}
+                        {/* Notes with Voice-to-Text */}
                         <div>
-                          <label className="text-sm text-gray-700 block mb-1">
-                            Notes (optional):
-                          </label>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-sm text-gray-700">
+                              Notes (optional):
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => toggleVoiceRecording(category.id, item.id)}
+                              className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+                                recordingItem?.categoryId === category.id && recordingItem?.itemId === item.id
+                                  ? 'bg-red-500 text-white animate-pulse'
+                                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                              }`}
+                              title={recordingItem?.categoryId === category.id && recordingItem?.itemId === item.id ? 'Stop recording' : 'Start voice-to-text'}
+                            >
+                              {recordingItem?.categoryId === category.id && recordingItem?.itemId === item.id ? (
+                                <>
+                                  <MicOff className="w-3 h-3" />
+                                  Recording...
+                                </>
+                              ) : (
+                                <>
+                                  <Mic className="w-3 h-3" />
+                                  Voice
+                                </>
+                              )}
+                            </button>
+                          </div>
                           <textarea
                             value={item.notes}
                             onChange={(e) => updateItem(category.id, item.id, 'notes', e.target.value)}
                             rows={2}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:border-entrusted-orange text-sm"
-                            placeholder="Any details about this work..."
+                            placeholder="Type or use voice button to dictate..."
                           />
                         </div>
                       </div>
