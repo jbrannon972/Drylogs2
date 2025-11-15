@@ -4,7 +4,7 @@ import { Input } from '../../../shared/Input';
 import { PhotoCapture } from '../../../shared/PhotoCapture';
 import { Thermometer, Droplets, MapPin, CheckCircle, Info } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
-import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
+import { photoService } from '../../../../services/firebase/photoService';
 import { useAuth } from '../../../../hooks/useAuth';
 
 interface EnvironmentalBaselineStepProps {
@@ -13,7 +13,6 @@ interface EnvironmentalBaselineStepProps {
 
 export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps> = ({ job }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
-  const { queuePhoto } = useBatchPhotos();
   const { user } = useAuth();
 
   // Outside baseline
@@ -143,13 +142,24 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
         </p>
         <PhotoCapture
           contextLabel="Hygrometer Reading"
-          onPhotoCapture={async (file: File) => {
+          onPhotoCapture={async (file: File): Promise<string | null> => {
             if (!user) return null;
-            const url = await queuePhoto(file, job.jobId, 'hygrometer', 'Hygrometer Reading', 'environmental-baseline');
-            if (url) {
-              setHygrometerPhotos([...hygrometerPhotos, url]);
+            try {
+              // Upload photo immediately and get URL
+              const url = await photoService.uploadPhoto(
+                file,
+                job.jobId,
+                'environmental-baseline',
+                'arrival', // PhotoStep type
+                user.uid
+              );
+              // Add to local state
+              setHygrometerPhotos(prev => [...prev, url]);
+              return url;
+            } catch (error) {
+              console.error('Failed to upload hygrometer photo:', error);
+              return null;
             }
-            return url;
           }}
           photos={hygrometerPhotos}
           onPhotoDelete={(index: number) => {
