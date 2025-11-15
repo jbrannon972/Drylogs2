@@ -62,11 +62,11 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
   const allDataComplete = outsideTemp && outsideHumidity && hygrometerPhotos.length > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
+          <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Establish Environmental Baseline</h4>
             <p className="text-sm text-blue-800">
@@ -77,16 +77,16 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
       </div>
 
       {/* Outside Conditions */}
-      <div className="border-2 border-blue-300 rounded-lg p-5 bg-blue-50">
-        <div className="flex items-center gap-2 mb-4">
-          <MapPin className="w-6 h-6 text-blue-600" />
+      <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50">
+        <div className="flex items-center gap-2 mb-3">
+          <MapPin className="w-5 h-5 text-blue-600" />
           <h3 className="font-semibold text-gray-900">Outside Conditions</h3>
         </div>
-        <p className="text-sm text-gray-700 mb-4">
+        <p className="text-sm text-gray-700 mb-3">
           Step outside and record the current outdoor temperature and relative humidity.
         </p>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
               <Thermometer className="w-4 h-4" />
@@ -98,7 +98,6 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
               placeholder="72.5"
               value={outsideTemp}
               onChange={(e) => setOutsideTemp(e.target.value)}
-              className="text-lg"
             />
           </div>
           <div>
@@ -114,30 +113,29 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
               placeholder="55"
               value={outsideHumidity}
               onChange={(e) => setOutsideHumidity(e.target.value)}
-              className="text-lg"
             />
           </div>
         </div>
 
         {/* Psychrometric Calculations - Outside */}
         {outsideDewPoint !== null && outsideGPP !== null && (
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div className="bg-white rounded-lg p-3 border border-blue-200">
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <div className="bg-white rounded-lg p-2 border border-blue-200">
               <p className="text-xs text-gray-600">Dew Point</p>
-              <p className="text-lg font-bold text-blue-900">{outsideDewPoint.toFixed(1)}°F</p>
+              <p className="text-base font-bold text-blue-900">{outsideDewPoint.toFixed(1)}°F</p>
             </div>
-            <div className="bg-white rounded-lg p-3 border border-blue-200">
+            <div className="bg-white rounded-lg p-2 border border-blue-200">
               <p className="text-xs text-gray-600">GPP (Grains/Lb)</p>
-              <p className="text-lg font-bold text-blue-900">{outsideGPP.toFixed(1)}</p>
+              <p className="text-base font-bold text-blue-900">{outsideGPP.toFixed(1)}</p>
             </div>
           </div>
         )}
       </div>
 
       {/* Hygrometer Photos */}
-      <div className="border-2 border-gray-300 rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-3">Hygrometer Photos</h3>
-        <p className="text-sm text-gray-700 mb-4">
+      <div className="border-2 border-gray-300 rounded-lg p-4">
+        <h3 className="font-semibold text-gray-900 mb-2">Hygrometer Photos</h3>
+        <p className="text-sm text-gray-700 mb-3">
           Take photos of your hygrometer displaying the outside temperature and humidity readings.
         </p>
         <PhotoCapture
@@ -172,9 +170,9 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
 
       {/* Success Indicator */}
       {allDataComplete && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
+            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-green-900 mb-1">✓ Environmental Baseline Complete</h4>
               <p className="text-sm text-green-800">

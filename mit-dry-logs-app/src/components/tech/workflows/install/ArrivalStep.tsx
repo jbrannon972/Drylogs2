@@ -86,9 +86,9 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
   const canProceed = hasTruckPhoto && hasPropertyPhoto && propertyAge;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Job Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <h3 className="font-semibold text-blue-900 mb-2">Job Information</h3>
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2 text-gray-700">
@@ -103,7 +103,7 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
       </div>
 
       {/* Clock In */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Arrival Time *
@@ -130,13 +130,13 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
       </div>
 
       {/* Property Age & EPA Hazards */}
-      <div className="border-2 border-gray-300 rounded-lg p-5">
-        <div className="flex items-center gap-2 mb-4">
+      <div className="border-2 border-gray-300 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
           <Shield className="w-5 h-5 text-gray-700" />
           <h3 className="font-semibold text-gray-900">Property Age & EPA Hazards</h3>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-3">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Year Built *
           </label>
@@ -153,20 +153,20 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
 
         {/* EPA Hazard Warnings - Smart Display */}
         {(showAsbestosWarning || showLeadWarning) && (
-          <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4 mt-4">
-            <div className="flex items-start gap-3 mb-3">
-              <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="bg-red-50 border-2 border-red-300 rounded-lg p-3 mt-3">
+            <div className="flex items-start gap-2 mb-2">
+              <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-red-900 mb-1">⚠️ EPA Hazard Alert</h4>
-                <p className="text-sm text-red-800 mb-3">
+                <p className="text-sm text-red-800 mb-2">
                   This property was built {showAsbestosWarning ? 'before 1980' : 'before 1978'}. Be aware of the following potential hazards:
                 </p>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               {showAsbestosWarning && (
-                <div className="bg-white border border-red-200 rounded p-3">
+                <div className="bg-white border border-red-200 rounded p-2">
                   <p className="font-medium text-red-900 mb-2">🔴 Asbestos Hazard (Pre-1980)</p>
                   <ul className="text-sm text-red-800 space-y-1 list-disc list-inside">
                     <li>Do not disturb ceiling tiles, insulation, or flooring without testing</li>
@@ -178,7 +178,7 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
               )}
 
               {showLeadWarning && (
-                <div className="bg-white border border-red-200 rounded p-3">
+                <div className="bg-white border border-red-200 rounded p-2">
                   <p className="font-medium text-red-900 mb-2">🔴 Lead Paint Hazard (Pre-1978)</p>
                   <ul className="text-sm text-red-800 space-y-1 list-disc list-inside">
                     <li>Assume all painted surfaces contain lead</li>
@@ -209,15 +209,15 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Truck Location Photo *
         </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-3">
           {hasTruckPhoto && (
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <CheckCircle className="w-4 h-4 text-green-600" />
               <span className="text-sm text-green-600 font-medium">Photo captured ✓</span>
             </div>
           )}
 
-          <label className="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange hover:bg-orange-50 transition-all cursor-pointer active:scale-95">
+          <label className="flex flex-col items-center justify-center p-5 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange hover:bg-orange-50 transition-all cursor-pointer active:scale-95">
             <input
               type="file"
               accept="image/*"
@@ -225,7 +225,7 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
               onChange={handleTruckPhotosCapture}
               className="hidden"
             />
-            <Camera className="w-12 h-12 text-entrusted-orange mb-3" />
+            <Camera className="w-10 h-10 text-entrusted-orange mb-2" />
             <span className="text-base font-bold text-gray-900">Take Photo</span>
             <span className="text-sm text-gray-500">Document truck location for safety</span>
           </label>
@@ -237,15 +237,15 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Property Exterior Photo *
         </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-3">
           {hasPropertyPhoto && (
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <CheckCircle className="w-4 h-4 text-green-600" />
               <span className="text-sm text-green-600 font-medium">Photo captured ✓</span>
             </div>
           )}
 
-          <label className="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange hover:bg-orange-50 transition-all cursor-pointer active:scale-95">
+          <label className="flex flex-col items-center justify-center p-5 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange hover:bg-orange-50 transition-all cursor-pointer active:scale-95">
             <input
               type="file"
               accept="image/*"
@@ -253,7 +253,7 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
               onChange={handlePropertyPhotosCapture}
               className="hidden"
             />
-            <Camera className="w-12 h-12 text-entrusted-orange mb-3" />
+            <Camera className="w-10 h-10 text-entrusted-orange mb-2" />
             <span className="text-base font-bold text-gray-900">Take Photo</span>
             <span className="text-sm text-gray-500">Document property exterior</span>
           </label>
@@ -262,9 +262,9 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
 
       {/* Success Indicator */}
       {canProceed && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
+            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-green-900 mb-1">✓ Arrival Step Complete</h4>
               <p className="text-sm text-green-800">
@@ -277,7 +277,7 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
 
       {/* Validation Message */}
       {!canProceed && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-sm text-yellow-800 font-medium mb-2">
             ⚠️ Please complete the following to proceed:
           </p>
