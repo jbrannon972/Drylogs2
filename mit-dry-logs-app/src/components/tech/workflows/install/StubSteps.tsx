@@ -53,15 +53,15 @@ export const PreExistingStep: React.FC<StepProps> = ({ job, onNext }) => {
   };
 
   return (
-    <div className="space-y-6" onBlur={handleSave}>
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <div className="space-y-4" onBlur={handleSave}>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <p className="text-sm text-blue-800">
           📋 Document any damage, stains, or issues that existed BEFORE the water loss to protect against liability.
         </p>
       </div>
 
       <div>
-        <label className="flex items-center gap-3 cursor-pointer">
+        <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
             checked={hasPreExisting}
@@ -120,12 +120,12 @@ export const PreExistingStep: React.FC<StepProps> = ({ job, onNext }) => {
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   {uploading ? (
                     <>
-                      <Upload className="w-8 h-8 mb-2 text-gray-400 animate-bounce" />
+                      <Upload className="w-10 h-10 mb-2 text-gray-400 animate-bounce" />
                       <p className="text-sm text-gray-500">Uploading...</p>
                     </>
                   ) : (
                     <>
-                      <Camera className="w-8 h-8 mb-2 text-gray-400" />
+                      <Camera className="w-10 h-10 mb-2 text-gray-400" />
                       <p className="text-sm text-gray-500">
                         <span className="font-semibold">Tap to capture</span> pre-existing conditions
                       </p>
@@ -145,7 +145,7 @@ export const PreExistingStep: React.FC<StepProps> = ({ job, onNext }) => {
           </div>
 
           {preExistingPhotos.length === 0 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
               <p className="text-sm text-yellow-800">
                 ⚠️ Please upload at least one photo of pre-existing conditions for documentation.
               </p>
@@ -155,7 +155,7 @@ export const PreExistingStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {!hasPreExisting && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <p className="text-sm text-green-800 font-medium">
@@ -166,7 +166,7 @@ export const PreExistingStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {hasPreExisting && preExistingNotes && preExistingPhotos.length > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <p className="text-sm text-green-800 font-medium">
@@ -228,7 +228,7 @@ export const CauseOfLossStep: React.FC<StepProps> = ({ job, onNext }) => {
   ];
 
   return (
-    <div className="space-y-6" onBlur={handleSave}>
+    <div className="space-y-4" onBlur={handleSave}>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Type of Loss *
@@ -286,12 +286,12 @@ export const CauseOfLossStep: React.FC<StepProps> = ({ job, onNext }) => {
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
               {uploading ? (
                 <>
-                  <Upload className="w-8 h-8 mb-2 text-gray-400 animate-bounce" />
+                  <Upload className="w-10 h-10 mb-2 text-gray-400 animate-bounce" />
                   <p className="text-sm text-gray-500">Uploading...</p>
                 </>
               ) : (
                 <>
-                  <Camera className="w-8 h-8 mb-2 text-gray-400" />
+                  <Camera className="w-10 h-10 mb-2 text-gray-400" />
                   <p className="text-sm text-gray-500">
                     <span className="font-semibold">Tap to capture</span> cause of loss
                   </p>
@@ -311,7 +311,7 @@ export const CauseOfLossStep: React.FC<StepProps> = ({ job, onNext }) => {
       </div>
 
       {causePhotos.length < 2 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-sm text-yellow-800">
             ⚠️ Please upload at least 2 photos of the cause of loss for documentation.
           </p>
@@ -319,7 +319,7 @@ export const CauseOfLossStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {causeType && causeDescription && causePhotos.length >= 2 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <p className="text-sm text-green-800 font-medium">
@@ -382,8 +382,8 @@ export const AffectedRoomsStep: React.FC<StepProps> = ({ job, onNext }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <div className="space-y-4">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-blue-800 font-medium">
@@ -401,7 +401,7 @@ export const AffectedRoomsStep: React.FC<StepProps> = ({ job, onNext }) => {
       </div>
 
       {rooms.length === 0 ? (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-sm text-yellow-800">
             ⚠️ No rooms have been added. Go back to Room Evaluation to add rooms first.
           </p>
@@ -415,11 +415,11 @@ export const AffectedRoomsStep: React.FC<StepProps> = ({ job, onNext }) => {
             return (
               <div
                 key={room.id}
-                className={`border-2 rounded-lg p-4 ${
+                className={`border-2 rounded-lg p-3 ${
                   isComplete ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'
                 }`}
               >
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2">
                   <div>
                     <h4 className="font-semibold text-gray-900">{room.name}</h4>
                     <p className="text-xs text-gray-600">
@@ -462,7 +462,7 @@ export const AffectedRoomsStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {rooms.length > 0 && getTotalAffectedMaterials() === 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-sm text-yellow-800">
             ⚠️ Please select at least one affected material for each room.
           </p>
@@ -470,7 +470,7 @@ export const AffectedRoomsStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {rooms.length > 0 && getTotalAffectedMaterials() > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <p className="text-sm text-green-800 font-medium">
@@ -493,7 +493,7 @@ export const EquipmentCalcStep: React.FC<StepProps> = ({ job, onNext }) => {
 
   return (
     <div>
-      <p className="text-gray-600 mb-4">
+      <p className="text-gray-600 mb-2">
         Calculate equipment needs using IICRC S500-2021 standards based on the rooms you've documented.
       </p>
 
@@ -504,7 +504,7 @@ export const EquipmentCalcStep: React.FC<StepProps> = ({ job, onNext }) => {
       />
 
       {rooms.length === 0 && (
-        <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="mt-2 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-sm text-yellow-800">
             ⚠️ No rooms have been added yet. Go back to the Room Evaluation step to add rooms before calculating equipment needs.
           </p>
@@ -598,13 +598,13 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 text-white rounded-lg p-6">
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 text-white rounded-lg p-3">
         <h3 className="text-xl font-poppins font-bold mb-2">Equipment Placement</h3>
         <p className="text-orange-100 text-sm">
           Track equipment placement according to the IICRC-calculated requirements
         </p>
-        <div className="mt-4">
+        <div className="mt-2">
           <div className="flex items-center justify-between text-sm mb-2">
             <span>Placement Progress</span>
             <span className="font-bold">{Math.round(getProgress())}%</span>
@@ -619,20 +619,20 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
       </div>
 
       {equipmentCalc && (
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-blue-900">
               {getTotalPlaced('dehumidifier')}/{equipmentCalc.dehumidifiers.dehumidifierCount}
             </p>
             <p className="text-xs text-gray-600">Dehumidifiers</p>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-green-900">
               {getTotalPlaced('air-mover')}/{equipmentCalc.airMovers.totalCount}
             </p>
             <p className="text-xs text-gray-600">Air Movers</p>
           </div>
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-purple-900">
               {getTotalPlaced('air-scrubber')}/{equipmentCalc.airScrubbers.count}
             </p>
@@ -641,8 +641,8 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-4">Add Equipment</h4>
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2">Add Equipment</h4>
 
         <div className="space-y-4">
           <div>
@@ -758,11 +758,11 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
             return (
               <div
                 key={room.id}
-                className={`border-2 rounded-lg p-4 ${
+                className={`border-2 rounded-lg p-3 ${
                   roomEquipment.length > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'
                 }`}
               >
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2">
                   <div>
                     <h5 className="font-semibold text-gray-900">{room.name}</h5>
                     <p className="text-xs text-gray-600">{roomEquipment.length} pieces of equipment</p>
@@ -823,7 +823,7 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {getTotalPlaced() === 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-sm text-yellow-800">
             ⚠️ No equipment has been placed yet. Add equipment using the form above.
           </p>
@@ -831,7 +831,7 @@ export const EquipmentPlaceStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {equipmentCalc && getProgress() >= 100 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <p className="text-sm text-green-800 font-medium">
@@ -882,29 +882,29 @@ export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 text-white rounded-lg p-6">
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 text-white rounded-lg p-3">
         <h3 className="text-xl font-poppins font-bold mb-2">Mitigation Plan Summary</h3>
         <p className="text-orange-100 text-sm">
           Review this plan with {job.customerInfo.name} and ensure they understand the process
         </p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-4">Scope of Work</h4>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2">Scope of Work</h4>
+        <div className="grid grid-cols-2 gap-2 mb-2">
+          <div className="text-center p-3 bg-blue-50 rounded-lg">
             <p className="text-2xl font-bold text-blue-900">{planSummary.rooms}</p>
             <p className="text-xs text-gray-600">Affected Rooms</p>
           </div>
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
+          <div className="text-center p-3 bg-blue-50 rounded-lg">
             <p className="text-2xl font-bold text-blue-900">{planSummary.totalSqFt.toFixed(0)}</p>
             <p className="text-xs text-gray-600">Total Sq Ft</p>
           </div>
         </div>
 
-        <h4 className="font-semibold text-gray-900 mb-3">Equipment Being Installed</h4>
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <h4 className="font-semibold text-gray-900 mb-2">Equipment Being Installed</h4>
+        <div className="grid grid-cols-3 gap-2 mb-2">
           <div className="text-center p-3 bg-green-50 rounded">
             <p className="text-xl font-bold text-green-900">{planSummary.dehumidifiers}</p>
             <p className="text-xs text-gray-600">Dehumidifiers</p>
@@ -919,7 +919,7 @@ export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => {
           </div>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-sm text-blue-800">
             <strong>Estimated Drying Time:</strong> {planSummary.dryingDays} days
           </p>
@@ -929,11 +929,11 @@ export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-3">Customer Expectations</h4>
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2">Customer Expectations</h4>
         <ul className="space-y-2">
           {customerExpectations.map((expectation, index) => (
-            <li key={index} className="flex items-start gap-3 text-sm text-gray-700">
+            <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
               <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
               <span>{expectation}</span>
             </li>
@@ -941,11 +941,11 @@ export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => {
         </ul>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-3">Customer Agreement</h4>
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2">Customer Agreement</h4>
 
-        <div className="mb-4">
-          <label className="flex items-center gap-3 cursor-pointer p-4 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange transition-colors">
+        <div className="mb-2">
+          <label className="flex items-center gap-2 cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange transition-colors">
             <input
               type="checkbox"
               checked={customerAgreed}
@@ -978,7 +978,7 @@ export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => {
       </div>
 
       {!customerAgreed && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-sm text-yellow-800">
             ⚠️ Customer agreement required before proceeding to equipment installation.
           </p>
@@ -986,7 +986,7 @@ export const CommunicatePlanStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {customerAgreed && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <p className="text-sm text-green-800 font-medium">
@@ -1052,13 +1052,13 @@ export const ReviewStep: React.FC<StepProps> = ({ job, onNext }) => {
   const completionPercentage = (sections.filter(s => s.complete).length / sections.length) * 100;
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 text-white rounded-lg p-6">
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 text-white rounded-lg p-3">
         <h3 className="text-2xl font-poppins font-bold mb-2">Install Review</h3>
         <p className="text-orange-100">
           Review all collected data before completing the install workflow
         </p>
-        <div className="mt-4">
+        <div className="mt-2">
           <div className="flex items-center justify-between text-sm mb-2">
             <span>Completion Progress</span>
             <span className="font-bold">{Math.round(completionPercentage)}%</span>
@@ -1076,13 +1076,13 @@ export const ReviewStep: React.FC<StepProps> = ({ job, onNext }) => {
         {sections.map((section, index) => (
           <div
             key={index}
-            className={`p-4 rounded-lg border-2 ${
+            className={`p-3 rounded-lg border-2 ${
               section.complete
                 ? 'bg-green-50 border-green-200'
                 : 'bg-yellow-50 border-yellow-200'
             }`}
           >
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2">
               <div
                 className={`p-2 rounded-lg ${
                   section.complete ? 'bg-green-100' : 'bg-yellow-100'
@@ -1109,8 +1109,8 @@ export const ReviewStep: React.FC<StepProps> = ({ job, onNext }) => {
       </div>
 
       {rooms.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-900 mb-3">Rooms Summary</h4>
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <h4 className="font-semibold text-gray-900 mb-2">Rooms Summary</h4>
           <div className="space-y-2">
             {rooms.map((room: any, index: number) => (
               <div key={index} className="flex items-center justify-between text-sm py-2 border-b last:border-b-0">
@@ -1123,9 +1123,9 @@ export const ReviewStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {equipmentCalc && (
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-900 mb-3">Equipment Summary</h4>
-          <div className="grid grid-cols-3 gap-4 text-center">
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <h4 className="font-semibold text-gray-900 mb-2">Equipment Summary</h4>
+          <div className="grid grid-cols-3 gap-2 text-center">
             <div>
               <p className="text-2xl font-bold text-blue-900">{equipmentCalc.dehumidifiers.dehumidifierCount}</p>
               <p className="text-xs text-gray-600">Dehumidifiers</p>
@@ -1143,7 +1143,7 @@ export const ReviewStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {!allComplete && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <p className="text-sm text-yellow-800 font-medium">
             ⚠️ Some sections are incomplete. Please go back and complete all required steps before finalizing the install.
           </p>
@@ -1151,7 +1151,7 @@ export const ReviewStep: React.FC<StepProps> = ({ job, onNext }) => {
       )}
 
       {allComplete && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <p className="text-sm text-green-800 font-medium">
@@ -1360,9 +1360,9 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-8 text-center">
-        <CheckCircle className="w-16 h-16 mx-auto mb-4" />
+        <CheckCircle className="w-16 h-16 mx-auto mb-2" />
         <h3 className="text-3xl font-poppins font-bold mb-2">Install Complete!</h3>
         <p className="text-green-100">
           Great work! All steps have been completed successfully.
@@ -1370,10 +1370,10 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Labor Hours Tracking */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-4">Labor Hours</h4>
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2">Labor Hours</h4>
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-2 gap-2 mb-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Arrival Time
@@ -1400,7 +1400,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
           </div>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Travel Time from Site (minutes)
           </label>
@@ -1416,9 +1416,9 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
         </div>
 
         {laborSummary && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h5 className="font-semibold text-blue-900 mb-3">Labor Summary</h5>
-            <div className="grid grid-cols-3 gap-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <h5 className="font-semibold text-blue-900 mb-2">Labor Summary</h5>
+            <div className="grid grid-cols-3 gap-2">
               <div className="text-center">
                 <p className="text-2xl font-bold text-blue-900">{laborSummary.totalHours}</p>
                 <p className="text-xs text-gray-600">Total Hours</p>
@@ -1432,7 +1432,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
                 <p className="text-xs text-gray-600">After Hours</p>
               </div>
             </div>
-            <p className="text-xs text-blue-700 mt-3 text-center">
+            <p className="text-xs text-blue-700 mt-2 text-center">
               {installData.arrivalTime} → {departureTime} = {laborSummary.totalHours} hours on-site
             </p>
           </div>
@@ -1440,30 +1440,30 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Installation Summary */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-4">Installation Summary</h4>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2">Installation Summary</h4>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="text-center p-3 bg-blue-50 rounded-lg">
             <p className="text-3xl font-bold text-blue-900">{summary.rooms}</p>
             <p className="text-sm text-gray-600">Rooms Evaluated</p>
           </div>
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
+          <div className="text-center p-3 bg-blue-50 rounded-lg">
             <p className="text-3xl font-bold text-blue-900">{summary.totalSqFt.toFixed(0)}</p>
             <p className="text-sm text-gray-600">Total Sq Ft</p>
           </div>
-          <div className="text-center p-4 bg-green-50 rounded-lg">
+          <div className="text-center p-3 bg-green-50 rounded-lg">
             <p className="text-3xl font-bold text-green-900">{summary.dehumidifiers}</p>
             <p className="text-sm text-gray-600">Dehumidifiers</p>
           </div>
-          <div className="text-center p-4 bg-green-50 rounded-lg">
+          <div className="text-center p-3 bg-green-50 rounded-lg">
             <p className="text-3xl font-bold text-green-900">{summary.airMovers}</p>
             <p className="text-sm text-gray-600">Air Movers</p>
           </div>
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
+          <div className="text-center p-3 bg-purple-50 rounded-lg">
             <p className="text-3xl font-bold text-purple-900">{summary.airScrubbers}</p>
             <p className="text-sm text-gray-600">Air Scrubbers</p>
           </div>
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
+          <div className="text-center p-3 bg-purple-50 rounded-lg">
             <p className="text-3xl font-bold text-purple-900">{summary.photos}</p>
             <p className="text-sm text-gray-600">Photos Captured</p>
           </div>
@@ -1485,17 +1485,17 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Customer Signature Capture */}
-      <div className="bg-white border-2 border-gray-300 rounded-lg p-6">
-        <div className="flex items-center gap-2 mb-4">
+      <div className="bg-white border-2 border-gray-300 rounded-lg p-3">
+        <div className="flex items-center gap-2 mb-2">
           <CheckCircle className="w-5 h-5 text-entrusted-orange" />
           <h4 className="font-semibold text-gray-900">Customer Signature *</h4>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 mb-2">
           Customer signature confirms work completion and equipment placement. Required for dispute prevention.
         </p>
 
         {/* Customer Name */}
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Customer Name *
           </label>
@@ -1543,7 +1543,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
         </div>
 
         {signature && (
-          <div className="mt-4 bg-green-50 border border-green-300 rounded-lg p-3 flex items-start gap-2">
+          <div className="mt-2 bg-green-50 border border-green-300 rounded-lg p-3 flex items-start gap-2">
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-green-900">Signature Captured</p>
@@ -1559,7 +1559,7 @@ export const CompleteStep: React.FC<StepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Next Steps */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <p className="text-sm text-blue-800">
           <strong>Next Steps:</strong>
         </p>

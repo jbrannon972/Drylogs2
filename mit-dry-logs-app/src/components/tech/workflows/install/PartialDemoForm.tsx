@@ -149,10 +149,10 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
   };
 
   return (
-    <div className="space-y-6 mt-6 pt-6 border-t-2 border-orange-200">
+    <div className="space-y-4 mt-6 pt-6 border-t-2 border-orange-200">
       {/* Header */}
-      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Trash2 className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
           <div>
             <h3 className="font-semibold text-orange-900 mb-1">
@@ -173,9 +173,9 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
 
       {/* Demo Rooms */}
       {demoRooms.map((demoRoom) => (
-        <div key={demoRoom.roomId} className="border-2 border-gray-300 rounded-lg p-4 bg-white">
+        <div key={demoRoom.roomId} className="border-2 border-gray-300 rounded-lg p-3 bg-white">
           {/* Room Header */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-2">
             <h4 className="font-semibold text-gray-900 text-lg flex items-center gap-2">
               <Trash2 className="w-5 h-5 text-orange-600" />
               {demoRoom.roomName}
@@ -190,12 +190,12 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
           </div>
 
           {/* Materials Removed */}
-          <div className="space-y-3 mb-4">
+          <div className="space-y-3 mb-2">
             <label className="block text-sm font-medium text-gray-700">
               Materials Removed:
             </label>
             {demoRoom.materialsRemoved.map((material, idx) => (
-              <div key={idx} className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+              <div key={idx} className="flex items-center gap-2 bg-gray-50 p-3 rounded-lg">
                 {/* Material Type */}
                 <select
                   value={material.materialType}
@@ -257,7 +257,7 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
           </div>
 
           {/* Demo Time */}
-          <div className="mb-4">
+          <div className="mb-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Demo Time (minutes):
             </label>
@@ -291,8 +291,8 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
       {/* Add Room Button */}
       {demoRooms.length === 0 ? (
         <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-          <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600 mb-4">No rooms added yet</p>
+          <AlertCircle className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+          <p className="text-gray-600 mb-2">No rooms added yet</p>
           <Button variant="primary" onClick={() => setShowAddRoom(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Add Room with Demo Work
@@ -312,11 +312,11 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
 
       {/* Add Room Selector */}
       {showAddRoom && (
-        <div className="bg-gray-50 border border-gray-300 rounded-lg p-4">
+        <div className="bg-gray-50 border border-gray-300 rounded-lg p-3">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select Room:
           </label>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <select
               value={selectedRoomId}
               onChange={(e) => setSelectedRoomId(e.target.value)}
@@ -343,7 +343,7 @@ export const PartialDemoForm: React.FC<PartialDemoFormProps> = ({ rooms, onSave,
 
       {/* Save Summary */}
       {demoRooms.length > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <h4 className="font-medium text-green-900 mb-2">
             ✓ Partial Demo Summary
           </h4>

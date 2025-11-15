@@ -122,11 +122,11 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
   const equipmentReady = (dehumidifiersLoaded > 0 || airMoversLoaded > 0 || airScrubbersLoaded > 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <Clipboard className="w-6 h-6 text-blue-600 mt-0.5 flex-shrink-0" />
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
+          <Clipboard className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
           <div>
             <h3 className="font-semibold text-blue-900 mb-1">
               Office Preparation (Optional)
@@ -140,14 +140,14 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
       </div>
 
       {/* Work Order Review */}
-      <div className="border-2 border-gray-200 rounded-lg p-5">
-        <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border-2 border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Clipboard className="w-5 h-5 text-entrusted-orange" />
           Work Order Review
         </h4>
 
         <div className="space-y-3">
-          <label className="flex items-start gap-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+          <label className="flex items-start gap-2 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors">
             <input
               type="checkbox"
               checked={workOrderReviewed}
@@ -160,7 +160,7 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
             </div>
           </label>
 
-          <label className="flex items-start gap-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+          <label className="flex items-start gap-2 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors">
             <input
               type="checkbox"
               checked={customerContactVerified}
@@ -173,7 +173,7 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
             </div>
           </label>
 
-          <label className="flex items-start gap-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+          <label className="flex items-start gap-2 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors">
             <input
               type="checkbox"
               checked={insuranceInfoReviewed}
@@ -190,7 +190,7 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
         </div>
 
         {workOrderComplete && (
-          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
+          <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <span className="text-sm font-medium text-green-800">Work order review complete</span>
           </div>
@@ -198,13 +198,13 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
       </div>
 
       {/* Customer Communication */}
-      <div className="border-2 border-gray-200 rounded-lg p-5">
-        <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border-2 border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Phone className="w-5 h-5 text-entrusted-orange" />
           Customer Communication
         </h4>
 
-        <label className="flex items-start gap-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors mb-4">
+        <label className="flex items-start gap-2 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors mb-2">
           <input
             type="checkbox"
             checked={customerCalled}
@@ -223,7 +223,7 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Confirmed Arrival Window:
               </label>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <label className="flex items-center gap-2">
                   <input
                     type="radio"
@@ -284,8 +284,8 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
       </div>
 
       {/* Equipment & Supplies Loaded */}
-      <div className="border-2 border-gray-200 rounded-lg p-5">
-        <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border-2 border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Package className="w-5 h-5 text-entrusted-orange" />
           Equipment & Supplies Loaded
         </h4>
@@ -293,8 +293,8 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
         <div className="space-y-4">
           {/* Equipment Counts */}
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-3">Equipment loaded on truck:</p>
-            <div className="grid grid-cols-3 gap-3">
+            <p className="text-sm font-medium text-gray-700 mb-2">Equipment loaded on truck:</p>
+            <div className="grid grid-cols-3 gap-2">
               <Input
                 type="number"
                 label="Dehumidifiers"
@@ -321,8 +321,8 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
 
           {/* Supplies Checklist */}
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-3">Supplies packed:</p>
-            <div className="grid grid-cols-2 gap-3">
+            <p className="text-sm font-medium text-gray-700 mb-2">Supplies packed:</p>
+            <div className="grid grid-cols-2 gap-2">
               {[
                 { key: 'moistureMeter', label: 'Moisture meter' },
                 { key: 'thermalCamera', label: 'Thermal imaging camera' },
@@ -346,13 +346,13 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
               value={suppliesChecklist.other}
               onChange={(e) => setSuppliesChecklist({ ...suppliesChecklist, other: e.target.value })}
               placeholder="Other supplies..."
-              className="mt-3 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:border-entrusted-orange text-sm"
+              className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:border-entrusted-orange text-sm"
             />
           </div>
         </div>
 
         {equipmentReady && (
-          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-sm text-green-800">
               <strong>Total equipment loaded:</strong> {dehumidifiersLoaded + airMoversLoaded + airScrubbersLoaded} units
             </p>
@@ -361,8 +361,8 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
       </div>
 
       {/* Additional Preparation Notes */}
-      <div className="border-2 border-gray-200 rounded-lg p-5">
-        <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+      <div className="border-2 border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Info className="w-5 h-5 text-entrusted-orange" />
           Additional Preparation Notes
         </h4>
@@ -377,7 +377,7 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
 
       {/* Completion Summary */}
       {(workOrderComplete || customerCalled || equipmentReady) && (
-        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-3">
           <h4 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
             <CheckCircle className="w-5 h-5" />
             Office Preparation Summary
@@ -387,7 +387,7 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
             {customerCalled && <li>✓ Customer called - arrival window confirmed: {arrivalWindow === 'custom' ? customArrivalWindow : arrivalWindow}</li>}
             {equipmentReady && <li>✓ Equipment loaded: {dehumidifiersLoaded + airMoversLoaded + airScrubbersLoaded} units</li>}
           </ul>
-          <p className="text-xs text-green-700 mt-3 flex items-center gap-2">
+          <p className="text-xs text-green-700 mt-2 flex items-center gap-2">
             <Clock className="w-4 h-4" />
             Ready to depart for job site
           </p>

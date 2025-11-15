@@ -160,7 +160,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
   if (!currentRoom) {
     return (
       <div className="text-center py-8">
-        <AlertCircle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
+        <AlertCircle className="w-10 h-10 mx-auto mb-2 text-yellow-500" />
         <p className="text-gray-600">No rooms found. Please add rooms in the previous steps.</p>
       </div>
     );
@@ -172,9 +172,9 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
   const roomsWithReadings = new Set(moistureTracking.map(t => t.roomId)).size;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Progress Header */}
-      <div className="bg-gray-50 border rounded-lg p-4">
+      <div className="bg-gray-50 border rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-gray-900">
             Room {currentRoomIndex + 1} of {rooms.length}: {currentRoom.name}
@@ -192,8 +192,8 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
       </div>
 
       {/* ULTRAFIELD Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">ULTRAFIELD Moisture Mapping</h4>
@@ -208,8 +208,8 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
 
       {/* Existing Readings for This Room */}
       {roomReadings.length > 0 && (
-        <div className="border rounded-lg p-4 bg-white">
-          <h4 className="font-semibold text-gray-900 mb-3">
+        <div className="border rounded-lg p-3 bg-white">
+          <h4 className="font-semibold text-gray-900 mb-2">
             Materials Tracked in {currentRoom.name} ({roomReadings.length})
           </h4>
           <div className="space-y-2">
@@ -259,8 +259,8 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
 
       {/* ULTRAFIELD Workflow */}
       {workflowStep !== 'complete' && (
-        <div className="border-2 border-entrusted-orange rounded-lg p-6 bg-orange-50">
-          <h3 className="font-semibold text-gray-900 mb-4">
+        <div className="border-2 border-entrusted-orange rounded-lg p-3 bg-orange-50">
+          <h3 className="font-semibold text-gray-900 mb-2">
             Add Moisture Reading - Step {
               workflowStep === 'select-material' ? '1' :
               workflowStep === 'location' ? '2' :
@@ -317,7 +317,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
                   Be specific so you can return to the same spot for check services
                 </p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <Button variant="secondary" onClick={() => setWorkflowStep('select-material')} className="flex-1">
                   Back
                 </Button>
@@ -336,7 +336,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
           {/* Step 3: Dry Standard */}
           {workflowStep === 'dry-standard' && (
             <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
                 <p className="text-sm text-blue-800">
                   <Info className="w-4 h-4 inline mr-1" />
                   Take a reading from an <strong>unaffected</strong> area of the same material type
@@ -359,7 +359,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
                   className="text-lg"
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <Button variant="secondary" onClick={() => setWorkflowStep('location')} className="flex-1">
                   Back
                 </Button>
@@ -378,7 +378,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
           {/* Step 4: Wet Reading */}
           {workflowStep === 'wet-reading' && (
             <div className="space-y-4">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-2">
                 <p className="text-sm text-yellow-800">
                   <AlertCircle className="w-4 h-4 inline mr-1" />
                   Now take a reading from the <strong>affected</strong> area at the location you specified.
@@ -412,7 +412,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <Button variant="secondary" onClick={() => setWorkflowStep('dry-standard')} className="flex-1">
                   Back
                 </Button>
@@ -431,8 +431,8 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
           {/* Step 5: Photo */}
           {workflowStep === 'photo' && (
             <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <div className="flex items-start gap-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                <div className="flex items-start gap-2">
                   <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <h4 className="font-medium text-blue-900 mb-1">Photo (Required) *</h4>
@@ -458,7 +458,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
                 />
               )}
 
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <Button variant="secondary" onClick={() => setWorkflowStep('wet-reading')} className="flex-1">
                   Back
                 </Button>
@@ -478,14 +478,14 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
 
       {/* Completion State */}
       {workflowStep === 'complete' && (
-        <div className="border-2 border-green-500 rounded-lg p-6 bg-green-50">
+        <div className="border-2 border-green-500 rounded-lg p-3 bg-green-50">
           <div className="text-center space-y-4">
             <CheckCircle className="w-16 h-16 mx-auto text-green-600" />
             <h3 className="text-xl font-bold text-gray-900">Reading Saved!</h3>
             <p className="text-gray-700">
               {currentMaterial} at {location} has been added to moisture tracking
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button variant="secondary" onClick={handleAddAnother} className="flex-1">
                 Add Another Material
               </Button>
@@ -525,7 +525,7 @@ export const MoistureMappingStepNew: React.FC<MoistureMappingStepNewProps> = ({ 
       </div>
 
       {/* IICRC Reference */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
         <p className="text-xs text-gray-600">
           <strong>IICRC Best Practice:</strong> Materials are considered dry when within 2% of dry standard
           or below 12% moisture content. Return to the same locations daily for consistent progress tracking.

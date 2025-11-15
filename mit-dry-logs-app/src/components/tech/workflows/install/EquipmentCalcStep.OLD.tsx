@@ -161,8 +161,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
   if (!dryingPlan.overallClass) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-        <AlertCircle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+        <AlertCircle className="w-10 h-10 mx-auto mb-2 text-yellow-500" />
         <p className="text-gray-700">
           Drying plan not found. Please complete the previous "Plan the Job" step first.
         </p>
@@ -171,10 +171,10 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">IICRC Equipment Calculations</h4>
@@ -187,25 +187,25 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       </div>
 
       {/* Job Context */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-gray-50 border rounded-lg p-4 text-center">
+      <div className="grid grid-cols-3 gap-2">
+        <div className="bg-gray-50 border rounded-lg p-3 text-center">
           <p className="text-sm text-gray-600 mb-1">Cubic Footage</p>
           <p className="text-2xl font-bold text-gray-900">{calculations?.cubicFootage.toFixed(0) || '0'}</p>
         </div>
-        <div className="bg-gray-50 border rounded-lg p-4 text-center">
+        <div className="bg-gray-50 border rounded-lg p-3 text-center">
           <p className="text-sm text-gray-600 mb-1">Damage Class</p>
           <p className="text-2xl font-bold text-gray-900">Class {dryingPlan.overallClass}</p>
         </div>
-        <div className="bg-gray-50 border rounded-lg p-4 text-center">
+        <div className="bg-gray-50 border rounded-lg p-3 text-center">
           <p className="text-sm text-gray-600 mb-1">Water Category</p>
           <p className="text-2xl font-bold text-gray-900">Cat {waterClassification.category}</p>
         </div>
       </div>
 
       {/* Dehumidifier Settings */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4">Dehumidifier Specifications</h3>
-        <div className="grid grid-cols-2 gap-4">
+      <div className="border rounded-lg p-3">
+        <h3 className="font-semibold text-gray-900 mb-2">Dehumidifier Specifications</h3>
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Dehumidifier Type
@@ -243,8 +243,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       {calculations && (
         <div className="space-y-4">
           {/* Dehumidifiers */}
-          <div className="border-2 border-blue-300 rounded-lg p-5 bg-blue-50">
-            <div className="flex items-start justify-between mb-3">
+          <div className="border-2 border-blue-300 rounded-lg p-3 bg-blue-50">
+            <div className="flex items-start justify-between mb-2">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
                   <Wind className="w-5 h-5 text-blue-600" />
@@ -257,7 +257,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 <p className="text-sm text-gray-600">units</p>
               </div>
             </div>
-            <div className="bg-white rounded p-3 mt-3">
+            <div className="bg-white rounded p-3 mt-2">
               <p className="text-xs font-mono text-gray-700">
                 {calculations.dehumidifiers.calculation}
               </p>
@@ -265,8 +265,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
           </div>
 
           {/* Air Movers */}
-          <div className="border-2 border-orange-300 rounded-lg p-5 bg-orange-50">
-            <div className="flex items-start justify-between mb-3">
+          <div className="border-2 border-orange-300 rounded-lg p-3 bg-orange-50">
+            <div className="flex items-start justify-between mb-2">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
                   <Wind className="w-5 h-5 text-orange-600" />
@@ -279,7 +279,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 <p className="text-sm text-gray-600">units</p>
               </div>
             </div>
-            <div className="bg-white rounded p-3 mt-3">
+            <div className="bg-white rounded p-3 mt-2">
               <p className="text-xs font-mono text-gray-700">
                 {calculations.airMovers.calculation}
               </p>
@@ -287,12 +287,12 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
           </div>
 
           {/* Air Scrubbers */}
-          <div className={`border-2 rounded-lg p-5 ${
+          <div className={`border-2 rounded-lg p-3 ${
             calculations.airScrubbers.count > 0
               ? 'border-purple-300 bg-purple-50'
               : 'border-gray-300 bg-gray-50'
           }`}>
-            <div className="flex items-start justify-between mb-3">
+            <div className="flex items-start justify-between mb-2">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
                   <Wind className={`w-5 h-5 ${calculations.airScrubbers.count > 0 ? 'text-purple-600' : 'text-gray-400'}`} />
@@ -311,7 +311,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 <p className="text-sm text-gray-600">units</p>
               </div>
             </div>
-            <div className="bg-white rounded p-3 mt-3">
+            <div className="bg-white rounded p-3 mt-2">
               <p className="text-xs font-mono text-gray-700">
                 {calculations.airScrubbers.calculation}
               </p>
@@ -322,21 +322,21 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
       {/* Total Equipment Summary */}
       {calculations && (
-        <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 rounded-lg p-6 text-white">
-          <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
-            <Calculator className="w-6 h-6" />
+        <div className="bg-gradient-to-r from-entrusted-orange to-orange-600 rounded-lg p-3 text-white">
+          <h3 className="font-semibold text-white mb-2 flex items-center gap-2">
+            <Calculator className="w-5 h-5" />
             Total Equipment Required
           </h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white bg-opacity-20 rounded-lg p-4 text-center">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-white bg-opacity-20 rounded-lg p-3 text-center">
               <p className="text-3xl font-bold">{calculations.dehumidifiers.count}</p>
               <p className="text-sm mt-1">Dehumidifiers</p>
             </div>
-            <div className="bg-white bg-opacity-20 rounded-lg p-4 text-center">
+            <div className="bg-white bg-opacity-20 rounded-lg p-3 text-center">
               <p className="text-3xl font-bold">{calculations.airMovers.count}</p>
               <p className="text-sm mt-1">Air Movers</p>
             </div>
-            <div className="bg-white bg-opacity-20 rounded-lg p-4 text-center">
+            <div className="bg-white bg-opacity-20 rounded-lg p-3 text-center">
               <p className="text-3xl font-bold">{calculations.airScrubbers.count}</p>
               <p className="text-sm mt-1">Air Scrubbers</p>
             </div>
@@ -345,7 +345,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       )}
 
       {/* IICRC Reference */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
         <h4 className="font-medium text-gray-900 mb-2">Calculation Standards</h4>
         <div className="space-y-1 text-xs text-gray-600">
           <p>• <strong>Dehumidifiers:</strong> ANSI/IICRC S500-2021 Appendix B - Chart Factors</p>
@@ -357,8 +357,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
       {/* Warning if no equipment calculated */}
       {calculations && (calculations.dehumidifiers.count === 0 || calculations.airMovers.count === 0) && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-red-900 mb-1">Warning: Insufficient Equipment</h4>

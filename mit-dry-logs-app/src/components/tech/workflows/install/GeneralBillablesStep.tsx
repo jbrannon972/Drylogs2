@@ -246,10 +246,10 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
           <div>
             <h3 className="font-medium text-blue-900 mb-1">
@@ -271,8 +271,8 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
         {categories.map(category => (
           <div key={category.id} className="border border-gray-200 rounded-lg overflow-hidden">
             {/* Category Header - Not Clickable */}
-            <div className="flex items-center justify-between p-4 bg-gray-50">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between p-3 bg-gray-50">
+              <div className="flex items-center gap-2">
                 <div className="text-entrusted-orange">
                   {category.icon}
                 </div>
@@ -286,7 +286,7 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
             </div>
 
             {/* Category Items - Always Visible */}
-            <div className="p-4 bg-white space-y-4">
+            <div className="p-3 bg-white space-y-4">
               {category.items.map(item => (
                   <div
                     key={item.id}
@@ -295,7 +295,7 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
                     }`}
                   >
                     {/* Item Checkbox and Label */}
-                    <div className="flex items-start gap-3 mb-3">
+                    <div className="flex items-start gap-2 mb-2">
                       <input
                         type="checkbox"
                         checked={item.performed}
@@ -311,7 +311,7 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
                     {item.performed && (
                       <div className="ml-8 space-y-3">
                         {/* Quantity Input */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           <label className="text-sm text-gray-700 w-20">
                             {getUnitLabel(item.unit)}:
                           </label>
@@ -380,7 +380,7 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
 
       {/* Summary */}
       {getTotalItemsPerformed() > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <h4 className="font-medium text-green-900 mb-2">
             ✓ Summary: {getTotalItemsPerformed()} billable items logged
           </h4>
@@ -400,7 +400,7 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
 
       {/* No Items Warning */}
       {getTotalItemsPerformed() === 0 && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
           <p className="text-gray-600">
             No additional billable work logged. If you performed any of the work above, check the boxes and enter quantities.
           </p>

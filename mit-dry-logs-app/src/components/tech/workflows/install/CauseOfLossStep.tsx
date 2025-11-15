@@ -148,10 +148,10 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
   const isComplete = causeType && causeLocation && causePhotos.length > 0 && waterCategory;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Cause Photo */}
       <div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Document the Water Source</h4>
             <p className="text-sm text-blue-800">
@@ -243,8 +243,8 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
 
       {/* Water Category Selection */}
       <div>
-        <h3 className="font-semibold text-gray-900 mb-3">Water Category *</h3>
-        <p className="text-sm text-gray-600 mb-4">
+        <h3 className="font-semibold text-gray-900 mb-2">Water Category *</h3>
+        <p className="text-sm text-gray-600 mb-2">
           Based on the source, determine the contamination level. This affects safety protocols and equipment requirements.
         </p>
         <div className="space-y-3">
@@ -252,12 +252,12 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
             <button
               key={category.value}
               onClick={() => setWaterCategory(category.value as 1 | 2 | 3)}
-              className={`w-full text-left p-4 rounded-lg transition-all ${getColorClasses(
+              className={`w-full text-left p-3 rounded-lg transition-all ${getColorClasses(
                 category.color,
                 waterCategory === category.value
               )}`}
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-2">
                 <Droplets className={`w-5 h-5 flex-shrink-0 mt-1 ${
                   category.color === 'blue' ? 'text-blue-600' :
                   category.color === 'yellow' ? 'text-yellow-600' :
@@ -290,8 +290,8 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
 
       {/* Category 2/3 Warning */}
       {waterCategory === 2 && (
-        <div className="border rounded-lg p-4 bg-yellow-50 border-yellow-200">
-          <div className="flex items-start gap-3">
+        <div className="border rounded-lg p-3 bg-yellow-50 border-yellow-200">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-yellow-600" />
             <div>
               <h4 className="font-medium mb-1 text-yellow-900">Category 2 Safety Requirements</h4>
@@ -306,18 +306,18 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
 
       {/* Category 3 Safety Reminders (Simplified) */}
       {waterCategory === 3 && (
-        <div className="border-2 border-red-500 rounded-lg p-5 bg-red-50">
-          <div className="flex items-start gap-3 mb-4">
-            <AlertCircle className="w-6 h-6 flex-shrink-0 mt-0.5 text-red-600" />
+        <div className="border-2 border-red-500 rounded-lg p-3 bg-red-50">
+          <div className="flex items-start gap-2 mb-2">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-600" />
             <div className="flex-1">
               <h4 className="font-bold text-red-900 text-lg mb-2">🚨 Category 3 Biohazard Alert</h4>
-              <p className="text-sm text-red-800 mb-4">
+              <p className="text-sm text-red-800 mb-2">
                 Grossly contaminated water (sewage, toilet overflow, rising flood water). Contains dangerous pathogens.
                 <strong> OSHA compliance required before starting work.</strong>
               </p>
 
-              <div className="bg-white border border-red-300 rounded-lg p-4">
-                <h5 className="font-semibold text-gray-900 mb-3">Safety Reminders:</h5>
+              <div className="bg-white border border-red-300 rounded-lg p-3">
+                <h5 className="font-semibold text-gray-900 mb-2">Safety Reminders:</h5>
                 <ul className="text-sm text-red-900 space-y-2">
                   <li>• <strong>Enhanced PPE Required:</strong> N95/P100 respirator, Tyvek suit, double gloves, goggles, rubber boots</li>
                   <li>• <strong>Containment Barriers:</strong> Plastic sheeting seals, negative air pressure, HEPA filtration</li>
@@ -328,7 +328,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
                 </ul>
               </div>
 
-              <div className="mt-4 bg-red-100 border border-red-300 rounded-lg p-3">
+              <div className="mt-2 bg-red-100 border border-red-300 rounded-lg p-3">
                 <p className="text-xs text-red-900 font-medium">
                   ⚠️ OSHA Violation Risk: Failure to follow Cat 3 protocols can result in fines up to $15,625 per violation.
                 </p>
@@ -339,8 +339,8 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       )}
 
       {/* Request Specialist Button */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3 mb-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2 mb-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <h4 className="font-medium text-blue-900 mb-1">Need a Specialist?</h4>
@@ -361,8 +361,8 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
 
       {/* Validation Warning */}
       {!isComplete && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-yellow-800">

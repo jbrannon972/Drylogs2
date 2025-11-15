@@ -220,10 +220,10 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Hammer className="w-5 h-5 text-orange-600 mt-0.5" />
           <div>
             <h3 className="font-semibold text-orange-900 mb-1">
@@ -239,7 +239,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
 
       {/* Toggle */}
       <div>
-        <label className="flex items-center gap-3 cursor-pointer p-4 border-2 border-gray-200 rounded-lg hover:border-orange-300 transition-colors">
+        <label className="flex items-center gap-2 cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:border-orange-300 transition-colors">
           <input
             type="checkbox"
             checked={demoPerformed}
@@ -263,16 +263,16 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
         <>
           {/* Summary Stats */}
           {demoRooms.length > 0 && (
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-blue-900">{demoRooms.length}</p>
                 <p className="text-xs text-gray-600">Rooms with Demo</p>
               </div>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-green-900">{getTotalMaterials()}</p>
                 <p className="text-xs text-gray-600">Materials Removed</p>
               </div>
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-purple-900">{getTotalTime()}</p>
                 <p className="text-xs text-gray-600">Total Minutes</p>
               </div>
@@ -280,8 +280,8 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
           )}
 
           {/* Add Room */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <h4 className="font-semibold text-gray-900 mb-3">Add Room with Demo Work</h4>
+          <div className="bg-white border border-gray-200 rounded-lg p-3">
+            <h4 className="font-semibold text-gray-900 mb-2">Add Room with Demo Work</h4>
             <div className="flex gap-2">
               <select
                 value={currentRoomId}
@@ -314,7 +314,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
 
           {/* Demo Rooms */}
           {demoRooms.length === 0 ? (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-5 h-5 text-yellow-600" />
                 <p className="text-sm text-yellow-800">
@@ -327,10 +327,10 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
               {demoRooms.map((demoRoom) => (
                 <div
                   key={demoRoom.roomId}
-                  className="border-2 border-gray-200 rounded-lg p-6 bg-white"
+                  className="border-2 border-gray-200 rounded-lg p-3 bg-white"
                 >
                   {/* Room Header */}
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-2">
                     <div>
                       <h4 className="text-lg font-semibold text-gray-900">
                         {demoRoom.roomName}
@@ -349,7 +349,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
                   </div>
 
                   {/* Demo Time */}
-                  <div className="mb-4">
+                  <div className="mb-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Demo Time (minutes) *
                     </label>
@@ -373,7 +373,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
                   </div>
 
                   {/* Materials Removed */}
-                  <div className="mb-4">
+                  <div className="mb-2">
                     <div className="flex items-center justify-between mb-2">
                       <label className="block text-sm font-medium text-gray-700">
                         Materials Removed
@@ -509,7 +509,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
                   </div>
 
                   {/* Photos */}
-                  <div className="mb-4">
+                  <div className="mb-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Demo Photos
                     </label>
@@ -529,10 +529,10 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
                       <label className="flex flex-col items-center justify-center h-24 border-2 border-gray-300 border-dashed rounded cursor-pointer bg-gray-50 hover:bg-gray-100">
                         <div className="flex flex-col items-center">
                           {isUploading ? (
-                            <Upload className="w-6 h-6 text-gray-400 animate-bounce" />
+                            <Upload className="w-5 h-5 text-gray-400 animate-bounce" />
                           ) : (
                             <>
-                              <Camera className="w-6 h-6 text-gray-400" />
+                              <Camera className="w-5 h-5 text-gray-400" />
                               <p className="text-xs text-gray-500 mt-1">Add Photo</p>
                             </>
                           )}
@@ -574,7 +574,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
 
           {/* Completion Status */}
           {demoRooms.length > 0 && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
                 <p className="text-sm text-green-800 font-medium">
@@ -589,7 +589,7 @@ export const PartialDemoStep: React.FC<PartialDemoStepProps> = ({ job }) => {
 
       {/* Skip Message */}
       {!demoPerformed && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-gray-600" />
             <p className="text-sm text-gray-700">

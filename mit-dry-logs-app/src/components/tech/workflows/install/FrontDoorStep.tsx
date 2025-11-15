@@ -124,11 +124,11 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
   const allComplete = frontEntrancePhotos.length > 0 && buildingYear && Object.values(checklist).every(v => v);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* After Hours Warning */}
       {isAfterHours && (
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertTriangle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-orange-900 mb-1">After-Hours Service</h4>
@@ -141,9 +141,9 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
       )}
 
       {/* Front Entrance Photo */}
-      <div className="border border-gray-200 rounded-lg p-4">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <div className="flex items-start gap-3">
+      <div className="border border-gray-200 rounded-lg p-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+          <div className="flex items-start gap-2">
             <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-blue-900 mb-1">Front Entrance Photo</h4>
@@ -171,23 +171,23 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
       </div>
 
       {/* Customer Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <h3 className="font-semibold text-blue-900 mb-2">Customer: {job.customerInfo.name}</h3>
         <p className="text-sm text-gray-700">Phone: {job.customerInfo.phoneNumber}</p>
       </div>
 
       {/* EPA Compliance - Property Hazards */}
-      <div className="border border-gray-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 mb-3">
+      <div className="border border-gray-200 rounded-lg p-3">
+        <div className="flex items-center gap-2 mb-2">
           <ShieldAlert className="w-5 h-5 text-red-600" />
           <h3 className="font-semibold text-gray-900">Property Age & EPA Hazards *</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 mb-2">
           Required for EPA compliance. Pre-1978 buildings may contain lead paint. Pre-1980 buildings may contain asbestos.
         </p>
 
         {/* Building Year */}
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Building Year Built *
           </label>
@@ -204,7 +204,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
 
         {/* Hazard Warnings */}
         {buildingYear && parseInt(buildingYear) < 1980 && (
-          <div className="space-y-3 mb-4">
+          <div className="space-y-3 mb-2">
             {parseInt(buildingYear) < 1978 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                 <div className="flex items-start gap-2">
@@ -267,7 +267,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
         </div>
 
         {(asbestosConcern || leadConcern) && (
-          <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded p-2">
+          <div className="mt-2 bg-yellow-50 border border-yellow-200 rounded p-2">
             <p className="text-xs text-yellow-800">
               <strong>Action Required:</strong> Document concerns in notes. Notify MIT Lead before demo work.
               Customer must be informed in writing of potential hazards.
@@ -277,16 +277,16 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
       </div>
 
       {/* Vulnerable Occupants Section */}
-      <div className="border border-gray-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 mb-3">
+      <div className="border border-gray-200 rounded-lg p-3">
+        <div className="flex items-center gap-2 mb-2">
           <Info className="w-5 h-5 text-blue-600" />
           <h3 className="font-semibold text-gray-900">Vulnerable Occupants</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 mb-2">
           Identify any vulnerable occupants for special safety considerations during restoration work.
         </p>
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-2 gap-2 mb-2">
           <label className="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
             <input
               type="checkbox"
@@ -358,7 +358,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
         )}
 
         {Object.values(vulnerableOccupants).slice(0, -1).some(v => v) && (
-          <div className="mt-3 bg-blue-50 border border-blue-200 rounded p-2">
+          <div className="mt-2 bg-blue-50 border border-blue-200 rounded p-2">
             <p className="text-xs text-blue-800">
               <strong>Customer Care:</strong> Extra attention to noise levels, access paths, and safety barriers.
               Communicate schedule changes promptly.
@@ -368,9 +368,9 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
       </div>
 
       <div>
-        <h3 className="font-semibold text-gray-900 mb-4">Ground Rules Presentation</h3>
+        <h3 className="font-semibold text-gray-900 mb-2">Ground Rules Presentation</h3>
         <div className="space-y-3">
-          <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+          <label className="flex items-start gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
             <input
               type="checkbox"
               checked={checklist.introduced}
@@ -383,7 +383,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+          <label className="flex items-start gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
             <input
               type="checkbox"
               checked={checklist.groundRules}
@@ -396,7 +396,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+          <label className="flex items-start gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
             <input
               type="checkbox"
               checked={checklist.walkthrough}
@@ -409,7 +409,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+          <label className="flex items-start gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
             <input
               type="checkbox"
               checked={checklist.questions}
@@ -422,7 +422,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+          <label className="flex items-start gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
             <input
               type="checkbox"
               checked={checklist.utilities}
@@ -438,7 +438,7 @@ export const FrontDoorStep: React.FC<FrontDoorStepProps> = ({ job, onNext }) => 
       </div>
 
       {allComplete && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-2">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
           <CheckCircle className="w-5 h-5 text-green-600" />
           <p className="text-sm text-green-800 font-medium">All ground rules completed ✓</p>
         </div>

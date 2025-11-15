@@ -139,10 +139,10 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
   }, [dryingPlan, totals]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Review & Plan the Job</h4>
@@ -155,8 +155,8 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Job Summary */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border rounded-lg p-3">
+        <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <FileCheck className="w-5 h-5 text-entrusted-orange" />
           Job Summary
         </h3>
@@ -201,26 +201,26 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Affected Areas Breakdown */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border rounded-lg p-3">
+        <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Layers className="w-5 h-5 text-entrusted-orange" />
           Affected Areas Breakdown
         </h3>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 rounded-lg p-4 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div className="bg-blue-50 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-blue-900">{totals.totalFloorSqFt.toFixed(0)}</p>
             <p className="text-sm text-gray-600 mt-1">Floor Sq Ft</p>
           </div>
-          <div className="bg-orange-50 rounded-lg p-4 text-center">
+          <div className="bg-orange-50 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-orange-900">{totals.totalWallSqFt.toFixed(0)}</p>
             <p className="text-sm text-gray-600 mt-1">Wall Sq Ft</p>
           </div>
-          <div className="bg-purple-50 rounded-lg p-4 text-center">
+          <div className="bg-purple-50 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-purple-900">{totals.totalCeilingSqFt.toFixed(0)}</p>
             <p className="text-sm text-gray-600 mt-1">Ceiling Sq Ft</p>
           </div>
-          <div className="bg-red-50 rounded-lg p-4 text-center">
+          <div className="bg-red-50 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-red-900">{totals.totalAffectedSqFt.toFixed(0)}</p>
             <p className="text-sm text-gray-600 mt-1">Total Affected</p>
           </div>
@@ -228,22 +228,22 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Moisture Readings Summary */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border rounded-lg p-3">
+        <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Droplets className="w-5 h-5 text-entrusted-orange" />
           Moisture Readings Summary
         </h3>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-gray-50 rounded-lg p-4 text-center">
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-gray-50 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-gray-900">{totalReadings}</p>
             <p className="text-sm text-gray-600 mt-1">Total Readings</p>
           </div>
-          <div className="bg-blue-50 rounded-lg p-4 text-center">
+          <div className="bg-blue-50 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-blue-900">{dryStandards}</p>
             <p className="text-sm text-gray-600 mt-1">Dry Standards</p>
           </div>
-          <div className="bg-red-50 rounded-lg p-4 text-center">
+          <div className="bg-red-50 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-red-900">{affectedReadings}</p>
             <p className="text-sm text-gray-600 mt-1">Affected Readings</p>
           </div>
@@ -251,13 +251,13 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Rooms Summary */}
-      <div className="border rounded-lg p-5">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border rounded-lg p-3">
+        <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Home className="w-5 h-5 text-entrusted-orange" />
           Rooms Summary
         </h3>
 
-        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+        <div className="bg-gray-50 rounded-lg p-3 mb-2">
           <p className="text-center">
             <span className="text-3xl font-bold text-gray-900">{rooms.length}</span>
             <span className="text-gray-600 ml-2">rooms documented</span>
@@ -286,11 +286,11 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Drying Plan Settings */}
-      <div className="border-2 border-entrusted-orange rounded-lg p-5 bg-orange-50">
-        <h3 className="font-semibold text-gray-900 mb-4">Set Drying Goals</h3>
+      <div className="border-2 border-entrusted-orange rounded-lg p-3 bg-orange-50">
+        <h3 className="font-semibold text-gray-900 mb-2">Set Drying Goals</h3>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2">
             <Input
               label="Estimated Drying Days *"
               type="number"
@@ -342,8 +342,8 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
 
       {/* Validation Warnings */}
       {totalReadings === 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-yellow-800">
@@ -355,8 +355,8 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
       )}
 
       {!waterClassification && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-yellow-800">
@@ -369,8 +369,8 @@ export const PlanJobStep: React.FC<PlanJobStepProps> = ({ job, onNext }) => {
 
       {/* Success Message */}
       {totalReadings > 0 && waterClassification && totals.totalAffectedSqFt > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <FileCheck className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-green-900 mb-1">Job Plan Complete</h4>

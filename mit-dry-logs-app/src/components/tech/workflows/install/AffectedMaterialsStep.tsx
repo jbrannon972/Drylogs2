@@ -234,7 +234,7 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
   if (!currentRoom) {
     return (
       <div className="text-center py-8">
-        <AlertCircle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
+        <AlertCircle className="w-10 h-10 mx-auto mb-2 text-yellow-500" />
         <p className="text-gray-600">No rooms found. Please add rooms in the previous step.</p>
       </div>
     );
@@ -257,9 +257,9 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
   const completedRooms = Object.keys(roomsAffectedData).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Progress Header */}
-      <div className="bg-gray-50 border rounded-lg p-4">
+      <div className="bg-gray-50 border rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-gray-900">
             Room {currentRoomIndex + 1} of {rooms.length}: {currentRoom.name}
@@ -277,8 +277,8 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       </div>
 
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Document Affected Materials</h4>
@@ -291,9 +291,9 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       </div>
 
       {/* Room Dimensions Reference */}
-      <div className="bg-gray-50 border rounded-lg p-4">
+      <div className="bg-gray-50 border rounded-lg p-3">
         <h4 className="font-medium text-gray-900 mb-2">Room Dimensions (Reference)</h4>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 gap-2 text-sm">
           <div>
             <p className="text-gray-600">Dimensions: {currentRoom.length}' × {currentRoom.width}' × {currentRoom.height}'</p>
             <p className="text-gray-600">Floor Area: <strong>{currentRoom.floorSqFt.toFixed(0)} sq ft</strong></p>
@@ -306,12 +306,12 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       </div>
 
       {/* Floor Section */}
-      <div className="border rounded-lg p-5">
-        <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Layers className="w-5 h-5 text-entrusted-orange" />
           Floor Materials
         </h4>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Floor Material Type
@@ -344,12 +344,12 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       </div>
 
       {/* Walls Section */}
-      <div className="border rounded-lg p-5">
-        <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Layers className="w-5 h-5 text-entrusted-orange" />
           Wall Materials
         </h4>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Wall Material Type
@@ -391,12 +391,12 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       </div>
 
       {/* Ceiling Section */}
-      <div className="border rounded-lg p-5">
-        <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border rounded-lg p-3">
+        <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Layers className="w-5 h-5 text-entrusted-orange" />
           Ceiling Materials
         </h4>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Ceiling Material Type
@@ -427,9 +427,9 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       </div>
 
       {/* DEMO MATERIALS CHECKLIST - Critical for billing! */}
-      <div className="border-2 border-entrusted-orange rounded-lg p-5 bg-orange-50">
-        <div className="flex items-start gap-3 mb-4">
-          <AlertCircle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-0.5" />
+      <div className="border-2 border-entrusted-orange rounded-lg p-3 bg-orange-50">
+        <div className="flex items-start gap-2 mb-2">
+          <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">Materials for Removal (Demo Billing)</h3>
             <p className="text-sm text-gray-700 mb-2">
@@ -450,13 +450,13 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
           {demoMaterials.map((material, idx) => (
             <div
               key={material.type}
-              className={`border-2 rounded-lg p-4 transition-all ${
+              className={`border-2 rounded-lg p-3 transition-all ${
                 material.affected
                   ? 'border-entrusted-orange bg-white'
                   : 'border-gray-200 bg-gray-50 opacity-60'
               }`}
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-2">
                 <input
                   type="checkbox"
                   checked={material.affected}
@@ -526,7 +526,7 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
 
         {/* Summary of selected materials */}
         {demoMaterials.some(m => m.affected) && (
-          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
             <h4 className="font-semibold text-green-900 mb-2">✓ Materials Marked for Removal:</h4>
             <ul className="text-sm text-green-800 space-y-1">
               {demoMaterials
@@ -554,13 +554,13 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       </div>
 
       {/* Mold Visibility Assessment */}
-      <div className="border-2 border-gray-200 rounded-lg p-5 bg-white">
-        <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+      <div className="border-2 border-gray-200 rounded-lg p-3 bg-white">
+        <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-orange-600" />
           Mold Visibility Assessment
         </h4>
         <div className="space-y-4">
-          <label className="flex items-center gap-3 cursor-pointer p-3 border border-gray-200 rounded-lg hover:border-orange-300">
+          <label className="flex items-center gap-2 cursor-pointer p-3 border border-gray-200 rounded-lg hover:border-orange-300">
             <input
               type="checkbox"
               checked={!!(roomsAffectedData[currentRoom?.id]?.moldVisible)}
@@ -591,7 +591,7 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
           </label>
 
           {roomsAffectedData[currentRoom?.id]?.moldVisible && currentRoom && (
-            <div className="ml-8 space-y-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+            <div className="ml-8 space-y-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Mold Location Description *
@@ -658,13 +658,13 @@ export const AffectedMaterialsStep: React.FC<AffectedMaterialsStepProps> = ({ jo
       </div>
 
       {/* Summary & Class Determination */}
-      <div className={`border-2 rounded-lg p-5 ${
+      <div className={`border-2 rounded-lg p-3 ${
         waterClass === 3 ? 'border-red-300 bg-red-50' :
         waterClass === 2 ? 'border-yellow-300 bg-yellow-50' :
         'border-green-300 bg-green-50'
       }`}>
-        <h4 className="font-semibold text-gray-900 mb-3">Room Classification Summary</h4>
-        <div className="grid grid-cols-2 gap-4 text-sm mb-3">
+        <h4 className="font-semibold text-gray-900 mb-2">Room Classification Summary</h4>
+        <div className="grid grid-cols-2 gap-2 text-sm mb-2">
           <div>
             <p className="text-gray-600">Total Affected Area:</p>
             <p className="text-2xl font-bold text-gray-900">{totalAffected.toFixed(0)} sq ft</p>

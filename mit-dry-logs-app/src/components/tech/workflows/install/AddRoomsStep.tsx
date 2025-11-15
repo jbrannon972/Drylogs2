@@ -151,10 +151,10 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
   const totalRooms = rooms.length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Measure Each Room</h4>
@@ -167,12 +167,12 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gray-50 border rounded-lg p-4 text-center">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="bg-gray-50 border rounded-lg p-3 text-center">
           <p className="text-3xl font-bold text-gray-900">{totalRooms}</p>
           <p className="text-sm text-gray-600 mt-1">Total Rooms</p>
         </div>
-        <div className="bg-gray-50 border rounded-lg p-4 text-center">
+        <div className="bg-gray-50 border rounded-lg p-3 text-center">
           <p className="text-3xl font-bold text-gray-900">{totalFloorSqFt.toFixed(0)}</p>
           <p className="text-sm text-gray-600 mt-1">Total Floor Sq Ft</p>
         </div>
@@ -181,17 +181,17 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       {/* Existing Rooms List */}
       {rooms.length > 0 && (
         <div>
-          <h3 className="font-semibold text-gray-900 mb-3">Rooms ({rooms.length})</h3>
+          <h3 className="font-semibold text-gray-900 mb-2">Rooms ({rooms.length})</h3>
           <div className="space-y-3">
             {rooms.map(room => (
-              <div key={room.id} className={`border-2 rounded-lg bg-white p-4 ${
+              <div key={room.id} className={`border-2 rounded-lg bg-white p-3 ${
                 room.isReferenceRoom ? 'border-blue-400 bg-blue-50' :
                 room.affectedStatus === 'affected' ? 'border-red-200' :
                 room.affectedStatus === 'partial' ? 'border-yellow-200' :
                 'border-green-200'
               }`}>
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1">
+                  <div className="flex items-start gap-2 flex-1">
                     {room.overviewPhoto && (
                       <img src={room.overviewPhoto} alt={room.name} className="w-20 h-20 rounded object-cover flex-shrink-0" />
                     )}
@@ -259,10 +259,10 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
 
       {/* Add Room Form */}
       {showAddRoom ? (
-        <div className="border-2 border-entrusted-orange rounded-lg p-6 bg-orange-50">
-          <h3 className="font-semibold text-gray-900 mb-4">Add New Room</h3>
+        <div className="border-2 border-entrusted-orange rounded-lg p-3 bg-orange-50">
+          <h3 className="font-semibold text-gray-900 mb-2">Add New Room</h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <Input
                 label="Room Name *"
                 placeholder="e.g., Master Bedroom"
@@ -337,7 +337,7 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
             {/* Reference Room Checkbox */}
             {newRoom.affectedStatus === 'unaffected' && (
               <div className="border border-blue-200 bg-blue-50 rounded-lg p-3">
-                <label className="flex items-start gap-3 cursor-pointer">
+                <label className="flex items-start gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={newRoom.isReferenceRoom}
@@ -398,7 +398,7 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-2">
               <Input
                 label="Length (ft) *"
                 type="number"
@@ -429,17 +429,17 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
             </div>
 
             {/* Insets & Offsets for Equipment Calculations */}
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div className="border border-gray-200 rounded-lg p-3 bg-gray-50">
               <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
                 <Info className="w-4 h-4 text-gray-600" />
                 Insets & Offsets (Optional)
               </h4>
-              <p className="text-xs text-gray-600 mb-3">
+              <p className="text-xs text-gray-600 mb-2">
                 <strong>Insets</strong> (closets, alcoves) create dead air zones requiring additional air movers.
                 <strong> Offsets</strong> (columns, obstacles) disrupt airflow patterns.
                 Per IICRC S500, these affect air mover placement to maintain proper air circulation.
               </p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Input
                     label="Insets (cubic ft)"
@@ -482,7 +482,7 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button variant="primary" onClick={handleAddRoom}>
                 <Plus className="w-4 h-4" />
                 Add Room
@@ -503,16 +503,16 @@ export const AddRoomsStep: React.FC<AddRoomsStepProps> = ({ job, onNext }) => {
       {/* Empty State */}
       {rooms.length === 0 && !showAddRoom && (
         <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
-          <Home className="w-16 h-16 mx-auto mb-3 text-gray-300" />
+          <Home className="w-16 h-16 mx-auto mb-2 text-gray-300" />
           <p className="text-gray-600 font-medium mb-2">No rooms added yet</p>
-          <p className="text-sm text-gray-500 mb-4">Add your first room to begin the assessment</p>
+          <p className="text-sm text-gray-500 mb-2">Add your first room to begin the assessment</p>
         </div>
       )}
 
       {/* Validation Warning */}
       {rooms.length === 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-yellow-800">

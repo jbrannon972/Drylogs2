@@ -65,9 +65,9 @@ export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onN
   const affectedRooms = rooms.filter(r => r.status === 'affected').length;
 
   return (
-    <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="grid grid-cols-2 gap-4 text-center">
+    <div className="space-y-4">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="grid grid-cols-2 gap-2 text-center">
           <div>
             <p className="text-2xl font-bold text-blue-900">{rooms.length}</p>
             <p className="text-sm text-gray-600">Total Rooms</p>
@@ -82,11 +82,11 @@ export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onN
       {/* Existing Rooms */}
       {rooms.length > 0 && (
         <div>
-          <h3 className="font-semibold text-gray-900 mb-3">Rooms ({rooms.length})</h3>
+          <h3 className="font-semibold text-gray-900 mb-2">Rooms ({rooms.length})</h3>
           <div className="space-y-2">
             {rooms.map(room => (
-              <div key={room.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
-                <div className="flex items-center gap-3">
+              <div key={room.id} className="flex items-center justify-between p-3 border rounded-lg bg-white">
+                <div className="flex items-center gap-2">
                   <Home className="w-5 h-5 text-gray-400" />
                   <div>
                     <p className="font-medium text-gray-900">{room.name}</p>
@@ -120,10 +120,10 @@ export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onN
 
       {/* Add Room Form */}
       {showAddRoom ? (
-        <div className="border-2 border-entrusted-orange rounded-lg p-4 bg-orange-50">
-          <h3 className="font-semibold text-gray-900 mb-4">Add New Room</h3>
+        <div className="border-2 border-entrusted-orange rounded-lg p-3 bg-orange-50">
+          <h3 className="font-semibold text-gray-900 mb-2">Add New Room</h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2">
               <Input
                 label="Room Name *"
                 placeholder="e.g., Master Bedroom"
@@ -154,7 +154,7 @@ export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onN
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-2">
               <Input
                 label="Length (ft) *"
                 type="number"
@@ -214,7 +214,7 @@ export const RoomEvaluationStep: React.FC<RoomEvaluationStepProps> = ({ job, onN
 
       {rooms.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          <Home className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+          <Home className="w-10 h-10 mx-auto mb-2 text-gray-300" />
           <p>No rooms added yet. Add your first room to begin.</p>
         </div>
       )}

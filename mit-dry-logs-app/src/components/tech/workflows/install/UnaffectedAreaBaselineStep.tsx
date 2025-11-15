@@ -446,12 +446,12 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
     <div className="min-h-screen bg-gray-50">
       {/* ROOM LIST VIEW */}
       {viewMode === 'list' && (
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="max-w-4xl mx-auto p-3">
           {/* Header - BLUE THEMED */}
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Unaffected Area Baseline (Dry Standard)</h2>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
-              <div className="flex items-start gap-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+              <div className="flex items-start gap-2">
                 <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm text-blue-900 font-medium mb-1">
@@ -475,7 +475,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
           <Button
             variant="primary"
             onClick={() => setViewMode('add')}
-            className="w-full mb-4"
+            className="w-full mb-2"
           >
             <Plus className="w-5 h-5" />
             Add Unaffected Area
@@ -487,7 +487,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
               <button
                 key={room.id}
                 onClick={() => openRoomDetail(room.id)}
-                className="w-full text-left p-4 rounded-lg border-2 border-blue-300 bg-blue-50 hover:border-blue-500 transition-all"
+                className="w-full text-left p-3 rounded-lg border-2 border-blue-300 bg-blue-50 hover:border-blue-500 transition-all"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -509,7 +509,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <ChevronRight className="w-6 h-6 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -526,7 +526,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
             {rooms.length === 0 && (
               <div className="text-center py-12 text-gray-500 border-2 border-dashed border-blue-300 rounded-lg bg-blue-50">
-                <Home className="w-16 h-16 mx-auto mb-3 text-blue-300" />
+                <Home className="w-16 h-16 mx-auto mb-2 text-blue-300" />
                 <p className="text-base">No unaffected areas added yet</p>
                 <p className="text-sm mt-1">Click "Add Unaffected Area" to establish baseline readings</p>
               </div>
@@ -562,8 +562,8 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
       {viewMode === 'detail' && selectedRoom && (
         <div className="min-h-screen bg-white flex flex-col">
           {/* Header - BLUE THEMED */}
-          <div className="border-b border-blue-300 bg-blue-50 p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="border-b border-blue-300 bg-blue-50 p-3">
+            <div className="flex items-center justify-between mb-2">
               <button
                 onClick={returnToList}
                 className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
@@ -635,12 +635,12 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
           {/* Tab Content */}
           <div className="flex-1 overflow-y-auto">
-            <div className="max-w-4xl mx-auto p-6">
+            <div className="max-w-4xl mx-auto p-3">
               {activeTab === 'info' && (
-                <div className="max-w-2xl space-y-6">
+                <div className="max-w-2xl space-y-4">
                   {/* Baseline Notice */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
                       <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm text-blue-900 font-medium mb-1">
@@ -655,8 +655,8 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
                   {/* Room Dimensions - REQUIRED */}
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Room Dimensions *</h3>
-                    <div className="grid grid-cols-3 gap-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Room Dimensions *</h3>
+                    <div className="grid grid-cols-3 gap-2">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Length (ft) *</label>
                         <input
@@ -689,7 +689,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                       </div>
                     </div>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
                       <p className="text-sm text-blue-900">
                         <strong>Cubic Footage:</strong> {(selectedRoom.length * selectedRoom.width * selectedRoom.height).toFixed(0)} cf
                       </p>
@@ -700,11 +700,11 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                   </div>
 
                   {/* Environmental Readings - REQUIRED */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h4 className="font-medium text-blue-900 mb-3">Environmental Readings *</h4>
-                    <p className="text-xs text-blue-700 mb-3">Record dry standard conditions for this unaffected area</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <h4 className="font-medium text-blue-900 mb-2">Environmental Readings *</h4>
+                    <p className="text-xs text-blue-700 mb-2">Record dry standard conditions for this unaffected area</p>
 
-                    <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-2 gap-2 mb-2">
                       <div>
                         <label className="block text-sm font-medium text-blue-900 mb-1">Room Temperature (°F) *</label>
                         <input
@@ -756,8 +756,8 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                   <div className="border-t pt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Notable Items Photos *</h3>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-start gap-3">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                      <div className="flex items-start gap-2">
                         <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm text-blue-800 font-medium mb-1">
@@ -793,10 +793,10 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
                   {/* Pre-existing Damage Section - REQUIRED */}
                   <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Pre-existing Damage *</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Pre-existing Damage *</h3>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-start gap-3">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                      <div className="flex items-start gap-2">
                         <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm text-blue-800 font-medium">
@@ -809,8 +809,8 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                       </div>
                     </div>
 
-                    <div className="space-y-3 mb-4">
-                      <label className="flex items-center gap-3 cursor-pointer p-3 border-2 rounded-lg hover:bg-gray-50 transition-colors" style={{ borderColor: selectedRoom.hasPreexistingDamage === true ? '#f97316' : '#d1d5db' }}>
+                    <div className="space-y-3 mb-2">
+                      <label className="flex items-center gap-2 cursor-pointer p-3 border-2 rounded-lg hover:bg-gray-50 transition-colors" style={{ borderColor: selectedRoom.hasPreexistingDamage === true ? '#f97316' : '#d1d5db' }}>
                         <input
                           type="radio"
                           name={`preexisting-${selectedRoom.id}`}
@@ -823,7 +823,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                         </span>
                       </label>
 
-                      <label className="flex items-center gap-3 cursor-pointer p-3 border-2 rounded-lg hover:bg-gray-50 transition-colors" style={{ borderColor: selectedRoom.hasPreexistingDamage === false ? '#10b981' : '#d1d5db' }}>
+                      <label className="flex items-center gap-2 cursor-pointer p-3 border-2 rounded-lg hover:bg-gray-50 transition-colors" style={{ borderColor: selectedRoom.hasPreexistingDamage === false ? '#10b981' : '#d1d5db' }}>
                         <input
                           type="radio"
                           name={`preexisting-${selectedRoom.id}`}
@@ -877,8 +877,8 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
               {activeTab === 'moisture' && (
                 <div>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-                    <div className="flex items-start gap-3">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-6">
+                    <div className="flex items-start gap-2">
                       <Info className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-700 font-medium mb-1">
@@ -909,13 +909,13 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
       {viewMode === 'add' && (
         <div className="min-h-screen bg-white flex flex-col">
           {/* Header */}
-          <div className="border-b border-blue-300 bg-blue-50 p-4">
+          <div className="border-b border-blue-300 bg-blue-50 p-3">
             <button
               onClick={() => {
                 setViewMode('list');
                 setNewRoomForm({ name: '', type: 'Bedroom', floor: '1st Floor', length: '', width: '', height: '8' });
               }}
-              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-3"
+              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-2"
             >
               <ChevronRight className="w-5 h-5 transform rotate-180" />
               <span>Back to Unaffected Areas</span>
@@ -926,7 +926,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
           {/* Form Content */}
           <div className="flex-1 overflow-y-auto">
-            <div className="max-w-2xl mx-auto p-6 space-y-6">
+            <div className="max-w-2xl mx-auto p-3 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Room Name *</label>
                 <input
@@ -938,7 +938,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Room Type</label>
                   <select
@@ -977,7 +977,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Length (ft) *</label>
                   <input
@@ -1028,10 +1028,10 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
       {/* Pre-existing Damage Modal (reuse PhotoCapture modal pattern) */}
       {showPreexistingModal && selectedRoom && user && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
+            <div className="p-3">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xl font-bold text-gray-900">Document Pre-existing Damage</h3>
                 <button
                   onClick={() => setShowPreexistingModal(false)}
@@ -1041,7 +1041,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                 </button>
               </div>
 
-              <div className="mb-4">
+              <div className="mb-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Notes
                 </label>
@@ -1068,7 +1068,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                 label="Pre-existing Damage Photos"
               />
 
-              <div className="mt-4 flex justify-end">
+              <div className="mt-2 flex justify-end">
                 <Button
                   variant="primary"
                   onClick={() => setShowPreexistingModal(false)}

@@ -143,10 +143,10 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Plan Day-by-Day Work Schedule</h4>
@@ -158,9 +158,9 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
       </div>
 
       {/* Estimated Drying Timeline */}
-      <div className="border rounded-lg p-5 bg-gray-50">
-        <h3 className="font-semibold text-gray-900 mb-3">Estimated Drying Timeline</h3>
-        <div className="grid grid-cols-2 gap-4">
+      <div className="border rounded-lg p-3 bg-gray-50">
+        <h3 className="font-semibold text-gray-900 mb-2">Estimated Drying Timeline</h3>
+        <div className="grid grid-cols-2 gap-2">
           <Input
             label="Estimated Drying Days"
             type="number"
@@ -180,7 +180,7 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
 
       {/* Scheduled Visits */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-gray-900">Scheduled Visits (Day 2+)</h3>
           <div className="flex gap-2">
             <Button
@@ -212,22 +212,22 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
 
         {visits.length === 0 ? (
           <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
-            <Calendar className="w-16 h-16 mx-auto mb-3 text-gray-300" />
+            <Calendar className="w-16 h-16 mx-auto mb-2 text-gray-300" />
             <p className="text-gray-600 font-medium mb-2">No visits scheduled yet</p>
-            <p className="text-sm text-gray-500 mb-4">Add demo, check services, and pull visits</p>
+            <p className="text-sm text-gray-500 mb-2">Add demo, check services, and pull visits</p>
           </div>
         ) : (
           <div className="space-y-3">
             {visits.sort((a, b) => a.day - b.day).map((visit) => (
               <div
                 key={visit.id}
-                className={`border-2 rounded-lg p-4 ${
+                className={`border-2 rounded-lg p-3 ${
                   visit.type === 'demo' ? 'border-orange-200 bg-orange-50' :
                   visit.type === 'check' ? 'border-blue-200 bg-blue-50' :
                   'border-green-200 bg-green-50'
                 }`}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-2">
                   <div className="text-3xl flex-shrink-0">{getVisitIcon(visit.type)}</div>
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center justify-between">
@@ -247,7 +247,7 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
                           Date
@@ -325,7 +325,7 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
 
       {/* Quick Add Suggestions */}
       {visits.length === 0 && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
           <h4 className="font-medium text-gray-900 mb-2">Typical Job Schedule</h4>
           <div className="space-y-2 text-sm text-gray-700">
             <p>• <strong>Day 1 (Today):</strong> Install equipment, initial readings</p>
@@ -337,8 +337,8 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
       )}
 
       {/* Request Specialist Button */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3 mb-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2 mb-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <h4 className="font-medium text-blue-900 mb-1">Need a Specialist for Future Work?</h4>
@@ -359,7 +359,7 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
 
       {/* Summary */}
       {visits.length > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <h4 className="font-medium text-green-900 mb-2">Work Schedule Summary</h4>
           <div className="space-y-1 text-sm text-green-800">
             <p>• Total visits scheduled: <strong>{visits.length}</strong></p>

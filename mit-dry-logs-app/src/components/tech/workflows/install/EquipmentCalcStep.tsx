@@ -329,8 +329,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   // Validation
   if (chambers.length === 0) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-        <AlertCircle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+        <AlertCircle className="w-10 h-10 mx-auto mb-2 text-yellow-500" />
         <p className="text-gray-700 mb-2">
           No drying chambers defined. Please go back and complete the "Define Chambers" step first.
         </p>
@@ -340,8 +340,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
   if (!overallDamageClass) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-        <AlertCircle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+        <AlertCircle className="w-10 h-10 mx-auto mb-2 text-yellow-500" />
         <p className="text-gray-700 mb-2">
           Overall damage class not found. Please ensure you have:
         </p>
@@ -363,10 +363,10 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">IICRC Equipment Calculations</h4>
@@ -382,9 +382,9 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       </div>
 
       {/* Global Settings */}
-      <div className="border rounded-lg p-5 bg-white">
-        <h3 className="font-semibold text-gray-900 mb-4">Dehumidifier Specifications (All Chambers)</h3>
-        <div className="grid grid-cols-2 gap-4">
+      <div className="border rounded-lg p-3 bg-white">
+        <h3 className="font-semibold text-gray-900 mb-2">Dehumidifier Specifications (All Chambers)</h3>
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Dehumidifier Type
@@ -420,10 +420,10 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
       {/* Per-Chamber Calculations */}
       {chamberCalculations.map((calc, index) => (
-        <div key={calc.chamberId} className="border-2 border-gray-300 rounded-lg p-5 bg-gray-50">
-          <div className="flex items-center justify-between mb-4">
+        <div key={calc.chamberId} className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
+          <div className="flex items-center justify-between mb-2">
             <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Wind className="w-6 h-6 text-orange-600" />
+              <Wind className="w-5 h-5 text-orange-600" />
               {calc.chamberName}
             </h3>
             <div className="text-sm text-gray-600">
@@ -431,22 +431,22 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-2 gap-2 mb-2">
             {/* Dehumidifiers */}
-            <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 text-center">
-              <Wind className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+            <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-3 text-center">
+              <Wind className="w-5 h-5 text-blue-600 mx-auto mb-2" />
               <p className="text-3xl font-bold text-blue-900">{calc.dehumidifiers}</p>
               <p className="text-sm text-blue-700 font-medium">Dehumidifiers</p>
               <p className="text-xs text-blue-600 mt-1">For this chamber</p>
             </div>
 
             {/* Air Scrubbers */}
-            <div className={`rounded-lg p-4 text-center ${
+            <div className={`rounded-lg p-3 text-center ${
               calc.airScrubbers > 0
                 ? 'bg-purple-100 border-2 border-purple-300'
                 : 'bg-gray-100 border-2 border-gray-300'
             }`}>
-              <Wind className={`w-6 h-6 mx-auto mb-2 ${
+              <Wind className={`w-5 h-5 mx-auto mb-2 ${
                 calc.airScrubbers > 0 ? 'text-purple-600' : 'text-gray-400'
               }`} />
               <p className={`text-3xl font-bold ${
@@ -462,8 +462,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
           </div>
 
           {/* Air Movers - Room by Room Breakdown */}
-          <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-4 mb-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-3 mb-2">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Wind className="w-5 h-5 text-orange-600" />
                 <h4 className="font-bold text-orange-900">Air Movers (By Room)</h4>
@@ -474,8 +474,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
             </div>
 
             {/* Installation Timing Option */}
-            <div className="mb-3 bg-yellow-50 border border-yellow-300 rounded-lg p-3">
-              <label className="flex items-start gap-3 cursor-pointer">
+            <div className="mb-2 bg-yellow-50 border border-yellow-300 rounded-lg p-3">
+              <label className="flex items-start gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={airMoversAfterDemo.has(calc.chamberId)}
@@ -506,7 +506,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                     <span className="text-xl font-bold text-orange-700">{room.total} units</span>
                   </div>
                   <p className="text-xs text-gray-600 italic">{room.placement}</p>
-                  <div className="flex gap-3 mt-2 text-xs text-gray-500">
+                  <div className="flex gap-2 mt-2 text-xs text-gray-500">
                     <span>Base: {room.base}</span>
                     <span>Floor: +{room.floor}</span>
                     <span>Wall: +{room.wall}</span>
@@ -517,7 +517,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
           </div>
 
           {/* Calculation Details */}
-          <div className="space-y-2 mb-4">
+          <div className="space-y-2 mb-2">
             <div className="bg-white rounded-lg p-3">
               <p className="text-xs font-medium text-gray-600 mb-1">Dehumidifier Calculation:</p>
               <p className="text-xs font-mono text-gray-800">{calc.formula}</p>
@@ -541,8 +541,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
             {(() => {
               const placed = getPlacedCounts(calc.chamberId);
               return (
-                <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
-                  <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="bg-white border-2 border-gray-200 rounded-lg p-3">
+                  <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
                       <div className="text-2xl font-bold text-gray-900">
                         {placed.dehumidifiers}/{calc.dehumidifiers}
@@ -590,9 +590,9 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                   const roomEquipment = placedEquipment.filter(e => e.assignedRoomId === room.id);
 
                   return (
-                    <div key={room.id} className="bg-white border-2 border-gray-300 rounded-lg p-4">
+                    <div key={room.id} className="bg-white border-2 border-gray-300 rounded-lg p-3">
                       {/* Room Header */}
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center justify-between mb-2">
                         <h5 className="font-semibold text-gray-900">{room.name}</h5>
                         <span className="text-xs text-gray-500">
                           {roomEquipment.length} placed
@@ -600,7 +600,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                       </div>
 
                       {/* Inline Add Buttons - Three buttons per room */}
-                      <div className="grid grid-cols-3 gap-2 mb-3">
+                      <div className="grid grid-cols-3 gap-2 mb-2">
                         <Button
                           variant="secondary"
                           onClick={() => openScanner('dehumidifier', calc.chamberId, room.id)}
@@ -663,9 +663,9 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       ))}
 
       {/* Total Summary */}
-      <div className="bg-green-50 border-2 border-green-300 rounded-lg p-5">
-        <div className="flex items-start gap-3 mb-4">
-          <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+      <div className="bg-green-50 border-2 border-green-300 rounded-lg p-3">
+        <div className="flex items-start gap-2 mb-2">
+          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-green-900 mb-1">Total Equipment Required</h4>
             <p className="text-sm text-green-800">
@@ -674,16 +674,16 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white border-2 border-blue-300 rounded-lg p-4 text-center">
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-white border-2 border-blue-300 rounded-lg p-3 text-center">
             <p className="text-4xl font-bold text-blue-900">{totalEquipment.dehumidifiers}</p>
             <p className="text-sm text-gray-600 mt-1">Dehumidifiers</p>
           </div>
-          <div className="bg-white border-2 border-orange-300 rounded-lg p-4 text-center">
+          <div className="bg-white border-2 border-orange-300 rounded-lg p-3 text-center">
             <p className="text-4xl font-bold text-orange-900">{totalEquipment.airMovers}</p>
             <p className="text-sm text-gray-600 mt-1">Air Movers</p>
           </div>
-          <div className="bg-white border-2 border-purple-300 rounded-lg p-4 text-center">
+          <div className="bg-white border-2 border-purple-300 rounded-lg p-3 text-center">
             <p className="text-4xl font-bold text-purple-900">{totalEquipment.airScrubbers}</p>
             <p className="text-sm text-gray-600 mt-1">Air Scrubbers</p>
           </div>
@@ -692,9 +692,9 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
       {/* Scan/Manual Entry Modal */}
       {showScanModal && scanningFor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-3">
+            <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-bold text-gray-900">
                 Add {scanningFor.type === 'dehumidifier' ? 'Dehumidifier' : scanningFor.type === 'air-mover' ? 'Air Mover' : 'Air Scrubber'}
               </h3>
@@ -707,7 +707,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
             </div>
 
             {/* QR Scanner Placeholder */}
-            <div className="mb-4 p-8 border-2 border-dashed border-gray-300 rounded-lg text-center bg-gray-50">
+            <div className="mb-2 p-8 border-2 border-dashed border-gray-300 rounded-lg text-center bg-gray-50">
               <QrCode className="w-16 h-16 mx-auto mb-2 text-gray-400" />
               <p className="text-sm text-gray-600">QR Scanner Would Appear Here</p>
               <p className="text-xs text-gray-500 mt-1">Use manual entry below for now</p>
@@ -745,7 +745,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 />
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <Button
                   variant="secondary"
                   onClick={() => setShowScanModal(false)}

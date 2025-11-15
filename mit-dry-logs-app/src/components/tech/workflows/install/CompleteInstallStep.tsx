@@ -123,10 +123,10 @@ export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, o
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Completion Form */}
-      <div className="border rounded-lg p-4 bg-white">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="border rounded-lg p-3 bg-white">
+        <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Clock className="w-5 h-5 text-blue-600" />
           Completion Details
         </h3>
@@ -161,12 +161,12 @@ export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, o
 
       {/* Validation Errors */}
       {showValidation && validationErrors.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <h4 className="font-medium text-red-900 mb-2">Cannot Complete Workflow</h4>
-              <p className="text-sm text-red-800 mb-3">
+              <p className="text-sm text-red-800 mb-2">
                 Please complete the following required steps:
               </p>
               <ul className="list-disc list-inside space-y-1 text-sm text-red-800">
@@ -174,7 +174,7 @@ export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, o
                   <li key={idx}>{error}</li>
                 ))}
               </ul>
-              <p className="text-sm text-red-700 mt-3 font-medium">
+              <p className="text-sm text-red-700 mt-2 font-medium">
                 Use the workflow overview (tap header) to navigate to missing steps.
               </p>
             </div>
@@ -184,8 +184,8 @@ export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, o
 
       {/* Success Indicator */}
       {showValidation && validationErrors.length === 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-center gap-3">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+          <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <div>
               <h4 className="font-medium text-green-900">All Steps Complete!</h4>

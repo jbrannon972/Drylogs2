@@ -207,7 +207,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   const roomReadings = moistureTracking.filter(t => t.roomId === roomId);
 
   return (
-    <div className="w-full h-full space-y-6">
+    <div className="w-full h-full space-y-4">
       {/* Existing Readings - Grouped by Material with Expandable Dropdown */}
       {roomReadings.length > 0 && (
         <div className="space-y-3">
@@ -229,7 +229,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
               >
                 {/* Material Header - Clickable to Expand */}
                 <div
-                  className="p-4 cursor-pointer hover:opacity-90 transition-opacity"
+                  className="p-3 cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => toggleExpanded(tracking.id)}
                 >
                   <div className="flex items-start justify-between">
@@ -346,7 +346,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
       {/* No readings yet */}
       {roomReadings.length === 0 && !showAddForm && (
         <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
-          <Droplets className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+          <Droplets className="w-10 h-10 mx-auto mb-2 text-gray-300" />
           <p>No moisture readings yet</p>
           <p className="text-sm mt-1">Add a material to start tracking</p>
         </div>
@@ -354,8 +354,8 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 
       {/* Add New Reading Form - Full Screen Single Form */}
       {showAddForm && (
-        <div className="border-2 border-entrusted-orange rounded-lg p-6 bg-orange-50 space-y-5">
-          <div className="mb-4">
+        <div className="border-2 border-entrusted-orange rounded-lg p-3 bg-orange-50 space-y-4">
+          <div className="mb-2">
             <h3 className="font-semibold text-gray-900 text-lg">
               {addingToTrackingId ? 'Add Another Reading' : 'Add Moisture Reading'}
             </h3>
@@ -368,7 +368,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 
           {/* Photo Upload - PHASE 1: FIRST and REQUIRED */}
           <div>
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-2">
               <p className="text-xs text-orange-900">
                 <strong>Take 2 photos!</strong> (1) Moisture meter display showing reading, (2) Material surface being tested. Use gallery to select both at once.
               </p>
@@ -411,7 +411,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
           </div>
 
           {/* Dry Standard and Wet Reading */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Droplets className="w-4 h-4 inline mr-1" />
@@ -484,7 +484,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-2 pt-2">
             <Button variant="secondary" onClick={resetForm} className="flex-1">
               Cancel
             </Button>
@@ -514,7 +514,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
       )}
 
       {/* IICRC Reference */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
         <p className="text-xs font-semibold text-gray-700 mb-2">IICRC Best Practice:</p>
         <ul className="text-xs text-gray-600 list-disc ml-5 space-y-1">
           <li>Materials are dry when within 2% of dry standard OR below 12% moisture content</li>

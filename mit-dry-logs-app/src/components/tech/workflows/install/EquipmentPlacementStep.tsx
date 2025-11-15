@@ -132,9 +132,9 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
 
   if (!equipmentCalc) {
     return (
-      <div className="space-y-6">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+      <div className="space-y-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-yellow-900 mb-1">Equipment Not Calculated</h4>
@@ -149,10 +149,10 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Place Equipment by Chamber</h4>
@@ -191,11 +191,11 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
 
       {/* Equipment Needed Summary */}
       {selectedChamber && equipmentNeeded && (
-        <div className="bg-gray-50 border rounded-lg p-4">
-          <h3 className="font-semibold text-gray-900 mb-3">
+        <div className="bg-gray-50 border rounded-lg p-3">
+          <h3 className="font-semibold text-gray-900 mb-2">
             {selectedChamber.chamberName} - Equipment Needed
           </h3>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-900">
                 {equipmentNeeded.dehumidifiers.placed}/{equipmentNeeded.dehumidifiers.needed}
@@ -229,7 +229,7 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
 
       {/* Quick Add Buttons */}
       {selectedChamberId && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           <Button
             variant="secondary"
             onClick={() => openScanner('dehumidifier')}
@@ -259,12 +259,12 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
 
       {/* Placed Equipment List */}
       <div>
-        <h3 className="font-semibold text-gray-900 mb-3">
+        <h3 className="font-semibold text-gray-900 mb-2">
           Placed Equipment ({placedEquipment.length} total)
         </h3>
         {placedEquipment.length === 0 ? (
           <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-            <Wind className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+            <Wind className="w-10 h-10 mx-auto mb-2 text-gray-300" />
             <p className="text-gray-600">No equipment placed yet</p>
             <p className="text-sm text-gray-500">Scan or add equipment above</p>
           </div>
@@ -309,7 +309,7 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
 
       {/* Overall Progress */}
       {equipmentCalc.total && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <h4 className="font-medium text-green-900 mb-2">Overall Progress</h4>
           <div className="space-y-1 text-sm text-green-800">
             <p>
@@ -327,9 +327,9 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
 
       {/* Scan/Manual Entry Modal */}
       {showScanModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-3">
+            <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-bold text-gray-900">
                 Add {scanningFor === 'dehumidifier' ? 'Dehumidifier' : scanningFor === 'air-mover' ? 'Air Mover' : 'Air Scrubber'}
               </h3>
@@ -342,7 +342,7 @@ export const EquipmentPlacementStep: React.FC<EquipmentPlacementStepProps> = ({ 
             </div>
 
             {/* QR Scanner Placeholder */}
-            <div className="mb-4 p-8 border-2 border-dashed border-gray-300 rounded-lg text-center bg-gray-50">
+            <div className="mb-2 p-8 border-2 border-dashed border-gray-300 rounded-lg text-center bg-gray-50">
               <QrCode className="w-16 h-16 mx-auto mb-2 text-gray-400" />
               <p className="text-sm text-gray-600">QR Scanner Would Appear Here</p>
               <p className="text-xs text-gray-500 mt-1">Use manual entry below for now</p>

@@ -81,10 +81,10 @@ export const WaterClassificationStep: React.FC<WaterClassificationStepProps> = (
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Determine Water Category</h4>
@@ -98,19 +98,19 @@ export const WaterClassificationStep: React.FC<WaterClassificationStepProps> = (
 
       {/* Category Selection */}
       <div>
-        <h3 className="font-semibold text-gray-900 mb-4">Select Water Category</h3>
+        <h3 className="font-semibold text-gray-900 mb-2">Select Water Category</h3>
         <div className="space-y-4">
           {categories.map((category) => (
             <button
               key={category.value}
               onClick={() => setWaterCategory(category.value as 1 | 2 | 3)}
-              className={`w-full text-left p-5 rounded-lg transition-all ${getColorClasses(
+              className={`w-full text-left p-3 rounded-lg transition-all ${getColorClasses(
                 category.color,
                 waterCategory === category.value
               )}`}
             >
-              <div className="flex items-start gap-4">
-                <Droplets className={`w-6 h-6 flex-shrink-0 mt-1 ${
+              <div className="flex items-start gap-2">
+                <Droplets className={`w-5 h-5 flex-shrink-0 mt-1 ${
                   category.color === 'blue' ? 'text-blue-600' :
                   category.color === 'yellow' ? 'text-yellow-600' :
                   'text-red-600'
@@ -124,9 +124,9 @@ export const WaterClassificationStep: React.FC<WaterClassificationStepProps> = (
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-700 mb-3">{category.description}</p>
+                  <p className="text-sm text-gray-700 mb-2">{category.description}</p>
 
-                  <div className="mb-3">
+                  <div className="mb-2">
                     <p className={`text-xs font-medium mb-2 ${getBadgeClasses(category.color)
                       .replace('bg-', 'text-')}`}>
                       Common Examples:
@@ -169,10 +169,10 @@ export const WaterClassificationStep: React.FC<WaterClassificationStepProps> = (
 
       {/* Category 2/3 Warning */}
       {(waterCategory === 2 || waterCategory === 3) && (
-        <div className={`border rounded-lg p-4 ${
+        <div className={`border rounded-lg p-3 ${
           waterCategory === 3 ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'
         }`}>
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
               waterCategory === 3 ? 'text-red-600' : 'text-yellow-600'
             }`} />
@@ -202,8 +202,8 @@ export const WaterClassificationStep: React.FC<WaterClassificationStepProps> = (
 
       {/* Validation Warning */}
       {!waterCategory && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-yellow-800">
@@ -215,7 +215,7 @@ export const WaterClassificationStep: React.FC<WaterClassificationStepProps> = (
       )}
 
       {/* IICRC Reference */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
         <p className="text-xs text-gray-600">
           <strong>Reference:</strong> ANSI/IICRC S500-2021 Standard for Professional Water Damage Restoration
         </p>

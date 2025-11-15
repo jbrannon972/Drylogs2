@@ -481,7 +481,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     <div className="min-h-screen bg-gray-50">
       {/* ROOM LIST VIEW */}
       {viewMode === 'list' && (
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="max-w-4xl mx-auto p-3">
           {/* Header */}
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Room Assessment</h2>
@@ -496,7 +496,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
           <Button
             variant="primary"
             onClick={() => setViewMode('add')}
-            className="w-full mb-4"
+            className="w-full mb-2"
           >
             <Plus className="w-5 h-5" />
             Add Room
@@ -508,7 +508,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               <button
                 key={room.id}
                 onClick={() => openRoomDetail(room.id)}
-                className="w-full text-left p-4 rounded-lg border-2 border-gray-300 bg-white hover:border-orange-500 transition-all"
+                className="w-full text-left p-3 rounded-lg border-2 border-gray-300 bg-white hover:border-orange-500 transition-all"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -527,7 +527,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <ChevronRight className="w-6 h-6 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -544,7 +544,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
             {rooms.length === 0 && (
               <div className="text-center py-12 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
-                <Home className="w-16 h-16 mx-auto mb-3 text-gray-300" />
+                <Home className="w-16 h-16 mx-auto mb-2 text-gray-300" />
                 <p className="text-base">No rooms added yet</p>
                 <p className="text-sm mt-1">Click "Add Room" to get started</p>
               </div>
@@ -557,8 +557,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       {viewMode === 'detail' && selectedRoom && (
         <div className="min-h-screen bg-white flex flex-col">
           {/* Header */}
-          <div className="border-b border-gray-300 bg-gray-50 p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="border-b border-gray-300 bg-gray-50 p-3">
+            <div className="flex items-center justify-between mb-2">
               <button
                 onClick={returnToList}
                 className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
@@ -641,10 +641,10 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
           {/* Tab Content */}
           <div className="flex-1 overflow-y-auto">
-            <div className="max-w-4xl mx-auto p-6">
+            <div className="max-w-4xl mx-auto p-3">
               {activeTab === 'info' && (
-                <div className="max-w-2xl space-y-6">
-                  <div className="grid grid-cols-3 gap-4">
+                <div className="max-w-2xl space-y-4">
+                  <div className="grid grid-cols-3 gap-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Length (ft)</label>
                       <input
@@ -677,7 +677,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                     <p className="text-sm text-blue-900">
                       <strong>Cubic Footage:</strong> {(selectedRoom.length * selectedRoom.width * selectedRoom.height).toFixed(0)} cf
                     </p>
@@ -690,8 +690,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-t pt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Affected Area *</h3>
 
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-start gap-3">
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-2">
+                      <div className="flex items-start gap-2">
                         <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm text-orange-900 font-medium">
@@ -707,9 +707,9 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                     {selectedRoom.length > 0 && selectedRoom.width > 0 && selectedRoom.height > 0 ? (
                       <div className="space-y-4">
                         {/* Calculated Total Surfaces */}
-                        <div className="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                        <div className="bg-gray-50 border border-gray-300 rounded-lg p-3">
                           <p className="text-xs font-semibold text-gray-700 mb-2">Total Surface Areas:</p>
-                          <div className="grid grid-cols-3 gap-3 text-xs">
+                          <div className="grid grid-cols-3 gap-2 text-xs">
                             <div>
                               <span className="text-gray-600">Floor:</span>
                               <span className="font-bold ml-1">
@@ -732,7 +732,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         </div>
 
                         {/* Affected Square Footage Inputs */}
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-3 gap-2">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               Floor Affected (sq ft) *
@@ -800,7 +800,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                           }
 
                           return totalAffected > 0 ? (
-                            <div className={`border-l-4 rounded-lg p-4 ${
+                            <div className={`border-l-4 rounded-lg p-3 ${
                               damageClass === 3 ? 'border-red-500 bg-red-50' :
                               damageClass === 2 ? 'border-yellow-500 bg-yellow-50' :
                               'border-green-500 bg-green-50'
@@ -825,7 +825,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         })()}
                       </div>
                     ) : (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                         <p className="text-sm text-yellow-900">
                           Enter room dimensions first to calculate affected areas
                         </p>
@@ -837,8 +837,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-t pt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Overall Room Photos</h3>
 
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-start gap-3">
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-2">
+                      <div className="flex items-start gap-2">
                         <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm text-orange-900 font-medium mb-1">
@@ -874,8 +874,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-t pt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Thermal Imaging (Optional)</h3>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-start gap-3">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                      <div className="flex items-start gap-2">
                         <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm text-blue-900 font-medium mb-1">
@@ -908,10 +908,10 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
                   {/* Pre-existing Damage Section */}
                   <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Pre-existing Damage</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Pre-existing Damage</h3>
 
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-start gap-3">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-2">
+                      <div className="flex items-start gap-2">
                         <Info className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm text-yellow-900">
@@ -922,7 +922,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       </div>
                     </div>
 
-                    <label className="flex items-center gap-3 cursor-pointer mb-4">
+                    <label className="flex items-center gap-2 cursor-pointer mb-2">
                       <input
                         type="checkbox"
                         checked={selectedRoom.hasPreexistingDamage}
@@ -977,7 +977,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                 <div className="max-w-4xl space-y-4">
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Materials Removal Plan</h3>
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-sm text-gray-600 mb-2">
                       Document what materials need to be removed and why. Expand categories to select materials.
                     </p>
                   </div>
@@ -1004,7 +1004,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('flooring') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('flooring') && (
-                      <div className="p-4 space-y-3 bg-white">
+                      <div className="p-3 space-y-3 bg-white">
                         {selectedRoom.materialsAffected
                           .filter(m => ['Carpet & Pad', 'Hardwood Flooring', 'Vinyl/Linoleum Flooring', 'Tile Flooring', 'Laminate Flooring', 'Engineered Flooring', 'Subfloor'].includes(m.materialType))
                           .map((material) => {
@@ -1028,8 +1028,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                   {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                                 </button>
                                 {material.removalRequired && (
-                                  <div className="ml-6 space-y-3 mt-3">
-                                    <div className="grid grid-cols-2 gap-3">
+                                  <div className="ml-6 space-y-3 mt-2">
+                                    <div className="grid grid-cols-2 gap-2">
                                       <div>
                                         <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (sq ft)</label>
                                         <input
@@ -1118,7 +1118,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('drywall') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('drywall') && (
-                      <div className="p-4 space-y-3 bg-white">
+                      <div className="p-3 space-y-3 bg-white">
                         {selectedRoom.materialsAffected
                           .filter(m => ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType))
                           .map((material) => (
@@ -1140,8 +1140,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
-                                <div className="ml-6 space-y-3 mt-3">
-                                  <div className="grid grid-cols-2 gap-3">
+                                <div className="ml-6 space-y-3 mt-2">
+                                  <div className="grid grid-cols-2 gap-2">
                                     <div>
                                       <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (sq ft)</label>
                                       <input
@@ -1209,7 +1209,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('trim') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('trim') && (
-                      <div className="p-4 space-y-3 bg-white">
+                      <div className="p-3 space-y-3 bg-white">
                         {selectedRoom.materialsAffected
                           .filter(m => ['Baseboards', 'Shoe Molding', 'Crown Molding', 'Door Casing', 'Window Casing', 'Chair Rail', 'Other Trim'].includes(m.materialType))
                           .map((material) => (
@@ -1231,8 +1231,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
-                                <div className="ml-6 space-y-3 mt-3">
-                                  <div className="grid grid-cols-2 gap-3">
+                                <div className="ml-6 space-y-3 mt-2">
+                                  <div className="grid grid-cols-2 gap-2">
                                     <div>
                                       <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (linear ft)</label>
                                       <input
@@ -1299,7 +1299,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('tile') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('tile') && (
-                      <div className="p-4 space-y-3 bg-white">
+                      <div className="p-3 space-y-3 bg-white">
                         {selectedRoom.materialsAffected
                           .filter(m => ['Tile Walls', 'Backsplash', 'Tub Surround'].includes(m.materialType))
                           .map((material) => (
@@ -1321,8 +1321,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
-                                <div className="ml-6 space-y-3 mt-3">
-                                  <div className="grid grid-cols-2 gap-3">
+                                <div className="ml-6 space-y-3 mt-2">
+                                  <div className="grid grid-cols-2 gap-2">
                                     <div>
                                       <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (sq ft)</label>
                                       <input
@@ -1388,7 +1388,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('cabinetry') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('cabinetry') && (
-                      <div className="p-4 space-y-3 bg-white">
+                      <div className="p-3 space-y-3 bg-white">
                         {selectedRoom.materialsAffected
                           .filter(m => ['Base Cabinets', 'Upper Cabinets', 'Vanity', 'Countertops', 'Shelving'].includes(m.materialType))
                           .map((material) => (
@@ -1410,8 +1410,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
-                                <div className="ml-6 space-y-3 mt-3">
-                                  <div className="grid grid-cols-2 gap-3">
+                                <div className="ml-6 space-y-3 mt-2">
+                                  <div className="grid grid-cols-2 gap-2">
                                     <div>
                                       <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (linear ft)</label>
                                       <input
@@ -1478,7 +1478,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('insulation') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('insulation') && (
-                      <div className="p-4 space-y-3 bg-white">
+                      <div className="p-3 space-y-3 bg-white">
                         {selectedRoom.materialsAffected
                           .filter(m => ['Insulation - Wall', 'Insulation - Ceiling/Attic'].includes(m.materialType))
                           .map((material) => (
@@ -1500,8 +1500,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
-                                <div className="ml-6 space-y-3 mt-3">
-                                  <div className="grid grid-cols-2 gap-3">
+                                <div className="ml-6 space-y-3 mt-2">
+                                  <div className="grid grid-cols-2 gap-2">
                                     <div>
                                       <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (sq ft)</label>
                                       <input
@@ -1567,7 +1567,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('fixtures') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('fixtures') && (
-                      <div className="p-4 space-y-3 bg-white">
+                      <div className="p-3 space-y-3 bg-white">
                         {selectedRoom.materialsAffected
                           .filter(m => ['Sink/Faucet', 'Tub', 'Shower Pan', 'Dishwasher', 'Refrigerator', 'Washer', 'Dryer', 'Stove/Oven', 'Microwave', 'Water Heater', 'Disposal', 'Other Appliance', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType))
                           .map((material) => (
@@ -1589,8 +1589,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
-                                <div className="ml-6 space-y-3 mt-3">
-                                  <div className="grid grid-cols-2 gap-3">
+                                <div className="ml-6 space-y-3 mt-2">
+                                  <div className="grid grid-cols-2 gap-2">
                                     <div>
                                       <label className="block text-xs font-medium text-gray-700 mb-1">Quantity (each)</label>
                                       <input
@@ -1652,7 +1652,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('other') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('other') && (
-                      <div className="p-4 space-y-3 bg-white">
+                      <div className="p-3 space-y-3 bg-white">
                         {selectedRoom.materialsAffected
                           .filter(m => m.materialType === 'Other')
                           .map((material) => (
@@ -1674,7 +1674,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
-                                <div className="ml-6 space-y-3 mt-3">
+                                <div className="ml-6 space-y-3 mt-2">
                                   <div>
                                     <label className="block text-xs font-medium text-gray-700 mb-1">Material Description</label>
                                     <input
@@ -1685,7 +1685,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                       placeholder="Describe the material..."
                                     />
                                   </div>
-                                  <div className="grid grid-cols-2 gap-3">
+                                  <div className="grid grid-cols-2 gap-2">
                                     <div>
                                       <label className="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
                                       <input
@@ -1738,7 +1738,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('custom') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('custom') && (
-                      <div className="p-4 space-y-3 bg-white">
+                      <div className="p-3 space-y-3 bg-white">
                         <button
                           onClick={addCustomMaterial}
                           className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
@@ -1751,7 +1751,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                           .filter(m => m.materialType === 'Custom')
                           .map((material) => (
                             <div key={material.id} className="border-2 border-blue-200 rounded-lg p-3 bg-blue-50">
-                              <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
                                   <label className="block text-xs font-medium text-gray-700 mb-1">Material Name</label>
                                   <input
@@ -1772,7 +1772,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                               </div>
 
                               <div className="space-y-3">
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 gap-2">
                                   <div>
                                     <label className="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
                                     <input
@@ -1837,8 +1837,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   </div>
 
                   {selectedRoom.materialsAffected.filter(m => m.removalRequired).length === 0 && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center mt-4">
-                      <Layers className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center mt-2">
+                      <Layers className="w-10 h-10 text-gray-400 mx-auto mb-2" />
                       <p className="text-gray-600">
                         No materials selected for removal yet. Expand categories above to select materials for demo.
                       </p>
@@ -1856,13 +1856,13 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
       {viewMode === 'add' && (
         <div className="min-h-screen bg-white flex flex-col">
           {/* Header */}
-          <div className="border-b border-gray-300 bg-gray-50 p-4">
+          <div className="border-b border-gray-300 bg-gray-50 p-3">
             <button
               onClick={() => {
                 setViewMode('list');
                 setNewRoomForm({ name: '', type: 'Bedroom', floor: '1st Floor', length: '', width: '', height: '8' });
               }}
-              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-3"
+              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-2"
             >
               <ChevronRight className="w-5 h-5 transform rotate-180" />
               <span>Back to Rooms</span>
@@ -1872,7 +1872,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
           {/* Form Content */}
           <div className="flex-1 overflow-y-auto">
-            <div className="max-w-2xl mx-auto p-6 space-y-6">
+            <div className="max-w-2xl mx-auto p-3 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Room Name *</label>
@@ -1924,8 +1924,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Room Dimensions *</h3>
-                <div className="grid grid-cols-3 gap-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Room Dimensions *</h3>
+                <div className="grid grid-cols-3 gap-2">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Length (ft)</label>
                     <input
@@ -1963,7 +1963,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               </div>
 
               {newRoomForm.length && newRoomForm.width && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <p className="text-sm text-blue-900">
                     <strong>Cubic Footage:</strong> {(parseFloat(newRoomForm.length) * parseFloat(newRoomForm.width) * parseFloat(newRoomForm.height || '8')).toFixed(0)} cf
                   </p>
@@ -1976,8 +1976,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
           </div>
 
           {/* Bottom Buttons */}
-          <div className="border-t border-gray-300 bg-white p-4 sticky bottom-0">
-            <div className="max-w-2xl mx-auto flex gap-3">
+          <div className="border-t border-gray-300 bg-white p-3 sticky bottom-0">
+            <div className="max-w-2xl mx-auto flex gap-2">
               <Button
                 variant="primary"
                 onClick={addRoom}
@@ -2003,7 +2003,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
       {/* Pre-existing Damage Modal */}
       {showPreexistingModal && selectedRoom && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">Document Pre-existing Damage</h2>
@@ -2015,9 +2015,9 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
+            <div className="p-3 space-y-4">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <div className="flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-yellow-900">
@@ -2060,7 +2060,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
               </div>
             </div>
 
-            <div className="sticky bottom-0 bg-gray-50 border-t px-6 py-4 flex gap-3">
+            <div className="sticky bottom-0 bg-gray-50 border-t px-6 py-4 flex gap-2">
               <Button
                 variant="primary"
                 onClick={() => setShowPreexistingModal(false)}

@@ -123,7 +123,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
   if (!currentRoom) {
     return (
       <div className="text-center py-8">
-        <AlertCircle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
+        <AlertCircle className="w-10 h-10 mx-auto mb-2 text-yellow-500" />
         <p className="text-gray-600">No rooms found. Please add rooms in the previous steps.</p>
       </div>
     );
@@ -142,9 +142,9 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Progress Header */}
-      <div className="bg-gray-50 border rounded-lg p-4">
+      <div className="bg-gray-50 border rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-gray-900">
             Room {currentRoomIndex + 1} of {rooms.length}: {currentRoom.name}
@@ -162,8 +162,8 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
       </div>
 
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-medium text-blue-900 mb-1">Initial Moisture Mapping</h4>
@@ -182,8 +182,8 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
 
       {/* High Readings Warning */}
       {affectedReadings.some(r => r.moisturePercent > 40) && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-red-900 mb-1">⚠️ Very High Moisture Detected (&gt;40%)</h4>
@@ -209,8 +209,8 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
 
       {/* Dry Standard Status */}
       {!dryStandard && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-yellow-900 mb-1">Dry Standard Required</h4>
@@ -224,8 +224,8 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
       )}
 
       {dryStandard && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-green-900 mb-1">Dry Standard Established</h4>
@@ -241,14 +241,14 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
       {/* Existing Readings */}
       {roomReadings.length > 0 && (
         <div>
-          <h3 className="font-semibold text-gray-900 mb-3">
+          <h3 className="font-semibold text-gray-900 mb-2">
             Readings for {currentRoom.name} ({roomReadings.length})
           </h3>
           <div className="space-y-2">
             {roomReadings.map(reading => (
               <div
                 key={reading.id}
-                className={`border-l-4 rounded-lg bg-white p-4 ${
+                className={`border-l-4 rounded-lg bg-white p-3 ${
                   reading.isDryStandard
                     ? 'border-blue-500'
                     : isDry(reading.moisturePercent)
@@ -278,7 +278,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
                     <p className="text-sm text-gray-700 mb-2">
                       <strong>Location:</strong> {reading.location}
                     </p>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div className="grid grid-cols-3 gap-2 text-sm">
                       <div>
                         <p className="text-gray-600">Moisture</p>
                         <p className="font-bold text-lg">{reading.moisturePercent}%</p>
@@ -322,10 +322,10 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
 
       {/* Add Reading Form */}
       {showAddReading ? (
-        <div className="border-2 border-entrusted-orange rounded-lg p-6 bg-orange-50">
-          <h3 className="font-semibold text-gray-900 mb-4">Add Moisture Reading</h3>
+        <div className="border-2 border-entrusted-orange rounded-lg p-3 bg-orange-50">
+          <h3 className="font-semibold text-gray-900 mb-2">Add Moisture Reading</h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Material Type *
@@ -363,7 +363,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-2">
               <Input
                 label="Moisture % *"
                 type="number"
@@ -463,7 +463,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
               />
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button variant="primary" onClick={handleAddReading}>
                 <Plus className="w-4 h-4" />
                 Add Reading
@@ -503,7 +503,7 @@ export const MoistureMappingStep: React.FC<MoistureMappingStepProps> = ({ job, o
       </div>
 
       {/* IICRC Reference */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
         <p className="text-xs text-gray-600">
           <strong>Best Practice:</strong> Establish a dry standard in each room before taking affected readings.
           Return to the same locations daily for consistent progress tracking.
