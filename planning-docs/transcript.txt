@@ -1,0 +1,1282 @@
+00:00:00 Jason
+So one second. Okay. Can you hear me still? I can. Yes. So before we hop into those questions, let me show you one thing, which is something that I forgot to push an update to is we weren't getting the baseline environmentals anywhere. And I don't think anybody caught that. And one of the things that even in the summer, like when we were talking about it with tech, and you're pointing out and like mentally how we make it function, I can do whatever you want. Now that we're talking about it.
+
+00:00:39 Jason
+It's all here. Just moving buttons around is like, if you look at the when we do this, let me make it look more like a phone, huh? There we go. When we do this, it's difficult to play with the do you scroll down? Do you do tabs like there's so much there. is what which is what we're talking about so one of the things that it suggested on the arrival, is like hey you're scrolling too far so it added the environmental things that we need to do the.
+
+00:01:13 Jason
+baselines but it's suggesting like tabs at the top here and then it said hey maybe you should do that throughout the workflow but then it's also confusing to make sure you hit all the tabs so yeah that's where i i just i'll start with that and then you guys just feedback the only other thing that um you had mentioned and i'll show you if you click on the logo it shows you where you're at yeah i tried to have words right here and maybe we seem to make the titles smaller but they would.
+
+00:01:46 Jason
+get cut off a lot was the issue yeah that's my initial thought i don't like the tabs.
+
+00:01:56 Speaker 2
+because when you're on your phone, like there was the other one that has the moisture and like the other you have the products or the different supplies in the rooms here yeah that one right there yeah the materials that's another one where i did the first time through i didn't even like i'm like where do you put the moisture meter the moisture readings i didn't i missed that um i wonder if i don't know what the solution is and maybe that is the solution but i i like you know maybe we just instead of it being a 14 step.
+
+00:02:28 Speaker 2
+process it's a 20 step process and we just break that into i don't know if we can do that because.
+
+00:02:33 Jason
+you're within a room that's what i was gonna say that's where i just honestly and i i'm very i'm very excited about robert's feedback i don't know what to do here like yeah and this is the part where i'm like with the tech team i can't figure it out because you need to go room by room and then, like i i was putting myself in the house this is where this is where my mindset was, and i might go into a kitchen and then i might go into the room next to it and find i actually need.
+
+00:03:05 Jason
+to look on another wall in the kitchen after i looked at the adjacent room whatever it may be, so you might be hopping back and forth between these rooms i feel like that's a pretty normal thing to do as you're trying to do investigation um so i don't yeah that's how i ended up here here how can they easily go back and forth between rooms and access everything so i would love to hear what you think about visually how to change this if you go back could you put those.
+
+00:03:38 Speaker 2
+tabs here so from this screen you could click on kitchen room info kitchen so it's you know.
+
+00:03:46 Jason
+what i mean i don't know so you're saying like uh you have three different tabs for each room.
+
+00:03:53 Speaker 2
+yeah so if you go to the next click on kitchen can i can i draw on this no i can't draw um where it says room info moisture and materials if you just basically just took that little section where it says room info moisture materials and made it buttons yeah i made three buttons right here so you could just go straight into them from here yeah i don't know i don't know if i like that but either way yeah either way i think we could train this like we could train you have to there.
+
+00:04:25 Speaker 2
+would just need to be errors or you can't leave unless you get certain things filled out and you move or even if it had these three tabs here that might be fine but then when you get to the bottom of this and it says net when you hit next like it doesn't take you to the drying chambers right it takes you to the moisture yeah. That was another piece that I, this has got to get figured out is there's exit, there's next, and then there's sometimes within there. And I wasn't always clear. You probably saw this in my notes. I wasn't always clear. Did it save it? Did it not save it. 
+
+00:05:01 Jason
+Yeah, these two buttons are identical. This is, you're talking about like nested workflow. One thing that maybe we do is, hey, I'm entering the room workflow, and these just disappear. These two buttons disappear. Action stays there, but these two disappear. And then you're just in the room workflow. And then when you go back to the main room assessment, then you can go to the next step.
+
+00:05:34 Jason
+Right now, the way that it is, is when I'm in, these buttons control 6 out of 14, which I'm sure you figured out. They don't control anything inside, like, the nested workflows.
+
+00:05:50 Speaker 3
+Yeah.
+
+00:05:51 Jason
+So you can either say, hey, like, you hit next when you're in this, and it doesn't let you go, like, finish your room assessment. What I also haven't done is put any really guards on it yet. Oh, did I lose you guys. 
+
+00:06:10 Speaker 2
+No, Robert just joined.
+
+00:06:11 Jason
+I haven't put any guards on it yet so that we can go through it freely and understand it, and then you could add guards in later. That was my thinking.
+
+00:06:22 Speaker 3
+Yeah, yeah.
+
+00:06:25 Jason
+You need to be more critical, Robert.
+
+00:06:34 Speaker 4
+I don't know if they're going to spit out something that's like 80% this or 120% this or something like that. So, man, this is like nuts and bolts, bones. Like, if it's going to be an example for them to follow, this is the one for sure.
+
+00:06:53 Speaker 2
+So, Robert, thanks for joining. Jason's going to tee us off here. We just got going into a few things. Jason, if you want to pick up from here, we can. Robert, I just wanted to share two quick things with you guys while I have you. Number one is Nate Wasilius is working on a project for cap-offs, and I've said, yes, let's go ahead and start tracking that data because they're going down the path like they do in Houston where the customer's going to pay for the cap-off.
+
+00:07:29 Speaker 2
+and they need some data to help validate some of that and so robert i felt based on conversations we've had that you'd be fine giving them data if we could go that direction is that fair so nate's gonna call both of you and and it's not do we capture the data it's yes we want to capture the the question now is how and so i wanted to get him with you guys for 10 minutes each or whatever he'll call you separately and just say what's the best way for us to capture this data ultimately it'll get captured in what we're about to look in look at i would think um but i want to just.
+
+00:08:07 Speaker 2
+give you guys a heads up that that's coming in that what that's all about the second thing, guys i got a sneak peek at october results have you guys seen this yet.
+
+00:08:21 Speaker 4
+I think I had to be at, like, 79%, so.
+
+00:08:23 Speaker 2
+Oh, it's not that high. If you incorporate Tampa, it might be.
+
+00:08:28 Speaker 4
+Yeah, I'm thinking Tampa, too.
+
+00:08:29 Speaker 2
+Yeah, West Palm, I think, is at 77.
+
+00:08:33 Speaker 4
+Wow.
+
+00:08:35 Speaker 2
+Absolutely amazing. Tampa's at 81.
+
+00:08:38 Speaker 3
+Dang.
+
+00:08:40 Speaker 2
+And, Jason, I want to say you're at 75, 75.8, 75.6, something like that.
+
+00:08:46 Jason
+Yeah, that's the best we've seen.
+
+00:08:50 Speaker 2
+Yeah, I'm blown away. I'm blown away. Orlando's the caboose this month, so. And they were at 73, I think. So, guys, thank you. Hopefully I didn't spoil the Christmas present, but when you see that, just know I'm super encouraged. Thank you both for all your work. All right, that's all I had. Jason, thanks.
+
+00:09:14 Jason
+So, let me go back to it. A couple of things real fast, Robert. I'm going to go through. There's a couple of things that was not there. So I'm going to start from the beginning, which we weren't capturing environmentals anywhere. And as I was playing with it, it's like this tension of, do you want to scroll a lot on these? Do we want more steps? Like we have 14 steps right now. Do we want kind of tabs?
+
+00:09:45 Jason
+Like if you look at this one, I went and I added where you can kind of see the tabs of like when you arrive, you do this. Then you go to photos and you take the photos of your truck location and your exterior. And then you go to environmental and you take your outside temperature, your relative humidity and your pictures of that.
+
+00:10:05 Speaker 2
+So it's kind of like within that step, there's three sub steps.
+
+00:10:08 Jason
+Yes. And we could, I guess let's just talk about this one for a second. When you think about this. I can see it either way. I don't know. You could just have to scroll a bunch. Do we like a tab idea? Or do we say, no, this should be step two, three, and four. 
+
+00:10:31 Speaker 2
+Whatever you say, Robert, is what we're doing, just so you know. Because Jason and I, we can't decide.
+
+00:10:36 Speaker 4
+I would prefer to just go increase the out of 14s. So, like, out of 15, out of 16. And that way it's easy to – the guys were so hyped about the actions button.
+
+00:10:48 Jason
+The actions button was fun.
+
+00:10:51 Speaker 4
+Yeah. So, like, I can go in between, like, pick what I want. So, like, this would show up on the actions button, right? If you made it a separate out of 14 or something like that. 
+
+00:11:02 Jason
+When you say actions button, you're talking about here. 
+
+00:11:04 Speaker 4
+Yeah.
+
+00:11:05 Jason
+So it would not show up there. It would show up here.
+
+00:11:09 Speaker 4
+Okay. so this is so this is all yeah they were they were just excited about how to move between stuff easier because encircle doesn't do that well okay so up here which step yeah so you're saying hey.
+
+00:11:23 Jason
+let's do two three four would be new steps arrival and and maybe it's maybe it's arrival, and then environmental and then upload pictures of all of that yeah i think you can smush the.
+
+00:11:40 Speaker 4
+photos in there and instead of it being three steps two steps two steps but you the photos.
+
+00:11:46 Jason
+are just like the rest of the app the photos are part of it okay i can do that so arrival and then environmental derrick i'm just going to keep going unless you keep going okay um step three, I think this is kind of redundant. It was technically in the user stories, like outside and the entrance. I think there were some comments, so I'll just, what are the thoughts about this step. 
+
+00:12:15 Speaker 2
+This is literally taking a picture of the front door.
+
+00:12:18 Jason
+Yeah, I think we can remove it.
+
+00:12:23 Speaker 4
+Twice a year, I wish I had a picture of the front door, out of the 2,800 jobs, so I'd get rid of it.
+
+00:12:31 Jason
+Okay, we'll get rid of it. And then.
+
+00:12:36 Speaker 4
+Oh, that one was the one I had a question about. Yeah. Just because of where they're gonna be standing when this pops up, if this isn't automatic, like if it doesn't pull from previous data that we have, we've gotta change where it's at. Because that would be like, you're at the front door, you're about to walk in, you're actually talking to them under vulnerable occupants about how they feel about mold. But right before you start, they might even answer the door while you're Googling that you're built.
+
+00:13:08 Jason
+Yep. So do we want to move this to property age and EPA hazards. 
+
+00:13:14 Speaker 4
+Or environmental or something like that.
+
+00:13:16 Jason
+To just arrival, maybe. 
+
+00:13:18 Speaker 2
+Yeah, sure.
+
+00:13:19 Jason
+My camera keeps freezing.
+
+00:13:21 Speaker 2
+Do we want to do that at step one, where you're doing the pre, like doing it back at the office? Or is it better to be done in the truck? Maybe in the truck, because you're right there.
+
+00:13:37 Jason
+Yeah, I'll be honest. I put very little effort into step one on any of this.
+
+00:13:41 Speaker 2
+Yeah, I saw that. But that's fine, because we'll have to build that out. But that's kind of a standalone thing. That's fine.
+
+00:13:49 Jason
+Yep. For now, I'll put it on step two. Because on ours right now, we don't even... Landed updates don't even show that for us in Houston. I don't know if it does for you, Robert. It's not in the landed update. It's not in the dispatch for us. It used to be.
+
+00:14:10 Speaker 2
+We want, Jason, I don't want to get in the, can you go back or pull it, go back to the asbestos area? So you put the year in and then, oh, depending on what year you put in, what if you put in 19 or 2000? Yeah, maybe it doesn't even show up. I don't know. Do you like it being like that. 
+
+00:14:44 Jason
+Uh, we can have it where based on the year is what shows up. That's what you're saying, right. 
+
+00:14:49 Speaker 2
+Yeah, yeah.
+
+00:14:51 Jason
+Okay. Yeah, that's not that hard. So move it to step two and then based on what year you input. um if you input before 1980 then this shows up if you import before 1978 then this shows up.
+
+00:15:03 Speaker 2
+yeah because that all that is is just it's more for safety and compliance with the asbestos policy right yes it's just a heads up hey you're going into house you need to be aware of these things.
+
+00:15:16 Jason
+yep okay keep going sorry so then this is just the notes on that and this i think we can just turn into bullet points personally i don't think they have to select it i don't know what you guys have thoughts are on that um i think either way the guys like the check boxes oh okay yeah i do.
+
+00:15:40 Speaker 2
+think i'll just say this real quick i don't want to bug yourself um this is a big opportunity for us to do this well so i don't think this is the the area that we train or that we have all the documents and it's like okay guys so this is more of a reminder, But I do think we need to make sure where the guys are walking through that. I don't think we need to capture check boxes necessarily and like hold people accountable to that because you do that, they're just going to check them and whatever.
+
+00:16:10 Speaker 2
+So maybe doing it in a more simplified format, to your point, Jason, is probably, yeah, probably best.
+
+00:16:20 Jason
+Okay. I'm going to keep going. The cause of loss. There is, I'm going to say this before we go on, but as we think about pictures throughout this, and this is a big question for the tech team, when I was playing with how to take a photo in a web app, it was hard to be able to take 10 photos at a time. It was clunky, which a lot of us get is a web app and it's not a native app. If Yeah.
+
+00:16:50 Jason
+on a native app they should be able to make that smoother hey you take 10 pictures and you upload 10 pictures all at the same time a concern of mine is like it would be nice to force that where, this is the only option if this option is there in real life what that could allow is that could allow somebody to essentially go in and do their whole install and then come to the app at the end.
+
+00:17:22 Jason
+and fill out the workflow yeah i have mixed feelings about that i think at the beginning if they have this option a lot of the guys that have a really good process in their head might say buffooey to this i'm going to go do everything i do and then fill out the workflow at the end, that's just something i have been thinking through i don't know how you feel like the change management on this robert will be you use guys you guys use in circles so maybe it.
+
+00:17:50 Speaker 4
+won't be as hard but we don't use anything close to this right now i like the choose from gallery, section for the couple jobs a month that each guy's going to go to where it's such such big amount of damage that the customer would be offended if you have your app out and you're going slow like you got to get the water up you got to get this going yeah that's so that's where.
+
+00:18:16 Jason
+i was leaning towards too but we just have to know it opens the door for them to ignore it but as long as they're doing the workflow in the house if they miss things they're gonna have to go back and fix it it's not like they can get away with it so i'm like i don't know, So, that's just a thought as we move along. The cause of loss, any feedback on this immediately guys? I don't know if we want to capture discovery date, it recommended that we did.
+
+00:18:49 Speaker 4
+I don't want to write anything down that has to do with someone getting approved or denied from their claim.
+
+00:18:55 Jason
+That's what I was thinking too. So we'll remove discovery date altogether. And then water category, this is a lot of scrolling. When you click category three, it's not accurate completely right now I would say, it's not terrible. But I like the idea of the checklist popping up here, but do we think that's too much?
+
+00:19:25 Jason
+it's at the very bottom right it's at the very bottom so we you come in here you take your photo you take your picture what caused the damage what's the location any additional notes you, select the category whatever it may be and then at the very bottom too you can right there request.
+
+00:19:43 Speaker 4
+a plumber immediately i think um it's tied to profit i love the checkbox idea like if you click the ppe it's going to add gloves and stuff to the log i think if it's just a reminder that it's too.
+
+00:20:05 Jason
+much scrolling could this be on the back end then because this this would be before they're really getting started they're just identifying the leak maybe we're adding that checklist on the back end when they actually need to use it so we capture pictures. So we just remove all of it together, and maybe just kind of simple checklists there, and not this big.
+
+00:20:32 Speaker 4
+And then maybe a little reminders box that has these six steps, but no bullet points under it.
+
+00:20:39 Speaker 3
+Okay.
+
+00:20:41 Speaker 4
+But then later, since you've checked three, it's like, show me a picture of your containment barriers, and how many times did you have to clean, something like that, for the demo measurements later.
+
+00:20:53 Jason
+Yep, that makes sense. Derek, anything on that before I keep moving? I don't want to move too fast, but I also don't want to move too fast.
+
+00:21:01 Speaker 2
+Can you show me the very bottom real quick? Okay. I just maybe have a little bit more of a separation between three and that, but that's minor. Go ahead. You're good. It's good.
+
+00:21:19 Jason
+This is something I added since I sent it to you guys. We didn't have any way to add unaffected rooms, so this allows us to add unaffected rooms. It would take – it would add them all in the same – it would ask for the same thing, so let's just do a test one here. First floor, 12, 11, 8. I think that's 8. 98. Push.
+
+00:21:49 Speaker 2
+That's it.
+
+00:21:50 Jason
+And then you have your environmental readings, your photos, overalls. Remove that.
+
+00:22:10 Speaker 2
+Anything that's optional I'm not a fan of because I think that's going to get abused. like he had thermals on there we'll get to thermals that are optional yeah um i don't know you guys may differ but i just if it's optional people are just going to blow by it they're they're.
+
+00:22:26 Speaker 4
+i think i think just the notable stuff pictures would be what i'd want what pictures like like.
+
+00:22:37 Jason
+what's what stands out to you in this room photo yeah so this would be an unaffected room my my thought for maybe doing it is like if this room is like a big pathway room where we're walking a bunch it wouldn't be bad to have some overalls just for like proof that we didn't damage something or but i also could see this being like too much robert robert i really want your opinion.
+
+00:23:08 Speaker 4
+what i really think because i there's a lot of times where i have a video of a room where i've got, Pictures of a room adjacent and stuff. It still doesn't show me the wall that got scratched or the tile that's cracked. So I would like the unaffected room to say, like, give me one or two photos, mandatory, of things that stand out to you in this room.
+
+00:23:33 Jason
+So prompting what they're supposed to be taking pictures of. Mm-hmm. Okay. I think that's a bad idea. And then I did leave pre-existing damage. Derek, to your point, hey, optional, I don't like optional. Anywhere that we talk about pre-existing damage, do we want to force them to answer yes or no instead of it being optional. 
+
+00:23:55 Speaker 4
+No, no, no.
+
+00:23:56 Jason
+Okay.
+
+00:23:58 Speaker 4
+Anticipating image, important notes.
+
+00:24:02 Jason
+So we just, we could probably take away the overalls and rename this a little bit, like pre-existing damage, and they have to say yes or no. If they say yes, they have to add pictures and notes. If they say no, then they're acknowledging there's nothing in that room.
+
+00:24:19 Speaker 4
+I wouldn't make it not optional, but give them more options of what they need to take a picture of. So what stands out to you, what's of note, like really dirty house, take a picture. Like I'm trying to get that. Like, uh, pre-existing damage, take a picture, versus put their feet on the wall over here and it's really dirty, take a picture, something like that.
+
+00:24:50 Speaker 4
+This door is scratched, take a picture.
+
+00:24:53 Jason
+Okay, I think I can do that. And we can make it, give some props. Derek. 
+
+00:25:00 Speaker 2
+i would say if we can do this when they're like above there when you have take photo choose from gallery i think there are cases in the flow where you may want to choose from the gallery you might need to to robert's point earlier but if any time in this process that's never going to happen like you're only going to take one or two pictures and the homework can wait while you take a quick picture or whatever the case is i say we remove the choose from gallery so that that choose from gallery is only available in those unique scenarios yep okay that's fair so when we're.
+
+00:25:32 Jason
+taking a lot of pictures we have to choose from gallery if it's a picture of your truck you can't choose some gallery you got to take that while you're outside picture of exterior can't choose.
+
+00:25:41 Speaker 2
+some gallery am i on the right track there yeah or a moisture meter or things like that i would think you guys tell me maybe that is a choose your gallery but yes yes that's clear okay, i love what robert was saying too and i mentioned this in my notes where it says, like this blue box right here you know this is a baseline and it gives a little like excerpt i don't think we want to overdo that but there's times when it's as a mid-tech you guys would know man that's really helpful to have that so it's very clear why we're doing this.
+
+00:26:14 Speaker 2
+um you don't want to overdo that but i i think that could be really helpful.
+
+00:26:18 Speaker 4
+i like that it's in there and not like another step that you have to click like it doesn't add.
+
+00:26:24 Jason
+a click i think that's important would i'm trying about playing with the balance of like clunkiness versus too much information i think they call it a tool tip would it make more sense to have like little info buttons and you it's a click but it doesn't change it just kind of is like a little like dialogue uh can i got i'm gonna show you guys another website and, explain kind of what I'm thinking because there's a lot of the almost where it's like a help button.
+
+00:26:58 Jason
+like hey I need help on what that means I just click this button and it it doesn't take me out it just shows like a little a modal like an overlay um I think about I'm going to share my screen for just a second this is the routing stuff I've been working on and when I when I click over here it just kind of shows me what this guy's route looks like and it grades it so it's not.
+
+00:27:19 Speaker 2
+like does that make sense yeah here's my thought Jason you have two two tiers one tier is I don't want a modal I want it showing there because it's very important or it's an important step or it's safety but then there's other things where it's not there all the time but you do have that tool tip for somebody who's newer or somebody who's has a question I I think you can do both okay that's that's my two cents but Robert you.
+
+00:27:54 Speaker 4
+I think we need there's space for both. I don't know if we need to work on it now because later we can always add it.
+
+00:28:03 Jason
+Okay, and then in these unaffected rooms, My my thinking here was sometimes your dry like if you have a whole house flood You might not be able to get a dry standard in that room. So maybe they're pulling their dry standard from here, So I left it, but I also left it optional which I know how you guys feel about that. Robert, what are your thoughts? Do we want to be able to take baseline moisture readings in unaffected rooms? No. Remove it?
+
+00:28:36 Jason
+Okay, that's what I was leaning but I put it there. I was going back and forth in my head.
+
+00:28:40 Speaker 4
+I couldn't figure it out. We need at least one unaffected area to have the hydrometer readings, but that's about it. Okay.
+
+00:28:50 Jason
+I'm gonna move to the next one because I don't want to spend all our time with unaffected, uh but it is important anything else here that immediately comes to mind this continued next step just needs to be removed it's it shouldn't be the whole navigating from one to the other.
+
+00:29:06 Speaker 2
+the exit the next like we talked about before robert got on we need to think through that but.
+
+00:29:10 Speaker 4
+we don't need to do that today okay so the first thing i did when i did this is i went to step two then i hit the back button on the browser and i was like no don't do that now that is a feature.
+
+00:29:24 Jason
+that in a real app shouldn't be a problem but in a web app will be a problem i'll put it that way, um so i think this one to me has been is the like the most important the most confusing, so i'll just right now you add your room the my mentality you go in you add the links, the the measurements the affected area this is where we're pulling air mover calculations from it's automatically.
+
+00:29:58 Jason
+based off of the room measurements determining class, right now so it's not something that our guys have to figure out on their own, and then it has you do the overall room photos, and then it asks for thermal imaging which we can make not optional, my one and only dot was on that and the reason why i made it optional which is probably a lack of coaching and uh anxiety in my own part but if a guy does not have a thermal for some reason like what does he do there and is it.
+
+00:30:28 Jason
+just like an override button um if a guy works at a thermal or it's broken i've had that happen.
+
+00:30:36 Speaker 2
+yeah even if you leave it just thermal imaging and it like they don't have to do it it just doesn't say optional but they can if they skip it they can go back or make it required but they have to check a button saying thermal i didn't use thermal on this job they sound can even track hey why why is joe never using thermal on his job or something like when they try to leave if they.
+
+00:30:59 Jason
+haven't done the thermal it says hey you didn't do thermal and they can it takes them back to do the thermal or they say hey i'm not doing thermal on this job yeah i like the yes now my one concern is this is a lot of scrolling for one room for one room and we haven't gotten to moisture materials.
+
+00:31:21 Speaker 2
+i think it's okay personally when i was doing it on my phone i i think it's okay. navigate between rooms i think materials is a lot worse than this to be honest a lot worse, that this one threw me off like this one gets really confusing so you can go back what was.
+
+00:31:42 Speaker 4
+there ever how do you go between rooms you might need to add a room go back to the back top then go over can we have like a left and a right at the top here ooh like maybe instead of.
+
+00:31:59 Jason
+this because these buttons are the same just have removed one of them so maybe instead of this you're saying hmm like you always have one on the left that says go back to rooms and then you have one that says like next room next room okay yeah or add a room after you're done with it like if there's no if there's not a next room i like that uh i'm gonna moisture first so.
+
+00:32:29 Jason
+i'm gonna think through how i phrase this, we had a moisture room let's just talk about you take your photo or you choose from gallery. right now on our dry logs we track wall drywall we have one reading for it i don't know if you do something different if i have a huge room and all the drywall is affected i track one spot in that room but i need a lot of pictures for that one moisture reading to be able to show insurance.
+
+00:33:05 Jason
+that the whole room was affected which is like which is the rub because you might need for this one quote unquote moisture reading you might need 20 to 30 pictures am i off here robert like what are you thinking through when you when i say that.
+
+00:33:24 Speaker 4
+so if you watch the video on moisture mapping from the chair of the icrc standards committee, he says the more moisture points you have the better because you can tell the story of how the room is drying so the way we do it wouldn't be best practice in the industry with the one reading, it would be okay well i've got five drywall readings on day two three of them are dry, i look adjust your look how much i got done on date day three another one's dry day four another.
+
+00:33:55 Jason
+one's dry it corresponds to what you're pulling this is where we get crazy in a good way in a good way this is where we get crazy compared to what we've done because it i was as i was doing this i was telling i don't know how into ai you are robert for me it's a personal problem. So, I was talking to AI about moisture readings and we were going back and forth in the app and it's saying like, hey, you don't just want one drywall reading, you want 10 drywall.
+
+00:34:26 Jason
+readings. But then you imagine in this workflow having 10 drywall readings here and then 10 flooring readings, you're going to have a list super long of readings that you've got to track. And then also, how are you telling the technicians where to go to track that? Are we doing crayon? Are we adding notes? Are they just going off the picture?
+
+00:34:58 Jason
+One of the things here would be if I had a moisture reading, just grab some random photos here. I think I need to grab one more. Okay. Then I'm gonna save it just for the sake of this can't type. So then you had the location which maybe that helps us with it It's optional right now any notes. So then maybe every single reading you can see a little.
+
+00:35:33 Jason
+Icon of where that was taken. But in my head, I'm just imagining doing this on a phone and like having, 20, Readings that you've got to check in on your check service, Robert what are your thoughts on that? Because I agree with what you said. I don't know how to execute it. Where's.
+
+00:35:49 Speaker 4
+All right, that's a good video. He says you put a piece of tape on the wall and you write a one That is what they do. I don't know. It's another one right a three. So.
+
+00:36:00 Jason
+This is not in our user stories But I think it's incredibly important that we decide what we want to do because that's going to change this app drastically.
+
+00:36:10 Speaker 4
+So when I look at this, Look at we're we're asking them for information and displaying the information at the same time Which I'm wondering if we don't have to do like can you go back to the moisture reading? Maybe scroll down from here. Where were you back before before there was none, okay, I don't see the add moisture reading so.
+
+00:36:40 Speaker 4
+There's only like a certain amount of watch McCulloch's, Materials so what if that button there was five of them and it said drywall wall drywall ceiling, flooring, Baseboard cabinet and you clicked on it and the next thing you saw was take a photo and then you take the photo and then It asks you what the reading was and it's all kind of like that And then it saves it and puts it on it instead of showing it all at once because I think that's what's making it.
+
+00:37:14 Jason
+Like you want this to be work flowy.
+
+00:37:17 Speaker 4
+Yeah, like look because because like what I want them to do is like with one hand you're taking a photo and a reading and, It's just like super easy to navigate and then like this has to be the fastest thing in the app.
+
+00:37:32 Jason
+I agree, so you don't look like the fastest thing in the app You're saying they take a photo then it asks for the or they they choose the material and it's like.
+
+00:37:47 Speaker 4
+The dry standards already collected before for this so you don't have to do it for each one.
+
+00:37:52 Jason
+The dry standard is hard-coded into the app or they're collecting it during the unaffected room that we already did.
+
+00:38:05 Speaker 4
+Or if you get it once then it's. this has to be like three things right material picture reading they take the.
+
+00:38:21 Jason
+material they take the picture they do the reading like that's it and then what I mean and maybe I do this we do this more here but like what about like all the unaffected like sub floor and framing like we do a lot more of that probably putting the unaffected of that in at the same time as the reading because I couldn't get it not affected at that from another room does that make sense because what you're saying is basically add a step of.
+
+00:38:56 Jason
+you go define all your dry readings before you do any of this and then when you go in here you already have your dry readings instead of adding. Instead of adding a dry reading for every single material that you select, right? Maybe the first time that you select a, Material it asks for the dry reading and then from that point forward and if you select a drywall before.
+
+00:39:27 Jason
+We're not going to ask for the dry reading. We already have the dry reading for that, Would that be better? Even if I move to a different room the dry reading is just going to be the same It doesn't change. Yeah, it doesn't change. I think we could definitely do that and that makes it pretty work flow II so that so you this is work flow II you go in to add a moisture reading It asks for the material then pictures then the reading if there's no driving reading or dry Reading for that material that also asks for that. We don't need pictures of dry readings. We do know.
+
+00:40:08 Speaker 4
+i like pictures of my readings in a room that's wet so we can show the extent of the damage yeah, but we also are taping walls so and getting overalls after taping yeah can we talk about.
+
+00:40:27 Jason
+the taping walls things for a second i think that's my not my biggest rub the biggest thing.
+
+00:40:35 Speaker 4
+we need to dig in on so we tried these little circle things here i think i can show you how.
+
+00:40:50 Jason
+does in the circle handle that does in circle handle that right now it makes you draw it on the.
+
+00:40:55 Speaker 4
+map yeah it's super clunky it's the worst thing ever so we did i don't think you can see these. they're like little little dots stickers and uh they work great they're like garage sale stickers, yeah but we found out that it takes like 10 minutes to peel them all at the end of a job.
+
+00:41:24 Jason
+we're using them the wrong way i think i'm just i'm just i'm sitting here processing, somebody else can fill the space i think yeah go ahead no you go ahead my thought is this would be a big change in process it's a big change in in my opinion a little bit in the user stories, uh my question to you and i'm actually for it i'm pretty sure i'm for it i've wanted to do.
+
+00:41:58 Speaker 4
+this for years yeah but the dry log app only has like five spots it only has five spots.
+
+00:42:06 Jason
+so when you think about handling what does um man maybe i need to get access to encircle just to play with it you don't it's all terrible okay never mind uh like how would you when we go to track materials in your mind robert you have drywall there you click drywall and then you see the five different spots of the drywall you need to check and then you click on one of those i'm just what i'm seeing in my head is a ton of clicks which i'm not against because i i.
+
+00:42:39 Speaker 4
+yeah so it's replacing the uncertainty like if you ever watched a guy oh no i'm not going to expect service they're doing they're doing this all over the room because they you can't tell what it is now, and they're trying to they're having to re-moisture map every time they go to a house it would it would take a lot of time to set up the stickers and to do the readings and stuff but the check service is literally just like five moisture points oh that's three click on three.
+
+00:43:10 Speaker 4
+new reading okay there's two there's one there's five uh four i don't see four uh oh there it is, and then you're done with your check service in that room it would just be like lightning and.
+
+00:43:22 Jason
+you don't have to do anything but that yeah the efficiency on the front side goes down but we get it back on all the two to four check services and we can show insurance a better it tells a story which is what we're trying to do for the insurance company now if you look.
+
+00:43:38 Speaker 4
+at our logs it looks like oh right you dried this material for five days and all of a sudden it went from 999 to 142. great job i'm so glad you were really honest with your readings.
+
+00:43:52 Speaker 2
+For the app, Jason and Robert, for now, we just need for every reading, we need a space to have some sort of a, you have a location, but some place to put either a color, a number, some sort of identifier, right? That's all we need for the app for this discussion, right? Or is it more in-depth. 
+
+00:44:13 Jason
+To me, so let's go to materials. This is, let's go to materials. I would correlate these two. So materials looks clunky right now.
+
+00:44:24 Speaker 2
+It looks smooth, but when you're on your phone and you click it, it's like, did I click that? No, it's okay. Now there's just, there's a lot there when you're scrolling on your phone.
+
+00:44:33 Jason
+So here's what I'm imagining for the moisture readings and why I went over here. If I'm taking... Let's say I'm taking, Robert, do you have an opinion, two spots per, like if I have, if a whole room is flooded, am I taking moisture readings on one spot per wall, two spots per wall? What's your experience showing us. 
+
+00:44:59 Speaker 4
+I think it should be per fan, personally.
+
+00:45:02 Jason
+Ooh. I like that idea.
+
+00:45:09 Speaker 4
+When your dry reading corresponds to pulling a fan.
+
+00:45:12 Jason
+So that could be a lot. If I got four materials in a room, and then I've got five readings for each material, I'm looking at 20 to 30 tracked moisture readings in every single room.
+
+00:45:32 Speaker 4
+I don't think it would be that high.
+
+00:45:35 Jason
+It might be a little higher for Houston, just with how much wood framing we have. I'm thinking through what we've done. What would you think it would be, Robert. 
+
+00:45:46 Speaker 4
+Yeah, so if I'm drawing cat one in a room, I've got five fans in it, I'm going to have a four-ring reading or two, and I'll have four drywall readings.
+
+00:46:03 Jason
+Okay, so in that room, you just have those four readings, and then you're just selecting, it's just a list that you go down and you select. Are the readings per material categorized together, or they're just, here's four drywall readings, here's, in your mind, just a list? Okay, we can definitely, and then,
+
+00:46:34 Jason
+we haven't gotten a check service and that wasn't the point of this but maybe, what i was looking at with the check service is once something's dry it moves somewhere into like a dry area where you don't see it it doesn't jump at your face but you can go back to it, okay so multiple per material per mirror room okay i can i'm processing that and then i'm gonna robert do you have any sorry derek do you have any thoughts on that before i kind of we dive into materials no actually i have one more question so i have a lot of questions you.
+
+00:47:10 Jason
+should see how many questions i asked claude uh robert do you robert derek what i'm seeing out there versus what we're not doing in any of this is capturing some kind of a map, That's not anywhere something that we've discussed, and that was something that when I was kind of researching IICRC in circle, what everybody else does, or not everybody, what a lot of people do, versus the user stories that we've created, nowhere are we creating a moisture map of any kind or diagram during MIP.
+
+00:47:48 Jason
+There is kind of an industry standard that we're supposed to do that. Am I wrong about that, Robert. 
+
+00:47:54 Speaker 4
+It's not in the standard, but that's what our competitors do.
+
+00:47:58 Jason
+That's what our competitors do. A sketch of some sort showing the water migration, essentially.
+
+00:48:07 Speaker 3
+And your moisture points.
+
+00:48:08 Jason
+And your moisture points on that. And what I did notice about it when I was looking through some Simbility invoices, it feels like they are kind of recreating that for some of those Simbility invoices. Go ahead, Derek.
+
+00:48:25 Speaker 2
+few thoughts one is i think for us to get there like encircled has that capability the reality is. whenever i would do it or i'd see somebody do it we were not mapping out the the room we were taking a picture and then on the picture we were putting where that moisture point was taking on the picture so in order to do that i think the only way to really do that is to use some sort of software like um matterports or hover or something like that where they can just.
+
+00:49:01 Speaker 2
+so to me that's outside of the scope i don't think we're going to be able to get, a map with what we're trying to do i wouldn't even try i would also say my second point is. the standards and all that are built prior to technology in a lot of ways, if i like just i would think about it if i'm an adjuster and i'm trying to see what i'm trying to understand the story i wouldn't get so hung up on we need to have a map again i could be totally wrong probably am i want to get hung up on i need a map maybe we should i'd.
+
+00:49:37 Speaker 2
+get hung up on is it clear to the adjuster what we're trying to do and if if we have colors or numbers and we're painting that picture to me that we don't need a map yeah we can look at that information and know exactly what's happening there there's no map needed so what i'm hearing is.
+
+00:49:52 Jason
+focus on the execution of the moisture points and how we document that clearly and we don't need that stuff and use photos not maps if we do our overalls good enough we do all that kind of stuff.
+
+00:50:04 Speaker 4
+good enough we won't need it i think so robert what do you think uh yeah encircle has a way to like hand draw a sketch we couldn't figure it out so i just taught the guys how to like draw on a picture um, Don't know how much it would help when we send our invoices to third parties and stuff that would be it but it's outside of the scope like if we wanted to test that and, And all of the carriers that sends to sure edge or another third party to take a look.
+
+00:50:34 Speaker 4
+If it would have a map or not might help but it's not it's not for the app.
+
+00:50:38 Speaker 2
+Even if we need a map at some point, we're not gonna be the ones doing it We're not doing it in the app. I can tell you that Mm-hmm, it's gonna have to be somehow getting it the the matter port to the invoicer and then making it clear through pictures and the Invoicer creating that in exactament or some or graph paper and a pencil.
+
+00:50:57 Jason
+Yeah, so we'll close scope really good pictures really good moisture points And then that would be handle the back end if we ever decided to do it. That's what I'm hearing. Yeah, Okay, I would just love to hear your guys' feedback about the materials thing. What it did was it went through all of our dry logs and looked at every single material that we could find and added it in here. For flooring, it did add things like installation type, because I know that matters.
+
+00:51:30 Jason
+Reason for removal, these are just auto-generated. We can obviously change language, but I think that is something that would be helpful. The quantity that we're planning to remove and any notes. I'm just going to, that's all I have for you. I want to hear open feedback on that, like how we execute this better, because this one is difficult, in my opinion. Something that it did suggest was like a, so here's something that you could do.
+
+00:52:04 Jason
+We could have... uh it auto suggests here's some here's some things ai was suggesting we could have it auto suggest materials that we took wet readings on but we do need to cut like we don't necessarily take wet readings on a baseboard to take it off right if it so we could try to tie all that together where like at the top is all of the recommended and below that is everything else and then you also have a search box at the top that was one idea i had my opinion is get this.
+
+00:52:43 Speaker 4
+as good as we can and easily identifiable so like when you hit a drop down for flooring like, it's got to look different and like auto close everything, like the the text will figure out with their thumbs where stuff is like it's just going to happen at first people are going to be searching and looking but like, You do, you know, 30 installs, and all of a sudden, and check surface, all of a sudden, you know where everything is. That's, so I think, so, like, when you drop that down, I think these buttons should be a different color, just so you don't lose them.
+
+00:53:18 Speaker 4
+And the heading, the head, so when, because when you open a second one, like, just scroll down and open another one, like, open, yeah, you gotta know, you always know where your headings are to navigate, just visually. And then when you open something up, and you go to somewhere else, it's gotta auto-close the rest of it. So, like, if you opened up carpet pad, like, try to open up carpet pad, and then also, like, hardwood flooring, like, without, so, like, it's gotta auto-close the other one.
+
+00:53:50 Jason
+Okay, I'm gonna just repeat back what I'm hearing, mainly from my notes. If I open a category, and another category is open, it auto-closes. If I click on a material to add notes, it closes the material I was just on, but saves everything. that headers and the actual materials themselves look too much alike. It's hard to just visually see it. So a header should look one way. Materials should have different, I don't know, different color box, different font, maybe a little smaller so we see more of it at once.
+
+00:54:23 Jason
+Do we like that when I click this, it drops down and you put stuff in? Or would it be better if this is like a pop-up that makes you fill it out and then you hit save and then it, I don't know.
+
+00:54:41 Speaker 4
+I like the drop-down. The whole thing is drop-downs. I think it's predictable on the screen. You can see it before you certify it. I like the drop-down.
+
+00:54:52 Speaker 2
+Why is this different than, say, the moisture one where it just says, you know, add moisture? reading and then it pops up you add the moisture meeting hit hit add and then it shows up there's your first moisture meeting then do another one you got to add a second moisture reading.
+
+00:55:09 Speaker 4
+we're trying to get rid of the typing whenever we can so two thumb clicks is better than having to type in carpet and pen doesn't that no like go uh go back to the go to one tab to the.
+
+00:55:29 Speaker 2
+left go to moisture it's like why isn't it like this so you're saying add material to add material and then you then you select is it a flooring drywall boom okay now it's now it's carpet boom and then it comes up with here's here's what you need to add then you hit submit and it'll look.
+
+00:55:48 Speaker 4
+just like the moisture one yeah go back to moisture and then add one and then pick the click on that, do you have to type it in or is that is it a drop down drop down so we can't see the drop down right.
+
+00:56:06 Jason
+now that's weird it's a drop down i don't know why it doesn't show on the screen but yeah it's.
+
+00:56:13 Speaker 4
+just a drop down i think there one thing would be that the drop down would come out and it would have all of these on it or you'd have to type it so while this yeah i'm gonna say my thought here.
+
+00:56:27 Jason
+and this is why we're doing this i can be completely off i try to categorize all the things that you could take in a room so it's a reminder so they don't forget to add it in the first place, Like, drywall, okay, I know I need to, I'm taking drywall out, trim, molding, like, those are kind of the big categories, instead of just, like, mentally thinking, what did I take out, that was the idea behind it.
+
+00:56:50 Speaker 2
+Instead of, like, a blank board and seeing right on there what you took out, it's, here's everything, select which ones you took out, okay.
+
+00:56:57 Speaker 4
+Well, the only other way I could think to do it would be, instead of a dropdown, if you click it, you just type it in. Like, don't have any, like, so it looks exactly like your demo measurements right now, and you just, there's a box next to it, and you put a number in. That might speed it up.
+
+00:57:22 Speaker 2
+Yeah, I like the dropdowns, I think this is fine, I've got to jump and go to a meeting. If you guys can keep going, that's amazing. If we need to schedule more time. To me, honestly, this is the best hour I've probably spent in two months. Oh.
+
+00:57:38 Speaker 3
+Wow.
+
+00:57:39 Speaker 2
+So this is like crazy helpful and important. I hate to jump, but should we reschedule some more time. 
+
+00:57:45 Speaker 4
+I need to reschedule it. I've got some more meetings this afternoon.
+
+00:57:50 Jason
+Yeah, me too.
+
+00:57:53 Speaker 2
+Let's get on the calendar real quick. When's a good time? Tomorrow afternoon. 
+
+00:57:59 Speaker 4
+I'll be out at a job site waiting on an adjuster to get there in the afternoon. So I could be free any time between like 11 and 3. But I don't know when I won't be available. So that'd be a sliding time for me.
+
+00:58:19 Speaker 2
+Would you be able to do it remote, Robert. 
+
+00:58:21 Speaker 4
+Yeah, I'll sit down and lock in. I won't be doing anything but waiting.
+
+00:58:29 Jason
+I have an interview from 1 to 2, my time, and then 10.30 to 11.30, my time, I have a thing. I don't know when the field app call was going to get scheduled for, Derek. I don't know if we would rather do this instead of that. I know they're talking about rescheduling it, but it hasn't gotten rescheduled.
+
+00:58:52 Speaker 4
+Let's do that. If that works, no, that doesn't work for you, Jason.
+
+00:58:55 Jason
+We have a manager unity day that day.
+
+00:58:59 Speaker 4
+Let's do it tomorrow. Tomorrow afternoon, what time works for you, Robert? I'll be unavailable for 30 minutes. I don't know which 30 minutes, in between 11 and 3.
+
+00:59:10 Speaker 2
+Okay, so let's just gamble and hope we don't hit that time. Jason, what works for you tomorrow afternoon. 
+
+00:59:18 Jason
+Can we do, let me pull back up again, sorry. I exited it out. Between 11 and 3, what time is that for me?
+
+00:59:27 Speaker 2
+that's 10 to 2 10 to 2 uh good afternoon afternoon between 12 and 2 your time we do 11 30, my times i think it's 12 30 your time yeah okay i'll set it up for 12 30 to one i'll send it out here in just a second and uh we'll cross our fingers it can work thank you we'll pick up we'll pick up from here jason and we'll we'll go through the rest of it and we'll we'll we'll be able to get through it in an hour good stuff thanks guys
+
+
+
+00:00:00 Speaker 1
+Cash versus insurance. I was looking at with Billy. He was right beside me when I opened it up I said this is a weird trend because the it is all follows each other, Until this it it looks like probably what happened we were putting a bunch of work and we're seeing that on that tracker so this is going up and We haven't done the cash stuff and that's going down, Everywhere else in the year that it kind of correlates. Yeah, which I thought was super interesting.
+
+00:00:31 Speaker 1
+I'm sure you saw that too. I didn't notice that no.
+
+00:00:34 Speaker 2
+Yeah, like the month correlations Yeah.
+
+00:00:37 Speaker 1
+and all the other months when insurance goes up cash goes up we ensure it pretty pretty close like 80 to 90 percent and then in, September it goes like that, opposite directions.
+
+00:00:51 Speaker 2
+Interesting. So are you. 
+
+00:00:56 Speaker 1
+uh we've put a lot of work in the the equipment side we still have more work to do i don't discount that but we put a lot of work in it the cash side has been clunky like uh i was there when nathan rolled out the new process to his team at the end of it and he's like they're good to go and said nathan i was only there for the end are you sure because i don't think they are i think you thought you were clear i don't think you were clear at all so billy was there for the whole thing.
+
+00:01:27 Speaker 1
+and i touched base with billy i said billy what's your opinion because he's like i can come whirl it out to your guys now too and i said just make sure your team is clear because if they're not clear and they don't do what you say they're going to do it's going to lose a lot of trust for you and then billy was like no he would have had to do that 16 times where billy's words for that to have been clear so they're kind of i think it's growing pains for nathan on like hey what does clear look like, He just kind of drew some stuff on a whiteboard, didn't have any process or handout or anything for them to walk away with.
+
+00:01:57 Speaker 1
+And I've drawn stuff on my whiteboard and walked away, and no one remembered what I drew.
+
+00:02:05 Speaker 2
+Amen. Well done.
+
+00:02:07 Speaker 1
+So it's not that it's not being worked on. It's just going slower than I was hoping it would. I like the concept of the process, but we've got to execute. Yeah.
+
+00:02:22 Speaker 2
+Good. Well, good. All right. Let me just text Robert and see if... Did he text us? No.
+
+00:02:29 Speaker 1
+I don't think so.
+
+00:02:30 Speaker 2
+Let me text him real quick.
+
+00:02:32 Speaker 1
+I don't know if we made a bad bet.
+
+00:02:35 Speaker 2
+Are you able to join the call with question mark. 
+
+00:02:41 Speaker 3
+I'll pull it up here to you, Robert. Are you able to switch on the call question there. 
+
+00:03:04 Speaker 2
+I'd love your feedback on the template too, the training huddle template.
+
+00:03:08 Speaker 1
+Yes. I'm open and I haven't gotten feedback yet, though. I'll get feedback.
+
+00:03:14 Speaker 2
+I think, I mean, you can see the vision probably better than I can there. I think once we have that dialed in, I played around with doing it like in HTML stuff and PDFs, and I'm like, I think it's better just to do it in Google Docs, so then you and Robert can edit it really easily. And then once we, not that you're going to edit it every time and not that you really can edit it, but I'm thinking we do it in Google Docs,
+
+00:03:44 Speaker 2
+and then when we create the final, it comes out as a PDF. All right, do you want to get going on this and cover some things without him or is it kind of pointless. 
+
+00:04:04 Speaker 1
+I mean, I want him here. I thought yesterday was impactful. Let me open it up and get that started. I've just got to find the web address. One second.
+
+00:04:21 Speaker 2
+How did that do yesterday. 
+
+00:04:23 Speaker 1
+He did good. There was some stuff that I got involved in that was just, we have some weird stuff going on. We have a partner that we were hunting and on the first hunt, they caused a tech spill that's big. And now they're ghosting us and then they're telling the homeowner to sue us. Weird stuff like that. That was like Christian, Billy, and I need to be having some phone calls about just several stuff like that.
+
+00:04:53 Speaker 2
+Did that happen when I was out there? Did something like that happen. 
+
+00:04:59 Speaker 1
+It might have happened, and the plumbing partner we thought was on board, well, then they start ghosting the homeowner and us, and then the VP of the company emails the homeowner. It probably was when you were here because it was when Josh was here. And he emails the company and says, actually, you should be going after and trusted for this. I've kept up a great relationship with that homeowner, so she immediately picked up the phone and called me and was like, can you believe they're trying to do this to you guys?
+
+00:05:29 Speaker 1
+Which is difficult because the way that we go into those is we go in saying, hey, we trust these people, we work with them.
+
+00:05:35 Speaker 4
+Yeah.
+
+00:05:35 Speaker 1
+Well, we've never actually worked with this person, and I wouldn't say that we trust them. So. yeah she's like i'm willing to work with them they're just not even returning my phone calls so she like drove to their office in college station which is like yeah it was a mess oh boy.
+
+00:05:52 Speaker 2
+how do we vet partners that we want to do business with sounds like we didn't vet them very well.
+
+00:06:02 Speaker 1
+yeah i haven't brought that up they just go off of reviews and maybe they have somebody over there that used to be with a partner that we currently have like there's a lot of ways they get there um the issue would yeah i don't know i don't want to get into my feelings on that.
+
+00:06:19 Speaker 2
+all right all right good good call keep us online jason keep us in line i've been going down that.
+
+00:06:28 Speaker 1
+for a minute of like hey if you guys can get us more visibility we can help you more but we don't even know you're hunting until you're in the job and that's not helpful to anybody.
+
+00:06:36 Speaker 2
+yeah all right i haven't heard it's just it's delivered but i could call them.
+
+00:06:50 Speaker 1
+Yesterday we left off on... we were talking about materials, right? That's where we were at. 
+
+00:07:00 Speaker 2
+Yeah. Materials, moisture, that whole section.
+
+00:07:06 Speaker 4
+Oops. Sorry, guys. Thanks for being patient with me.
+
+00:07:11 Speaker 2
+No. Anything to get your brain on this call.
+
+00:07:16 Speaker 4
+Okay. We're picking up where we left off, right? Yes, sir. Did anybody have a dream that brought them the right way to do this? I didn't.
+
+00:07:27 Speaker 1
+I was hoping you would, Robert.
+
+00:07:30 Speaker 4
+I did not.
+
+00:07:30 Speaker 1
+Dang it! Well, I guess we'll just have to figure it out for real.
+
+00:07:35 Speaker 4
+Yeah.
+
+00:07:38 Speaker 1
+So I opened it up where we left off, where we left off, if I remember correctly, correct me if I'm wrong, guys, I was talking about materials. I think we're going to, just thinking out loud here, I think we're going to come up with the same problem when we go to like the mini generals page and how we do that well. Because they're both very similar right now. So that's, yeah, I'm going to kick it off that way. We left off yesterday with, and maybe we were done here.
+
+00:08:10 Speaker 1
+We left off yesterday, the headers need to be different than the boxes, that things needed to auto close, but that we wanted to keep it this format, but just make it more user friendly instead, essentially. We're done there? Should I move on? I can't remember.
+
+00:08:31 Speaker 4
+I like the idea of. the guys will be really fast at this once they've done it 100 times, and if we make it easy to use it'll be fine jason are you plotting this conversation i am.
+
+00:08:47 Speaker 1
+always plotting conversations all right so anything else or do we want to go to the next.
+
+00:08:57 Speaker 2
+page so on this one earlier when it had the tabs like that we decided creating a different screen splitting those three into two and making them screens this one we can't really do that because of the the room's nature of it did we want to do anything i'm just noticing at the very top, anything with these buttons were you going to do something already i think we were talking about.
+
+00:09:24 Speaker 1
+taking away these buttons so that you don't actually push them so like if i go into a room i see these buttons, When I click the room, these disappear. So these are redundant buttons by accident. So you just have this back to rooms button and then Robert was suggesting like a next room button right here. But you can't accidentally mentally think next and hit next and just skip past rooms.
+
+00:09:52 Speaker 2
+What does the exit button do in the upper right. 
+
+00:09:54 Speaker 1
+The exit button exits the whole entire workflow.
+
+00:09:59 Speaker 2
+Does it, and it saves it. 
+
+00:10:00 Speaker 1
+It does save it. If you click it back in, you're right back where you were.
+
+00:10:06 Speaker 4
+Okay.
+
+00:10:07 Speaker 1
+And it does give you that little warning dialogue.
+
+00:10:11 Speaker 4
+I'll turn the installation above there.
+
+00:10:15 Speaker 2
+All right, let's keep moving. I'm good with keeping moving.
+
+00:10:19 Speaker 1
+So the drawing chambers, obviously this looks a little funky. For some reason, I'll just make it bigger so it doesn't look like that. The drawing chambers right now, we have the baseline rooms, I guess I didn't add a baseline room while we were doing this, but you have the chambers. The way I have it set up right now is it auto does a new chamber for every floor. You can edit that afterwards, but when they're selecting what floor a room is on, if you have three floors, it's going to automatically do those chambers.
+
+00:10:52 Speaker 1
+If you want to split it outside of that, because we know we will, then you would go and add another chamber. You would go in here and select what chamber you want to move things to. Something that I was thinking through, Robert, I'd love to get your opinion on this and it, didn't fully build out like I wanted it to, but I can build it out, is if we're taking a room and making the room smaller and making that chamber smaller, which is where I personally would like to see my team go, because I like it to be efficient. You say like, hey, this chamber has containment barriers.
+
+00:11:24 Speaker 1
+I don't know if there's a better way to phrase that. How much plastic did you use for that? Zipper door installed, zip pulls used, a picture of that. What would be missing here is, what is the new chamber's dimensions? What are your thoughts on that, Robert. 
+
+00:11:44 Speaker 4
+I think we have to have it for sure. It might be easier to program if it was built as like, how much of this room is outside of your plastic containment? And then you'd put 500 square feet, and then it would remove it from the overall clip of footage. That way you can have like five rooms in there, and you just ask them like, hey, how much of these five rooms did you contain off?
+
+00:12:17 Speaker 4
+It's worth it. And then it's just one number. even if you have two or three containment walls in a living room dining room kitchen.
+
+00:12:25 Speaker 1
+you could just hold it up and put it in yeah because the barrier chambers too is something that we can bill for right i see that on some invoices that's my only problem is i see it on invoices so if we're capturing this really well then we can show to insurance one we can bill for it more two insurance companies like to see us be trying to be intentional and being efficient so i know it would help our case too and what you're saying is hey instead of saying how big.
+
+00:12:59 Speaker 1
+is the chamber you're saying how much did we reduce the chamber by we just got the total dimensions yeah so we have to figure out a way to make that look really clean i can probably do that. but that would be a big miss right now on some of our the ways we do things if we chamber things off we have no way of reducing the views that are needed for that um other than that i can go.
+
+00:13:30 Speaker 1
+add a baseline room in when there's a baseline room it would show up over here and you just either select including chamber or exclude from chamber it would be right here uh so that if it's a baseline and it's not part of the chamber it's not there or if we can't you know take it out for.
+
+00:13:49 Speaker 4
+some reason we can add it in can you lift all the rooms and just make it a checkbox in each chamber you know what i mean like each chamber has the list of all the rooms and you you tap the ones.
+
+00:14:01 Speaker 1
+that are in the room yeah we could do that the question would be i'll try to do that logically, from uh, so you're saying like all the rooms for all the four are here like right now you would click here let me add let me add another room let me have another room real fast i thought this.
+
+00:14:26 Speaker 2
+functionality jason was pretty slick honestly but i want to make sure we're all on the same pages of what it does yeah you're gonna have another chamber right so this would.
+
+00:14:42 Speaker 1
+um man that is a lot you gotta put oh man is zero not an option that's a problem i'm just gonna say affected flooring or reflected ceiling in the room zero is an option it's saying, Oh, this is why I did not require everything while I was playing with it, because you've got to do all this just to test stuff.
+
+00:15:32 Speaker 3
+Currently have two. Come on. Sorry, guys. Maybe I shouldn't have done this.
+
+00:16:11 Speaker 3
+man this is clunky okay so you would have if you had two rooms in here you would have moved to a.
+
+00:16:31 Speaker 1
+chamber if we said that the first floor had multiple chambers we could add another chamber.
+
+00:16:37 Speaker 2
+and move this to chamber b like that the drop down isn't we don't see the drop down but oh there's a drop down that i'm clicking so you click that robert yeah i mean you know you probably saw and it's just a drop down of all your chambers and you just like and then it automatically moves it.
+
+00:16:55 Speaker 4
+okay that's good that is pretty slick and if you get it wrong you can move it yeah and then.
+
+00:17:05 Speaker 1
+here it does show the class based off of the affected materials that we put in, uh i would not say that i double and triple checked the math on that but we can make sure.
+
+00:17:16 Speaker 2
+it's double and triple triple checked i think it's right three quick things jason um the the rooms cubic footage and floor level that seems really big and is it is that is that critical information for the mid tech or is it just kind of nice to know information it just seems really big and then the rooms are really small just from a visual visually standpoint yeah we could technically.
+
+00:17:44 Speaker 1
+we could make all these boxes a lot smaller and bigger when you get to a 15 room project um it.
+
+00:17:54 Speaker 4
+might be a good thing that they're small i don't know that's just a thought the rooms the rooms.
+
+00:17:59 Speaker 2
+yeah but could we could we make the those boxes bigger or smaller the rooms one cubic footage.
+
+00:18:07 Speaker 1
+yeah we could definitely make that something smaller it'll be less to scroll yeah the other.
+
+00:18:13 Speaker 2
+thing if you scroll it keep going down um yeah maybe that was it this summer at the bottom that's giving you the green you know hey we've got everything we need um should that be standard on every one of these and maybe it is and if so should it be at the top or should it be at the bottom i like that because i i'm assuming if you don't have everything defined it's not green.
+
+00:18:41 Speaker 1
+green checks and green boxes yeah i think at the top makes more sense to me i think this is kind of the tension that we were talking about earlier like how many reminders do you want and how big do you want them to be yeah. This could be just an info button that they click on or they hover over, and then this could move up to the top.
+
+00:19:09 Speaker 2
+I don't know. Robert, what do you think. 
+
+00:19:12 Speaker 4
+I don't know anything about software stuff. I'm indifferent. All right.
+
+00:19:16 Speaker 2
+Well, I kind of like it at the bottom, because that's like you're scrolling through it and you're naturally going to kind of end at the bottom, I would think. So it's nice having it there, but at the top it's nice too because when you first pull in, you can see, oh, how am I doing? It's always there for you. Yeah, and I agree. I like what you just said in the blue box, putting that in the info button.
+
+00:19:49 Speaker 2
+Oh, this was the last one. Oh, if you hit the chamber, hit the button for the chamber has containment. and then scroll down so it says take containment photo should i'm thinking jason every time we take a photo it should have the same look so in tex c that right now it's like two boxes the photo and the gallery i'm wondering if we should just even though it might have a little bit more space i.
+
+00:20:23 Speaker 1
+don't know we talked about i do agree with that we did talk about yesterday the quick stuff like front door we want them to have to take the picture right there and then and then the bigger stuff we would add the gallery to am i remembering that incorrectly yes yep but what i'm saying is.
+
+00:20:39 Speaker 2
+remove the take containment photo button and put those two boxes or just put the one box depending on what we decide there but you know what i'm saying yeah so the button looks the same.
+
+00:20:50 Speaker 1
+yeah make it the square i can make it we can make it the square.
+
+00:20:55 Speaker 2
+yeah anytime there's a photo that way when you see that it's like oh i need to take a photo versus this button kind of blends in that makes perfect sense that's all i got looks good robert anything.
+
+00:21:07 Speaker 1
+there i think that's good um the partial demo one i'll be honest it's here i haven't built out the demo workflow and i think so i'll walk you through what i have done like i kind of what i want to do there is build out the demo workflow flow completely and then come back and just import that into here um the demo one is confusing in my head for a couple of reasons which is why it's.
+
+00:21:38 Speaker 1
+i've just focused on install so the whole concept of this is sometimes we do demo and this install sometimes we don't most of the time we do a little bit of something, a little bit of something some baseboards so what they would be able to do right now is they would say hey i did perform demo on this install i performed it in this room they add the room, and then right now they would go in here and say how many how much time did they spend demoing which is a requirement of our current logs what are the materials that are removed what.
+
+00:22:12 Speaker 1
+was the quantity what was the unit and then what the notes i do think i want to add a drop down here for the y like they can select from five different reasons or they can add their own notes would be the option um so this would be this would be their opportunity to go in here and add as many materials that they demoed right there the other idea too would be for this to possibly auto populate from the materials that they marked earlier and then they would select which ones.
+
+00:22:45 Speaker 1
+they actually did, so you can do that either way real quick the house is different than on the screen that has, info moisture and materials yeah and that screen they're marking what will be done throughout the whole project and this screen they're marking what they actually did on the install for us i don't know how i know we demo more here for us most of our demos on day two.
+
+00:23:19 Speaker 1
+so they're marking that and that's going to more or less create the pillars and the plan of what's coming out and then if they took out a toe kick and some baseboards and some drywall today they need to mark that today and the rest of it would get marked on another day so one's hey what are we planning to do the other ones what did we actually do now that would feed into this is what you're seeing yeah we could do it where you choose the options from what they marked. but there could be more than what was marked or no there could be more than what's marked so they.
+
+00:23:49 Speaker 1
+can go and add here as many as they want this would be interesting to get feedback from the pst team on i remember when part of these conversations came up was like hey there's a lot more materials that we could be marking than we do mark and my pushback was the logs don't allow for that like they would say they have to remember excuse me they have to memorize all.
+
+00:24:23 Speaker 1
+those things because our logs don't auto populate a lot of that stuff they were asking for let's.
+
+00:24:28 Speaker 2
+think for this discussion we have 33 minutes i would propose we're 8 out of 14. we put a pin in this and just know jason like you said we got to do some more work here but this would not be the bottleneck right now and what we're trying to do so yeah okay, unless robert has something off the top of his head he's dying to share this is probably going.
+
+00:24:50 Speaker 4
+to be the hardest thing to get right i agree so we should skip it for now good yeah and to me it was.
+
+00:25:00 Speaker 1
+demo workflow is going to be hardest then install and then check service and pull if we get those right will be pretty easy in my opinion uh so this is um equipment calculations how do i do this this is different than the workflow that we talked about last time so i'm going to acknowledge that, um in this it's showing them what they need in every room it's kind of a uh it's a it's a box.
+
+00:25:32 Speaker 1
+it's an inception here it's a box inside of a box which can get really confusing so you have the chamber, but then inside the chamber if you had multiple rooms it would then also break it down by room, and you know what just for i haven't actually seen that so, oh they're both from the same chamber so let's go look at this again so like chamber a we have air we need a one d hue and we need one air scrubber but then air movers go by rooms.
+
+00:26:05 Speaker 1
+so then air movers by room we need three fans in the kitchen and two in the well i said test room, so i was trying to figure out how to visualize that where it made sense and that's what i came up with some other things would be most of the time for us we're installing the d hue in the air scrubber on day one we might not always ins uh install the fans on day one so i also left like an option of like hey we're gonna just like to market this is going to be scheduled post demo.
+
+00:26:37 Speaker 1
+as part of our plan, So that when they get to the end, it doesn't pop and say you didn't do something because they're planning it that way. It also shows based off the calculations, you need one because it's just like you always have one. Then you need an additional one for the floor, additional one for the wall based off of what they input. Equipment placement. This is what I added that was different. We have talked about this going in the final room by room.
+
+00:27:09 Speaker 1
+I think when we had all met last time. I don't know. I felt like it should be here the more I played with it. So they would click here. This is just a demo, scan. This is not functional. But they would scan it here. They would verify the room location of what room they put it in. And then if they wanted to enter it manually because that wasn't working, they could do that. And they could scan a couple of de-hues, a couple air movers, and then at the bottom it just recaps. If I were to put something here and then put a serial number in here, it would say, okay, you place one out of one de-use.
+
+00:27:49 Speaker 1
+And then at the bottom it shows you place that in the kitchen. Beat it up. Also, this.
+
+00:27:59 Speaker 4
+That was a problem. The only thing I don't like about this is placing the equipment in the rooms besides the fans. It just seems like a lot to scan equipment. Like, you've got to press a button to get the scanner, and then you've got to tell it which room it's in after. Like, when we click on kitchen, and it just says scan the five pieces, and you scan them, and it's attached to the Asset Panda tag that tells you.
+
+00:28:37 Speaker 4
+that tells that tells the program if it's a d here in air scrubber i love that thought when we get to.
+
+00:28:45 Speaker 1
+the very end let's think about that too and see if we want to move this to the end like we thought we did because then at the very end when we're doing the final overalls you are going room by room so it could just auto tag what room you're in i don't know i wrestled back and forth are we just gonna do we want to do away with this calculation all together here and just say let's do it all at the.
+
+00:29:08 Speaker 4
+very end no i think it makes sense to do it in the chambers and to tell the guys how much of each thing you need i just don't want to make it harder to tell the program how much equipment you just added than it should be.
+
+00:29:32 Speaker 1
+The other thing, too, is do we, right now, you could go and select, like, the AHIM rating. Do we want to hard-code that in. 
+
+00:29:43 Speaker 4
+Yeah, it's the same for every. That's what I thought.
+
+00:29:46 Speaker 1
+I'll get rid of that. I'll get rid of that automatically. Derek. 
+
+00:29:50 Speaker 2
+Yeah, there seems to be a lot of texts and, like, the calculation, and I don't know, maybe that's an info button. It's probably just an info button. But I think, Robert, what you're saying is not necessarily we want to do it in a different place, but just make it, like, right now, you go to add DU, and you have to, that selection of the room, I think that's the, is there a way that that could, so maybe cancel this.
+
+00:30:23 Speaker 2
+If you scroll up, Jason. scroll higher up on the screen yeah if like there was a button on where it says dehumidifier one in chamber a you click add D you right there and it's automatically gonna say chamber a is D you scan it you scan it and it's done the next does that make sense and then the next step would be like Robert said if there's three or five of them like that they're being an active next to kitchen three units there be a button that says add air mover you click on it.
+
+00:30:54 Speaker 2
+and it's a you know like it knows you need to do three and it gives you an opportunity to do the first one do the second lunch in the third lunch like all in one continuous flow is that what you're saying Robert yeah yeah that's.
+
+00:31:09 Speaker 1
+right so move the buttons like this button would be like here this might be here this button would be here and then, The question, I guess, this, we wouldn't need to select a room because it would be automatic for fans. For de-hues and air scrubbers, I would think we would want to make sure they select what room they actually put it in inside the chamber. One of the things that comes to my mind is the invoicing team right now just guesses what room it was in, and I've had homeowners go against our bill because they're like, that was never in that room.
+
+00:31:43 Speaker 1
+I don't know. Or do we not care about that? We just don't care about what chamber it was in. I don't know how the app will know what room you put it in automatically for air scrubbers and de-hues. Robert, you're muted.
+
+00:32:05 Speaker 4
+Oh, man. That's a really good point.
+
+00:32:09 Speaker 2
+How often, I mean, you think about the grand scheme of everything we're doing. Like, how much additional time will it take to select that room drop-down, just for DUs and air scrubbers? Like, on a given job, there's normally, I mean, yes, Robert, there's going to be those cases where there's 30 of them.
+
+00:32:31 Speaker 4
+Yeah, but I mean, like, how many times, if we can get this one, we can use that time on something else, you know what I mean? Like, I could say, like, yeah, let's make a couple of the changes and we can refine this further, because at this point, we don't have a better solution. Let's certify it so we can move on. And you're right, this isn't going to be that, but I wouldn't want to, like, take it out of the notes that we're not really done with equipment assignment and scanning.
+
+00:33:02 Speaker 2
+What if we did this, Jason? What if, in Kitchen, you have the three buttons? For every room, you have a button. So you just hit Add DU to the Kitchen, even though it's like...
+
+00:33:16 Speaker 4
+it's it's by chamber yep i'm in yep and it just it just pulls up scan everything in the kit yep okay i'm in and then i think if we do that we don't have to do the one at the end yeah we don't.
+
+00:33:28 Speaker 1
+need the one at the end this would still stay the same so they know how many goes in the whole chamber but then in the rooms they're selecting it that's a great idea 10 out of 10 derek i love.
+
+00:33:43 Speaker 4
+robert like robert pushes us this is the best meeting i've been in in two months.
+
+00:33:51 Speaker 2
+this is the best me i've been in 24 hours because the better one was two a day ago.
+
+00:33:55 Speaker 1
+what i was uh what i'm learning about robert is he hates pushing buttons, i love that good to know um everything else here guys i think everything else we can get rid of this stuff it could be an info but i think we can get rid of it completely in my opinion, like that yeah we don't need that i this stuff right here i do like that we're like kind of hey this is one for floor one for based off of the affected area i like that any issues with that.
+
+00:34:23 Speaker 4
+yeah i like that i think you have the space for it anyways so let's do it yep okay and then install.
+
+00:34:30 Speaker 1
+after demo should we remove that and it just is assumed if they don't put it as part of the plan, yeah get rid of it okay that's what i was i'm picking up on anything else guys i like it, and we're gonna get rid of this too. oh man i don't even want to get into this one uh so here's what i did this should be all in demo.
+
+00:35:04 Speaker 1
+i don't know why it's here i'm going to move it so just ignore this these are all demo line items. i think they are actually in the demo line items because this is where they started and i've got to take them out of here so everything else though this is the only place that that this is here this went through all of the general and billable items on our current dry log excel and said you don't have a place to build for these things right now so i want to just call.
+
+00:35:38 Speaker 1
+out what this screen is these all probably also need a picture button how granular do we want to get like contents do we need right like right now contents we have like content smaller room big room all that kind of stuff appliance do we need a list of appliances here, floor protection i think that one's pretty straightforward.
+
+00:36:10 Speaker 1
+so i think my first question is when you look at this screen, just in general do we need to scrap it and completely rethink the way we do it. this is bad sorry jason i don't i mean whichever ai made this is i don't know where to put it it's.
+
+00:36:40 Speaker 1
+not i this essentially is what we do now we leave it all on one huge page to figure it out and it doesn't work but i can't mentally figure out where we put that stuff and the, the more important part is we've got to be really aligned on where we put that stuff.
+
+00:37:15 Speaker 4
+Oh, you know, Jason. 
+
+00:37:18 Speaker 1
+Do we automate decomparing. 
+
+00:37:20 Speaker 4
+That's not a really good idea.
+
+00:37:22 Speaker 1
+Give it to me.
+
+00:37:26 Speaker 4
+Oh, I got a really bad idea. What if we go backwards on it? And Eric's going to tell me this is a bad idea, too. What if demo and general's line items was just a gallery upload, and you select all your pictures from the demo, and then it asks you for each picture what room and what material it is, or what room in the general item, and it's a drop-down box,
+
+00:37:59 Speaker 4
+and you just label your photos? Because you've got to get photos of everything anyway.
+
+00:38:07 Speaker 1
+Look, man, I don't like that idea. I don't like my idea.
+
+00:38:13 Speaker 4
+Tell me, no, no, tell me, tell me a couple things.
+
+00:38:16 Speaker 1
+So, what I'm trying to figure out...
+
+00:38:18 Speaker 4
+It labels the photo for the adjuster.
+
+00:38:20 Speaker 1
+Yeah.
+
+00:38:20 Speaker 4
+It captures the item, and it keeps you from forgetting what you did.
+
+00:38:25 Speaker 1
+I think my concern, and maybe this is only my belief here, is I want it to prompt to make sure they actually get the pictures, not assume they got the pictures and they'll upload them.
+
+00:38:38 Speaker 4
+Got you.
+
+00:38:40 Speaker 1
+Now, we can disagree about that, but I... No, you're right. I kind of feel strongly about that at the moment.
+
+00:38:53 Speaker 4
+Okay, well then I don't know what to do besides this. I would prefer that they don't expand and contract for this, and they're just headered. so you want it like this yeah i think you think of um i'm attacked and uh i'm looking at uh disposal and logistics and it just says zero four but i don't know which one of the four it's click so then i gotta expand it to go like structure with zero six you know i gotta expand it to see.
+
+00:39:28 Speaker 4
+which one of the six it is but i i know i can scroll to the heading and see what's clicked or.
+
+00:39:33 Speaker 1
+not the yeah that the other options in my opinion and i just think this takes a lot of it's going to take if we went this way it would take a lot of mental energy i gotta figure out where we would put that and that the tech team would not be able to execute without that mental energy from us, would be adding all these to mental workflow like little mini workflows like when i'm done with a.
+
+00:40:04 Speaker 4
+demo it asks me about these things hey can you just uh give me some feedback on what you saw on there, give me a second no you can you can talk to me or something else i have it for the other one what if i can air it for like two minutes all right you guys two hundred yeah jason what if we.
+
+00:40:27 Speaker 2
+just did what we do today and you just have a list of all the items like robert was saying but there's no check box and you just have whatever information you need is right there on the line so you're just scrolling tapping okay i got 10 of those oh i need a picture there's a button there's like but every line has a small little icon for the picture, and so you're not like clicking on the button to expand it's all just right there.
+
+00:40:54 Speaker 1
+so you're saying just this this list it's a a number instead of a check mark.
+
+00:40:59 Speaker 2
+a little it's not even a number it's just yeah but yeah yeah because sometimes some of this might be.
+
+00:41:05 Speaker 1
+like need to be numbers um what would be an example of that like how many air scrubbers like.
+
+00:41:12 Speaker 2
+do we want that to be automatic no what i'm saying is um leave it checked leave it checked but now picture every so picture this orange box orange box for every one of these line items so you don't have to check the button just everything's expanded but now now picture this where it says quantity zero it's just to the right of scrubbers, And then just to the right of that, there's a little notes that kind of maybe it pops up and you can just enter the notes in there. So in other words, like it's all on one line, kind of like what it is today. You don't really have the notes right there per line. And then there'd be a button for pictures. I know there's a lot to cram in there. So maybe decontaminated air scrubbers is on two lines and it's a smaller font or something. But you just you just have the lines that you can just like it is today.
+
+00:42:11 Speaker 1
+Well, we okay, I don't disagree. I think if we do anything other than that, it gets really messy. Like where you put it is that you only put it in that one spot. Maybe an idea would be just to try to help the guys out a little bit. As you add a what are we calling this billables or generals, whatever you want to call it, you add that as a quick action. and then if a guy is good as he's going through doing it he's like oh let me i just did this let me go at it real fast where it's not all left to the end you could come here and have this filled.
+
+00:42:46 Speaker 1
+out for himself but if he chooses to wait he chooses to wait and it's not making them do it but they have the option i would be frustrated by having to fill this all at the end personally but.
+
+00:42:57 Speaker 2
+i can't figure out a way around it yeah i like that idea with the action so if you clicked on that it would just take you to this screen and you could scroll to where you need to go and enter it.
+
+00:43:07 Speaker 1
+real time yeah because that was my thought too is like hey if you're outside of a room and you're like oh shoot i found a pre-existing damage let me go log that real fast or oh man i just found out that i i need to take this baseboard off let me just note that i did that so i don't have to go back to the workflow yeah so leave it all open yeah i can do that.
+
+00:43:34 Speaker 2
+But here's what I'm thinking. I'm thinking six, 12 months from now, we'll be able to somehow connect in an AI that's going to be analyzing the stuff. Maybe you, I don't know, it'll analyze stuff. It'll make suggestions. You can take pictures of it and automatically recognize what it is. Or it'll just be voice to text type stuff where you just go, hey, I've got a billable item. Can you add this to this to this? And it like automatically comes in.
+
+00:44:06 Speaker 1
+And I think that's where this is going. So I don't know if we want to overthink this right now. Yeah, overthinking it would take a lot of overthinking. So I'm down with it. All right. That's plus when Robert comes back when you say we solved it. So I'll be happy about that. I can see the disdain on his face when I open the page. I also hate it. We'll go through our waiting. Let me see how this actually turned out. This would be the final photos and equipment performance. So earlier we went into it room by room. We added the equipment. But then we need to let the equipment run for 20 to 30 minutes before we go get readings on it to make sure it's working on an install. So I didn't have us take the readings back then because they wouldn't be accurate.
+
+00:45:01 Speaker 1
+They need to run. So at the end it walks you through each room kind of a mini workflow. Says hey take your final photos, your final overalls, show dehumidifiers, all that. And then it also, oh I didn't assign any equipment. Right here it would ask you to take the inlet and outlet humidity and temperatures. two tabs so let me go back here let me add something to a room if i have added something.
+
+00:45:34 Speaker 1
+to a room and it didn't get it that would be a problem that's an issue with the coding so let's uh oh do you know that's already in there let's go back and see yeah yeah that piece of equipment's.
+
+00:45:48 Speaker 2
+not showing up uh derek you want to add to that room say what is it assigned to that room it is.
+
+00:45:56 Speaker 1
+i don't know why it's not showing i added this last minute so i didn't test it that's my bad uh robert where we ended is essentially a huge list at the end and then also adding it to the quick actions where as they were going through if they want to add a billable item they can add it right there and then just like it'd be right here so they could try to fill it out as they go but at the end they would have their big list it would have quantity and what do you uh quantity and then.
+
+00:46:29 Speaker 4
+Oh, I'll take a look at the picnic basket and make sure everything's in there before they move on.
+
+00:46:34 Speaker 1
+Yeah, your analogies are great, but I'm never expecting them.
+
+00:46:40 Speaker 2
+Yeah, if there's an icon for that stage, it could be a little picnic basket.
+
+00:46:43 Speaker 1
+A little orange picnic basket. So this one that we're on now is kind of the final walkthrough of the rooms. It would guide them through room by room. You can kind of see it up here. You would ask them to take photos of overall photos of their room. I think these should be removed, like the icons. I just think icons make it look clunky, personally. And plus, these wouldn't be there because they wouldn't be, this would be new.
+
+00:47:17 Speaker 1
+But they would take overalls and then this, I need to figure out why it's not showing, but this is where they would log their inlet and outlet temperatures on the de-hues. It would show what de-hues are there and it would ask them to log the inlet and outlets. So that would give it time. Hey, I placed it, I did some things, I've given it 20 to 30 minutes to run, and now I'm going through my final checks, taking final overalls and logging. So I think the big question is, is that where we do this? And two, do we want it to be tabs like this?
+
+00:47:48 Speaker 1
+Or just scroll down? Maybe it's, it probably makes more sense in my head to have the inlet outlets above it and then the pictures below it.
+
+00:48:01 Speaker 2
+I'm not a tab guy. I think you get lost, like, it's one more thing, oh I gotta click around that tab. To me it's not super intuitive when you're on a phone, but.
+
+00:48:14 Speaker 4
+I like scrolling. Yeah.
+
+00:48:16 Speaker 1
+scroll that's easy that's an easy one or put the buttons inside of the box i don't know what that means like you're talking about that equipment tab right yeah so we would do like equipment would be here you put your inlet and outlet temperatures and then you scroll down and then you would have your photos to upload of your overalls and your pictures of the dq readings yeah you need to do.
+
+00:48:47 Speaker 1
+this bedroom you need to do it okay great and then you would click select next on the room when you kind of see all the rooms you have to go to you could also jump this way or you could go.
+
+00:48:57 Speaker 4
+previous and next something that i'm realizing that we need to do is have a move rooms function.
+
+00:49:05 Speaker 1
+for equipment do you think we need that for the install i was thinking we just need that for everything past the other way, Yeah, that is in the plan for like check services and demos and pools, but we don't have anything like that on the install because I didn't see a need for it.
+
+00:49:22 Speaker 2
+Quick comment. Jason, if you go to the top of the page, you see this progress.
+
+00:49:27 Speaker 1
+I think we just need to get rid of it.
+
+00:49:30 Speaker 2
+Well, yeah. To me, there's that other screen we were looking at where you have the green box that validated you got everything. Here you got the progress. I don't necessarily have a skin in the game as far as which one I like more. It's just I would want to be consistent.
+
+00:49:45 Speaker 1
+What if instead of like this, I think it's a little different, but what if after you do this room, this box just is green, and then after you do this room, this box turns green. 
+
+00:49:55 Speaker 2
+Yeah, if that's it. Yeah, be consistent. That's all.
+
+00:50:01 Speaker 1
+Visually, it would be less to have to look at.
+
+00:50:05 Speaker 2
+Perfect. all right we've got seven minutes i'm gonna keep going then three tabs this is what i've wanted for.
+
+00:50:16 Speaker 1
+a long time guys and i love this idea maybe you don't love this idea robert but this is where they're going and they're scheduling the whole job i love this idea because once we have this data we can see how loaded we are up we are three days from now which i like so you don't have to sell it i'm super kind of bad on this perfect this right here this right here just from the start i think it should go away it's just going to auto calculate you don't need to enter it you don't need to see it this this estimated drying timeline is it just needs to go away in my opinion you guys.
+
+00:50:52 Speaker 1
+can tell me if i'm wrong um you have your days here you start with nothing you hit add demo it adds a day to a demo you hit check services it adds check service pull all that kind of stuff, we probably need to edit this a little bit date arrival window estimated hours team size and then maybe a couple things from like the workflow that we have now i don't think we need to get in the weeds of exactly what this is in my maybe we do but just do we like this this idea of it, yeah at the bottom it also reminds us again if they need to do a cap off they can come in here.
+
+00:51:28 Speaker 1
+and schedule cap off too anything i wouldn't change anything about this here move on and i.
+
+00:51:45 Speaker 2
+have some questions but i think this would be one we'd want to think through some more and build out but for now i think it's great.
+
+00:51:53 Speaker 1
+This is reviewing the plan before departing, so the mental idea that I had for this one was hey, I'm going to meet with the homeowner, let me look at everything to make sure I don't miss anything with them. So it shows the rooms assessed, it shows in each room, these are the wet materials and this is what we would be planning to remove, I didn't select any so it's not showing any. These are the subcontractors that we've scheduled for you, this is the equipment that we placed in the home, and then this is the scheduled future work.
+
+00:52:28 Speaker 1
+So they kind of would have to start with a homeowner here because they'd be putting time frames in with the homeowner would be the idea, and then they would go to here and then just review all this with the homeowner. It's not something right now that would be set up for the homeowner to see, but it would kind of mentally tie it all together for them.
+
+00:52:51 Speaker 2
+Personally, I like the idea. I could visualize if I'm a tech and I fill out the tomorrow's arrival window or whatever, if that's part of that previous page, but then I pull this up and I could just literally almost be like, hey, Mrs. Jones, here's where we're at. Here's this. If they're wanting to see it, hey, if you want to see this, this is where we're at. That, I think, if you could make it customer friendly, that might be nice. I don't know. Maybe there's things we don't want them to see. I don't know.
+
+00:53:26 Speaker 4
+There's no reason not to show them any of this.
+
+00:53:30 Speaker 1
+Yeah, everything on here would be, they could see it for sure.
+
+00:53:34 Speaker 2
+For some people, there's a lot of value to that. It's like, wow, these guys, this is everything. It's not on a piece of paper. It's digital. Some people would really like that.
+
+00:53:43 Speaker 4
+They had a submit for supervisor review button. That would give everybody the warm and fuzzies in the house. I'd be like, hey, I get to be their customer.
+
+00:54:00 Speaker 1
+You mean like the tech would submit this. 
+
+00:54:03 Speaker 4
+No, just like if you wanted it. If I'm hanging out with a customer and I show them this, and I'm like, how do these time windows work for you? You know, work for me demo, yada, yada. And then you hit submit for a supervisor review to get to the next page.
+
+00:54:19 Speaker 1
+or to do that, that would be pretty cool. Yeah, we could definitely have that fake button there. There was, it did throw an idea, and I didn't run with it, but we could run with it, that when this is selected, that it doesn't actually go in until a supervisor approves it on the back side of what it's suggesting. I would like jobs to be able to auto run. And maybe, like on my side, what I would like to see is just like, hey, when a supervisor sees it, we see it somewhere. This is a whole other conversation. We see that they did review it, but they don't have to review it for the job to keep moving.
+
+00:55:00 Speaker 2
+We got one minute.
+
+00:55:02 Speaker 1
+The last one is just departure time and any additional notes.
+
+00:55:11 Speaker 2
+On any of these notes fields, will there be the, well, on your phone, you can just do text to talk.
+
+00:55:17 Speaker 1
+Yeah, I don't know. He has this quick note section, which I have no idea. He just added this. I don't know what this does. Testing one, two, three. Hey, it works.
+
+00:55:33 Speaker 2
+So, yeah, I don't know. I think it's super helpful to be able to do some text to voice to text. So, Jason, this looks great from my side. Robert. 
+
+00:55:43 Speaker 1
+great so next steps what are you thinking jason uh i think we need to i don't want to say this out loud i think at minimum though we need to do this one more time for the demo workflow.
+
+00:56:02 Speaker 4
+okay robert what do you think oh i'd like to get it to tech as soon as possible, and then maybe maybe with that note that don't put any energy towards the demo workflow until.
+
+00:56:16 Speaker 2
+we figured that out yeah i would agree with that sorry yeah yeah i was thinking jason you you spit shine this with all the notes we've had over the last two days and then get it to me in the meantime i'm going to start dropping some things to joshua and we'll get this in front of him hopefully before you go on vacation yeah i should be able to have it shined up on monday okay and then, you know maybe they can take a look at it maybe we can do a quick demo with them, before you go so they have something to start working off of and then to robert's point to.
+
+00:56:50 Speaker 2
+your point we can start working the demo and we'll be way ahead of them at this point in their hands yeah all right thank you for your time thank you guys thanks robert fantastic all.
+
+00:57:05 Speaker 1
+right i'm jumping on the other side i'll be i'll see you real fast i'll be right i'll be right there.
+
+00:57:12 Speaker 2
+okay tmi there we go.
+
+00:58:44 Speaker 1
+How's it going? Better. Can you drive? Sure. I got your email Dom, I'll follow up with you soon, it's really nice to get the latest.
+
+01:00:39 Speaker 1
+Do you know what I'm saying? I haven't... Do you know how to read the readings? Cool. Can you make it a minute or less? Yeah. Yesterday you talked about, um, the readings on slate, do those differ than tile? They can... They're more porous, so they can soak up more moisture. So, you could be making false readings? The material itself, the slate, could be holding more moisture, so you could just be... It is wet, but it could just be the slate and not what's behind the slate. It's like concrete. Slate is closer to concrete. Makes sense. So that would be the thing.
+
+01:01:10 Speaker 1
+Sure.
