@@ -7,8 +7,6 @@ import {
   Trash2,
   HardHat,
   FileText,
-  ChevronDown,
-  ChevronUp,
   Info
 } from 'lucide-react';
 
@@ -26,7 +24,6 @@ interface BillableCategory {
   title: string;
   icon: React.ReactNode;
   items: BillableItem[];
-  expanded: boolean;
 }
 
 interface GeneralBillablesStepProps {
@@ -39,7 +36,6 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
       id: 'structural',
       title: 'Structural Materials',
       icon: <Package className="w-5 h-5" />,
-      expanded: true,
       items: [
         { id: 'insulation', label: 'Insulation Removal', unit: 'sqft', performed: false, quantity: 0, notes: '' },
         { id: 'insulationVacuum', label: 'Insulation - Vacuum Wall Framing', unit: 'sqft', performed: false, quantity: 0, notes: '' },
@@ -53,7 +49,6 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
       id: 'contents',
       title: 'Contents & Protection',
       icon: <Shield className="w-5 h-5" />,
-      expanded: false,
       items: [
         { id: 'contents', label: 'Contents Manipulation', unit: 'each', performed: false, quantity: 0, notes: '' },
         { id: 'contentsBags', label: 'Contents (Bag for disposal)', unit: 'each', performed: false, quantity: 0, notes: '' },
@@ -67,7 +62,6 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
       id: 'containment',
       title: 'Containment Setup',
       icon: <Shield className="w-5 h-5" />,
-      expanded: false,
       items: [
         { id: 'containmentSqft', label: 'Containment', unit: 'sqft', performed: false, quantity: 0, notes: '' },
         { id: 'zipPoleSystem', label: 'Containment - Zip Pole System', unit: 'each', performed: false, quantity: 0, notes: '' },
@@ -78,7 +72,6 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
       id: 'specialized',
       title: 'Specialized Services',
       icon: <Wrench className="w-5 h-5" />,
-      expanded: false,
       items: [
         { id: 'waterExtraction', label: 'Water Extraction', unit: 'sqft', performed: false, quantity: 0, notes: '' },
         { id: 'sprayAntiMicrobial', label: 'Spray Anti-Microbial', unit: 'sqft', performed: false, quantity: 0, notes: '' },
@@ -95,7 +88,6 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
       id: 'equipment',
       title: 'Equipment Services',
       icon: <Droplets className="w-5 h-5" />,
-      expanded: false,
       items: [
         { id: 'jobsiteMonitoring', label: 'Jobsite / Equipment Monitoring', unit: 'daily', performed: false, quantity: 0, notes: '' },
         { id: 'decontaminateDehus', label: 'Decontaminate Dehumidifiers', unit: 'each', performed: false, quantity: 0, notes: '' },
@@ -109,7 +101,6 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
       id: 'materials',
       title: 'Materials & Supplies',
       icon: <HardHat className="w-5 h-5" />,
-      expanded: false,
       items: [
         { id: 'plastic', label: 'Plastic', unit: 'sqft', performed: false, quantity: 0, notes: '' },
         { id: 'bubbleWrap', label: 'Bubble Wrap', unit: 'sqft', performed: false, quantity: 0, notes: '' },
@@ -127,7 +118,6 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
       id: 'disposal',
       title: 'Disposal & Logistics',
       icon: <Trash2 className="w-5 h-5" />,
-      expanded: false,
       items: [
         { id: 'pod', label: 'POD', unit: 'each', performed: false, quantity: 0, notes: '' },
         { id: 'podDeliveryPickup', label: 'POD Delivery/Pickup Charge', unit: 'each', performed: false, quantity: 0, notes: '' },
@@ -139,7 +129,6 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
       id: 'other',
       title: 'Other Services',
       icon: <FileText className="w-5 h-5" />,
-      expanded: false,
       items: [
         { id: 'emergencyCallDuringHours', label: 'Emergency Call During Hours', unit: 'each', performed: false, quantity: 0, notes: '' },
         { id: 'emergencyCallAfterHours', label: 'Emergency Call After Hours', unit: 'each', performed: false, quantity: 0, notes: '' },
@@ -149,12 +138,6 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
       ]
     }
   ]);
-
-  const toggleCategory = (categoryId: string) => {
-    setCategories(prev => prev.map(cat =>
-      cat.id === categoryId ? { ...cat, expanded: !cat.expanded } : cat
-    ));
-  };
 
   const updateItem = (categoryId: string, itemId: string, field: keyof BillableItem, value: any) => {
     setCategories(prev => prev.map(cat => {
@@ -207,15 +190,12 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
         </div>
       </div>
 
-      {/* Categories */}
-      <div className="space-y-3">
+      {/* Categories - Always Expanded */}
+      <div className="space-y-4">
         {categories.map(category => (
           <div key={category.id} className="border border-gray-200 rounded-lg overflow-hidden">
-            {/* Category Header */}
-            <button
-              onClick={() => toggleCategory(category.id)}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
-            >
+            {/* Category Header - Not Clickable */}
+            <div className="flex items-center justify-between p-4 bg-gray-50">
               <div className="flex items-center gap-3">
                 <div className="text-entrusted-orange">
                   {category.icon}
@@ -227,17 +207,11 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
                   ({category.items.filter(i => i.performed).length} of {category.items.length})
                 </span>
               </div>
-              {category.expanded ? (
-                <ChevronUp className="w-5 h-5 text-gray-500" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-gray-500" />
-              )}
-            </button>
+            </div>
 
-            {/* Category Items */}
-            {category.expanded && (
-              <div className="p-4 bg-white space-y-4">
-                {category.items.map(item => (
+            {/* Category Items - Always Visible */}
+            <div className="p-4 bg-white space-y-4">
+              {category.items.map(item => (
                   <div
                     key={item.id}
                     className={`border rounded-lg p-3 transition-all ${
@@ -299,8 +273,7 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
                     )}
                   </div>
                 ))}
-              </div>
-            )}
+            </div>
           </div>
         ))}
       </div>
