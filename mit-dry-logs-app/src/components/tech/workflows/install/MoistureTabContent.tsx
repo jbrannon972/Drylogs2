@@ -9,7 +9,9 @@ import {
   CheckCircle,
   MapPin,
   Trash2,
-  Plus
+  Plus,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useAuth } from '../../../../hooks/useAuth';
 import {
@@ -38,6 +40,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 
   // Form state
   const [showAddForm, setShowAddForm] = useState(false);
+  const [addingToTrackingId, setAddingToTrackingId] = useState<string | null>(null); // NEW: Track if adding to existing material
   const [currentMaterial, setCurrentMaterial] = useState<ConstructionMaterialType>('Drywall - Wall');
   const [location, setLocation] = useState('');
   const [dryStandard, setDryStandard] = useState('');
@@ -48,6 +51,9 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   // Delete confirmation state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<string | null>(null);
+
+  // Expanded materials state
+  const [expandedMaterials, setExpandedMaterials] = useState<Set<string>>(new Set());
 
   // Construction materials only (no appliances, mirrors, etc.)
   const CONSTRUCTION_MATERIALS: ConstructionMaterialType[] = [
@@ -87,6 +93,34 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
     setPhotos([]);
     setNotes('');
     setShowAddForm(false);
+    setAddingToTrackingId(null);
+  };
+
+  const toggleExpanded = (trackingId: string) => {
+    setExpandedMaterials(prev => {
+      const next = new Set(prev);
+      if (next.has(trackingId)) {
+        next.delete(trackingId);
+      } else {
+        next.add(trackingId);
+      }
+      return next;
+    });
+  };
+
+  const handleAddReadingToExisting = (tracking: MaterialMoistureTracking) => {
+    setAddingToTrackingId(tracking.id);
+    setCurrentMaterial(tracking.material);
+    setLocation(tracking.location || '');
+    setDryStandard(tracking.dryStandard.toString());
+    setWetReading('');
+    setPhotos([]);
+    setNotes('');
+    setShowAddForm(true);
+  };
+
+  const getHighestReading = (tracking: MaterialMoistureTracking): number => {
+    return Math.max(...tracking.readings.map(r => r.moisturePercent));
   };
 
   const handleSaveReading = () => {
@@ -109,8 +143,8 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
       return;
     }
 
-    // Create initial reading entry
-    const initialReading: MoistureReadingEntry = {
+    // Create new reading entry
+    const newReading: MoistureReadingEntry = {
       timestamp: new Date().toISOString(),
       moisturePercent: wetReadingNum,
       photo: photos[0] || undefined,
@@ -120,22 +154,40 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
       notes,
     };
 
-    // Create moisture tracking record
-    const tracking: MaterialMoistureTracking = {
-      id: `${roomId}-${currentMaterial}-${Date.now()}`,
-      roomId,
-      roomName,
-      material: currentMaterial,
-      location,
-      dryStandard: dryStandardNum,
-      readings: [initialReading],
-      createdAt: new Date().toISOString(),
-      lastReadingAt: new Date().toISOString(),
-      status: isMaterialDry(wetReadingNum, dryStandardNum) ? 'dry' : 'wet',
-      trend: 'unknown',
-    };
+    if (addingToTrackingId) {
+      // Adding to existing material
+      const updatedTracking = moistureTracking.map(t => {
+        if (t.id === addingToTrackingId) {
+          const updatedReadings = [...t.readings, newReading];
+          const highestReading = Math.max(...updatedReadings.map(r => r.moisturePercent));
+          return {
+            ...t,
+            readings: updatedReadings,
+            lastReadingAt: new Date().toISOString(),
+            status: isMaterialDry(highestReading, t.dryStandard) ? 'dry' : 'wet',
+          };
+        }
+        return t;
+      });
+      onUpdate(updatedTracking);
+    } else {
+      // Create new moisture tracking record
+      const tracking: MaterialMoistureTracking = {
+        id: `${roomId}-${currentMaterial}-${Date.now()}`,
+        roomId,
+        roomName,
+        material: currentMaterial,
+        location,
+        dryStandard: dryStandardNum,
+        readings: [newReading],
+        createdAt: new Date().toISOString(),
+        lastReadingAt: new Date().toISOString(),
+        status: isMaterialDry(wetReadingNum, dryStandardNum) ? 'dry' : 'wet',
+        trend: 'unknown',
+      };
+      onUpdate([...moistureTracking, tracking]);
+    }
 
-    onUpdate([...moistureTracking, tracking]);
     resetForm();
   };
 
@@ -156,61 +208,135 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 
   return (
     <div className="w-full h-full space-y-6">
-      {/* Existing Readings */}
+      {/* Existing Readings - Grouped by Material with Expandable Dropdown */}
       {roomReadings.length > 0 && (
         <div className="space-y-3">
           <h4 className="font-semibold text-gray-900">
             Tracked Materials ({roomReadings.length})
           </h4>
           {roomReadings.map((tracking) => {
-            const lastReading = tracking.readings[tracking.readings.length - 1];
-            const isDry = isMaterialDry(lastReading.moisturePercent, tracking.dryStandard);
+            const highestReading = getHighestReading(tracking);
+            const isDry = isMaterialDry(highestReading, tracking.dryStandard);
+            const isExpanded = expandedMaterials.has(tracking.id);
+            const latestReading = tracking.readings[tracking.readings.length - 1];
 
             return (
               <div
                 key={tracking.id}
-                className={`border-l-4 rounded-lg p-4 ${
+                className={`border-l-4 rounded-lg ${
                   isDry ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'
                 }`}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
-                        isDry ? 'bg-green-200 text-green-900' : 'bg-red-200 text-red-900'
-                      }`}>
-                        {isDry ? '✓ DRY' : '✗ WET'}
-                      </span>
-                      <span className="font-medium text-gray-900">{tracking.material}</span>
+                {/* Material Header - Clickable to Expand */}
+                <div
+                  className="p-4 cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => toggleExpanded(tracking.id)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
+                          isDry ? 'bg-green-200 text-green-900' : 'bg-red-200 text-red-900'
+                        }`}>
+                          {isDry ? '✓ DRY' : '✗ WET'}
+                        </span>
+                        <span className="font-medium text-gray-900">{tracking.material}</span>
+                        {tracking.readings.length > 1 && (
+                          <span className="text-xs text-gray-600 bg-gray-200 px-2 py-0.5 rounded-full">
+                            {tracking.readings.length} readings
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-700 mb-2">
+                        <MapPin className="w-3 h-3 inline mr-1" />
+                        {tracking.location || 'No location specified'}
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-gray-600">Dry Standard:</span>
+                          <span className="font-bold ml-1">{tracking.dryStandard}%</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Highest:</span>
+                          <span className="font-bold ml-1 text-red-700">{highestReading}%</span>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-700 mb-2">
-                      <MapPin className="w-3 h-3 inline mr-1" />
-                      {tracking.location || 'No location specified'}
-                    </p>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="text-gray-600">Dry Standard:</span>
-                        <span className="font-bold ml-1">{tracking.dryStandard}%</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Current:</span>
-                        <span className="font-bold ml-1">{lastReading.moisturePercent}%</span>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(tracking.id);
+                        }}
+                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      {isExpanded ? (
+                        <ChevronUp className="w-5 h-5 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-gray-500" />
+                      )}
                     </div>
-                    {lastReading.photo && (
-                      <div className="mt-2">
-                        <img src={lastReading.photo} alt="Meter" className="max-h-24 rounded" />
-                      </div>
-                    )}
                   </div>
-                  <button
-                    onClick={() => handleDelete(tracking.id)}
-                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
                 </div>
+
+                {/* Expanded View - All Readings */}
+                {isExpanded && (
+                  <div className="px-4 pb-4 space-y-3 border-t border-gray-300">
+                    <div className="pt-3">
+                      <p className="text-sm font-medium text-gray-700 mb-2">All Readings:</p>
+                      <div className="space-y-2">
+                        {tracking.readings.map((reading, index) => (
+                          <div key={index} className="bg-white border border-gray-200 rounded p-3">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-lg font-bold text-gray-900">
+                                    {reading.moisturePercent}%
+                                  </span>
+                                  {reading.moisturePercent === highestReading && (
+                                    <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">
+                                      HIGHEST
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                  {new Date(reading.timestamp).toLocaleString()}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  By: {reading.technicianName}
+                                </p>
+                                {reading.notes && (
+                                  <p className="text-xs text-gray-700 mt-1 italic">
+                                    Note: {reading.notes}
+                                  </p>
+                                )}
+                              </div>
+                              {reading.photo && (
+                                <img src={reading.photo} alt="Meter" className="max-h-20 rounded ml-2" />
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Add Another Reading Button */}
+                    <Button
+                      variant="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddReadingToExisting(tracking);
+                      }}
+                      className="w-full"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Another Reading
+                    </Button>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -229,9 +355,16 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
       {/* Add New Reading Form - Full Screen Single Form */}
       {showAddForm && (
         <div className="border-2 border-entrusted-orange rounded-lg p-6 bg-orange-50 space-y-5">
-          <h3 className="font-semibold text-gray-900 text-lg mb-4">
-            Add Moisture Reading
-          </h3>
+          <div className="mb-4">
+            <h3 className="font-semibold text-gray-900 text-lg">
+              {addingToTrackingId ? 'Add Another Reading' : 'Add Moisture Reading'}
+            </h3>
+            {addingToTrackingId && (
+              <p className="text-sm text-gray-600 mt-1">
+                Adding to existing material: <strong>{currentMaterial}</strong>
+              </p>
+            )}
+          </div>
 
           {/* Photo Upload - PHASE 1: FIRST and REQUIRED */}
           <div>
