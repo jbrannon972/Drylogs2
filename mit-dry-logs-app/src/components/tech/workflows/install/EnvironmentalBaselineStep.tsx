@@ -4,6 +4,8 @@ import { Input } from '../../../shared/Input';
 import { PhotoCapture } from '../../../shared/PhotoCapture';
 import { Thermometer, Droplets, MapPin, CheckCircle, Info } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
+import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
+import { useAuth } from '../../../../hooks/useAuth';
 
 interface EnvironmentalBaselineStepProps {
   job: any;
@@ -11,6 +13,8 @@ interface EnvironmentalBaselineStepProps {
 
 export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps> = ({ job }) => {
   const { installData, updateWorkflowData } = useWorkflowStore();
+  const { queuePhoto } = useBatchPhotos();
+  const { user } = useAuth();
 
   // Outside baseline
   const [outsideTemp, setOutsideTemp] = useState(installData.environmentalBaseline?.outside?.temperature || '');
@@ -138,14 +142,21 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
           Take photos of your hygrometer displaying the outside temperature and humidity readings.
         </p>
         <PhotoCapture
-          jobId={job.jobId}
-          stepId="environmental-baseline"
-          photoType="hygrometer"
-          label="Hygrometer Reading Photos"
-          onPhotoCaptured={(url) => {
-            setHygrometerPhotos([...hygrometerPhotos, url]);
+          contextLabel="Hygrometer Reading"
+          onPhotoCapture={async (file: File) => {
+            if (!user) return null;
+            const url = await queuePhoto(file, job.jobId, 'hygrometer', 'Hygrometer Reading', 'environmental-baseline');
+            if (url) {
+              setHygrometerPhotos([...hygrometerPhotos, url]);
+            }
+            return url;
           }}
-          existingPhotos={hygrometerPhotos}
+          photos={hygrometerPhotos}
+          onPhotoDelete={(index: number) => {
+            const updated = hygrometerPhotos.filter((_, i) => i !== index);
+            setHygrometerPhotos(updated);
+          }}
+          minPhotos={1}
         />
       </div>
 

@@ -164,7 +164,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             ...t,
             readings: updatedReadings,
             lastReadingAt: new Date().toISOString(),
-            status: isMaterialDry(highestReading, t.dryStandard) ? 'dry' : 'wet',
+            status: (isMaterialDry(highestReading, t.dryStandard) ? 'dry' : 'wet') as 'dry' | 'wet' | 'drying',
           };
         }
         return t;
@@ -182,7 +182,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
         readings: [newReading],
         createdAt: new Date().toISOString(),
         lastReadingAt: new Date().toISOString(),
-        status: isMaterialDry(wetReadingNum, dryStandardNum) ? 'dry' : 'wet',
+        status: (isMaterialDry(wetReadingNum, dryStandardNum) ? 'dry' : 'wet') as 'dry' | 'wet' | 'drying',
         trend: 'unknown',
       };
       onUpdate([...moistureTracking, tracking]);

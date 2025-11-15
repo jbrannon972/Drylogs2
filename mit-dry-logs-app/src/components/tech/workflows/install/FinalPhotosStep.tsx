@@ -758,10 +758,12 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
             {/* Photo Capture */}
             <UniversalPhotoCapture
               jobId={job.jobId}
-              stepId="final-photos"
-              photoType={`final-${currentRoom.roomId}`}
-              label={`${currentRoom.roomName} Final Photos`}
+              location={currentRoom.roomName}
+              category="final"
+              userId={user?.uid || ''}
               onPhotosUploaded={handlePhotosUploaded}
+              uploadedCount={currentRoom.photos.length}
+              label={`${currentRoom.roomName} Final Photos`}
               minimumPhotos={4}
             />
 
