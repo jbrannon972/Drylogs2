@@ -389,12 +389,11 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const completedCount = rooms.filter(r => r.isComplete).length;
   const totalCount = rooms.length;
 
-  // Toggle category expansion
+  // Toggle category expansion with auto-close behavior
   const toggleCategory = (category: string) => {
-    const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(category)) {
-      newExpanded.delete(category);
-    } else {
+    const newExpanded = new Set<string>();
+    // If clicking already-open category, close it. Otherwise open clicked category and close all others
+    if (!expandedCategories.has(category)) {
       newExpanded.add(category);
     }
     setExpandedCategories(newExpanded);
@@ -1025,7 +1024,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                       : 'border-gray-300 bg-white hover:border-gray-400'}
                                   `}
                                 >
-                                  <span className="font-medium text-gray-900">{material.materialType}</span>
+                                  <span className="text-sm text-gray-900">{material.materialType}</span>
                                   {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                                 </button>
                                 {material.removalRequired && (
@@ -1130,14 +1129,14 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                   isAffected: !material.removalRequired
                                 })}
                                 className={`
-                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  w-full min-h-[36px] px-3 py-2 rounded-lg border-2 transition-all
                                   active:scale-95 flex items-center justify-between
                                   ${material.removalRequired
                                     ? 'border-entrusted-orange bg-orange-100'
                                     : 'border-gray-300 bg-white hover:border-gray-400'}
                                 `}
                               >
-                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                                <span className="text-sm text-gray-900">{material.materialType}</span>
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
@@ -1221,14 +1220,14 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                   isAffected: !material.removalRequired
                                 })}
                                 className={`
-                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  w-full min-h-[36px] px-3 py-2 rounded-lg border-2 transition-all
                                   active:scale-95 flex items-center justify-between
                                   ${material.removalRequired
                                     ? 'border-entrusted-orange bg-orange-100'
                                     : 'border-gray-300 bg-white hover:border-gray-400'}
                                 `}
                               >
-                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                                <span className="text-sm text-gray-900">{material.materialType}</span>
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
@@ -1311,14 +1310,14 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                   isAffected: !material.removalRequired
                                 })}
                                 className={`
-                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  w-full min-h-[36px] px-3 py-2 rounded-lg border-2 transition-all
                                   active:scale-95 flex items-center justify-between
                                   ${material.removalRequired
                                     ? 'border-entrusted-orange bg-orange-100'
                                     : 'border-gray-300 bg-white hover:border-gray-400'}
                                 `}
                               >
-                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                                <span className="text-sm text-gray-900">{material.materialType}</span>
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
@@ -1400,14 +1399,14 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                   isAffected: !material.removalRequired
                                 })}
                                 className={`
-                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  w-full min-h-[36px] px-3 py-2 rounded-lg border-2 transition-all
                                   active:scale-95 flex items-center justify-between
                                   ${material.removalRequired
                                     ? 'border-entrusted-orange bg-orange-100'
                                     : 'border-gray-300 bg-white hover:border-gray-400'}
                                 `}
                               >
-                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                                <span className="text-sm text-gray-900">{material.materialType}</span>
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
@@ -1490,14 +1489,14 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                   isAffected: !material.removalRequired
                                 })}
                                 className={`
-                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  w-full min-h-[36px] px-3 py-2 rounded-lg border-2 transition-all
                                   active:scale-95 flex items-center justify-between
                                   ${material.removalRequired
                                     ? 'border-entrusted-orange bg-orange-100'
                                     : 'border-gray-300 bg-white hover:border-gray-400'}
                                 `}
                               >
-                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                                <span className="text-sm text-gray-900">{material.materialType}</span>
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
@@ -1579,14 +1578,14 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                   isAffected: !material.removalRequired
                                 })}
                                 className={`
-                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  w-full min-h-[36px] px-3 py-2 rounded-lg border-2 transition-all
                                   active:scale-95 flex items-center justify-between
                                   ${material.removalRequired
                                     ? 'border-entrusted-orange bg-orange-100'
                                     : 'border-gray-300 bg-white hover:border-gray-400'}
                                 `}
                               >
-                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                                <span className="text-sm text-gray-900">{material.materialType}</span>
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
@@ -1664,14 +1663,14 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                                   isAffected: !material.removalRequired
                                 })}
                                 className={`
-                                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
+                                  w-full min-h-[36px] px-3 py-2 rounded-lg border-2 transition-all
                                   active:scale-95 flex items-center justify-between
                                   ${material.removalRequired
                                     ? 'border-entrusted-orange bg-orange-100'
                                     : 'border-gray-300 bg-white hover:border-gray-400'}
                                 `}
                               >
-                                <span className="font-medium text-gray-900">{material.materialType}</span>
+                                <span className="text-sm text-gray-900">{material.materialType}</span>
                                 {material.removalRequired && <CheckCircle className="w-5 h-5 text-entrusted-orange" />}
                               </button>
                               {material.removalRequired && (
