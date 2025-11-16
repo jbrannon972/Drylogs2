@@ -533,28 +533,26 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
             )}
           </div>
 
-          {/* Continue Button */}
-          <div className="mt-6">
-            <Button
-              variant="primary"
-              onClick={handleNext}
-              className="w-full"
-              disabled={rooms.length === 0 || completedCount !== totalCount}
-            >
-              Continue to Next Step
-              <ChevronRight className="w-5 h-5" />
-            </Button>
-            {rooms.length === 0 && (
-              <p className="text-sm text-orange-600 mt-2 text-center">
+          {/* Status Summary */}
+          {rooms.length === 0 ? (
+            <div className="mt-6 bg-orange-50 border border-orange-200 rounded-lg p-3">
+              <p className="text-sm text-orange-800 text-center">
                 Add at least 1 unaffected area to continue
               </p>
-            )}
-            {rooms.length > 0 && completedCount !== totalCount && (
-              <p className="text-sm text-orange-600 mt-2 text-center">
-                Complete all unaffected areas to continue
+            </div>
+          ) : completedCount !== totalCount ? (
+            <div className="mt-6 bg-orange-50 border border-orange-200 rounded-lg p-3">
+              <p className="text-sm text-orange-800 text-center">
+                Complete all unaffected areas to continue ({completedCount}/{totalCount} complete)
               </p>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-3">
+              <p className="text-sm text-green-800 text-center font-medium">
+                ✓ All unaffected areas complete - use Next button below to continue
+              </p>
+            </div>
+          )}
         </div>
       )}
 
