@@ -982,26 +982,63 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                     </p>
                   </div>
 
+                  {/* SMART SUGGESTIONS - Based on Moisture Readings */}
+                  {selectedRoom.moistureReadings && selectedRoom.moistureReadings.filter(r => !r.isDryStandard && r.percentage > 15).length > 0 && (
+                    <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-3">
+                      <div className="flex items-start gap-2">
+                        <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <h4 className="font-bold text-blue-900 mb-1">💡 Smart Suggestions</h4>
+                          <p className="text-sm text-blue-800 mb-2">
+                            Based on moisture readings, these materials may need removal:
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {Array.from(new Set(selectedRoom.moistureReadings
+                              .filter(r => !r.isDryStandard && r.percentage > 15)
+                              .map(r => r.material)))
+                              .map(material => (
+                                <button
+                                  key={material}
+                                  onClick={() => {
+                                    const materialToUpdate = selectedRoom.materialsAffected.find(m => m.materialType === material);
+                                    if (materialToUpdate) {
+                                      updateMaterial(material, {
+                                        removalRequired: true,
+                                        isAffected: true
+                                      });
+                                    }
+                                  }}
+                                  className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors"
+                                >
+                                  + {material}
+                                </button>
+                              ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* FLOORING CATEGORY */}
                   <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleCategory('flooring')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                      className="w-full px-3 py-2 bg-gradient-to-r from-entrusted-orange to-orange-500 flex items-center justify-between hover:from-orange-600 hover:to-orange-600 transition-colors"
                     >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="font-bold text-white text-base flex items-center gap-2">
                         <Layers className="w-5 h-5" />
                         Flooring
                         {selectedRoom.materialsAffected.filter(m =>
                           ['Carpet & Pad', 'Hardwood Flooring', 'Vinyl/Linoleum Flooring', 'Tile Flooring', 'Laminate Flooring', 'Engineered Flooring', 'Subfloor'].includes(m.materialType) && m.removalRequired
                         ).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                          <span className="ml-2 px-2 py-0.5 bg-white/20 text-white text-xs rounded-full font-bold">
                             {selectedRoom.materialsAffected.filter(m =>
                               ['Carpet & Pad', 'Hardwood Flooring', 'Vinyl/Linoleum Flooring', 'Tile Flooring', 'Laminate Flooring', 'Engineered Flooring', 'Subfloor'].includes(m.materialType) && m.removalRequired
                             ).length} selected
                           </span>
                         )}
                       </span>
-                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('flooring') ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`w-5 h-5 text-white transition-transform ${expandedCategories.has('flooring') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('flooring') && (
                       <div className="p-3 space-y-3 bg-white">
@@ -1100,22 +1137,22 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleCategory('drywall')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                      className="w-full px-3 py-2 bg-gradient-to-r from-entrusted-orange to-orange-500 flex items-center justify-between hover:from-orange-600 hover:to-orange-600 transition-colors"
                     >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="font-bold text-white text-base flex items-center gap-2">
                         <Layers className="w-5 h-5" />
                         Drywall
                         {selectedRoom.materialsAffected.filter(m =>
                           ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType) && m.removalRequired
                         ).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                          <span className="ml-2 px-2 py-0.5 bg-white/20 text-white text-xs rounded-full font-bold">
                             {selectedRoom.materialsAffected.filter(m =>
                               ['Drywall - Wall', 'Drywall - Ceiling'].includes(m.materialType) && m.removalRequired
                             ).length} selected
                           </span>
                         )}
                       </span>
-                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('drywall') ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`w-5 h-5 text-white transition-transform ${expandedCategories.has('drywall') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('drywall') && (
                       <div className="p-3 space-y-3 bg-white">
@@ -1191,22 +1228,22 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleCategory('trim')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                      className="w-full px-3 py-2 bg-gradient-to-r from-entrusted-orange to-orange-500 flex items-center justify-between hover:from-orange-600 hover:to-orange-600 transition-colors"
                     >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="font-bold text-white text-base flex items-center gap-2">
                         <Layers className="w-5 h-5" />
                         Trim & Molding
                         {selectedRoom.materialsAffected.filter(m =>
                           ['Baseboards', 'Shoe Molding', 'Crown Molding', 'Door Casing', 'Window Casing', 'Chair Rail', 'Other Trim'].includes(m.materialType) && m.removalRequired
                         ).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                          <span className="ml-2 px-2 py-0.5 bg-white/20 text-white text-xs rounded-full font-bold">
                             {selectedRoom.materialsAffected.filter(m =>
                               ['Baseboards', 'Shoe Molding', 'Crown Molding', 'Door Casing', 'Window Casing', 'Chair Rail', 'Other Trim'].includes(m.materialType) && m.removalRequired
                             ).length} selected
                           </span>
                         )}
                       </span>
-                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('trim') ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`w-5 h-5 text-white transition-transform ${expandedCategories.has('trim') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('trim') && (
                       <div className="p-3 space-y-3 bg-white">
@@ -1281,22 +1318,22 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleCategory('tile')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                      className="w-full px-3 py-2 bg-gradient-to-r from-entrusted-orange to-orange-500 flex items-center justify-between hover:from-orange-600 hover:to-orange-600 transition-colors"
                     >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="font-bold text-white text-base flex items-center gap-2">
                         <Layers className="w-5 h-5" />
                         Tile & Backsplash
                         {selectedRoom.materialsAffected.filter(m =>
                           ['Tile Walls', 'Backsplash', 'Tub Surround'].includes(m.materialType) && m.removalRequired
                         ).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                          <span className="ml-2 px-2 py-0.5 bg-white/20 text-white text-xs rounded-full font-bold">
                             {selectedRoom.materialsAffected.filter(m =>
                               ['Tile Walls', 'Backsplash', 'Tub Surround'].includes(m.materialType) && m.removalRequired
                             ).length} selected
                           </span>
                         )}
                       </span>
-                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('tile') ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`w-5 h-5 text-white transition-transform ${expandedCategories.has('tile') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('tile') && (
                       <div className="p-3 space-y-3 bg-white">
@@ -1370,22 +1407,22 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleCategory('cabinetry')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                      className="w-full px-3 py-2 bg-gradient-to-r from-entrusted-orange to-orange-500 flex items-center justify-between hover:from-orange-600 hover:to-orange-600 transition-colors"
                     >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="font-bold text-white text-base flex items-center gap-2">
                         <Layers className="w-5 h-5" />
                         Cabinetry & Counters
                         {selectedRoom.materialsAffected.filter(m =>
                           ['Base Cabinets', 'Upper Cabinets', 'Vanity', 'Countertops', 'Shelving'].includes(m.materialType) && m.removalRequired
                         ).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                          <span className="ml-2 px-2 py-0.5 bg-white/20 text-white text-xs rounded-full font-bold">
                             {selectedRoom.materialsAffected.filter(m =>
                               ['Base Cabinets', 'Upper Cabinets', 'Vanity', 'Countertops', 'Shelving'].includes(m.materialType) && m.removalRequired
                             ).length} selected
                           </span>
                         )}
                       </span>
-                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('cabinetry') ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`w-5 h-5 text-white transition-transform ${expandedCategories.has('cabinetry') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('cabinetry') && (
                       <div className="p-3 space-y-3 bg-white">
@@ -1460,22 +1497,22 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleCategory('insulation')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                      className="w-full px-3 py-2 bg-gradient-to-r from-entrusted-orange to-orange-500 flex items-center justify-between hover:from-orange-600 hover:to-orange-600 transition-colors"
                     >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="font-bold text-white text-base flex items-center gap-2">
                         <Layers className="w-5 h-5" />
                         Insulation
                         {selectedRoom.materialsAffected.filter(m =>
                           ['Insulation - Wall', 'Insulation - Ceiling/Attic'].includes(m.materialType) && m.removalRequired
                         ).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                          <span className="ml-2 px-2 py-0.5 bg-white/20 text-white text-xs rounded-full font-bold">
                             {selectedRoom.materialsAffected.filter(m =>
                               ['Insulation - Wall', 'Insulation - Ceiling/Attic'].includes(m.materialType) && m.removalRequired
                             ).length} selected
                           </span>
                         )}
                       </span>
-                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('insulation') ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`w-5 h-5 text-white transition-transform ${expandedCategories.has('insulation') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('insulation') && (
                       <div className="p-3 space-y-3 bg-white">
@@ -1549,22 +1586,22 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleCategory('fixtures')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                      className="w-full px-3 py-2 bg-gradient-to-r from-entrusted-orange to-orange-500 flex items-center justify-between hover:from-orange-600 hover:to-orange-600 transition-colors"
                     >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="font-bold text-white text-base flex items-center gap-2">
                         <Layers className="w-5 h-5" />
                         Fixtures & Appliances
                         {selectedRoom.materialsAffected.filter(m =>
                           ['Sink/Faucet', 'Tub', 'Shower Pan', 'Dishwasher', 'Refrigerator', 'Washer', 'Dryer', 'Stove/Oven', 'Microwave', 'Water Heater', 'Disposal', 'Other Appliance', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType) && m.removalRequired
                         ).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                          <span className="ml-2 px-2 py-0.5 bg-white/20 text-white text-xs rounded-full font-bold">
                             {selectedRoom.materialsAffected.filter(m =>
                               ['Sink/Faucet', 'Tub', 'Shower Pan', 'Dishwasher', 'Refrigerator', 'Washer', 'Dryer', 'Stove/Oven', 'Microwave', 'Water Heater', 'Disposal', 'Other Appliance', 'Mirror', 'Towel Bars/Accessories'].includes(m.materialType) && m.removalRequired
                             ).length} selected
                           </span>
                         )}
                       </span>
-                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('fixtures') ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`w-5 h-5 text-white transition-transform ${expandedCategories.has('fixtures') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('fixtures') && (
                       <div className="p-3 space-y-3 bg-white">
@@ -1638,18 +1675,18 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                   <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleCategory('other')}
-                      className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                      className="w-full px-3 py-2 bg-gradient-to-r from-entrusted-orange to-orange-500 flex items-center justify-between hover:from-orange-600 hover:to-orange-600 transition-colors"
                     >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="font-bold text-white text-base flex items-center gap-2">
                         <Layers className="w-5 h-5" />
                         Other
                         {selectedRoom.materialsAffected.filter(m => m.materialType === 'Other' && m.removalRequired).length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">
+                          <span className="ml-2 px-2 py-0.5 bg-white/20 text-white text-xs rounded-full font-bold">
                             1 selected
                           </span>
                         )}
                       </span>
-                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('other') ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`w-5 h-5 text-white transition-transform ${expandedCategories.has('other') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('other') && (
                       <div className="p-3 space-y-3 bg-white">
@@ -1726,7 +1763,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                       onClick={() => toggleCategory('custom')}
                       className="w-full px-4 py-3 bg-blue-50 flex items-center justify-between hover:bg-blue-100 transition-colors"
                     >
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="font-bold text-white text-base flex items-center gap-2">
                         <Plus className="w-5 h-5" />
                         Custom Materials
                         {selectedRoom.materialsAffected.filter(m => m.materialType === 'Custom').length > 0 && (
@@ -1735,7 +1772,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                           </span>
                         )}
                       </span>
-                      <ChevronRight className={`w-5 h-5 transition-transform ${expandedCategories.has('custom') ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`w-5 h-5 text-white transition-transform ${expandedCategories.has('custom') ? 'rotate-90' : ''}`} />
                     </button>
                     {expandedCategories.has('custom') && (
                       <div className="p-3 space-y-3 bg-white">
