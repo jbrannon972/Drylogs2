@@ -34,10 +34,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
     installData.waterClassification?.category || null
   );
 
-  // Event Date - when water event occurred
-  const [eventDate, setEventDate] = useState(
-    installData.causeOfLoss?.eventDate || new Date().toISOString().split('T')[0]
-  );
+  // PHASE 1: Event Date REMOVED - insurance claim liability
   // PHASE 1: Thermal imaging state removed - now handled in RoomAssessmentStep (per room)
   // PHASE 1: Cat 3 checklist simplified to reminder-only (detailed checklist moved to Demo workflow)
 
@@ -54,7 +51,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         notes: causeNotes,
         photos: causePhotos,
         photo: causePhotos[0] || null, // Keep backward compatibility
-        eventDate,
+        // PHASE 1: eventDate removed - insurance claim liability
       },
       waterClassification: {
         category: waterCategory,
@@ -64,7 +61,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
       // PHASE 1: cat3Containment removed - detailed checklist moved to Demo workflow
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [causeType, causeLocation, causeNotes, causePhotos, waterCategory, eventDate, determinedAt]);
+  }, [causeType, causeLocation, causeNotes, causePhotos, waterCategory, determinedAt]);
 
   const handleSubcontractorRequest = async (data: SubcontractorRequestData) => {
     if (!user) return;
@@ -223,21 +220,7 @@ export const CauseOfLossStep: React.FC<CauseOfLossStepProps> = ({ job, onNext })
         />
       </div>
 
-      {/* Event Date */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Event Date
-        </label>
-        <input
-          type="date"
-          value={eventDate}
-          onChange={(e) => setEventDate(e.target.value)}
-          max={new Date().toISOString().split('T')[0]}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange focus:outline-none"
-        />
-        <p className="text-xs text-gray-500 mt-1">When the water event occurred (if known)</p>
-      </div>
-
+      {/* PHASE 1: Event Date removed - insurance claim liability */}
       {/* PHASE 1: Thermal imaging moved to RoomAssessmentStep (per room, optional) */}
       {/* This section has been removed - see RoomAssessmentStep for thermal imaging */}
 
