@@ -558,45 +558,25 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
         <div className="min-h-screen bg-white flex flex-col">
           {/* Header */}
           <div className="border-b border-gray-300 bg-gray-50 p-3">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between">
               <button
                 onClick={returnToList}
-                className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+                className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium"
               >
                 <ChevronRight className="w-5 h-5 transform rotate-180" />
                 <span>Back to Rooms</span>
               </button>
 
-              {/* Save & Mark Complete Button - Moved to Header */}
-              <Button
-                variant="primary"
-                onClick={markCompleteAndReturn}
-                className="flex items-center gap-2"
-              >
-                {selectedRoom.isComplete ? (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Return to Room List
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Save & Mark Complete
-                  </>
-                )}
-              </Button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">{selectedRoom.name}</h2>
-                <p className="text-sm text-gray-600">{selectedRoom.floor} • {selectedRoom.type}</p>
-              </div>
               {selectedRoom.isComplete && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-lg">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-medium">Complete</span>
+                <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-lg">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">Complete</span>
                 </div>
               )}
+            </div>
+            <div className="mt-2">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedRoom.name}</h2>
+              <p className="text-sm text-gray-600">{selectedRoom.floor} • {selectedRoom.type}</p>
             </div>
           </div>
 
