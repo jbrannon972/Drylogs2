@@ -428,24 +428,12 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
             </div>
           </div>
 
-          {/* Chamber Totals */}
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="text-xs text-gray-600">Need:</span>
-            <span className="px-2 py-0.5 bg-blue-100 rounded text-sm font-bold">{calc.dehumidifiers} Dehu</span>
-            {calc.airScrubbers > 0 && <span className="px-2 py-0.5 bg-purple-100 rounded text-sm font-bold">{calc.airScrubbers} Scrub</span>}
-            <span className="px-2 py-0.5 bg-orange-100 rounded text-sm font-bold">{calc.airMovers} Mover</span>
-            {calc.airMovers > 0 && (
-              <label className="flex items-center gap-1 ml-2 text-xs cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={airMoversAfterDemo.has(calc.chamberId)}
-                  onChange={() => toggleAirMoversAfterDemo(calc.chamberId)}
-                  className="h-3 w-3"
-                />
-                Post-demo
-              </label>
-            )}
-          </div>
+          {/* Chamber Air Movers Total */}
+          {calc.airMovers > 0 && (
+            <div className="text-sm text-gray-700 mb-2">
+              {calc.airMovers} Air Mover{calc.airMovers > 1 ? 's' : ''} Needed
+            </div>
+          )}
 
           {/* Calculation Details - Collapsed by default */}
           <details className="mb-2">
@@ -484,23 +472,19 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 const roomPlacement = calc.roomPlacements.find(rp => rp.roomName === room.name);
                 const recommendedMovers = roomPlacement?.total || 0;
 
-                const summary = [
-                  counts.dehu > 0 && `${counts.dehu} dehu`,
-                  counts.scrub > 0 && `${counts.scrub} scrub`,
-                  counts.mover > 0 && `${counts.mover} mover`,
-                ].filter(Boolean).join(', ');
-
                 return (
                   <div key={room.id} className="bg-white border border-gray-200 rounded p-2">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium">{room.name}</span>
-                      <div className="flex items-center gap-2">
+                      <span className="text-base font-semibold text-gray-900">{room.name}</span>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {counts.dehu > 0 && <span className="px-2 py-0.5 bg-blue-100 rounded text-xs font-bold">{counts.dehu} Dehu</span>}
+                        {counts.scrub > 0 && <span className="px-2 py-0.5 bg-purple-100 rounded text-xs font-bold">{counts.scrub} Scrub</span>}
+                        {counts.mover > 0 && <span className="px-2 py-0.5 bg-orange-100 rounded text-xs font-bold">{counts.mover} Mover</span>}
                         {recommendedMovers > 0 && (
-                          <span className="text-xs text-orange-600 font-medium">
-                            Need {recommendedMovers} mover{recommendedMovers > 1 ? 's' : ''}
+                          <span className="text-xs text-gray-600">
+                            {recommendedMovers} Air Mover{recommendedMovers > 1 ? 's' : ''} Needed
                           </span>
                         )}
-                        {summary && <span className="text-xs text-gray-600">{summary}</span>}
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-1">
