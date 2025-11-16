@@ -43,6 +43,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   const [addingToTrackingId, setAddingToTrackingId] = useState<string | null>(null); // NEW: Track if adding to existing material
   const [currentMaterial, setCurrentMaterial] = useState<ConstructionMaterialType>('Drywall - Wall');
   const [location, setLocation] = useState('');
+  const [locationNumber, setLocationNumber] = useState(''); // NEW: Numbered labeling system
   const [dryStandard, setDryStandard] = useState('');
   const [wetReading, setWetReading] = useState('');
   const [photos, setPhotos] = useState<string[]>([]);
@@ -88,12 +89,19 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   const resetForm = () => {
     setCurrentMaterial('Drywall - Wall');
     setLocation('');
+    setLocationNumber('');
     setDryStandard('');
     setWetReading('');
     setPhotos([]);
     setNotes('');
     setShowAddForm(false);
     setAddingToTrackingId(null);
+  };
+
+  // Get dry standard for a material type (from any existing tracking across all rooms)
+  const getDryStandardForMaterial = (material: ConstructionMaterialType): number | null => {
+    const existingTracking = moistureTracking.find(t => t.material === material);
+    return existingTracking ? existingTracking.dryStandard : null;
   };
 
   const toggleExpanded = (trackingId: string) => {
@@ -249,7 +257,17 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                       </div>
                       <p className="text-sm text-gray-700 mb-2">
                         <MapPin className="w-3 h-3 inline mr-1" />
-                        {tracking.location || 'No location specified'}
+                        {tracking.location ? (
+                          <>
+                            {tracking.location.match(/^#?\d+$/) ? (
+                              <span className="font-bold text-entrusted-orange">#{tracking.location.replace('#', '')}</span>
+                            ) : (
+                              tracking.location
+                            )}
+                          </>
+                        ) : (
+                          'No location specified'
+                        )}
                       </p>
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
@@ -314,10 +332,21 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                                   </p>
                                 )}
                               </div>
-                              {reading.photo && (
-                                <img src={reading.photo} alt="Meter" className="max-h-20 rounded ml-2" />
-                              )}
                             </div>
+                            {/* Photo Thumbnails - Show all photos inline */}
+                            {reading.photo && (
+                              <div className="flex gap-1 mt-2">
+                                {[reading.photo].map((photo, photoIndex) => (
+                                  <img
+                                    key={photoIndex}
+                                    src={photo}
+                                    alt={`Photo ${photoIndex + 1}`}
+                                    className="h-16 w-16 object-cover rounded border border-gray-300 cursor-pointer hover:opacity-75"
+                                    onClick={() => window.open(photo, '_blank')}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -366,11 +395,20 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             )}
           </div>
 
+          {/* Numbered Tape Reminder */}
+          <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-3">
+            <p className="text-sm font-bold text-blue-900 mb-1">📍 Numbered Labeling System</p>
+            <p className="text-xs text-blue-800">
+              Use numbered tape or stickers on walls! Write the location number on painter's tape near each reading spot.
+              This helps find the exact same location on future check service visits for accurate progress tracking.
+            </p>
+          </div>
+
           {/* Photo Upload - PHASE 1: FIRST and REQUIRED */}
           <div>
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-2">
               <p className="text-xs text-orange-900">
-                <strong>Take 2 photos!</strong> (1) Moisture meter display showing reading, (2) Material surface being tested. Use gallery to select both at once.
+                <strong>Take 2 photos!</strong> (1) Moisture meter display showing reading, (2) Material surface with numbered tape visible.
               </p>
             </div>
             {user && (
@@ -396,7 +434,15 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             </label>
             <select
               value={currentMaterial}
-              onChange={(e) => setCurrentMaterial(e.target.value as ConstructionMaterialType)}
+              onChange={(e) => {
+                const newMaterial = e.target.value as ConstructionMaterialType;
+                setCurrentMaterial(newMaterial);
+                // Auto-populate dry standard if exists for this material type
+                const existingDryStandard = getDryStandardForMaterial(newMaterial);
+                if (existingDryStandard !== null && !addingToTrackingId) {
+                  setDryStandard(existingDryStandard.toString());
+                }
+              }}
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange text-base"
             >
               {CONSTRUCTION_MATERIALS.map((material) => (
@@ -452,21 +498,48 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
             </div>
           </div>
 
-          {/* Location - Now Optional */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <MapPin className="w-4 h-4 inline mr-1" />
-              Location Note (Optional)
-            </label>
-            <Input
-              placeholder="e.g., North wall, 2ft height, grid A3"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="text-base"
-            />
-            <p className="text-xs text-gray-600 mt-1">
-              Optional note to help find this spot on future visits
-            </p>
+          {/* Location Number - Numbered Tape System */}
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Location # *
+              </label>
+              <Input
+                type="number"
+                placeholder="1"
+                value={locationNumber}
+                onChange={(e) => {
+                  setLocationNumber(e.target.value);
+                  setLocation(e.target.value ? `#${e.target.value}` : '');
+                }}
+                className="text-base"
+                min="1"
+              />
+              <p className="text-xs text-gray-600 mt-1">
+                Tape/sticker number
+              </p>
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <MapPin className="w-4 h-4 inline mr-1" />
+                Additional Note (Optional)
+              </label>
+              <Input
+                placeholder="e.g., North wall, 2ft height"
+                value={location.startsWith('#') ? location.substring(location.indexOf(' ') + 1 || location.length) : location}
+                onChange={(e) => {
+                  if (locationNumber) {
+                    setLocation(`#${locationNumber} ${e.target.value}`.trim());
+                  } else {
+                    setLocation(e.target.value);
+                  }
+                }}
+                className="text-base"
+              />
+              <p className="text-xs text-gray-600 mt-1">
+                Optional detail
+              </p>
+            </div>
           </div>
 
           {/* Notes */}
