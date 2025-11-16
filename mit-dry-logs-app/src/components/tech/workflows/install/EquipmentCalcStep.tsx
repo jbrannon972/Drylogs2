@@ -115,19 +115,10 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
       const chartFactor = chartFactors[dehumidifierType]?.[overallDamageClass] || 50;
 
-      // Calculate dehumidifiers
-      let dehumidifierCount: number;
-      let dehumidifierFormula: string;
-
-      if (dehumidifierType === 'Desiccant') {
-        const totalCfmRequired = (cubicFootage * chartFactor) / 60;
-        dehumidifierCount = Math.ceil(totalCfmRequired / dehumidifierRating);
-        dehumidifierFormula = `${cubicFootage.toFixed(0)} cf × ${chartFactor} ACH ÷ 60 = ${totalCfmRequired.toFixed(0)} CFM ÷ ${dehumidifierRating} CFM/unit = ${dehumidifierCount} units`;
-      } else {
-        const ppdRequired = cubicFootage / chartFactor;
-        dehumidifierCount = Math.ceil(ppdRequired / dehumidifierRating);
-        dehumidifierFormula = `${cubicFootage.toFixed(0)} cf ÷ ${chartFactor} = ${ppdRequired.toFixed(1)} PPD ÷ ${dehumidifierRating} PPD/unit = ${dehumidifierCount} units`;
-      }
+      // Calculate dehumidifiers (using LGR formula)
+      const ppdRequired = cubicFootage / chartFactor;
+      const dehumidifierCount = Math.ceil(ppdRequired / dehumidifierRating);
+      const dehumidifierFormula = `${cubicFootage.toFixed(0)} cf ÷ ${chartFactor} = ${ppdRequired.toFixed(1)} PPD ÷ ${dehumidifierRating} PPD/unit = ${dehumidifierCount} units`;
 
       // Calculate air movers per room with placement suggestions
       const roomPlacements: RoomAirMoverPlacement[] = chamberRooms.map(room => {
