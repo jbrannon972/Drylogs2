@@ -479,6 +479,11 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                   scrub: roomEquipment.filter(e => e.type === 'air-scrubber').length,
                   mover: roomEquipment.filter(e => e.type === 'air-mover').length,
                 };
+
+                // Find recommended air mover count for this room
+                const roomPlacement = calc.roomPlacements.find(rp => rp.roomName === room.name);
+                const recommendedMovers = roomPlacement?.total || 0;
+
                 const summary = [
                   counts.dehu > 0 && `${counts.dehu} dehu`,
                   counts.scrub > 0 && `${counts.scrub} scrub`,
@@ -489,7 +494,14 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                   <div key={room.id} className="bg-white border border-gray-200 rounded p-2">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium">{room.name}</span>
-                      {summary && <span className="text-xs text-gray-600">{summary}</span>}
+                      <div className="flex items-center gap-2">
+                        {recommendedMovers > 0 && (
+                          <span className="text-xs text-orange-600 font-medium">
+                            Need {recommendedMovers} mover{recommendedMovers > 1 ? 's' : ''}
+                          </span>
+                        )}
+                        {summary && <span className="text-xs text-gray-600">{summary}</span>}
+                      </div>
                     </div>
                     <div className="grid grid-cols-3 gap-1">
                       <Button
@@ -546,29 +558,22 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       ))}
 
       {/* Total Summary */}
-      <div className="bg-green-50 border-2 border-green-300 rounded-lg p-3">
-        <div className="flex items-start gap-2 mb-2">
-          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h4 className="font-medium text-green-900 mb-1">Total Equipment Required</h4>
-            <p className="text-sm text-green-800">
-              Combined requirements across all {chamberCalculations.length} chamber(s)
-            </p>
-          </div>
+      <div className="bg-green-50 border border-green-300 rounded p-2">
+        <div className="text-xs text-green-800 mb-2">
+          Total: {chamberCalculations.length} chamber{chamberCalculations.length > 1 ? 's' : ''}
         </div>
-
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-white border-2 border-blue-300 rounded-lg p-3 text-center">
-            <p className="text-4xl font-bold text-blue-900">{totalEquipment.dehumidifiers}</p>
-            <p className="text-sm text-gray-600 mt-1">Dehumidifiers</p>
+          <div className="bg-white border border-blue-300 rounded p-2 text-center">
+            <p className="text-2xl font-bold text-blue-900">{totalEquipment.dehumidifiers}</p>
+            <p className="text-xs text-gray-600">Dehus</p>
           </div>
-          <div className="bg-white border-2 border-orange-300 rounded-lg p-3 text-center">
-            <p className="text-4xl font-bold text-orange-900">{totalEquipment.airMovers}</p>
-            <p className="text-sm text-gray-600 mt-1">Air Movers</p>
+          <div className="bg-white border border-orange-300 rounded p-2 text-center">
+            <p className="text-2xl font-bold text-orange-900">{totalEquipment.airMovers}</p>
+            <p className="text-xs text-gray-600">Movers</p>
           </div>
-          <div className="bg-white border-2 border-purple-300 rounded-lg p-3 text-center">
-            <p className="text-4xl font-bold text-purple-900">{totalEquipment.airScrubbers}</p>
-            <p className="text-sm text-gray-600 mt-1">Air Scrubbers</p>
+          <div className="bg-white border border-purple-300 rounded p-2 text-center">
+            <p className="text-2xl font-bold text-purple-900">{totalEquipment.airScrubbers}</p>
+            <p className="text-xs text-gray-600">Scrubbers</p>
           </div>
         </div>
       </div>
