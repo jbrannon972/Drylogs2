@@ -235,7 +235,7 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
           job.jobId,
           `billable-${itemId}`,
           `Billable: ${item?.label || itemId}`,
-          'billables'
+          'assessment'
         );
       }
 
