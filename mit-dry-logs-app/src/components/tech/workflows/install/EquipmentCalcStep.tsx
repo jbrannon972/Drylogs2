@@ -422,18 +422,17 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       {chamberCalculations.map((calc, index) => (
         <div key={calc.chamberId} className="border-2 border-gray-300 rounded-lg p-2 bg-gray-50">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-base font-bold text-gray-900">{calc.chamberName}</h3>
-            <div className="text-xs text-gray-600">
-              {calc.cubicFootage.toFixed(0)} cf
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-gray-900">{calc.chamberName}</h3>
+              <span className="text-xs text-gray-600">({calc.cubicFootage.toFixed(0)} cf)</span>
             </div>
           </div>
 
-          {/* Chamber Air Movers Total */}
-          {calc.airMovers > 0 && (
-            <div className="text-sm text-gray-700 mb-2">
-              {calc.airMovers} Air Mover{calc.airMovers > 1 ? 's' : ''} Needed
-            </div>
-          )}
+          {/* Chamber Equipment Badges */}
+          <div className="flex items-center gap-1 mb-2">
+            {calc.dehumidifiers > 0 && <span className="px-2 py-0.5 bg-blue-100 rounded text-sm font-bold">{calc.dehumidifiers} Dehu</span>}
+            {calc.airScrubbers > 0 && <span className="px-2 py-0.5 bg-purple-100 rounded text-sm font-bold">{calc.airScrubbers} Scrubber</span>}
+          </div>
 
           {/* Calculation Details - Collapsed by default */}
           <details className="mb-2">
@@ -462,11 +461,6 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
               return chamberRooms.map(room => {
                 const roomEquipment = placedEquipment.filter(e => e.assignedRoomId === room.id);
-                const counts = {
-                  dehu: roomEquipment.filter(e => e.type === 'dehumidifier').length,
-                  scrub: roomEquipment.filter(e => e.type === 'air-scrubber').length,
-                  mover: roomEquipment.filter(e => e.type === 'air-mover').length,
-                };
 
                 // Find recommended air mover count for this room
                 const roomPlacement = calc.roomPlacements.find(rp => rp.roomName === room.name);
@@ -474,18 +468,13 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
                 return (
                   <div key={room.id} className="bg-white border border-gray-200 rounded p-2">
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2 mb-1">
                       <span className="text-base font-semibold text-gray-900">{room.name}</span>
-                      <div className="flex items-center gap-1 flex-wrap">
-                        {counts.dehu > 0 && <span className="px-2 py-0.5 bg-blue-100 rounded text-xs font-bold">{counts.dehu} Dehu</span>}
-                        {counts.scrub > 0 && <span className="px-2 py-0.5 bg-purple-100 rounded text-xs font-bold">{counts.scrub} Scrub</span>}
-                        {counts.mover > 0 && <span className="px-2 py-0.5 bg-orange-100 rounded text-xs font-bold">{counts.mover} Mover</span>}
-                        {recommendedMovers > 0 && (
-                          <span className="text-xs text-gray-600">
-                            {recommendedMovers} Air Mover{recommendedMovers > 1 ? 's' : ''} Needed
-                          </span>
-                        )}
-                      </div>
+                      {recommendedMovers > 0 && (
+                        <span className="px-2 py-0.5 bg-orange-100 rounded text-sm font-bold">
+                          {recommendedMovers} Air Mover{recommendedMovers > 1 ? 's' : ''} Needed
+                        </span>
+                      )}
                     </div>
                     <div className="grid grid-cols-3 gap-1">
                       <Button
