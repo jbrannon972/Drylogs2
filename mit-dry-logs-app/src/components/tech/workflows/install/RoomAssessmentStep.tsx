@@ -86,9 +86,8 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   const [moistureTracking, setMoistureTracking] = useState<MaterialMoistureTracking[]>(
     installData.moistureTracking || []
   );
-  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(
-    rooms.length > 0 ? rooms[0].id : null
-  );
+  // Always start on the rooms list page (null), not auto-selecting first room
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'info' | 'moisture' | 'materials'>('info');
   const [showPreexistingModal, setShowPreexistingModal] = useState(false);
 
