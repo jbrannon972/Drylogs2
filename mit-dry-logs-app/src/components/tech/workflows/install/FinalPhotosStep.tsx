@@ -221,11 +221,18 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
   };
 
   const getTotalPhotos = () => {
-    return roomPhotos.reduce((sum, rp) => sum + rp.photos.length, 0);
+    // ULTRAFAULT: Protect against undefined elements in roomPhotos array
+    return roomPhotos.reduce((sum, rp) => {
+      if (!rp || !rp.photos) return sum;
+      return sum + rp.photos.length;
+    }, 0);
   };
 
   const getCompletedRooms = () => {
     return roomPhotos.filter((rp, index) => {
+      // ULTRAFAULT: Guard against undefined rp or rp.photos
+      if (!rp || !rp.photos) return false;
+
       const hasPhotos = rp.photos.length >= 4;
       const roomEquipment = equipmentPerformance[index];
 
