@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
-import { PhotoCapture } from '../../../shared/PhotoCapture';
+import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 import { Thermometer, Droplets, MapPin, CheckCircle, Info } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
-import { photoService } from '../../../../services/firebase/photoService';
 import { useAuth } from '../../../../hooks/useAuth';
 
 interface EnvironmentalBaselineStepProps {
@@ -133,39 +132,27 @@ export const EnvironmentalBaselineStep: React.FC<EnvironmentalBaselineStepProps>
       </div>
 
       {/* Hygrometer Photos */}
-      <div className="border-2 border-gray-300 rounded-lg p-4">
-        <h3 className="font-semibold text-gray-900 mb-2">Hygrometer Photos</h3>
-        <p className="text-sm text-gray-700 mb-3">
-          Take photos of your hygrometer displaying the outside temperature and humidity readings.
-        </p>
-        <PhotoCapture
-          contextLabel="Hygrometer Reading"
-          onPhotoCapture={async (file: File): Promise<string | null> => {
-            if (!user) return null;
-            try {
-              // Upload photo immediately and get URL
-              const url = await photoService.uploadPhoto(
-                file,
-                job.jobId,
-                'environmental-baseline',
-                'arrival', // PhotoStep type
-                user.uid
-              );
-              // Add to local state
-              setHygrometerPhotos(prev => [...prev, url]);
-              return url;
-            } catch (error) {
-              console.error('Failed to upload hygrometer photo:', error);
-              return null;
-            }
-          }}
-          photos={hygrometerPhotos}
-          onPhotoDelete={(index: number) => {
-            const updated = hygrometerPhotos.filter((_, i) => i !== index);
-            setHygrometerPhotos(updated);
-          }}
-          minPhotos={1}
-        />
+      <div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+          <p className="text-sm text-blue-800">
+            Take photos of your hygrometer displaying the outside temperature and humidity readings
+          </p>
+        </div>
+        {user && (
+          <UniversalPhotoCapture
+            jobId={job.jobId}
+            location="environmental-baseline"
+            category="arrival"
+            userId={user.uid}
+            onPhotosUploaded={(urls) => {
+              setHygrometerPhotos(prev => [...prev, ...urls]);
+            }}
+            uploadedCount={hygrometerPhotos.length}
+            label="Hygrometer Photos *"
+            minimumPhotos={1}
+            singlePhotoMode={true}
+          />
+        )}
       </div>
 
       {/* Success Indicator */}

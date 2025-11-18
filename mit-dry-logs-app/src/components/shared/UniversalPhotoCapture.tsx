@@ -14,6 +14,7 @@ interface UniversalPhotoCaptureProps {
   uploadedCount: number;
   label?: string;
   minimumPhotos?: number;
+  singlePhotoMode?: boolean; // When true, only shows "Take Photo" button (hides gallery)
 }
 
 export const UniversalPhotoCapture: React.FC<UniversalPhotoCaptureProps> = ({
@@ -25,6 +26,7 @@ export const UniversalPhotoCapture: React.FC<UniversalPhotoCaptureProps> = ({
   uploadedCount,
   label,
   minimumPhotos,
+  singlePhotoMode = false,
 }) => {
   const { user } = useAuth();
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -129,7 +131,7 @@ export const UniversalPhotoCapture: React.FC<UniversalPhotoCaptureProps> = ({
       )}
 
       {/* Photo Capture Options */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className={singlePhotoMode ? "flex" : "grid grid-cols-2 gap-3"}>
         {/* Camera Option */}
         <button
           type="button"
@@ -140,16 +142,18 @@ export const UniversalPhotoCapture: React.FC<UniversalPhotoCaptureProps> = ({
           <span className="text-sm font-medium text-gray-700">Take Photo</span>
         </button>
 
-        {/* Gallery Option */}
-        <button
-          type="button"
-          onClick={handleGalleryClick}
-          className="flex flex-col items-center justify-center p-4 border-2 border-gray-300 border-dashed rounded-lg hover:border-entrusted-orange hover:bg-orange-50 transition-all"
-        >
-          <ImageIcon className="w-8 h-8 mb-2 text-gray-400" />
-          <span className="text-sm font-medium text-gray-700">Choose from Gallery</span>
-          <span className="text-xs text-gray-500 mt-1">Multiple selection</span>
-        </button>
+        {/* Gallery Option - Hidden in single photo mode */}
+        {!singlePhotoMode && (
+          <button
+            type="button"
+            onClick={handleGalleryClick}
+            className="flex flex-col items-center justify-center p-4 border-2 border-gray-300 border-dashed rounded-lg hover:border-entrusted-orange hover:bg-orange-50 transition-all"
+          >
+            <ImageIcon className="w-8 h-8 mb-2 text-gray-400" />
+            <span className="text-sm font-medium text-gray-700">Choose from Gallery</span>
+            <span className="text-xs text-gray-500 mt-1">Multiple selection</span>
+          </button>
+        )}
       </div>
 
       {/* Upload Status */}

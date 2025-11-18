@@ -714,6 +714,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                           uploadedCount={selectedRoom.meterPhotos.length}
                           label="Meter Reading Photo *"
                           minimumPhotos={1}
+                          singlePhotoMode={true}
                         />
                       )}
                     </div>

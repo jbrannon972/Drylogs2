@@ -421,8 +421,9 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                   setPhotos(prev => [...prev, ...urls]);
                 }}
                 uploadedCount={photos.length}
-                label="Moisture Reading Photos *"
-                minimumPhotos={2}
+                label="Moisture Meter Reading Photo *"
+                minimumPhotos={1}
+                singlePhotoMode={true}
               />
             )}
           </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../../../shared/Button';
 import { Input } from '../../../shared/Input';
 import { Camera, MapPin, Clock, CheckCircle, Image as ImageIcon, AlertTriangle, Shield, Info } from 'lucide-react';
-import { useBatchPhotos } from '../../../../hooks/useBatchPhotos';
+import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 
@@ -12,7 +12,6 @@ interface ArrivalStepProps {
 
 export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
   const { user } = useAuth();
-  const { queuePhoto } = useBatchPhotos();
   const { installData, updateWorkflowData } = useWorkflowStore();
 
   // Initialize from saved data or current time
@@ -26,11 +25,11 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
   const [travelTimeToSite, setTravelTimeToSite] = useState(
     installData.travelTimeToSite || 0
   );
-  const [hasTruckPhoto, setHasTruckPhoto] = useState<boolean>(
-    installData.hasTruckPhoto || false
+  const [truckPhotos, setTruckPhotos] = useState<string[]>(
+    installData.truckPhotos || []
   );
-  const [hasPropertyPhoto, setHasPropertyPhoto] = useState<boolean>(
-    installData.hasPropertyPhoto || false
+  const [propertyPhotos, setPropertyPhotos] = useState<string[]>(
+    installData.propertyPhotos || []
   );
   const [propertyAge, setPropertyAge] = useState<string>(
     installData.propertyAge || ''
@@ -42,48 +41,20 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
       updateWorkflowData('install', {
         arrivalTime,
         travelTimeToSite,
-        hasTruckPhoto,
-        hasPropertyPhoto,
+        truckPhotos,
+        propertyPhotos,
         propertyAge: parseInt(propertyAge) || 0,
       });
     }, 100); // 100ms debounce
 
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [arrivalTime, travelTimeToSite, hasTruckPhoto, hasPropertyPhoto, propertyAge]);
-
-  const handleTruckPhotosCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0 && user) {
-      // Queue all captured photos for background upload
-      for (let i = 0; i < files.length; i++) {
-        await queuePhoto(files[i], job.jobId, 'truck-location', 'Truck Location', 'arrival');
-      }
-      // Mark as taken
-      setHasTruckPhoto(true);
-      // Reset input so same files can be selected again
-      e.target.value = '';
-    }
-  };
-
-  const handlePropertyPhotosCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0 && user) {
-      // Queue all captured photos for background upload
-      for (let i = 0; i < files.length; i++) {
-        await queuePhoto(files[i], job.jobId, 'property-exterior', 'Property Exterior', 'arrival');
-      }
-      // Mark as taken
-      setHasPropertyPhoto(true);
-      // Reset input so same files can be selected again
-      e.target.value = '';
-    }
-  };
+  }, [arrivalTime, travelTimeToSite, truckPhotos, propertyPhotos, propertyAge]);
 
   const propertyYearNum = parseInt(propertyAge) || 0;
   const showAsbestosWarning = propertyYearNum > 0 && propertyYearNum < 1980;
   const showLeadWarning = propertyYearNum > 0 && propertyYearNum < 1978;
-  const canProceed = hasTruckPhoto && hasPropertyPhoto && propertyAge;
+  const canProceed = truckPhotos.length > 0 && propertyPhotos.length > 0 && propertyAge;
 
   return (
     <div className="space-y-4">
@@ -206,58 +177,50 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
 
       {/* Truck Photo */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Truck Location Photo *
-        </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-3">
-          {hasTruckPhoto && (
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              <span className="text-sm text-green-600 font-medium">Photo captured ✓</span>
-            </div>
-          )}
-
-          <label className="flex flex-col items-center justify-center p-5 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange hover:bg-orange-50 transition-all cursor-pointer active:scale-95">
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleTruckPhotosCapture}
-              className="hidden"
-            />
-            <Camera className="w-10 h-10 text-entrusted-orange mb-2" />
-            <span className="text-base font-bold text-gray-900">Take Photo</span>
-            <span className="text-sm text-gray-500">Document truck location for safety</span>
-          </label>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+          <p className="text-sm text-blue-800">
+            Document truck location for safety and arrival verification
+          </p>
         </div>
+        {user && (
+          <UniversalPhotoCapture
+            jobId={job.jobId}
+            location="truck-location"
+            category="arrival"
+            userId={user.uid}
+            onPhotosUploaded={(urls) => {
+              setTruckPhotos(prev => [...prev, ...urls]);
+            }}
+            uploadedCount={truckPhotos.length}
+            label="Truck Location Photo *"
+            minimumPhotos={1}
+            singlePhotoMode={true}
+          />
+        )}
       </div>
 
       {/* Property Exterior Photo */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Property Exterior Photo *
-        </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-3">
-          {hasPropertyPhoto && (
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              <span className="text-sm text-green-600 font-medium">Photo captured ✓</span>
-            </div>
-          )}
-
-          <label className="flex flex-col items-center justify-center p-5 border-2 border-gray-200 rounded-lg hover:border-entrusted-orange hover:bg-orange-50 transition-all cursor-pointer active:scale-95">
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handlePropertyPhotosCapture}
-              className="hidden"
-            />
-            <Camera className="w-10 h-10 text-entrusted-orange mb-2" />
-            <span className="text-base font-bold text-gray-900">Take Photo</span>
-            <span className="text-sm text-gray-500">Document property exterior</span>
-          </label>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+          <p className="text-sm text-blue-800">
+            Document property exterior for job verification and insurance documentation
+          </p>
         </div>
+        {user && (
+          <UniversalPhotoCapture
+            jobId={job.jobId}
+            location="property-exterior"
+            category="arrival"
+            userId={user.uid}
+            onPhotosUploaded={(urls) => {
+              setPropertyPhotos(prev => [...prev, ...urls]);
+            }}
+            uploadedCount={propertyPhotos.length}
+            label="Property Exterior Photo *"
+            minimumPhotos={1}
+            singlePhotoMode={true}
+          />
+        )}
       </div>
 
       {/* Success Indicator */}
@@ -282,8 +245,8 @@ export const ArrivalStep: React.FC<ArrivalStepProps> = ({ job }) => {
             ⚠️ Please complete the following to proceed:
           </p>
           <ul className="text-sm text-yellow-800 list-disc list-inside space-y-1">
-            {!hasTruckPhoto && <li>Take truck location photo</li>}
-            {!hasPropertyPhoto && <li>Take property exterior photo</li>}
+            {truckPhotos.length === 0 && <li>Take truck location photo</li>}
+            {propertyPhotos.length === 0 && <li>Take property exterior photo</li>}
             {!propertyAge && <li>Enter year built</li>}
           </ul>
         </div>

@@ -882,6 +882,7 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
                         }}
                         uploadedCount={selectedRoom.thermalPhotos?.length || 0}
                         label={`${selectedRoom.name} Thermal Imaging (Optional)`}
+                        singlePhotoMode={true}
                       />
                     )}
                   </div>
