@@ -390,20 +390,35 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
       </div>
 
       {/* Per-Chamber Calculations */}
-      {chamberCalculations.map((calc, index) => (
-        <div key={calc.chamberId} className="border-2 border-gray-300 rounded-lg p-2 bg-gray-50">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-gray-900">{calc.chamberName}</h3>
-              <span className="text-xs text-gray-600">({calc.cubicFootage.toFixed(0)} cf)</span>
-            </div>
-          </div>
+      {chamberCalculations.map((calc, index) => {
+        const chamberEquipment = placedEquipment.filter(e => e.assignedChamberId === calc.chamberId);
+        const placedDehus = chamberEquipment.filter(e => e.type === 'dehumidifier').length;
+        const placedScrubs = chamberEquipment.filter(e => e.type === 'air-scrubber').length;
+        const placedMovers = chamberEquipment.filter(e => e.type === 'air-mover').length;
 
-          {/* Chamber Equipment Badges */}
-          <div className="flex items-center gap-1 mb-2">
-            {calc.dehumidifiers > 0 && <span className="px-2 py-0.5 bg-blue-100 rounded text-sm font-bold">{calc.dehumidifiers} Dehu</span>}
-            {calc.airScrubbers > 0 && <span className="px-2 py-0.5 bg-purple-100 rounded text-sm font-bold">{calc.airScrubbers} Scrubber</span>}
-          </div>
+        return (
+          <div key={calc.chamberId} className="border-2 border-gray-300 rounded-lg p-2 bg-gray-50">
+            <div className="mb-2">
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-gray-900">{calc.chamberName}</h3>
+                <span className="text-xs text-gray-600">({calc.cubicFootage.toFixed(0)} cf)</span>
+              </div>
+              {/* Chamber-level equipment status */}
+              <div className="text-xs text-gray-700 mt-1">
+                Status:
+                <span className={`ml-1 ${placedDehus >= calc.dehumidifiers ? 'text-green-700 font-semibold' : 'text-gray-700'}`}>
+                  Dehus {placedDehus}/{calc.dehumidifiers}
+                </span>
+                {' · '}
+                <span className={`${placedScrubs >= calc.airScrubbers ? 'text-green-700 font-semibold' : 'text-gray-700'}`}>
+                  Scrubs {placedScrubs}/{calc.airScrubbers}
+                </span>
+                {' · '}
+                <span className={`${placedMovers >= calc.airMovers ? 'text-green-700 font-semibold' : 'text-gray-700'}`}>
+                  Movers {placedMovers}/{calc.airMovers}
+                </span>
+              </div>
+            </div>
 
           {/* Calculation Details - Collapsed by default */}
           <details className="mb-2">
@@ -436,14 +451,22 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 // Find recommended air mover count for this room
                 const roomPlacement = calc.roomPlacements.find(rp => rp.roomName === room.name);
                 const recommendedMovers = roomPlacement?.total || 0;
+                const placedRoomMovers = roomEquipment.filter(e => e.type === 'air-mover').length;
 
                 return (
                   <div key={room.id} className="bg-white border border-gray-200 rounded p-2">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-base font-semibold text-gray-900">{room.name}</span>
                       {recommendedMovers > 0 && (
-                        <span className="px-2 py-0.5 bg-orange-100 rounded text-sm font-bold">
-                          {recommendedMovers} Air Mover{recommendedMovers > 1 ? 's' : ''} Needed
+                        <span className={`px-2 py-0.5 rounded text-sm font-bold ${
+                          placedRoomMovers >= recommendedMovers
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-orange-100 text-orange-800'
+                        }`}>
+                          {placedRoomMovers >= recommendedMovers
+                            ? `${placedRoomMovers} Movers ✓`
+                            : `${placedRoomMovers}/${recommendedMovers} Movers`
+                          }
                         </span>
                       )}
                     </div>
@@ -473,48 +496,14 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                         Mover
                       </Button>
                     </div>
-                    {/* Show placed equipment counts */}
-                    {roomEquipment.length > 0 && (
-                      <div className="mt-1 flex gap-2 text-xs text-gray-600">
-                        {roomEquipment.filter(e => e.type === 'dehumidifier').length > 0 && (
-                          <span>{roomEquipment.filter(e => e.type === 'dehumidifier').length} Dehu</span>
-                        )}
-                        {roomEquipment.filter(e => e.type === 'air-scrubber').length > 0 && (
-                          <span>{roomEquipment.filter(e => e.type === 'air-scrubber').length} Scrub</span>
-                        )}
-                        {roomEquipment.filter(e => e.type === 'air-mover').length > 0 && (
-                          <span>{roomEquipment.filter(e => e.type === 'air-mover').length} Mover</span>
-                        )}
-                      </div>
-                    )}
                   </div>
                 );
               });
             })()}
           </div>
         </div>
-      ))}
-
-      {/* Total Summary */}
-      <div className="bg-green-50 border border-green-300 rounded p-2">
-        <div className="text-xs text-green-800 mb-1">
-          Total: {chamberCalculations.length} chamber{chamberCalculations.length > 1 ? 's' : ''}
-        </div>
-        <div className="grid grid-cols-3 gap-1">
-          <div className="bg-white border border-blue-300 rounded p-1.5 text-center">
-            <p className="text-lg font-bold text-blue-900">{totalEquipment.dehumidifiers}</p>
-            <p className="text-xs text-gray-600">Dehus</p>
-          </div>
-          <div className="bg-white border border-orange-300 rounded p-1.5 text-center">
-            <p className="text-lg font-bold text-orange-900">{totalEquipment.airMovers}</p>
-            <p className="text-xs text-gray-600">Movers</p>
-          </div>
-          <div className="bg-white border border-purple-300 rounded p-1.5 text-center">
-            <p className="text-lg font-bold text-purple-900">{totalEquipment.airScrubbers}</p>
-            <p className="text-xs text-gray-600">Scrubbers</p>
-          </div>
-        </div>
-      </div>
+        );
+      })}
 
       {/* Scan/Manual Entry Modal */}
       {showScanModal && scanningFor && (
