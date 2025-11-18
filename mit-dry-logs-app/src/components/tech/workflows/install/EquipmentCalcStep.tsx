@@ -408,21 +408,27 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
                   placedDehus >= calc.dehumidifiers
                     ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-700'
+                    : placedDehus > 0
+                    ? 'bg-orange-100 text-orange-800'
+                    : 'bg-red-100 text-red-800'
                 }`}>
                   Dehus {placedDehus}/{calc.dehumidifiers}{placedDehus >= calc.dehumidifiers ? ' ✓' : ''}
                 </span>
                 <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
                   placedScrubs >= calc.airScrubbers
                     ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-700'
+                    : placedScrubs > 0
+                    ? 'bg-orange-100 text-orange-800'
+                    : 'bg-red-100 text-red-800'
                 }`}>
                   Scrubs {placedScrubs}/{calc.airScrubbers}{placedScrubs >= calc.airScrubbers ? ' ✓' : ''}
                 </span>
                 <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
                   placedMovers >= calc.airMovers
                     ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-700'
+                    : placedMovers > 0
+                    ? 'bg-orange-100 text-orange-800'
+                    : 'bg-red-100 text-red-800'
                 }`}>
                   Movers {placedMovers}/{calc.airMovers}{placedMovers >= calc.airMovers ? ' ✓' : ''}
                 </span>
@@ -472,7 +478,9 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                         <span className={`px-2 py-0.5 rounded text-sm font-bold ${
                           placedRoomMovers >= recommendedMovers
                             ? 'bg-green-100 text-green-800'
-                            : 'bg-orange-100 text-orange-800'
+                            : placedRoomMovers > 0
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-red-100 text-red-800'
                         }`}>
                           {placedRoomMovers >= recommendedMovers
                             ? `${placedRoomMovers} Movers ✓`
