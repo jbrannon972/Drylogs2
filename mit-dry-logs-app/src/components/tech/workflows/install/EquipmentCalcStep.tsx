@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Button } from '../../../shared/Button';
-import { Wind, AlertCircle, Info, Calculator, CheckCircle, QrCode, X, Plus } from 'lucide-react';
+import { Wind, AlertCircle, Info, Calculator, CheckCircle, QrCode, X, Plus, List, Trash2 } from 'lucide-react';
 import { useWorkflowStore } from '../../../../stores/workflowStore';
 import { DehumidifierType, DryingChamber } from '../../../../types';
 import { calculateChamberEquipment } from '../../../../utils/iicrcCalculations';
@@ -86,6 +86,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   const [manualSerialInput, setManualSerialInput] = useState('');
   const [selectedRoomId, setSelectedRoomId] = useState<string>('');
   const [scannedCount, setScannedCount] = useState(0); // Track how many have been scanned in bulk operation
+  const [viewingEquipmentForRoom, setViewingEquipmentForRoom] = useState<string | null>(null); // Room ID for equipment list modal
 
   const lastSavedCalculationsRef = useRef<string | null>(null);
   const prevPlacedEquipmentRef = useRef<string>(JSON.stringify(installData.placedEquipment || []));
@@ -473,7 +474,13 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 return (
                   <div key={room.id} className="bg-white border border-gray-200 rounded p-2">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="text-base font-semibold text-gray-900">{room.name}</span>
+                      <button
+                        onClick={() => setViewingEquipmentForRoom(room.id)}
+                        className="flex items-center gap-1 text-base font-semibold text-gray-900 hover:text-blue-700 hover:underline transition-colors"
+                      >
+                        <List className="w-4 h-4" />
+                        {room.name}
+                      </button>
                       {recommendedMovers > 0 && (
                         <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
                           placedRoomMovers >= recommendedMovers
@@ -624,6 +631,74 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
           </div>
         </div>
       )}
+
+      {/* Equipment List Modal - View/Remove equipment in a room */}
+      {viewingEquipmentForRoom && (() => {
+        const room = rooms.find(r => r.id === viewingEquipmentForRoom);
+        const roomEquipment = placedEquipment.filter(e => e.assignedRoomId === viewingEquipmentForRoom);
+
+        if (!room) return null;
+
+        return (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Equipment in {room.name}
+                </h3>
+                <button
+                  onClick={() => setViewingEquipmentForRoom(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              {roomEquipment.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <List className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                  <p>No equipment placed in this room yet</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {roomEquipment.map((equipment) => (
+                    <div
+                      key={equipment.id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                    >
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900">
+                          {equipment.type === 'dehumidifier' ? 'Dehumidifier' :
+                           equipment.type === 'air-mover' ? 'Air Mover' :
+                           'Air Scrubber'}
+                        </p>
+                        <p className="text-sm text-gray-600 font-mono">{equipment.serialNumber}</p>
+                      </div>
+                      <button
+                        onClick={() => removeEquipment(equipment.id)}
+                        className="p-2 hover:bg-red-100 rounded-lg text-red-600 hover:text-red-800 transition-colors"
+                        title="Remove equipment"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-4">
+                <Button
+                  variant="secondary"
+                  onClick={() => setViewingEquipmentForRoom(null)}
+                  className="w-full"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
