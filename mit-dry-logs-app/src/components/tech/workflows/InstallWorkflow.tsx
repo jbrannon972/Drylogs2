@@ -165,6 +165,7 @@ export const InstallWorkflow: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showSaveError, setShowSaveError] = useState(false);
+  const [hideNavButtons, setHideNavButtons] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -176,11 +177,13 @@ export const InstallWorkflow: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobId, user]);
 
-  // Auto-scroll to top when step changes
+  // Auto-scroll to top when step changes, reset nav button visibility
   useEffect(() => {
     if (contentRef.current) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    // Reset nav buttons to visible when changing steps
+    setHideNavButtons(false);
   }, [installStep]);
 
   const currentStepIndex = INSTALL_STEPS.findIndex(s => s.id === installStep);
@@ -221,6 +224,10 @@ export const InstallWorkflow: React.FC = () => {
     if (currentStepIndex > 0) {
       setInstallStep(INSTALL_STEPS[currentStepIndex - 1].id);
     }
+  };
+
+  const handleViewModeChange = (inDetailView: boolean) => {
+    setHideNavButtons(inDetailView);
   };
 
   const handleStepClick = (stepId: InstallStep) => {
@@ -307,7 +314,13 @@ export const InstallWorkflow: React.FC = () => {
               console.error('Error info:', errorInfo);
             }}
           >
-            {StepComponent && <StepComponent job={job} />}
+            {StepComponent && (
+              currentStepConfig.id === 'unaffected-baseline' || currentStepConfig.id === 'room-assessment' ? (
+                <StepComponent job={job} onViewModeChange={handleViewModeChange} />
+              ) : (
+                <StepComponent job={job} />
+              )
+            )}
           </ErrorBoundary>
         </div>
       </div>
@@ -323,6 +336,7 @@ export const InstallWorkflow: React.FC = () => {
         onNext={handleSaveAndContinue}
         canGoBack={currentStepIndex > 0 && !isSaving}
         canGoForward={currentStepIndex < INSTALL_STEPS.length - 1 && !isSaving}
+        hideNavButtons={hideNavButtons}
       />
 
       {/* STEP OVERVIEW MODAL */}

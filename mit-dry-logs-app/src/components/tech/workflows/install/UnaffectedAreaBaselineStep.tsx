@@ -15,6 +15,7 @@ import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 interface UnaffectedAreaBaselineStepProps {
   job: any;
   onNext: () => void;
+  onViewModeChange?: (inDetailView: boolean) => void;
 }
 
 interface MoistureReading {
@@ -81,7 +82,7 @@ interface RoomData {
   isComplete: boolean;
 }
 
-export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProps> = ({ job, onNext }) => {
+export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProps> = ({ job, onNext, onViewModeChange }) => {
   const { installData, updateWorkflowData, saveWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
@@ -400,6 +401,11 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
 
   // View state: 'list' | 'detail' | 'add'
   const [viewMode, setViewMode] = useState<'list' | 'detail' | 'add'>('list');
+
+  // Notify parent when view mode changes (to hide/show nav buttons)
+  useEffect(() => {
+    onViewModeChange?.(viewMode === 'detail' || viewMode === 'add');
+  }, [viewMode, onViewModeChange]);
 
   const openRoomDetail = (roomId: string) => {
     setSelectedRoomId(roomId);

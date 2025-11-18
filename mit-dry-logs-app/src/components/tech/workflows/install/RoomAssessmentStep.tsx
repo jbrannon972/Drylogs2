@@ -15,6 +15,7 @@ import { UniversalPhotoCapture } from '../../../shared/UniversalPhotoCapture';
 interface RoomAssessmentStepProps {
   job: any;
   onNext: () => void;
+  onViewModeChange?: (inDetailView: boolean) => void;
 }
 
 interface MoistureReading {
@@ -75,7 +76,7 @@ interface RoomData {
   isComplete: boolean;
 }
 
-export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onNext }) => {
+export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onNext, onViewModeChange }) => {
   const { installData, updateWorkflowData, saveWorkflowData } = useWorkflowStore();
   const { user } = useAuth();
   const { uploadPhoto, isUploading } = usePhotos();
@@ -90,6 +91,11 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
   );
   const [activeTab, setActiveTab] = useState<'info' | 'moisture' | 'materials'>('info');
   const [showPreexistingModal, setShowPreexistingModal] = useState(false);
+
+  // Notify parent when viewing room detail (to hide/show nav buttons)
+  useEffect(() => {
+    onViewModeChange?.(selectedRoomId !== null);
+  }, [selectedRoomId, onViewModeChange]);
 
   // Material category expansion state
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set()); // Default: All collapsed
