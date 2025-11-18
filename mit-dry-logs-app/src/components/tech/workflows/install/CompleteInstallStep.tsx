@@ -124,6 +124,149 @@ export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, o
 
   return (
     <div className="space-y-4">
+      {/* Job Information Summary */}
+      <div className="border rounded-lg p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <FileText className="w-5 h-5 text-blue-600" />
+          Job Information
+        </h3>
+
+        <div className="grid grid-cols-1 gap-3 text-sm">
+          {/* Customer Info */}
+          <div className="bg-white rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-500 uppercase font-medium mb-1">Customer</p>
+            <p className="font-medium text-gray-900">
+              {job.customerName || job.firstName && job.lastName ? `${job.firstName} ${job.lastName}` : 'Not provided'}
+            </p>
+          </div>
+
+          {/* Address */}
+          <div className="bg-white rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-500 uppercase font-medium mb-1">Property Address</p>
+            <p className="text-gray-900">
+              {job.address || job.street ? (
+                <>
+                  {job.street && <>{job.street}<br /></>}
+                  {job.city && job.state && job.zip ? `${job.city}, ${job.state} ${job.zip}` : 'Address incomplete'}
+                </>
+              ) : 'Not provided'}
+            </p>
+          </div>
+
+          {/* Contact Info */}
+          {(job.phone || job.email) && (
+            <div className="bg-white rounded-lg p-3 border border-gray-200">
+              <p className="text-xs text-gray-500 uppercase font-medium mb-1">Contact</p>
+              <div className="space-y-1">
+                {job.phone && <p className="text-gray-900">📞 {job.phone}</p>}
+                {job.email && <p className="text-gray-900">✉️ {job.email}</p>}
+              </div>
+            </div>
+          )}
+
+          {/* Job Details */}
+          <div className="bg-white rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-500 uppercase font-medium mb-2">Job Details</p>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Job ID:</span>
+                <span className="font-medium text-gray-900">{job.jobId || 'Not set'}</span>
+              </div>
+              {job.claimNumber && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Claim #:</span>
+                  <span className="font-medium text-gray-900">{job.claimNumber}</span>
+                </div>
+              )}
+              {job.insuranceCompany && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Insurance:</span>
+                  <span className="font-medium text-gray-900">{job.insuranceCompany}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-gray-600">Job Type:</span>
+                <span className="font-medium text-gray-900">{job.jobType || 'Water Damage'}</span>
+              </div>
+              {job.dateOfLoss && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Date of Loss:</span>
+                  <span className="font-medium text-gray-900">
+                    {new Date(job.dateOfLoss).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Cause of Loss Summary */}
+          <div className="bg-white rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-500 uppercase font-medium mb-2">Loss Information</p>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Cause of Loss:</span>
+                <span className="font-medium text-gray-900">
+                  {installData.causeOfLoss?.type || 'Not documented'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Water Category:</span>
+                <span className={`font-medium ${
+                  installData.causeOfLoss?.waterCategory === 'Category 3' ? 'text-red-600' :
+                  installData.causeOfLoss?.waterCategory === 'Category 2' ? 'text-yellow-600' :
+                  'text-green-600'
+                }`}>
+                  {installData.causeOfLoss?.waterCategory || 'Not documented'}
+                </span>
+              </div>
+              {installData.overallDamageClass && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Damage Class:</span>
+                  <span className="font-medium text-gray-900">
+                    Class {installData.overallDamageClass}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Workflow Summary */}
+          <div className="bg-white rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-500 uppercase font-medium mb-2">Workflow Summary</p>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Rooms Assessed:</span>
+                <span className="font-medium text-gray-900">
+                  {(installData.rooms || installData.roomAssessments || []).length}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Drying Chambers:</span>
+                <span className="font-medium text-gray-900">
+                  {(installData.chambers || []).length}
+                </span>
+              </div>
+              {installData.equipmentCalculations?.total && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Dehumidifiers:</span>
+                    <span className="font-medium text-gray-900">
+                      {installData.equipmentCalculations.total.dehumidifiers || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Air Movers:</span>
+                    <span className="font-medium text-gray-900">
+                      {installData.equipmentCalculations.total.airMovers || 0}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Completion Form */}
       <div className="border rounded-lg p-3 bg-white">
         <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
