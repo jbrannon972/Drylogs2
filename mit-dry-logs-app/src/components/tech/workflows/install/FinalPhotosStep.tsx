@@ -35,11 +35,19 @@ interface AirMoverPerformance {
   isRunning: boolean;
 }
 
+interface AirScrubberPerformance {
+  equipmentId: string;
+  serialNumber: string;
+  model: string;
+  isRunning: boolean;
+}
+
 interface RoomEquipmentPerformance {
   roomId: string;
   roomName: string;
   dehumidifiers: DehumidifierPerformance[];
   airMovers: AirMoverPerformance[];
+  airScrubbers: AirScrubberPerformance[];
 }
 
 export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext }) => {
@@ -101,18 +109,28 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
           isRunning: false,
         }));
 
+      // Create performance entries for air scrubbers in this room
+      const airScrubbers: AirScrubberPerformance[] = roomEquipment
+        .filter((e: any) => e.type === 'air-scrubber')
+        .map((as: any) => ({
+          equipmentId: as.id,
+          serialNumber: as.serialNumber,
+          model: as.model || 'Unknown',
+          isRunning: false,
+        }));
+
       return {
         roomId: room.id,
         roomName: room.name,
         dehumidifiers,
         airMovers,
+        airScrubbers,
       };
     });
   };
 
   const [equipmentPerformance, setEquipmentPerformance] = useState<RoomEquipmentPerformance[]>(initializeEquipmentPerformance);
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
-  const [expandedEquipmentId, setExpandedEquipmentId] = useState<string | null>(null);
 
   // ULTRAFAULT: Auto-save IMMEDIATELY to Firebase (no debounce)
   const prevDataRef = useRef({
@@ -193,7 +211,8 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
       const roomEquipment = equipmentPerformance[index];
       const hasEquipmentData =
         roomEquipment.dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null)) &&
-        roomEquipment.airMovers.every(am => am.isRunning !== undefined);
+        roomEquipment.airMovers.every(am => am.isRunning !== undefined) &&
+        roomEquipment.airScrubbers.every(as => as.isRunning !== undefined);
       return hasPhotos && hasEquipmentData;
     }).length;
   };
@@ -217,6 +236,18 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
 
     currentRoomPerf.airMovers = currentRoomPerf.airMovers.map(am =>
       am.equipmentId === equipmentId ? { ...am, ...updates } : am
+    );
+
+    setEquipmentPerformance(updatedPerformance);
+  };
+
+  // Update air scrubber performance
+  const updateAirScrubberPerformance = (equipmentId: string, updates: Partial<AirScrubberPerformance>) => {
+    const updatedPerformance = [...equipmentPerformance];
+    const currentRoomPerf = updatedPerformance[currentRoomIndex];
+
+    currentRoomPerf.airScrubbers = currentRoomPerf.airScrubbers.map(as =>
+      as.equipmentId === equipmentId ? { ...as, ...updates } : as
     );
 
     setEquipmentPerformance(updatedPerformance);
@@ -246,32 +277,9 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
     return mover.isRunning;
   };
 
-  // Get all equipment for current room in order (dehumidifiers first, then air movers)
-  const getAllEquipment = () => {
-    const dehumidifiers = currentEquipment.dehumidifiers.map(d => ({ ...d, type: 'dehumidifier' as const }));
-    const airMovers = currentEquipment.airMovers.map(am => ({ ...am, type: 'airmover' as const }));
-    return [...dehumidifiers, ...airMovers];
-  };
-
-  // Navigate to previous equipment
-  const handlePreviousEquipment = () => {
-    const allEquipment = getAllEquipment();
-    const currentIndex = allEquipment.findIndex(eq => eq.equipmentId === expandedEquipmentId);
-    if (currentIndex > 0) {
-      setExpandedEquipmentId(allEquipment[currentIndex - 1].equipmentId);
-    }
-  };
-
-  // Navigate to next equipment and mark current as complete
-  const handleMarkCompleteAndNext = () => {
-    const allEquipment = getAllEquipment();
-    const currentIndex = allEquipment.findIndex(eq => eq.equipmentId === expandedEquipmentId);
-    if (currentIndex < allEquipment.length - 1) {
-      setExpandedEquipmentId(allEquipment[currentIndex + 1].equipmentId);
-    } else {
-      // Last equipment - just collapse
-      setExpandedEquipmentId(null);
-    }
+  // Check if air scrubber is complete
+  const isAirScrubberComplete = (scrubber: AirScrubberPerformance): boolean => {
+    return scrubber.isRunning;
   };
 
   if (rooms.length === 0) {
@@ -288,8 +296,9 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
   const currentEquipment = equipmentPerformance[currentRoomIndex];
   const hasPhotos = currentRoom && currentRoom.photos.length >= 4;
   const hasEquipmentData =
-    currentEquipment.dehumidifiers.length === 0 ||
-    currentEquipment.dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null));
+    (currentEquipment.dehumidifiers.length === 0 || currentEquipment.dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null))) &&
+    (currentEquipment.airMovers.length === 0 || currentEquipment.airMovers.every(am => am.isRunning)) &&
+    (currentEquipment.airScrubbers.length === 0 || currentEquipment.airScrubbers.every(as => as.isRunning));
   const isCurrentRoomComplete = hasPhotos && hasEquipmentData;
   const allRoomsComplete = getCompletedRooms() === roomPhotos.length;
 
@@ -330,66 +339,6 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
         </div>
       </div>
 
-      {/* Room List Overview - AT TOP */}
-      <div className="bg-white border border-gray-200 rounded-lg p-3">
-        <h4 className="font-semibold text-gray-900 mb-2">All Rooms</h4>
-        <div className="space-y-2">
-          {roomPhotos.map((rp, index) => {
-            const roomEquipment = equipmentPerformance[index];
-            const roomHasPhotos = rp.photos.length >= 4;
-            const roomHasEquipmentData =
-              roomEquipment.dehumidifiers.length === 0 ||
-              roomEquipment.dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null));
-            const roomComplete = roomHasPhotos && roomHasEquipmentData;
-
-            return (
-              <div
-                key={rp.roomId}
-                className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                  index === currentRoomIndex
-                    ? 'border-orange-500 bg-orange-50 shadow-sm'
-                    : roomComplete
-                    ? 'border-green-300 bg-green-50 hover:border-green-400'
-                    : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-                }`}
-                onClick={() => {
-                  setCurrentRoomIndex(index);
-                }}
-              >
-                <div className="flex items-center gap-2">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                    roomComplete
-                      ? 'bg-green-500 text-white'
-                      : index === currentRoomIndex
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-gray-200 text-gray-600'
-                  }`}>
-                    {roomComplete ? '✓' : index + 1}
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{rp.roomName}</p>
-                    <p className="text-xs text-gray-600">
-                      {roomComplete ? (
-                        <span className="text-green-700 font-medium">Complete ✓</span>
-                      ) : (
-                        <span>
-                          {rp.photos.length}/4 photos
-                          {roomEquipment.dehumidifiers.length > 0 && !roomHasEquipmentData && ', equipment pending'}
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-                {index === currentRoomIndex && (
-                  <span className="text-xs font-bold text-orange-600 px-2 py-1 bg-orange-100 rounded">
-                    CURRENT
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
       {/* Current Room Detail View with Tabs */}
       <div className="bg-white border-2 border-orange-500 rounded-lg p-3 shadow-sm">
@@ -454,299 +403,222 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
         <div className="space-y-4">
           {/* Equipment Performance Section */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Equipment Performance</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Equipment in this Room:</h3>
             <div className="space-y-3">
             {/* Equipment Performance */}
-            {currentEquipment.dehumidifiers.length === 0 && currentEquipment.airMovers.length === 0 ? (
+            {currentEquipment.dehumidifiers.length === 0 && currentEquipment.airMovers.length === 0 && currentEquipment.airScrubbers.length === 0 ? (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
                 <p className="text-sm text-gray-600">No equipment assigned to this room</p>
               </div>
             ) : (
               <>
-                {/* Dehumidifiers */}
+                {/* Dehumidifiers - Compact Inline Cards */}
                 {currentEquipment.dehumidifiers.map((dehum, index) => {
-                  const isExpanded = expandedEquipmentId === dehum.equipmentId;
                   const isComplete = isDehumidifierComplete(dehum);
                   const hasWarning = isDehumidifierWarning(dehum);
-                  const allEquipment = getAllEquipment();
-                  const equipmentIndex = allEquipment.findIndex(eq => eq.equipmentId === dehum.equipmentId);
-                  const isFirst = equipmentIndex === 0;
-                  const isLast = equipmentIndex === allEquipment.length - 1;
 
                   return (
                     <div
                       key={dehum.equipmentId}
-                      className={`border-2 rounded-lg transition-all ${
-                        isExpanded
-                          ? 'border-blue-400 bg-blue-50'
-                          : isComplete
-                          ? 'border-green-300 bg-gray-50'
+                      className={`border-2 rounded-lg p-3 ${
+                        isComplete
+                          ? 'border-green-300 bg-white'
                           : 'border-gray-300 bg-white'
                       }`}
                     >
-                      {/* Card Header */}
-                      <div
-                        className="p-3 cursor-pointer flex items-center justify-between"
-                        onClick={() => setExpandedEquipmentId(isExpanded ? null : dehum.equipmentId)}
-                      >
-                        <div className="flex items-center gap-2 flex-1">
-                          <span className="text-lg">
-                            {isComplete ? '✓' : isExpanded ? '▼' : '→'}
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-semibold text-gray-900">
+                          Dehu {dehum.serialNumber}
+                        </p>
+                        {isComplete && (
+                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-semibold">
+                            ✓
                           </span>
-                          <div className="flex-1">
-                            <p className="font-medium text-gray-900">
-                              Dehumidifier {index + 1} (S/N: {dehum.serialNumber})
-                            </p>
-                            <p className="text-xs text-gray-600">{dehum.model}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {hasWarning && !isExpanded && (
-                            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-medium">
-                              ⚠️ Warning
-                            </span>
-                          )}
-                          {isComplete && !isExpanded && (
-                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-medium">
-                              Completed
-                            </span>
-                          )}
-                          {!isComplete && !isExpanded && (
-                            <span className="text-xs text-gray-500">Tap to expand</span>
-                          )}
-                        </div>
+                        )}
                       </div>
 
-                      {/* Card Content - Expanded */}
-                      {isExpanded && (
-                        <div className="px-3 pb-3 space-y-3">
-                          {hasWarning && (
-                            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-2 flex items-start gap-2">
-                              <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
-                              <p className="text-xs text-yellow-900">
-                                <strong>Warning:</strong> Inlet and outlet RH are similar. Unit may not be removing moisture effectively.
-                              </p>
-                            </div>
-                          )}
-
-                          <div className="grid grid-cols-2 gap-2">
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">Inlet Temperature (°F)</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={dehum.inletTemp ?? ''}
-                                onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { inletTemp: e.target.value ? parseFloat(e.target.value) : null })}
-                                className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                                placeholder="72.5"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">Inlet RH (%)</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                min="0"
-                                max="100"
-                                value={dehum.inletRH ?? ''}
-                                onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { inletRH: e.target.value ? parseFloat(e.target.value) : null })}
-                                className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                                placeholder="65.0"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">Outlet Temperature (°F)</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={dehum.outletTemp ?? ''}
-                                onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { outletTemp: e.target.value ? parseFloat(e.target.value) : null })}
-                                className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                                placeholder="85.0"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">Outlet RH (%)</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                min="0"
-                                max="100"
-                                value={dehum.outletRH ?? ''}
-                                onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { outletRH: e.target.value ? parseFloat(e.target.value) : null })}
-                                className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                                placeholder="45.0"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
-                                checked={dehum.isRunning}
-                                onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { isRunning: e.target.checked })}
-                                className="h-4 w-4 text-orange-600 rounded"
-                              />
-                              <span className="text-sm font-medium text-gray-700">Running</span>
-                            </label>
-                          </div>
-
-                          {/* Photo */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Photo:</label>
-                            {dehum.photoUrl ? (
-                              <div className="relative">
-                                <img
-                                  src={dehum.photoUrl}
-                                  alt="Dehumidifier readings"
-                                  className="w-full h-32 object-cover rounded-lg border border-gray-300"
-                                />
-                                <button
-                                  onClick={() => updateDehumidifierPerformance(dehum.equipmentId, { photoUrl: undefined })}
-                                  className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs"
-                                >
-                                  Remove
-                                </button>
-                              </div>
-                            ) : (
-                              <Button
-                                variant="secondary"
-                                onClick={async () => {
-                                  const input = document.createElement('input');
-                                  input.type = 'file';
-                                  input.accept = 'image/*';
-                                  input.capture = 'environment';
-                                  input.onchange = async (e: any) => {
-                                    const file = e.target?.files?.[0];
-                                    if (file && user) {
-                                      const reader = new FileReader();
-                                      reader.onload = (event) => {
-                                        const photoUrl = event.target?.result as string;
-                                        updateDehumidifierPerformance(dehum.equipmentId, { photoUrl });
-                                      };
-                                      reader.readAsDataURL(file);
-                                    }
-                                  };
-                                  input.click();
-                                }}
-                                className="w-full text-sm flex items-center justify-center gap-2"
-                              >
-                                <Camera className="w-4 h-4" />
-                                Take Photo
-                              </Button>
-                            )}
-                          </div>
-
-                          {/* Navigation Buttons */}
-                          <div className="flex gap-2 pt-2 border-t border-gray-300">
-                            {!isFirst && (
-                              <Button
-                                variant="secondary"
-                                onClick={handlePreviousEquipment}
-                                className="flex-1"
-                              >
-                                Previous
-                              </Button>
-                            )}
-                            <Button
-                              variant="primary"
-                              onClick={handleMarkCompleteAndNext}
-                              className="flex-1"
-                            >
-                              {isLast ? 'Mark Complete' : 'Mark Complete & Next'}
-                            </Button>
-                          </div>
+                      {/* Warning Banner */}
+                      {hasWarning && (
+                        <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-2 flex items-start gap-2 mb-2">
+                          <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+                          <p className="text-xs text-yellow-900">
+                            <strong>Warning:</strong> Inlet and outlet RH are similar. Unit may not be removing moisture effectively.
+                          </p>
                         </div>
+                      )}
+
+                      {/* Running Checkbox */}
+                      <label className="flex items-center gap-2 mb-2">
+                        <input
+                          type="checkbox"
+                          checked={dehum.isRunning}
+                          onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { isRunning: e.target.checked })}
+                          className="h-4 w-4 text-orange-600 rounded"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Running</span>
+                      </label>
+
+                      {/* Inline Temp/RH Fields */}
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={dehum.inletTemp ?? ''}
+                          onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { inletTemp: e.target.value ? parseFloat(e.target.value) : null })}
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                          placeholder="Inlet Temp (°F)"
+                        />
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="100"
+                          value={dehum.inletRH ?? ''}
+                          onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { inletRH: e.target.value ? parseFloat(e.target.value) : null })}
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                          placeholder="Inlet RH (%)"
+                        />
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={dehum.outletTemp ?? ''}
+                          onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { outletTemp: e.target.value ? parseFloat(e.target.value) : null })}
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                          placeholder="Outlet Temp (°F)"
+                        />
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="100"
+                          value={dehum.outletRH ?? ''}
+                          onChange={(e) => updateDehumidifierPerformance(dehum.equipmentId, { outletRH: e.target.value ? parseFloat(e.target.value) : null })}
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                          placeholder="Outlet RH (%)"
+                        />
+                      </div>
+
+                      {/* Photo Upload */}
+                      {dehum.photoUrl ? (
+                        <div className="relative">
+                          <img
+                            src={dehum.photoUrl}
+                            alt="Dehumidifier readings"
+                            className="w-full h-32 object-cover rounded-lg border border-gray-300"
+                          />
+                          <button
+                            onClick={() => updateDehumidifierPerformance(dehum.equipmentId, { photoUrl: undefined })}
+                            className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="secondary"
+                          onClick={async () => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = 'image/*';
+                            input.capture = 'environment';
+                            input.onchange = async (e: any) => {
+                              const file = e.target?.files?.[0];
+                              if (file && user) {
+                                const reader = new FileReader();
+                                reader.onload = (event) => {
+                                  const photoUrl = event.target?.result as string;
+                                  updateDehumidifierPerformance(dehum.equipmentId, { photoUrl });
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            };
+                            input.click();
+                          }}
+                          className="w-full text-sm flex items-center justify-center gap-2"
+                        >
+                          <Camera className="w-4 h-4" />
+                          Take Photo
+                        </Button>
                       )}
                     </div>
                   );
                 })}
 
-                {/* Air Movers */}
+                {/* Air Movers - Compact Inline Cards */}
                 {currentEquipment.airMovers.map((mover, index) => {
-                  const isExpanded = expandedEquipmentId === mover.equipmentId;
                   const isComplete = isAirMoverComplete(mover);
-                  const allEquipment = getAllEquipment();
-                  const equipmentIndex = allEquipment.findIndex(eq => eq.equipmentId === mover.equipmentId);
-                  const isFirst = equipmentIndex === 0;
-                  const isLast = equipmentIndex === allEquipment.length - 1;
 
                   return (
                     <div
                       key={mover.equipmentId}
-                      className={`border-2 rounded-lg transition-all ${
-                        isExpanded
-                          ? 'border-blue-400 bg-blue-50'
-                          : isComplete
-                          ? 'border-green-300 bg-gray-50'
+                      className={`border-2 rounded-lg p-3 ${
+                        isComplete
+                          ? 'border-green-300 bg-white'
                           : 'border-gray-300 bg-white'
                       }`}
                     >
-                      {/* Card Header */}
-                      <div
-                        className="p-3 cursor-pointer flex items-center justify-between"
-                        onClick={() => setExpandedEquipmentId(isExpanded ? null : mover.equipmentId)}
-                      >
-                        <div className="flex items-center gap-2 flex-1">
-                          <span className="text-lg">
-                            {isComplete ? '✓' : isExpanded ? '▼' : '→'}
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-semibold text-gray-900">
+                          Mover {mover.serialNumber}
+                        </p>
+                        {isComplete && (
+                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-semibold">
+                            ✓
                           </span>
-                          <div className="flex-1">
-                            <p className="font-medium text-gray-900">
-                              Air Mover {index + 1} (S/N: {mover.serialNumber})
-                            </p>
-                            <p className="text-xs text-gray-600">{mover.model}</p>
-                          </div>
-                        </div>
-                        <div>
-                          {isComplete && !isExpanded && (
-                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-medium">
-                              Completed
-                            </span>
-                          )}
-                          {!isComplete && !isExpanded && (
-                            <span className="text-xs text-gray-500">Tap to expand</span>
-                          )}
-                        </div>
+                        )}
                       </div>
 
-                      {/* Card Content - Expanded */}
-                      {isExpanded && (
-                        <div className="px-3 pb-3 space-y-3">
-                          <div>
-                            <label className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
-                                checked={mover.isRunning}
-                                onChange={(e) => updateAirMoverPerformance(mover.equipmentId, { isRunning: e.target.checked })}
-                                className="h-4 w-4 text-orange-600 rounded"
-                              />
-                              <span className="text-sm font-medium text-gray-700">Running</span>
-                            </label>
-                          </div>
+                      {/* Running Checkbox */}
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={mover.isRunning}
+                          onChange={(e) => updateAirMoverPerformance(mover.equipmentId, { isRunning: e.target.checked })}
+                          className="h-4 w-4 text-orange-600 rounded"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Running</span>
+                      </label>
+                    </div>
+                  );
+                })}
 
-                          {/* Navigation Buttons */}
-                          <div className="flex gap-2 pt-2 border-t border-gray-300">
-                            {!isFirst && (
-                              <Button
-                                variant="secondary"
-                                onClick={handlePreviousEquipment}
-                                className="flex-1"
-                              >
-                                Previous
-                              </Button>
-                            )}
-                            <Button
-                              variant="primary"
-                              onClick={handleMarkCompleteAndNext}
-                              className="flex-1"
-                            >
-                              {isLast ? 'Mark Complete' : 'Mark Complete & Next'}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
+                {/* Air Scrubbers - Compact Inline Cards */}
+                {currentEquipment.airScrubbers.map((scrubber, index) => {
+                  const isComplete = isAirScrubberComplete(scrubber);
+
+                  return (
+                    <div
+                      key={scrubber.equipmentId}
+                      className={`border-2 rounded-lg p-3 ${
+                        isComplete
+                          ? 'border-green-300 bg-white'
+                          : 'border-gray-300 bg-white'
+                      }`}
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-semibold text-gray-900">
+                          Scrubber {scrubber.serialNumber}
+                        </p>
+                        {isComplete && (
+                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-semibold">
+                            ✓
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Running Checkbox */}
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={scrubber.isRunning}
+                          onChange={(e) => updateAirScrubberPerformance(scrubber.equipmentId, { isRunning: e.target.checked })}
+                          className="h-4 w-4 text-orange-600 rounded"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Running</span>
+                      </label>
                     </div>
                   );
                 })}
