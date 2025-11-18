@@ -89,7 +89,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
   // Initialize from environmentalBaseline.unaffectedAreas
   const [rooms, setRooms] = useState<RoomData[]>(() => {
     const loadedRooms = installData.environmentalBaseline?.unaffectedAreas || [];
-    console.log('📊 UnaffectedAreaBaselineStep - Loading baseline rooms:', loadedRooms.map(r => ({
+    console.log('📊 UnaffectedAreaBaselineStep - Loading baseline rooms:', loadedRooms.map((r: any) => ({
       name: r.name,
       temp: r.temperature,
       humidity: r.relativeHumidity,
@@ -210,7 +210,7 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
       prevDataRef.current.moistureTracking !== currentMoistureStr
     ) {
       console.log('🔄 UnaffectedAreaBaselineStep: Data changed, saving IMMEDIATELY');
-      console.log('📋 Baseline rooms being saved:', rooms.map(r => ({
+      console.log('📋 Baseline rooms being saved:', rooms.map((r: any) => ({
         name: r.name,
         temp: r.temperature,
         humidity: r.relativeHumidity,
