@@ -64,35 +64,42 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
     });
   });
 
-  // Initialize equipment performance data from chambers
+  // Initialize equipment performance data from placedEquipment
   const initializeEquipmentPerformance = (): RoomEquipmentPerformance[] => {
     const saved = installData.equipmentPerformance || [];
+    const placedEquipment = installData.placedEquipment || [];
+
     return rooms.map((room: any) => {
       const existing = saved.find((ep: RoomEquipmentPerformance) => ep.roomId === room.id);
       if (existing) return existing;
 
-      // Find chamber containing this room
-      const chamber = chambers.find((c: any) => c.assignedRooms.includes(room.id));
+      // Get equipment placed in this specific room
+      const roomEquipment = placedEquipment.filter((e: any) => e.assignedRoomId === room.id);
 
-      // Create performance entries for all equipment in this room's chamber
-      const dehumidifiers: DehumidifierPerformance[] = chamber?.dehumidifiers?.map((d: any) => ({
-        equipmentId: d.equipmentId,
-        serialNumber: d.serialNumber,
-        model: d.model,
-        inletTemp: null,
-        inletRH: null,
-        outletTemp: null,
-        outletRH: null,
-        isRunning: false,
-        photoUrl: undefined,
-      })) || [];
+      // Create performance entries for dehumidifiers in this room
+      const dehumidifiers: DehumidifierPerformance[] = roomEquipment
+        .filter((e: any) => e.type === 'dehumidifier')
+        .map((d: any) => ({
+          equipmentId: d.id,
+          serialNumber: d.serialNumber,
+          model: d.model || 'Unknown',
+          inletTemp: null,
+          inletRH: null,
+          outletTemp: null,
+          outletRH: null,
+          isRunning: false,
+          photoUrl: undefined,
+        }));
 
-      const airMovers: AirMoverPerformance[] = chamber?.airMovers?.map((am: any) => ({
-        equipmentId: am.equipmentId,
-        serialNumber: am.serialNumber,
-        model: am.model,
-        isRunning: false,
-      })) || [];
+      // Create performance entries for air movers in this room
+      const airMovers: AirMoverPerformance[] = roomEquipment
+        .filter((e: any) => e.type === 'air-mover')
+        .map((am: any) => ({
+          equipmentId: am.id,
+          serialNumber: am.serialNumber,
+          model: am.model || 'Unknown',
+          isRunning: false,
+        }));
 
       return {
         roomId: room.id,
