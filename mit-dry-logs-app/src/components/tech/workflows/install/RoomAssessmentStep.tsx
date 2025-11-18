@@ -112,7 +112,12 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
       // Check if room has old material structure (< 42 materials or has old material names like 'Appliances')
       const hasOldAppliances = room.materialsAffected.some(m => m.materialType === 'Appliances' as any);
-      if (room.materialsAffected.length < 42 || hasOldAppliances) {
+      const hasUserModifications = room.materialsAffected.some(m =>
+        m.removalRequired || m.squareFootage > 0 || m.notes || m.removalReason
+      );
+
+      // Only migrate if old structure AND no user modifications (to avoid data loss)
+      if ((room.materialsAffected.length < 42 || hasOldAppliances) && !hasUserModifications) {
         needsMigration = true;
         // Preserve any custom materials that were added
         const customMaterials = room.materialsAffected.filter(m => m.materialType === 'Custom');
