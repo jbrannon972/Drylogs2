@@ -157,27 +157,6 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
         </div>
       </div>
 
-      {/* Estimated Drying Timeline */}
-      <div className="border rounded-lg p-3 bg-gray-50">
-        <h3 className="font-semibold text-gray-900 mb-2">Estimated Drying Timeline</h3>
-        <div className="grid grid-cols-2 gap-2">
-          <Input
-            label="Estimated Drying Days"
-            type="number"
-            min="1"
-            max="14"
-            value={estimatedDryingDays}
-            onChange={(e) => setEstimatedDryingDays(e.target.value)}
-          />
-          <div className="pt-6">
-            <p className="text-sm text-gray-600">
-              Based on damage class and affected area, job will take approximately{' '}
-              <strong>{estimatedDryingDays} days</strong> to dry.
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Scheduled Visits */}
       <div>
         <div className="flex items-center justify-between mb-2">
