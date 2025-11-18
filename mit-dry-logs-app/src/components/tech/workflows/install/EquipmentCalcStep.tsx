@@ -475,7 +475,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-base font-semibold text-gray-900">{room.name}</span>
                       {recommendedMovers > 0 && (
-                        <span className={`px-2 py-0.5 rounded text-sm font-bold ${
+                        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
                           placedRoomMovers >= recommendedMovers
                             ? 'bg-green-100 text-green-800'
                             : placedRoomMovers > 0
