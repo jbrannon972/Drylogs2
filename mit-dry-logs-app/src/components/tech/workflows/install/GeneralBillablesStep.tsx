@@ -42,19 +42,7 @@ export const GeneralBillablesStep: React.FC<GeneralBillablesStepProps> = ({ job 
   const { user } = useAuth();
   const { queuePhoto } = useBatchPhotos();
   const [categories, setCategories] = useState<BillableCategory[]>([
-    {
-      id: 'structural',
-      title: 'Structural Materials',
-      icon: <Package className="w-4 h-4" />,
-      items: [
-        { id: 'insulation', label: 'Insulation Removal', unit: 'sqft', performed: false, quantity: 0, notes: '', photos: [] },
-        { id: 'insulationVacuum', label: 'Insulation - Vacuum Wall Framing', unit: 'sqft', performed: false, quantity: 0, notes: '', photos: [] },
-        { id: 'insulationTruss', label: 'Insulation - Clean Truss System', unit: 'sqft', performed: false, quantity: 0, notes: '', photos: [] },
-        { id: 'countertops', label: 'Countertops', unit: 'sqft', performed: false, quantity: 0, notes: '', photos: [] },
-        { id: 'backsplash', label: 'Backsplash', unit: 'sqft', performed: false, quantity: 0, notes: '', photos: [] },
-        { id: 'cabinetry', label: 'Cabinetry', unit: 'each', performed: false, quantity: 0, notes: '', photos: [] },
-      ]
-    },
+    // Structural Materials category removed - all items were deleted per user request
     {
       id: 'contents',
       title: 'Contents & Protection',
