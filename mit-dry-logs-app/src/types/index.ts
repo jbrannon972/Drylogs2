@@ -1171,6 +1171,7 @@ export interface ContainmentBarrierSetup {
   zipperUsed?: boolean;
   zipPolesUsed?: boolean;
   zipPolesCount?: number;
+  spaceReductionCuFt?: number; // NEW: Cubic feet reduced by containment barriers
 }
 
 // Phase 4: Enhanced Signatures

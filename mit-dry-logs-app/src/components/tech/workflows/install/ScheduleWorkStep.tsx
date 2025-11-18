@@ -111,7 +111,7 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
       day: dayNumber,
       type,
       date: visitDate.toISOString().split('T')[0],
-      arrivalWindow: type === 'demo' ? '08:00-09:00' : '10:00-14:00',
+      arrivalWindow: type === 'demo' ? '9am-1pm' : '12pm-4pm',
       estimatedHours: type === 'demo' ? '4' : type === 'check' ? '1' : '3',
       teamSize: type === 'demo' ? '2' : '1',
       notes: '',
@@ -242,13 +242,15 @@ export const ScheduleWorkStep: React.FC<ScheduleWorkStepProps> = ({ job, onNext 
                         <label className="block text-xs font-medium text-gray-700 mb-1">
                           Arrival Window
                         </label>
-                        <input
-                          type="text"
+                        <select
                           value={visit.arrivalWindow}
                           onChange={(e) => updateVisit(visit.id, 'arrivalWindow', e.target.value)}
-                          placeholder="08:00-09:00"
                           className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-entrusted-orange"
-                        />
+                        >
+                          <option value="9am-1pm">9am-1pm</option>
+                          <option value="12pm-4pm">12pm-4pm</option>
+                          <option value="Custom">Custom (specify in notes)</option>
+                        </select>
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">

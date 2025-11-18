@@ -299,35 +299,6 @@ export const CommunicatePlanStep: React.FC<CommunicatePlanStepProps> = ({ job, o
         )}
       </div>
 
-      {/* Drying Timeline - AUTO-CALCULATED */}
-      <div className="border rounded-lg p-3 bg-white">
-        <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-blue-600" />
-          Estimated Drying Timeline
-        </h3>
-        <div className="text-sm">
-          <p className="text-gray-600 mb-2">
-            Based on {scheduledVisits.length > 0 ? 'scheduled work days' : 'damage class'}
-            {dryingPlan.overallClass && (
-              <span className="ml-1">
-                (Class {dryingPlan.overallClass})
-              </span>
-            )}
-          </p>
-          <p>
-            <span className="text-2xl font-bold text-gray-900">
-              {autoCalculatedDryingDays}
-            </span>
-            <span className="text-gray-600 ml-2">days estimated</span>
-          </p>
-          {scheduledVisits.length > 0 && (
-            <p className="text-xs text-green-700 mt-2">
-              ✓ Auto-calculated from {scheduledVisits.length} scheduled visit{scheduledVisits.length !== 1 ? 's' : ''}
-            </p>
-          )}
-        </div>
-      </div>
-
       {/* Scheduled Future Work */}
       <div className="border rounded-lg p-3 bg-white">
         <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">

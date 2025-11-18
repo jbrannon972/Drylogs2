@@ -465,6 +465,55 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                       )}
                     </div>
 
+                    {/* NEW: Space Reduction Field */}
+                    <div className="border-t pt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Space Reduction (Cubic Feet) *
+                      </label>
+                      <p className="text-xs text-blue-700 mb-2">
+                        How much space (cubic feet) did you REDUCE from this chamber with containment barriers?
+                      </p>
+                      <input
+                        type="number"
+                        step="1"
+                        min="0"
+                        value={chamber.containmentBarrier.spaceReductionCuFt || ''}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || undefined;
+                          setChambers(chambers.map(c =>
+                            c.chamberId === chamber.chamberId
+                              ? {
+                                  ...c,
+                                  containmentBarrier: { ...c.containmentBarrier!, spaceReductionCuFt: value }
+                                }
+                              : c
+                          ));
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        placeholder="e.g., 1500"
+                      />
+                      <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                        <p className="font-medium text-blue-900 mb-1">💡 Why this matters:</p>
+                        <ul className="text-blue-800 space-y-1 list-disc list-inside">
+                          <li>Reduces dehumidifier requirements</li>
+                          <li>Shows efficiency to insurance</li>
+                          <li>Billable item (containment barriers)</li>
+                        </ul>
+                        <p className="text-blue-700 mt-2">
+                          <strong>Example:</strong> 5-room chamber, contained off 500 sq ft dining area = {(500 * 8).toLocaleString()} cu ft reduction
+                        </p>
+                      </div>
+                      {chamber.totalCubicFootage && chamber.containmentBarrier.spaceReductionCuFt && (
+                        <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
+                          <p className="font-medium text-green-900">Equipment Calculation:</p>
+                          <p className="text-green-800">
+                            Original: {chamber.totalCubicFootage.toLocaleString()} cu ft →
+                            Reduced: {(chamber.totalCubicFootage - chamber.containmentBarrier.spaceReductionCuFt).toLocaleString()} cu ft
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
                     {/* Containment Photos */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
