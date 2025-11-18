@@ -377,7 +377,9 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
     );
   }
 
-  const hasPhotos = currentRoom.photos && currentRoom.photos.length >= 4;
+  // ULTRAFAULT: Ensure currentRoom.photos exists, default to empty array
+  const roomPhotosArray = currentRoom.photos || [];
+  const hasPhotos = roomPhotosArray.length >= 4;
 
   // Safety check: ensure currentEquipment exists before accessing its properties
   const hasEquipmentData =
@@ -469,14 +471,14 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
               <>
                 <CheckCircle className="w-5 h-5 text-green-600" />
                 <span className="text-sm font-medium text-green-900">
-                  Room complete - {currentRoom.photos.length} photos & equipment readings captured ✓
+                  Room complete - {roomPhotosArray.length} photos & equipment readings captured ✓
                 </span>
               </>
             ) : (
               <>
                 <AlertTriangle className="w-5 h-5 text-yellow-600" />
                 <span className="text-sm font-medium text-yellow-900">
-                  {!hasPhotos && `${currentRoom.photos.length}/4 photos needed`}
+                  {!hasPhotos && `${roomPhotosArray.length}/4 photos needed`}
                   {!hasPhotos && !hasEquipmentData && ' • '}
                   {!hasEquipmentData && 'Equipment readings needed'}
                 </span>
@@ -727,19 +729,19 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
               category="final"
               userId={user?.uid || ''}
               onPhotosUploaded={handlePhotosUploaded}
-              uploadedCount={currentRoom.photos.length}
+              uploadedCount={roomPhotosArray.length}
               label={`${currentRoom.roomName} Final Photos`}
               minimumPhotos={4}
             />
 
             {/* Photo Preview Grid */}
-            {currentRoom.photos.length > 0 && (
+            {roomPhotosArray.length > 0 && (
               <div className="mt-2">
                 <p className="text-sm font-medium text-gray-700 mb-2">
-                  Captured Photos ({currentRoom.photos.length})
+                  Captured Photos ({roomPhotosArray.length})
                 </p>
                 <div className="grid grid-cols-2 gap-2">
-                  {currentRoom.photos.map((photoUrl, index) => (
+                  {roomPhotosArray.map((photoUrl, index) => (
                     <div key={index} className="relative group">
                       <img
                         src={photoUrl}
