@@ -49,6 +49,16 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
   const [photos, setPhotos] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
 
+  // Quick Reading state (camera-first flow)
+  const [showQuickReadingModal, setShowQuickReadingModal] = useState(false);
+  const [quickReadingPhoto, setQuickReadingPhoto] = useState<string | null>(null);
+  const [quickReadingTrackingId, setQuickReadingTrackingId] = useState<string | null>(null);
+  const [showContinuePrompt, setShowContinuePrompt] = useState(false);
+  const [quickWetReading, setQuickWetReading] = useState('');
+  const [quickLocation, setQuickLocation] = useState('');
+  const [quickLocationNumber, setQuickLocationNumber] = useState('');
+  const [quickNotes, setQuickNotes] = useState('');
+
   // Delete confirmation state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<string | null>(null);
@@ -125,6 +135,124 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
     setPhotos([]);
     setNotes('');
     setShowAddForm(true);
+  };
+
+  // QUICK READING FUNCTIONS (Camera-First Flow)
+  const handleStartQuickReading = (tracking: MaterialMoistureTracking) => {
+    // Store which material we're adding to
+    setQuickReadingTrackingId(tracking.id);
+
+    // Trigger camera immediately
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.onchange = async (e: any) => {
+      const file = e.target?.files?.[0];
+      if (file && user) {
+        // Upload photo
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // For now, create a temporary URL for preview
+        const photoUrl = URL.createObjectURL(file);
+        setQuickReadingPhoto(photoUrl);
+
+        // Upload in background and replace URL when done
+        import('../../../../services/firebase/photoService').then(({ photoService }) => {
+          photoService.uploadPhoto(file, job.jobId, roomId, 'assessment', user.uid).then(url => {
+            if (url) {
+              setQuickReadingPhoto(url);
+            }
+          });
+        });
+
+        // Show modal with form
+        setShowQuickReadingModal(true);
+      }
+    };
+    input.click();
+  };
+
+  const resetQuickReadingForm = () => {
+    setShowQuickReadingModal(false);
+    setQuickReadingPhoto(null);
+    setQuickReadingTrackingId(null);
+    setShowContinuePrompt(false);
+    setQuickWetReading('');
+    setQuickLocation('');
+    setQuickLocationNumber('');
+    setQuickNotes('');
+  };
+
+  const handleSaveQuickReading = () => {
+    if (!quickWetReading || !quickReadingPhoto || !quickReadingTrackingId) {
+      alert('Please complete all required fields: Wet Reading');
+      return;
+    }
+
+    const wetReadingNum = parseFloat(quickWetReading);
+    if (isNaN(wetReadingNum)) {
+      alert('Please enter a valid number for wet reading');
+      return;
+    }
+
+    // Build location string
+    const finalLocation = quickLocationNumber
+      ? `#${quickLocationNumber}${quickLocation ? ' ' + quickLocation : ''}`
+      : quickLocation;
+
+    // Create new reading entry
+    const newReading: MoistureReadingEntry = {
+      timestamp: new Date().toISOString(),
+      moisturePercent: wetReadingNum,
+      photo: quickReadingPhoto,
+      technicianId: user?.uid || 'unknown',
+      technicianName: user?.displayName || 'Unknown Tech',
+      workflowPhase: 'install',
+      notes: quickNotes,
+    };
+
+    // Add reading to existing material
+    const updatedTracking = moistureTracking.map(t => {
+      if (t.id === quickReadingTrackingId) {
+        const updatedReadings = [...t.readings, newReading];
+        const highestReading = Math.max(...updatedReadings.map(r => r.moisturePercent));
+        return {
+          ...t,
+          readings: updatedReadings,
+          location: finalLocation || t.location, // Update location if provided
+          lastReadingAt: new Date().toISOString(),
+          status: (isMaterialDry(highestReading, t.dryStandard) ? 'dry' : 'wet') as 'dry' | 'wet' | 'drying',
+        };
+      }
+      return t;
+    });
+
+    onUpdate(updatedTracking);
+
+    // Show continuation prompt
+    setShowQuickReadingModal(false);
+    setShowContinuePrompt(true);
+  };
+
+  const handleTakeAnotherReading = () => {
+    if (!quickReadingTrackingId) return;
+
+    // Find the tracking we just added to
+    const tracking = moistureTracking.find(t => t.id === quickReadingTrackingId);
+    if (tracking) {
+      // Reset form but keep same material
+      setQuickWetReading('');
+      setQuickLocation('');
+      setQuickLocationNumber('');
+      setQuickNotes('');
+      setQuickReadingPhoto(null);
+      setShowContinuePrompt(false);
+
+      // Start new quick reading for same material
+      handleStartQuickReading(tracking);
+    }
   };
 
   const getHighestReading = (tracking: MaterialMoistureTracking): number => {
@@ -290,6 +418,17 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStartQuickReading(tracking);
+                        }}
+                        className="px-3 py-1.5 bg-entrusted-orange text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-1"
+                        title="Quick Reading"
+                      >
+                        <Camera className="w-4 h-4" />
+                        <span className="text-sm font-medium">Quick Reading</span>
                       </button>
                       {isExpanded ? (
                         <ChevronUp className="w-5 h-5 text-gray-500" />
@@ -606,6 +745,178 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
         confirmText="Delete"
         variant="danger"
       />
+
+      {/* Quick Reading Modal (Camera-First Flow) */}
+      {showQuickReadingModal && quickReadingTrackingId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 space-y-4">
+              {/* Header */}
+              <div className="border-b pb-3">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Quick Reading: {moistureTracking.find(t => t.id === quickReadingTrackingId)?.material}
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  Adding to existing material
+                </p>
+              </div>
+
+              {/* Photo Preview */}
+              {quickReadingPhoto && (
+                <div className="border-2 border-gray-300 rounded-lg p-2">
+                  <p className="text-xs font-medium text-gray-700 mb-2">📸 Photo Captured</p>
+                  <img
+                    src={quickReadingPhoto}
+                    alt="Moisture meter reading"
+                    className="w-full h-48 object-cover rounded"
+                  />
+                </div>
+              )}
+
+              {/* Material Info (Read-Only) */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-xs font-semibold text-blue-900 mb-2">📊 Material Info</p>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-blue-700">Material:</span>
+                    <span className="ml-2 font-medium text-blue-900">
+                      {moistureTracking.find(t => t.id === quickReadingTrackingId)?.material}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">Dry Standard:</span>
+                    <span className="ml-2 font-medium text-blue-900">
+                      {moistureTracking.find(t => t.id === quickReadingTrackingId)?.dryStandard}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-4"></div>
+
+              {/* Wet Reading (Auto-Focused) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  💧 Wet Reading % *
+                </label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  placeholder="18.5"
+                  value={quickWetReading}
+                  onChange={(e) => setQuickWetReading(e.target.value)}
+                  autoFocus
+                  className="text-2xl font-bold"
+                />
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  📍 Location *
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1"># Tape Number</label>
+                    <Input
+                      type="number"
+                      placeholder="5"
+                      value={quickLocationNumber}
+                      onChange={(e) => setQuickLocationNumber(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs text-gray-600 mb-1">Additional Detail (Optional)</label>
+                    <Input
+                      placeholder="North wall, 2ft height"
+                      value={quickLocation}
+                      onChange={(e) => setQuickLocation(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  📝 Notes (Optional)
+                </label>
+                <textarea
+                  value={quickNotes}
+                  onChange={(e) => setQuickNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Any observations..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-entrusted-orange"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 pt-4 border-t">
+                <Button
+                  variant="secondary"
+                  onClick={resetQuickReadingForm}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleSaveQuickReading}
+                  disabled={!quickWetReading}
+                  className="flex-1"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  Save Reading
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Continuation Prompt (Take Another Reading?) */}
+      {showContinuePrompt && quickReadingTrackingId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+            {/* Success Message */}
+            <div className="text-center">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle className="w-10 h-10 text-green-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">✓ Reading Saved!</h3>
+              <p className="text-gray-600">
+                {quickWetReading}% reading added to {moistureTracking.find(t => t.id === quickReadingTrackingId)?.material}
+              </p>
+            </div>
+
+            <div className="border-t pt-4"></div>
+
+            {/* Prompt */}
+            <p className="text-center text-gray-700 font-medium">
+              Measure another spot on this material?
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <Button
+                variant="primary"
+                onClick={handleTakeAnotherReading}
+                className="flex-1 flex items-center justify-center gap-2"
+              >
+                <Camera className="w-4 h-4" />
+                Take Another Reading
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={resetQuickReadingForm}
+                className="flex-1"
+              >
+                ✓ Done
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
