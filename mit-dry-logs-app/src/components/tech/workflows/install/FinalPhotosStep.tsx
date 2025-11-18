@@ -132,6 +132,14 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
   const [equipmentPerformance, setEquipmentPerformance] = useState<RoomEquipmentPerformance[]>(initializeEquipmentPerformance);
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
 
+  // ULTRAFAULT: Ensure currentRoomIndex stays within bounds
+  useEffect(() => {
+    if (currentRoomIndex >= roomPhotos.length && roomPhotos.length > 0) {
+      console.warn('⚠️ currentRoomIndex out of bounds, resetting to 0');
+      setCurrentRoomIndex(0);
+    }
+  }, [currentRoomIndex, roomPhotos.length]);
+
   // ULTRAFAULT: Auto-save IMMEDIATELY to Firebase (no debounce)
   const prevDataRef = useRef({
     roomPhotos: JSON.stringify(installData.finalPhotosByRoom || []),
@@ -180,11 +188,22 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
   }, [saveWorkflowData]);
 
   const handlePhotosUploaded = (urls: string[]) => {
+    // ULTRAFAULT: Validate index before updating
+    if (currentRoomIndex >= roomPhotos.length) {
+      console.error('🔥 ULTRAFAULT: handlePhotosUploaded called with out-of-bounds index', currentRoomIndex);
+      return;
+    }
+
     const currentRoom = roomPhotos[currentRoomIndex];
+    if (!currentRoom) {
+      console.error('🔥 ULTRAFAULT: currentRoom is undefined in handlePhotosUploaded');
+      return;
+    }
+
     const updatedRoomPhotos = [...roomPhotos];
     updatedRoomPhotos[currentRoomIndex] = {
       ...currentRoom,
-      photos: [...currentRoom.photos, ...urls],
+      photos: [...(currentRoom.photos || []), ...urls],
     };
     setRoomPhotos(updatedRoomPhotos);
   };
@@ -223,8 +242,19 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
 
   // Update dehumidifier performance
   const updateDehumidifierPerformance = (equipmentId: string, updates: Partial<DehumidifierPerformance>) => {
+    // ULTRAFAULT: Validate index before updating
+    if (currentRoomIndex >= equipmentPerformance.length) {
+      console.error('🔥 ULTRAFAULT: updateDehumidifierPerformance called with out-of-bounds index', currentRoomIndex);
+      return;
+    }
+
     const updatedPerformance = [...equipmentPerformance];
     const currentRoomPerf = updatedPerformance[currentRoomIndex];
+
+    if (!currentRoomPerf) {
+      console.error('🔥 ULTRAFAULT: currentRoomPerf is undefined in updateDehumidifierPerformance');
+      return;
+    }
 
     currentRoomPerf.dehumidifiers = currentRoomPerf.dehumidifiers.map(d =>
       d.equipmentId === equipmentId ? { ...d, ...updates } : d
@@ -235,8 +265,19 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
 
   // Update air mover performance
   const updateAirMoverPerformance = (equipmentId: string, updates: Partial<AirMoverPerformance>) => {
+    // ULTRAFAULT: Validate index before updating
+    if (currentRoomIndex >= equipmentPerformance.length) {
+      console.error('🔥 ULTRAFAULT: updateAirMoverPerformance called with out-of-bounds index', currentRoomIndex);
+      return;
+    }
+
     const updatedPerformance = [...equipmentPerformance];
     const currentRoomPerf = updatedPerformance[currentRoomIndex];
+
+    if (!currentRoomPerf) {
+      console.error('🔥 ULTRAFAULT: currentRoomPerf is undefined in updateAirMoverPerformance');
+      return;
+    }
 
     currentRoomPerf.airMovers = currentRoomPerf.airMovers.map(am =>
       am.equipmentId === equipmentId ? { ...am, ...updates } : am
@@ -247,8 +288,19 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
 
   // Update air scrubber performance
   const updateAirScrubberPerformance = (equipmentId: string, updates: Partial<AirScrubberPerformance>) => {
+    // ULTRAFAULT: Validate index before updating
+    if (currentRoomIndex >= equipmentPerformance.length) {
+      console.error('🔥 ULTRAFAULT: updateAirScrubberPerformance called with out-of-bounds index', currentRoomIndex);
+      return;
+    }
+
     const updatedPerformance = [...equipmentPerformance];
     const currentRoomPerf = updatedPerformance[currentRoomIndex];
+
+    if (!currentRoomPerf) {
+      console.error('🔥 ULTRAFAULT: currentRoomPerf is undefined in updateAirScrubberPerformance');
+      return;
+    }
 
     currentRoomPerf.airScrubbers = currentRoomPerf.airScrubbers.map(as =>
       as.equipmentId === equipmentId ? { ...as, ...updates } : as
@@ -286,6 +338,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
     return scrubber.isRunning;
   };
 
+  // ULTRAFAULT: Early return if no rooms
   if (rooms.length === 0) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
@@ -296,16 +349,34 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
     );
   }
 
+  // ULTRAFAULT: Validate currentRoomIndex is within bounds
   const currentRoom = roomPhotos[currentRoomIndex];
   const currentEquipment = equipmentPerformance[currentRoomIndex];
-  const hasPhotos = currentRoom && currentRoom.photos.length >= 4;
+
+  // ULTRAFAULT: Guard against undefined currentRoom or currentEquipment
+  if (!currentRoom || !currentEquipment) {
+    console.error('🔥 ULTRAFAULT: currentRoom or currentEquipment is undefined!', {
+      currentRoomIndex,
+      roomPhotosLength: roomPhotos.length,
+      equipmentPerformanceLength: equipmentPerformance.length,
+      roomsLength: rooms.length
+    });
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+        <p className="text-sm text-red-800">
+          ⚠️ Data sync error. Please go back to a previous step and return.
+        </p>
+      </div>
+    );
+  }
+
+  const hasPhotos = currentRoom.photos && currentRoom.photos.length >= 4;
 
   // Safety check: ensure currentEquipment exists before accessing its properties
-  const hasEquipmentData = currentEquipment ? (
+  const hasEquipmentData =
     (currentEquipment.dehumidifiers.length === 0 || currentEquipment.dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null))) &&
     (currentEquipment.airMovers.length === 0 || currentEquipment.airMovers.every(am => am.isRunning)) &&
-    (currentEquipment.airScrubbers.length === 0 || currentEquipment.airScrubbers.every(as => as.isRunning))
-  ) : false;
+    (currentEquipment.airScrubbers.length === 0 || currentEquipment.airScrubbers.every(as => as.isRunning));
 
   const isCurrentRoomComplete = hasPhotos && hasEquipmentData;
   const allRoomsComplete = getCompletedRooms() === roomPhotos.length;
@@ -414,7 +485,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Equipment in this Room:</h3>
             <div className="space-y-3">
             {/* Equipment Performance */}
-            {!currentEquipment || (currentEquipment.dehumidifiers.length === 0 && currentEquipment.airMovers.length === 0 && currentEquipment.airScrubbers.length === 0) ? (
+            {currentEquipment.dehumidifiers.length === 0 && currentEquipment.airMovers.length === 0 && currentEquipment.airScrubbers.length === 0 ? (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
                 <p className="text-sm text-gray-600">No equipment assigned to this room</p>
               </div>
