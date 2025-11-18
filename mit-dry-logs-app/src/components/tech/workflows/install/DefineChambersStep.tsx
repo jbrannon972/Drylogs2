@@ -503,15 +503,18 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                           <strong>Example:</strong> 5-room chamber, contained off 500 sq ft dining area = {(500 * 8).toLocaleString()} cu ft reduction
                         </p>
                       </div>
-                      {chamber.totalCubicFootage && chamber.containmentBarrier.spaceReductionCuFt && (
-                        <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
-                          <p className="font-medium text-green-900">Equipment Calculation:</p>
-                          <p className="text-green-800">
-                            Original: {chamber.totalCubicFootage.toLocaleString()} cu ft →
-                            Reduced: {(chamber.totalCubicFootage - chamber.containmentBarrier.spaceReductionCuFt).toLocaleString()} cu ft
-                          </p>
-                        </div>
-                      )}
+                      {(() => {
+                        const totalCubicFt = calculateChamberCubicFootage(chamber);
+                        return totalCubicFt > 0 && chamber.containmentBarrier.spaceReductionCuFt ? (
+                          <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
+                            <p className="font-medium text-green-900">Equipment Calculation:</p>
+                            <p className="text-green-800">
+                              Original: {totalCubicFt.toLocaleString()} cu ft →
+                              Reduced: {(totalCubicFt - chamber.containmentBarrier.spaceReductionCuFt).toLocaleString()} cu ft
+                            </p>
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
 
                     {/* Containment Photos */}
