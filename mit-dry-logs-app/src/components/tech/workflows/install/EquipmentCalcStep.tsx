@@ -81,9 +81,11 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   const [scanningFor, setScanningFor] = useState<{
     type: 'dehumidifier' | 'air-mover' | 'air-scrubber';
     chamberId: string;
+    quantityNeeded?: number; // For air movers, how many are needed
   } | null>(null);
   const [manualSerialInput, setManualSerialInput] = useState('');
   const [selectedRoomId, setSelectedRoomId] = useState<string>('');
+  const [scannedCount, setScannedCount] = useState(0); // Track how many have been scanned in bulk operation
 
   const lastSavedCalculationsRef = useRef<string | null>(null);
   const prevPlacedEquipmentRef = useRef<string>(JSON.stringify(installData.placedEquipment || []));
@@ -230,10 +232,11 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   };
 
   // Equipment placement handlers - UPDATED to accept roomId directly
-  const openScanner = (type: 'dehumidifier' | 'air-mover' | 'air-scrubber', chamberId: string, roomId: string) => {
-    setScanningFor({ type, chamberId });
+  const openScanner = (type: 'dehumidifier' | 'air-mover' | 'air-scrubber', chamberId: string, roomId: string, quantityNeeded?: number) => {
+    setScanningFor({ type, chamberId, quantityNeeded });
     setShowScanModal(true);
     setManualSerialInput('');
+    setScannedCount(0); // Reset bulk scan counter
     // Room is pre-selected since button is room-specific
     setSelectedRoomId(roomId);
   };
@@ -247,7 +250,7 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     }
 
     const newEquipment: PlacedEquipment = {
-      id: `equipment-${Date.now()}`,
+      id: `equipment-${Date.now()}-${Math.random()}`, // Ensure unique IDs for bulk scans
       type: scanningFor.type,
       serialNumber: serialNumber.trim(),
       assignedChamberId: scanningFor.chamberId,
@@ -257,10 +260,23 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     };
 
     setPlacedEquipment([...placedEquipment, newEquipment]);
-    setShowScanModal(false);
-    setScanningFor(null);
-    setManualSerialInput('');
-    setSelectedRoomId('');
+
+    // Check if we're doing bulk scanning
+    const quantityNeeded = scanningFor.quantityNeeded || 1;
+    const newScannedCount = scannedCount + 1;
+
+    if (newScannedCount < quantityNeeded) {
+      // More scans needed - clear input and continue
+      setScannedCount(newScannedCount);
+      setManualSerialInput('');
+    } else {
+      // All scans complete - close modal
+      setShowScanModal(false);
+      setScanningFor(null);
+      setManualSerialInput('');
+      setSelectedRoomId('');
+      setScannedCount(0);
+    }
   };
 
   const handleManualAdd = () => {
@@ -450,32 +466,26 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                       </Button>
                       <Button
                         variant="secondary"
-                        onClick={() => openScanner('air-mover', calc.chamberId, room.id)}
+                        onClick={() => openScanner('air-mover', calc.chamberId, room.id, recommendedMovers)}
                         className="text-xs"
                       >
                         <Plus className="w-3 h-3" />
                         Mover
                       </Button>
                     </div>
+                    {/* Show placed equipment counts */}
                     {roomEquipment.length > 0 && (
-                      <details className="mt-1">
-                        <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
-                          Manage ({roomEquipment.length})
-                        </summary>
-                        <div className="mt-1 space-y-1">
-                          {roomEquipment.map(eq => (
-                            <div key={eq.id} className="flex items-center justify-between text-xs bg-gray-50 rounded p-1">
-                              <span>#{eq.serialNumber}</span>
-                              <button
-                                onClick={() => removeEquipment(eq.id)}
-                                className="text-red-600 hover:text-red-800"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </details>
+                      <div className="mt-1 flex gap-2 text-xs text-gray-600">
+                        {roomEquipment.filter(e => e.type === 'dehumidifier').length > 0 && (
+                          <span>{roomEquipment.filter(e => e.type === 'dehumidifier').length} Dehu</span>
+                        )}
+                        {roomEquipment.filter(e => e.type === 'air-scrubber').length > 0 && (
+                          <span>{roomEquipment.filter(e => e.type === 'air-scrubber').length} Scrub</span>
+                        )}
+                        {roomEquipment.filter(e => e.type === 'air-mover').length > 0 && (
+                          <span>{roomEquipment.filter(e => e.type === 'air-mover').length} Mover</span>
+                        )}
+                      </div>
                     )}
                   </div>
                 );
@@ -487,20 +497,20 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
 
       {/* Total Summary */}
       <div className="bg-green-50 border border-green-300 rounded p-2">
-        <div className="text-xs text-green-800 mb-2">
+        <div className="text-xs text-green-800 mb-1">
           Total: {chamberCalculations.length} chamber{chamberCalculations.length > 1 ? 's' : ''}
         </div>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-white border border-blue-300 rounded p-2 text-center">
-            <p className="text-2xl font-bold text-blue-900">{totalEquipment.dehumidifiers}</p>
+        <div className="grid grid-cols-3 gap-1">
+          <div className="bg-white border border-blue-300 rounded p-1.5 text-center">
+            <p className="text-lg font-bold text-blue-900">{totalEquipment.dehumidifiers}</p>
             <p className="text-xs text-gray-600">Dehus</p>
           </div>
-          <div className="bg-white border border-orange-300 rounded p-2 text-center">
-            <p className="text-2xl font-bold text-orange-900">{totalEquipment.airMovers}</p>
+          <div className="bg-white border border-orange-300 rounded p-1.5 text-center">
+            <p className="text-lg font-bold text-orange-900">{totalEquipment.airMovers}</p>
             <p className="text-xs text-gray-600">Movers</p>
           </div>
-          <div className="bg-white border border-purple-300 rounded p-2 text-center">
-            <p className="text-2xl font-bold text-purple-900">{totalEquipment.airScrubbers}</p>
+          <div className="bg-white border border-purple-300 rounded p-1.5 text-center">
+            <p className="text-lg font-bold text-purple-900">{totalEquipment.airScrubbers}</p>
             <p className="text-xs text-gray-600">Scrubbers</p>
           </div>
         </div>
@@ -511,11 +521,22 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-3">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-bold text-gray-900">
-                Add {scanningFor.type === 'dehumidifier' ? 'Dehumidifier' : scanningFor.type === 'air-mover' ? 'Air Mover' : 'Air Scrubber'}
-              </h3>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">
+                  Add {scanningFor.type === 'dehumidifier' ? 'Dehumidifier' : scanningFor.type === 'air-mover' ? 'Air Mover' : 'Air Scrubber'}
+                </h3>
+                {scanningFor.quantityNeeded && scanningFor.quantityNeeded > 1 && (
+                  <p className="text-sm text-orange-600 font-medium">
+                    Scan {scannedCount + 1} of {scanningFor.quantityNeeded}
+                  </p>
+                )}
+              </div>
               <button
-                onClick={() => setShowScanModal(false)}
+                onClick={() => {
+                  setShowScanModal(false);
+                  setScanningFor(null);
+                  setScannedCount(0);
+                }}
                 className="p-2 hover:bg-gray-100 rounded-lg"
               >
                 <X className="w-5 h-5 text-gray-500" />
