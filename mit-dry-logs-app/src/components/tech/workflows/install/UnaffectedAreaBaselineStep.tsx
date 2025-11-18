@@ -87,9 +87,16 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
   const { uploadPhoto, isUploading } = usePhotos();
 
   // Initialize from environmentalBaseline.unaffectedAreas
-  const [rooms, setRooms] = useState<RoomData[]>(
-    installData.environmentalBaseline?.unaffectedAreas || []
-  );
+  const [rooms, setRooms] = useState<RoomData[]>(() => {
+    const loadedRooms = installData.environmentalBaseline?.unaffectedAreas || [];
+    console.log('📊 UnaffectedAreaBaselineStep - Loading baseline rooms:', loadedRooms.map(r => ({
+      name: r.name,
+      temp: r.temperature,
+      humidity: r.relativeHumidity,
+      meterPhotos: r.meterPhotos?.length || 0
+    })));
+    return loadedRooms;
+  });
   const [moistureTracking, setMoistureTracking] = useState<MaterialMoistureTracking[]>(
     installData.moistureTracking || []
   );
@@ -115,6 +122,13 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
     const migratedRooms = rooms.map(room => {
       let updatedRoom = { ...room };
 
+      // Check if user has entered data for this baseline room
+      const hasUserData =
+        room.temperature !== undefined ||
+        room.relativeHumidity !== undefined ||
+        (room.meterPhotos && room.meterPhotos.length > 0) ||
+        (room.overallPhotos && room.overallPhotos.length > 0);
+
       // Ensure isBaseline is set
       if (!updatedRoom.isBaseline) {
         needsMigration = true;
@@ -122,8 +136,9 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
       }
 
       // Check if room has old material structure (< 42 materials or has old material names like 'Appliances')
+      // ONLY migrate if no user data exists (to avoid data loss)
       const hasOldAppliances = room.materialsAffected.some(m => m.materialType === 'Appliances' as any);
-      if (room.materialsAffected.length < 42 || hasOldAppliances) {
+      if ((room.materialsAffected.length < 42 || hasOldAppliances) && !hasUserData) {
         needsMigration = true;
         // Preserve any custom materials that were added
         const customMaterials = room.materialsAffected.filter(m => m.materialType === 'Custom');
@@ -195,6 +210,12 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
       prevDataRef.current.moistureTracking !== currentMoistureStr
     ) {
       console.log('🔄 UnaffectedAreaBaselineStep: Data changed, saving IMMEDIATELY');
+      console.log('📋 Baseline rooms being saved:', rooms.map(r => ({
+        name: r.name,
+        temp: r.temperature,
+        humidity: r.relativeHumidity,
+        meterPhotos: r.meterPhotos?.length || 0
+      })));
 
       // 1. Update Zustand store immediately (in-memory)
       updateWorkflowData('install', {
