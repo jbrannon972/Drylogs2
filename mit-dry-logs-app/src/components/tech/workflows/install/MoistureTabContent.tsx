@@ -770,8 +770,8 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 
       {/* Quick Reading Modal (Camera-First Flow) */}
       {showQuickReadingModal && quickReadingTrackingId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+          <div className="min-h-screen">
             <div className="p-6 space-y-4">
               {/* Header */}
               <div className="border-b pb-3">
@@ -942,8 +942,8 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 
       {/* Photo Gallery Modal */}
       {showPhotoGallery && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onClick={() => setShowPhotoGallery(false)}>
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+          <div className="min-h-screen">
             <div className="p-6 space-y-4">
               {/* Header */}
               <div className="flex items-center justify-between border-b pb-3">
