@@ -87,6 +87,8 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
   const [selectedRoomId, setSelectedRoomId] = useState<string>('');
   const [scannedCount, setScannedCount] = useState(0); // Track how many have been scanned in bulk operation
   const [viewingEquipmentForRoom, setViewingEquipmentForRoom] = useState<string | null>(null); // Room ID for equipment list modal
+  const [removingEquipment, setRemovingEquipment] = useState<PlacedEquipment | null>(null); // Equipment being removed
+  const [removeSerialInput, setRemoveSerialInput] = useState('');
 
   const lastSavedCalculationsRef = useRef<string | null>(null);
   const prevPlacedEquipmentRef = useRef<string>(JSON.stringify(installData.placedEquipment || []));
@@ -288,10 +290,23 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
     handleScan(manualSerialInput);
   };
 
-  const removeEquipment = (id: string) => {
-    if (confirm('Remove this equipment from the job?')) {
-      setPlacedEquipment(placedEquipment.filter(e => e.id !== id));
+  const handleRemoveEquipment = () => {
+    if (!removingEquipment || !removeSerialInput.trim()) {
+      alert('Please scan the equipment serial number');
+      return;
     }
+
+    // Verify the scanned serial matches
+    if (removeSerialInput.trim().toLowerCase() !== removingEquipment.serialNumber.toLowerCase()) {
+      alert('Serial number does not match. Please scan the correct equipment.');
+      setRemoveSerialInput('');
+      return;
+    }
+
+    // Remove the equipment
+    setPlacedEquipment(placedEquipment.filter(e => e.id !== removingEquipment.id));
+    setRemovingEquipment(null);
+    setRemoveSerialInput('');
   };
 
   // Get placed counts for a chamber
@@ -675,11 +690,13 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                         <p className="text-sm text-gray-600 font-mono">{equipment.serialNumber}</p>
                       </div>
                       <button
-                        onClick={() => removeEquipment(equipment.id)}
-                        className="p-2 hover:bg-red-100 rounded-lg text-red-600 hover:text-red-800 transition-colors"
-                        title="Remove equipment"
+                        onClick={() => {
+                          setRemovingEquipment(equipment);
+                          setViewingEquipmentForRoom(null);
+                        }}
+                        className="px-3 py-1 bg-red-100 hover:bg-red-200 rounded text-red-700 hover:text-red-900 text-sm font-medium transition-colors"
                       >
-                        <Trash2 className="w-5 h-5" />
+                        Remove
                       </button>
                     </div>
                   ))}
@@ -699,6 +716,90 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
           </div>
         );
       })()}
+
+      {/* Remove Equipment Modal - Scan to confirm removal */}
+      {removingEquipment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-gray-900">
+                Remove Equipment
+              </h3>
+              <button
+                onClick={() => {
+                  setRemovingEquipment(null);
+                  setRemoveSerialInput('');
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm font-medium text-yellow-900 mb-1">
+                Removing: {removingEquipment.type === 'dehumidifier' ? 'Dehumidifier' :
+                          removingEquipment.type === 'air-mover' ? 'Air Mover' :
+                          'Air Scrubber'}
+              </p>
+              <p className="text-xs text-yellow-700">
+                Expected Serial: <span className="font-mono font-semibold">{removingEquipment.serialNumber}</span>
+              </p>
+            </div>
+
+            {/* QR Scanner Placeholder */}
+            <div className="mb-2 p-8 border-2 border-dashed border-gray-300 rounded-lg text-center bg-gray-50">
+              <QrCode className="w-16 h-16 mx-auto mb-2 text-gray-400" />
+              <p className="text-sm text-gray-600">Scan equipment to confirm removal</p>
+              <p className="text-xs text-gray-500 mt-1">Use manual entry below for now</p>
+            </div>
+
+            {/* Manual Entry */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Serial Number *
+                </label>
+                <input
+                  type="text"
+                  value={removeSerialInput}
+                  onChange={(e) => setRemoveSerialInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleRemoveEquipment();
+                    }
+                  }}
+                  placeholder="Scan or enter serial number..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setRemovingEquipment(null);
+                    setRemoveSerialInput('');
+                  }}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleRemoveEquipment}
+                  disabled={!removeSerialInput.trim()}
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Remove Equipment
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
