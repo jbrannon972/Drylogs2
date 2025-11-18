@@ -31,7 +31,7 @@ export const CommunicatePlanStep: React.FC<CommunicatePlanStepProps> = ({ job, o
   useEffect(() => {
     console.log('📊 CommunicatePlanStep - Data loaded:');
     console.log('  Total rooms:', rooms.length);
-    rooms.forEach(room => {
+    rooms.forEach((room: any) => {
       const materialsForRemoval = room.materialsAffected?.filter((m: any) => m.removalRequired) || [];
       console.log(`  Room "${room.name}":`, {
         totalMaterials: room.materialsAffected?.length || 0,
