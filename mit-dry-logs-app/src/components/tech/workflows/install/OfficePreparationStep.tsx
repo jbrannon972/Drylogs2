@@ -124,84 +124,121 @@ export const OfficePreparationStep: React.FC<OfficePreparationStepProps> = ({ jo
 
   return (
     <div className="space-y-4">
-      {/* Job Information Summary - Non-Interactive Display */}
-      <div className="border rounded-lg p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-blue-600" />
-          Job Information
-        </h3>
+      {/* Job Information Summary - Excel-style Table */}
+      <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3">
+          <h3 className="font-semibold text-white flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            Job Information
+          </h3>
+        </div>
 
-        <div className="grid grid-cols-1 gap-3 text-sm">
-          {/* Customer Info */}
-          <div className="bg-white rounded-lg p-3 border border-gray-200">
-            <p className="text-xs text-gray-500 uppercase font-medium mb-1">Customer</p>
-            <p className="font-medium text-gray-900">
-              {job.customerName || job.firstName && job.lastName ? `${job.firstName} ${job.lastName}` : 'Not provided'}
-            </p>
+        {/* Excel-style table */}
+        <div className="divide-y divide-gray-200">
+          {/* Customer Name */}
+          <div className="grid grid-cols-3 hover:bg-gray-50">
+            <div className="px-4 py-3 bg-gray-50 font-medium text-gray-700 text-sm border-r border-gray-200">
+              Customer
+            </div>
+            <div className="px-4 py-3 col-span-2 text-gray-900 text-sm">
+              {job.customerName || (job.firstName && job.lastName ? `${job.firstName} ${job.lastName}` : 'Not provided')}
+            </div>
           </div>
 
           {/* Address */}
-          <div className="bg-white rounded-lg p-3 border border-gray-200">
-            <p className="text-xs text-gray-500 uppercase font-medium mb-1">Property Address</p>
-            <p className="text-gray-900">
+          <div className="grid grid-cols-3 hover:bg-gray-50">
+            <div className="px-4 py-3 bg-gray-50 font-medium text-gray-700 text-sm border-r border-gray-200">
+              Address
+            </div>
+            <div className="px-4 py-3 col-span-2 text-gray-900 text-sm">
               {job.address || job.street ? (
                 <>
-                  {job.street && <>{job.street}<br /></>}
-                  {job.city && job.state && job.zip ? `${job.city}, ${job.state} ${job.zip}` : 'Address incomplete'}
+                  {job.street && <>{job.street}</>}
+                  {job.city && job.state && job.zip && <>, {job.city}, {job.state} {job.zip}</>}
                 </>
               ) : 'Not provided'}
-            </p>
+            </div>
           </div>
 
-          {/* Contact Info */}
-          {(job.phone || job.email || job.customerInfo?.phoneNumber || job.customerInfo?.email) && (
-            <div className="bg-white rounded-lg p-3 border border-gray-200">
-              <p className="text-xs text-gray-500 uppercase font-medium mb-1">Contact</p>
-              <div className="space-y-1">
-                {(job.phone || job.customerInfo?.phoneNumber) && (
-                  <p className="text-gray-900">📞 {job.phone || job.customerInfo?.phoneNumber}</p>
-                )}
-                {(job.email || job.customerInfo?.email) && (
-                  <p className="text-gray-900">✉️ {job.email || job.customerInfo?.email}</p>
-                )}
+          {/* Phone */}
+          {(job.phone || job.customerInfo?.phoneNumber) && (
+            <div className="grid grid-cols-3 hover:bg-gray-50">
+              <div className="px-4 py-3 bg-gray-50 font-medium text-gray-700 text-sm border-r border-gray-200">
+                Phone
+              </div>
+              <div className="px-4 py-3 col-span-2 text-gray-900 text-sm">
+                {job.phone || job.customerInfo?.phoneNumber}
               </div>
             </div>
           )}
 
-          {/* Job Details */}
-          <div className="bg-white rounded-lg p-3 border border-gray-200">
-            <p className="text-xs text-gray-500 uppercase font-medium mb-2">Job Details</p>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Job ID:</span>
-                <span className="font-medium text-gray-900">{job.jobId || 'Not set'}</span>
+          {/* Email */}
+          {(job.email || job.customerInfo?.email) && (
+            <div className="grid grid-cols-3 hover:bg-gray-50">
+              <div className="px-4 py-3 bg-gray-50 font-medium text-gray-700 text-sm border-r border-gray-200">
+                Email
               </div>
-              {(job.claimNumber || job.insuranceInfo?.claimNumber) && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Claim #:</span>
-                  <span className="font-medium text-gray-900">{job.claimNumber || job.insuranceInfo?.claimNumber}</span>
-                </div>
-              )}
-              {(job.insuranceCompany || job.insuranceInfo?.carrierName) && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Insurance:</span>
-                  <span className="font-medium text-gray-900">{job.insuranceCompany || job.insuranceInfo?.carrierName}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-gray-600">Job Type:</span>
-                <span className="font-medium text-gray-900">{job.jobType || 'Water Damage'}</span>
+              <div className="px-4 py-3 col-span-2 text-gray-900 text-sm">
+                {job.email || job.customerInfo?.email}
               </div>
-              {job.dateOfLoss && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Date of Loss:</span>
-                  <span className="font-medium text-gray-900">
-                    {new Date(job.dateOfLoss).toLocaleDateString()}
-                  </span>
-                </div>
-              )}
+            </div>
+          )}
+
+          {/* Job ID */}
+          <div className="grid grid-cols-3 hover:bg-gray-50">
+            <div className="px-4 py-3 bg-gray-50 font-medium text-gray-700 text-sm border-r border-gray-200">
+              Job ID
+            </div>
+            <div className="px-4 py-3 col-span-2 text-gray-900 text-sm font-mono">
+              {job.jobId || 'Not set'}
             </div>
           </div>
+
+          {/* Claim Number */}
+          {(job.claimNumber || job.insuranceInfo?.claimNumber) && (
+            <div className="grid grid-cols-3 hover:bg-gray-50">
+              <div className="px-4 py-3 bg-gray-50 font-medium text-gray-700 text-sm border-r border-gray-200">
+                Claim #
+              </div>
+              <div className="px-4 py-3 col-span-2 text-gray-900 text-sm">
+                {job.claimNumber || job.insuranceInfo?.claimNumber}
+              </div>
+            </div>
+          )}
+
+          {/* Insurance Company */}
+          {(job.insuranceCompany || job.insuranceInfo?.carrierName) && (
+            <div className="grid grid-cols-3 hover:bg-gray-50">
+              <div className="px-4 py-3 bg-gray-50 font-medium text-gray-700 text-sm border-r border-gray-200">
+                Insurance
+              </div>
+              <div className="px-4 py-3 col-span-2 text-gray-900 text-sm">
+                {job.insuranceCompany || job.insuranceInfo?.carrierName}
+              </div>
+            </div>
+          )}
+
+          {/* Job Type */}
+          <div className="grid grid-cols-3 hover:bg-gray-50">
+            <div className="px-4 py-3 bg-gray-50 font-medium text-gray-700 text-sm border-r border-gray-200">
+              Job Type
+            </div>
+            <div className="px-4 py-3 col-span-2 text-gray-900 text-sm">
+              {job.jobType || 'Water Damage'}
+            </div>
+          </div>
+
+          {/* Date of Loss */}
+          {job.dateOfLoss && (
+            <div className="grid grid-cols-3 hover:bg-gray-50">
+              <div className="px-4 py-3 bg-gray-50 font-medium text-gray-700 text-sm border-r border-gray-200">
+                Date of Loss
+              </div>
+              <div className="px-4 py-3 col-span-2 text-gray-900 text-sm">
+                {new Date(job.dateOfLoss).toLocaleDateString()}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
