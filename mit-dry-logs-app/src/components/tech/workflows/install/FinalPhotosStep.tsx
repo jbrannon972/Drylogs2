@@ -239,10 +239,15 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
       // Safety check: ensure roomEquipment exists
       if (!roomEquipment) return false;
 
+      // ULTRAFAULT: Ensure equipment sub-arrays exist before calling .every()
+      const safeDehumidifiers = roomEquipment.dehumidifiers || [];
+      const safeAirMovers = roomEquipment.airMovers || [];
+      const safeAirScrubbers = roomEquipment.airScrubbers || [];
+
       const hasEquipmentData =
-        roomEquipment.dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null)) &&
-        roomEquipment.airMovers.every(am => am.isRunning !== undefined) &&
-        roomEquipment.airScrubbers.every(as => as.isRunning !== undefined);
+        safeDehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null)) &&
+        safeAirMovers.every(am => am.isRunning !== undefined) &&
+        safeAirScrubbers.every(as => as.isRunning !== undefined);
       return hasPhotos && hasEquipmentData;
     }).length;
   };
@@ -263,7 +268,9 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
       return;
     }
 
-    currentRoomPerf.dehumidifiers = currentRoomPerf.dehumidifiers.map(d =>
+    // ULTRAFAULT: Ensure dehumidifiers array exists before mapping
+    const safeDehumidifiers = currentRoomPerf.dehumidifiers || [];
+    currentRoomPerf.dehumidifiers = safeDehumidifiers.map(d =>
       d.equipmentId === equipmentId ? { ...d, ...updates } : d
     );
 
@@ -286,7 +293,9 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
       return;
     }
 
-    currentRoomPerf.airMovers = currentRoomPerf.airMovers.map(am =>
+    // ULTRAFAULT: Ensure airMovers array exists before mapping
+    const safeAirMovers = currentRoomPerf.airMovers || [];
+    currentRoomPerf.airMovers = safeAirMovers.map(am =>
       am.equipmentId === equipmentId ? { ...am, ...updates } : am
     );
 
@@ -309,7 +318,9 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
       return;
     }
 
-    currentRoomPerf.airScrubbers = currentRoomPerf.airScrubbers.map(as =>
+    // ULTRAFAULT: Ensure airScrubbers array exists before mapping
+    const safeAirScrubbers = currentRoomPerf.airScrubbers || [];
+    currentRoomPerf.airScrubbers = safeAirScrubbers.map(as =>
       as.equipmentId === equipmentId ? { ...as, ...updates } : as
     );
 
@@ -381,11 +392,16 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
   const roomPhotosArray = currentRoom.photos || [];
   const hasPhotos = roomPhotosArray.length >= 4;
 
+  // ULTRAFAULT: Ensure equipment sub-arrays exist, default to empty arrays
+  const dehumidifiers = currentEquipment.dehumidifiers || [];
+  const airMovers = currentEquipment.airMovers || [];
+  const airScrubbers = currentEquipment.airScrubbers || [];
+
   // Safety check: ensure currentEquipment exists before accessing its properties
   const hasEquipmentData =
-    (currentEquipment.dehumidifiers.length === 0 || currentEquipment.dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null))) &&
-    (currentEquipment.airMovers.length === 0 || currentEquipment.airMovers.every(am => am.isRunning)) &&
-    (currentEquipment.airScrubbers.length === 0 || currentEquipment.airScrubbers.every(as => as.isRunning));
+    (dehumidifiers.length === 0 || dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null))) &&
+    (airMovers.length === 0 || airMovers.every(am => am.isRunning)) &&
+    (airScrubbers.length === 0 || airScrubbers.every(as => as.isRunning));
 
   const isCurrentRoomComplete = hasPhotos && hasEquipmentData;
   const allRoomsComplete = getCompletedRooms() === roomPhotos.length;
@@ -494,14 +510,14 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Equipment in this Room:</h3>
             <div className="space-y-3">
             {/* Equipment Performance */}
-            {currentEquipment.dehumidifiers.length === 0 && currentEquipment.airMovers.length === 0 && currentEquipment.airScrubbers.length === 0 ? (
+            {dehumidifiers.length === 0 && airMovers.length === 0 && airScrubbers.length === 0 ? (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
                 <p className="text-sm text-gray-600">No equipment assigned to this room</p>
               </div>
             ) : (
               <>
                 {/* Dehumidifiers - Compact Inline Cards */}
-                {currentEquipment.dehumidifiers.map((dehum, index) => {
+                {dehumidifiers.map((dehum, index) => {
                   const isComplete = isDehumidifierComplete(dehum);
                   const hasWarning = isDehumidifierWarning(dehum);
 
@@ -634,7 +650,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
                 })}
 
                 {/* Air Movers - Compact Inline Cards */}
-                {currentEquipment.airMovers.map((mover, index) => {
+                {airMovers.map((mover, index) => {
                   const isComplete = isAirMoverComplete(mover);
 
                   return (
@@ -673,7 +689,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
                 })}
 
                 {/* Air Scrubbers - Compact Inline Cards */}
-                {currentEquipment.airScrubbers.map((scrubber, index) => {
+                {airScrubbers.map((scrubber, index) => {
                   const isComplete = isAirScrubberComplete(scrubber);
 
                   return (
