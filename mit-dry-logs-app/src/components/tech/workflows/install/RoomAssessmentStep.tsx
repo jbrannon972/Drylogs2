@@ -169,6 +169,14 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
     ) {
       console.log('🔄 RoomAssessmentStep: Data changed, saving IMMEDIATELY');
 
+      // DEBUG: Log materials marked for removal
+      const materialsForRemoval = rooms.flatMap(r =>
+        r.materialsAffected
+          .filter(m => m.removalRequired)
+          .map(m => ({ room: r.name, material: m.materialType, sqft: m.squareFootage }))
+      );
+      console.log('📋 Materials marked for removal:', materialsForRemoval);
+
       // 1. Update Zustand store immediately (in-memory)
       updateWorkflowData('install', {
         rooms: rooms,
@@ -258,6 +266,13 @@ export const RoomAssessmentStep: React.FC<RoomAssessmentStepProps> = ({ job, onN
 
   const updateMaterial = (materialType: MaterialType, updates: Partial<MaterialAffected>) => {
     if (!selectedRoom) return;
+
+    console.log('🔧 updateMaterial called:', {
+      room: selectedRoom.name,
+      materialType,
+      updates,
+      currentMaterial: selectedRoom.materialsAffected.find(m => m.materialType === materialType)
+    });
 
     updateSelectedRoom({
       materialsAffected: selectedRoom.materialsAffected.map(m =>

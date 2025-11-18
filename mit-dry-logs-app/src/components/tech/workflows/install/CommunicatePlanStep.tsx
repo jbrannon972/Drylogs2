@@ -27,6 +27,24 @@ export const CommunicatePlanStep: React.FC<CommunicatePlanStepProps> = ({ job, o
   const moistureTracking = installData.moistureTracking || [];
   const partialDemoDetails = installData.partialDemoDetails || { rooms: [] };
 
+  // DEBUG: Log what materials we're receiving
+  useEffect(() => {
+    console.log('📊 CommunicatePlanStep - Data loaded:');
+    console.log('  Total rooms:', rooms.length);
+    rooms.forEach(room => {
+      const materialsForRemoval = room.materialsAffected?.filter((m: any) => m.removalRequired) || [];
+      console.log(`  Room "${room.name}":`, {
+        totalMaterials: room.materialsAffected?.length || 0,
+        markedForRemoval: materialsForRemoval.length,
+        materials: materialsForRemoval.map((m: any) => ({
+          type: m.materialType,
+          sqft: m.squareFootage,
+          removalRequired: m.removalRequired
+        }))
+      });
+    });
+  }, [rooms]);
+
   // AUTO-CALCULATE drying days based on scheduled visits
   const autoCalculatedDryingDays = scheduledVisits.length > 0
     ? Math.max(...scheduledVisits.map((v: any) => v.day || 1))
