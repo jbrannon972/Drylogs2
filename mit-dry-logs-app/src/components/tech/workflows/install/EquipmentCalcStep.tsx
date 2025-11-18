@@ -399,23 +399,32 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
         return (
           <div key={calc.chamberId} className="border-2 border-gray-300 rounded-lg p-2 bg-gray-50">
             <div className="mb-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mb-1">
                 <h3 className="text-base font-bold text-gray-900">{calc.chamberName}</h3>
                 <span className="text-xs text-gray-600">({calc.cubicFootage.toFixed(0)} cf)</span>
               </div>
-              {/* Chamber-level equipment status */}
-              <div className="text-xs text-gray-700 mt-1">
-                Status:
-                <span className={`ml-1 ${placedDehus >= calc.dehumidifiers ? 'text-green-700 font-semibold' : 'text-gray-700'}`}>
-                  Dehus {placedDehus}/{calc.dehumidifiers}
+              {/* Chamber-level equipment status badges */}
+              <div className="flex flex-wrap gap-1">
+                <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                  placedDehus >= calc.dehumidifiers
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-gray-100 text-gray-700'
+                }`}>
+                  Dehus {placedDehus}/{calc.dehumidifiers}{placedDehus >= calc.dehumidifiers ? ' ✓' : ''}
                 </span>
-                {' · '}
-                <span className={`${placedScrubs >= calc.airScrubbers ? 'text-green-700 font-semibold' : 'text-gray-700'}`}>
-                  Scrubs {placedScrubs}/{calc.airScrubbers}
+                <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                  placedScrubs >= calc.airScrubbers
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-gray-100 text-gray-700'
+                }`}>
+                  Scrubs {placedScrubs}/{calc.airScrubbers}{placedScrubs >= calc.airScrubbers ? ' ✓' : ''}
                 </span>
-                {' · '}
-                <span className={`${placedMovers >= calc.airMovers ? 'text-green-700 font-semibold' : 'text-gray-700'}`}>
-                  Movers {placedMovers}/{calc.airMovers}
+                <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                  placedMovers >= calc.airMovers
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-gray-100 text-gray-700'
+                }`}>
+                  Movers {placedMovers}/{calc.airMovers}{placedMovers >= calc.airMovers ? ' ✓' : ''}
                 </span>
               </div>
             </div>
@@ -452,10 +461,12 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                 const roomPlacement = calc.roomPlacements.find(rp => rp.roomName === room.name);
                 const recommendedMovers = roomPlacement?.total || 0;
                 const placedRoomMovers = roomEquipment.filter(e => e.type === 'air-mover').length;
+                const placedRoomDehus = roomEquipment.filter(e => e.type === 'dehumidifier').length;
+                const placedRoomScrubs = roomEquipment.filter(e => e.type === 'air-scrubber').length;
 
                 return (
                   <div key={room.id} className="bg-white border border-gray-200 rounded p-2">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-base font-semibold text-gray-900">{room.name}</span>
                       {recommendedMovers > 0 && (
                         <span className={`px-2 py-0.5 rounded text-sm font-bold ${
@@ -467,6 +478,18 @@ export const EquipmentCalcStep: React.FC<EquipmentCalcStepProps> = ({ job, onNex
                             ? `${placedRoomMovers} Movers ✓`
                             : `${placedRoomMovers}/${recommendedMovers} Movers`
                           }
+                        </span>
+                      )}
+                      {/* Show dehus placed in this room */}
+                      {placedRoomDehus > 0 && (
+                        <span className="px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700 border border-blue-200">
+                          {placedRoomDehus} Dehu{placedRoomDehus > 1 ? 's' : ''}
+                        </span>
+                      )}
+                      {/* Show scrubs placed in this room */}
+                      {placedRoomScrubs > 0 && (
+                        <span className="px-2 py-0.5 rounded text-xs bg-purple-50 text-purple-700 border border-purple-200">
+                          {placedRoomScrubs} Scrub{placedRoomScrubs > 1 ? 's' : ''}
                         </span>
                       )}
                     </div>
