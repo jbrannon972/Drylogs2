@@ -508,13 +508,25 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                         </p>
                       </div>
                       {(() => {
-                        const totalCubicFt = calculateChamberCubicFootage(chamber);
-                        return totalCubicFt > 0 && chamber.containmentBarrier.spaceReductionCuFt ? (
+                        // Calculate original cubic footage (before reduction)
+                        const originalCubicFt = chamber.assignedRooms.reduce((total, roomId) => {
+                          const room = rooms.find(r => r.id === roomId);
+                          if (!room) return total;
+                          const baseCubicFt = room.length * room.width * room.height;
+                          const insets = room.insetsCubicFt || 0;
+                          const offsets = room.offsetsCubicFt || 0;
+                          return total + baseCubicFt + insets - offsets;
+                        }, 0);
+
+                        // Calculate reduced cubic footage (using the function which already applies reduction)
+                        const reducedCubicFt = calculateChamberCubicFootage(chamber);
+
+                        return originalCubicFt > 0 && chamber.containmentBarrier.spaceReductionCuFt ? (
                           <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
                             <p className="font-medium text-green-900">Equipment Calculation:</p>
                             <p className="text-green-800">
-                              Original: {totalCubicFt.toLocaleString()} cu ft →
-                              Reduced: {(totalCubicFt - chamber.containmentBarrier.spaceReductionCuFt).toLocaleString()} cu ft
+                              Original: {originalCubicFt.toLocaleString()} cu ft →
+                              Reduced: {reducedCubicFt.toLocaleString()} cu ft
                             </p>
                           </div>
                         ) : null;
