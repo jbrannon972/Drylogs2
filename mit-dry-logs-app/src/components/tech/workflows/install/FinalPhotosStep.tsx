@@ -79,45 +79,57 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
 
     return rooms.map((room: any) => {
       const existing = saved.find((ep: RoomEquipmentPerformance) => ep.roomId === room.id);
-      if (existing) return existing;
 
-      // Get equipment placed in this specific room
+      // ULTRAFAULT: ALWAYS sync with current placedEquipment (source of truth from Step 9)
+      // Get equipment currently placed in this specific room
       const roomEquipment = placedEquipment.filter((e: any) => e.assignedRoomId === room.id);
 
       // Create performance entries for dehumidifiers in this room
       const dehumidifiers: DehumidifierPerformance[] = roomEquipment
         .filter((e: any) => e.type === 'dehumidifier')
-        .map((d: any) => ({
-          equipmentId: d.id,
-          serialNumber: d.serialNumber,
-          model: d.model || 'Unknown',
-          inletTemp: null,
-          inletRH: null,
-          outletTemp: null,
-          outletRH: null,
-          isRunning: false,
-          photoUrl: undefined,
-        }));
+        .map((d: any) => {
+          // Try to find existing performance data for this specific equipment
+          const existingDehum = existing?.dehumidifiers?.find((ed: DehumidifierPerformance) => ed.equipmentId === d.id);
+          return existingDehum || {
+            equipmentId: d.id,
+            serialNumber: d.serialNumber,
+            model: d.model || 'Unknown',
+            inletTemp: null,
+            inletRH: null,
+            outletTemp: null,
+            outletRH: null,
+            isRunning: false,
+            photoUrl: undefined,
+          };
+        });
 
       // Create performance entries for air movers in this room
       const airMovers: AirMoverPerformance[] = roomEquipment
         .filter((e: any) => e.type === 'air-mover')
-        .map((am: any) => ({
-          equipmentId: am.id,
-          serialNumber: am.serialNumber,
-          model: am.model || 'Unknown',
-          isRunning: false,
-        }));
+        .map((am: any) => {
+          // Try to find existing performance data for this specific equipment
+          const existingMover = existing?.airMovers?.find((em: AirMoverPerformance) => em.equipmentId === am.id);
+          return existingMover || {
+            equipmentId: am.id,
+            serialNumber: am.serialNumber,
+            model: am.model || 'Unknown',
+            isRunning: false,
+          };
+        });
 
       // Create performance entries for air scrubbers in this room
       const airScrubbers: AirScrubberPerformance[] = roomEquipment
         .filter((e: any) => e.type === 'air-scrubber')
-        .map((as: any) => ({
-          equipmentId: as.id,
-          serialNumber: as.serialNumber,
-          model: as.model || 'Unknown',
-          isRunning: false,
-        }));
+        .map((as: any) => {
+          // Try to find existing performance data for this specific equipment
+          const existingScrubber = existing?.airScrubbers?.find((es: AirScrubberPerformance) => es.equipmentId === as.id);
+          return existingScrubber || {
+            equipmentId: as.id,
+            serialNumber: as.serialNumber,
+            model: as.model || 'Unknown',
+            isRunning: false,
+          };
+        });
 
       return {
         roomId: room.id,
@@ -131,6 +143,13 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
 
   const [equipmentPerformance, setEquipmentPerformance] = useState<RoomEquipmentPerformance[]>(initializeEquipmentPerformance);
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
+
+  // ULTRAFAULT: Re-sync equipment performance when placedEquipment changes
+  useEffect(() => {
+    console.log('🔄 FinalPhotosStep: Syncing equipment performance with placedEquipment');
+    const synced = initializeEquipmentPerformance();
+    setEquipmentPerformance(synced);
+  }, [installData.placedEquipment]);
 
   // ULTRAFAULT: Ensure currentRoomIndex stays within bounds
   useEffect(() => {
