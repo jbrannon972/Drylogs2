@@ -356,6 +356,7 @@ export interface MoistureReadingEntry {
   workflowPhase: 'install' | 'check-service' | 'pull';
   visitNumber?: number; // For check services (1, 2, 3, etc.)
   notes?: string;
+  location?: string; // NEW: Specific location for this reading (e.g., "#5", "#6 North wall")
 }
 
 // Material moisture tracking record - persists across all phases

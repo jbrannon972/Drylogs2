@@ -11,7 +11,8 @@ import {
   Trash2,
   Plus,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useAuth } from '../../../../hooks/useAuth';
 import {
@@ -65,6 +66,10 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
 
   // Expanded materials state
   const [expandedMaterials, setExpandedMaterials] = useState<Set<string>>(new Set());
+
+  // Photo gallery state
+  const [showPhotoGallery, setShowPhotoGallery] = useState(false);
+  const [galleryPhotos, setGalleryPhotos] = useState<Array<{url: string, reading: MoistureReadingEntry}>>([]);
 
   // Construction materials only (no appliances, mirrors, etc.)
   const CONSTRUCTION_MATERIALS: ConstructionMaterialType[] = [
@@ -211,6 +216,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
       technicianName: user?.displayName || 'Unknown Tech',
       workflowPhase: 'install',
       notes: quickNotes,
+      location: finalLocation, // NEW: Save location with each reading
     };
 
     // Add reading to existing material
@@ -447,7 +453,7 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                       <div className="space-y-2">
                         {tracking.readings.map((reading, index) => (
                           <div key={index} className="bg-white border border-gray-200 rounded p-3">
-                            <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="text-lg font-bold text-gray-900">
@@ -459,6 +465,17 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                                     </span>
                                   )}
                                 </div>
+                                {/* Location Display */}
+                                {reading.location && (
+                                  <p className="text-sm text-gray-700 font-medium mb-1">
+                                    <MapPin className="w-3 h-3 inline mr-1" />
+                                    {reading.location.match(/^#?\d+$/) ? (
+                                      <span className="font-bold text-entrusted-orange">#{reading.location.replace('#', '')}</span>
+                                    ) : (
+                                      reading.location
+                                    )}
+                                  </p>
+                                )}
                                 <p className="text-xs text-gray-500">
                                   {new Date(reading.timestamp).toLocaleString()}
                                 </p>
@@ -472,24 +489,29 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
                                 )}
                               </div>
                             </div>
-                            {/* Photo Thumbnails - Show all photos inline */}
-                            {reading.photo && (
-                              <div className="flex gap-1 mt-2">
-                                {[reading.photo].map((photo, photoIndex) => (
-                                  <img
-                                    key={photoIndex}
-                                    src={photo}
-                                    alt={`Photo ${photoIndex + 1}`}
-                                    className="h-16 w-16 object-cover rounded border border-gray-300 cursor-pointer hover:opacity-75"
-                                    onClick={() => window.open(photo, '_blank')}
-                                  />
-                                ))}
-                              </div>
-                            )}
                           </div>
                         ))}
                       </div>
                     </div>
+
+                    {/* View Photos Button */}
+                    {tracking.readings.some(r => r.photo) && (
+                      <Button
+                        variant="secondary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const photos = tracking.readings
+                            .filter(r => r.photo)
+                            .map(r => ({ url: r.photo!, reading: r }));
+                          setGalleryPhotos(photos);
+                          setShowPhotoGallery(true);
+                        }}
+                        className="w-full flex items-center justify-center gap-2"
+                      >
+                        <ImageIcon className="w-4 h-4" />
+                        View Photos ({tracking.readings.filter(r => r.photo).length})
+                      </Button>
+                    )}
 
                     {/* Add Another Reading Button */}
                     <Button
@@ -913,6 +935,89 @@ export const MoistureTabContent: React.FC<MoistureTabContentProps> = ({
               >
                 ✓ Done
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Photo Gallery Modal */}
+      {showPhotoGallery && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onClick={() => setShowPhotoGallery(false)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b pb-3">
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <ImageIcon className="w-6 h-6 text-entrusted-orange" />
+                  Photo Gallery ({galleryPhotos.length} photos)
+                </h2>
+                <button
+                  onClick={() => setShowPhotoGallery(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Photo Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {galleryPhotos.map((item, index) => (
+                  <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                    {/* Photo */}
+                    <img
+                      src={item.url}
+                      alt={`Reading ${index + 1}`}
+                      className="w-full h-64 object-cover rounded mb-3 cursor-pointer hover:opacity-90"
+                      onClick={() => window.open(item.url, '_blank')}
+                    />
+
+                    {/* Reading Info */}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold text-gray-900">
+                          {item.reading.moisturePercent}%
+                        </span>
+                      </div>
+
+                      {/* Location */}
+                      {item.reading.location && (
+                        <p className="text-sm text-gray-700 font-medium">
+                          <MapPin className="w-3 h-3 inline mr-1" />
+                          {item.reading.location.match(/^#?\d+$/) ? (
+                            <span className="font-bold text-entrusted-orange">#{item.reading.location.replace('#', '')}</span>
+                          ) : (
+                            item.reading.location
+                          )}
+                        </p>
+                      )}
+
+                      <p className="text-xs text-gray-500">
+                        {new Date(item.reading.timestamp).toLocaleString()}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        By: {item.reading.technicianName}
+                      </p>
+
+                      {item.reading.notes && (
+                        <p className="text-xs text-gray-700 mt-2 italic border-t pt-2">
+                          Note: {item.reading.notes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Close Button */}
+              <div className="border-t pt-4">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowPhotoGallery(false)}
+                  className="w-full"
+                >
+                  Close Gallery
+                </Button>
+              </div>
             </div>
           </div>
         </div>
