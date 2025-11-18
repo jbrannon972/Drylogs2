@@ -209,6 +209,10 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
     return roomPhotos.filter((rp, index) => {
       const hasPhotos = rp.photos.length >= 4;
       const roomEquipment = equipmentPerformance[index];
+
+      // Safety check: ensure roomEquipment exists
+      if (!roomEquipment) return false;
+
       const hasEquipmentData =
         roomEquipment.dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null)) &&
         roomEquipment.airMovers.every(am => am.isRunning !== undefined) &&
@@ -295,10 +299,14 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
   const currentRoom = roomPhotos[currentRoomIndex];
   const currentEquipment = equipmentPerformance[currentRoomIndex];
   const hasPhotos = currentRoom && currentRoom.photos.length >= 4;
-  const hasEquipmentData =
+
+  // Safety check: ensure currentEquipment exists before accessing its properties
+  const hasEquipmentData = currentEquipment ? (
     (currentEquipment.dehumidifiers.length === 0 || currentEquipment.dehumidifiers.every(d => d.isRunning || (d.inletTemp !== null && d.inletRH !== null))) &&
     (currentEquipment.airMovers.length === 0 || currentEquipment.airMovers.every(am => am.isRunning)) &&
-    (currentEquipment.airScrubbers.length === 0 || currentEquipment.airScrubbers.every(as => as.isRunning));
+    (currentEquipment.airScrubbers.length === 0 || currentEquipment.airScrubbers.every(as => as.isRunning))
+  ) : false;
+
   const isCurrentRoomComplete = hasPhotos && hasEquipmentData;
   const allRoomsComplete = getCompletedRooms() === roomPhotos.length;
 
@@ -406,7 +414,7 @@ export const FinalPhotosStep: React.FC<FinalPhotosStepProps> = ({ job, onNext })
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Equipment in this Room:</h3>
             <div className="space-y-3">
             {/* Equipment Performance */}
-            {currentEquipment.dehumidifiers.length === 0 && currentEquipment.airMovers.length === 0 && currentEquipment.airScrubbers.length === 0 ? (
+            {!currentEquipment || (currentEquipment.dehumidifiers.length === 0 && currentEquipment.airMovers.length === 0 && currentEquipment.airScrubbers.length === 0) ? (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
                 <p className="text-sm text-gray-600">No equipment assigned to this room</p>
               </div>
