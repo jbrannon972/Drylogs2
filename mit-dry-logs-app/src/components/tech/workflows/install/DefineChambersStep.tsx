@@ -575,10 +575,24 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                           </div>
                           <select
                             value={chamber.chamberId}
-                            onChange={(e) => assignRoomToChamber(room.id, e.target.value)}
+                            onChange={(e) => {
+                              if (e.target.value === 'unassign') {
+                                removeRoomFromChamber(room.id, chamber.chamberId);
+                              } else {
+                                assignRoomToChamber(room.id, e.target.value);
+                              }
+                            }}
                             className="text-xs px-2 py-1 border border-gray-300 rounded"
                           >
-                            {chambers.map(c => (
+                            <option value={chamber.chamberId} disabled>
+                              Current chamber
+                            </option>
+                            {isBaseline && (
+                              <option value="unassign">
+                                Unassign (baseline)
+                              </option>
+                            )}
+                            {chambers.filter(c => c.chamberId !== chamber.chamberId).map(c => (
                               <option key={c.chamberId} value={c.chamberId}>
                                 Move to {c.chamberName}
                               </option>

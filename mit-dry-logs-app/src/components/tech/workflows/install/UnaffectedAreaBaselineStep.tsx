@@ -561,49 +561,29 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
         <div className="min-h-screen bg-white flex flex-col">
           {/* Header - BLUE THEMED */}
           <div className="border-b border-blue-300 bg-blue-50 p-3">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between">
               <button
                 onClick={returnToList}
-                className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+                className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium"
               >
                 <ChevronRight className="w-5 h-5 transform rotate-180" />
                 <span>Back to Unaffected Areas</span>
               </button>
 
-              {/* Save & Mark Complete Button - Moved to Header */}
-              <Button
-                variant="primary"
-                onClick={markCompleteAndReturn}
-                className="flex items-center gap-2"
-              >
-                {selectedRoom.isComplete ? (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Return to Area List
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Save & Mark Complete
-                  </>
-                )}
-              </Button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">{selectedRoom.name}</h2>
-                <p className="text-sm text-gray-600">{selectedRoom.floor} • {selectedRoom.type} • Baseline Area</p>
-              </div>
               {selectedRoom.isComplete && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-lg">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-medium">Complete</span>
+                <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-lg">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">Complete</span>
                 </div>
               )}
             </div>
+            <div className="mt-2">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedRoom.name}</h2>
+              <p className="text-sm text-gray-600">{selectedRoom.floor} • {selectedRoom.type} • Baseline Area</p>
+            </div>
           </div>
 
-          {/* Tabs */}
+          {/* Tabs - Removed Moisture tab */}
           <div className="border-b border-gray-300 bg-white sticky top-0 z-10">
             <div className="flex gap-1 px-4">
               <button
@@ -616,17 +596,6 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
               >
                 <Home className="w-4 h-4 inline mr-2" />
                 Room Info
-              </button>
-              <button
-                onClick={() => setActiveTab('moisture')}
-                className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-                  activeTab === 'moisture'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <Droplets className="w-4 h-4 inline mr-2" />
-                Moisture (Optional) ({moistureTracking.filter(t => t.roomId === selectedRoom.id).length})
               </button>
             </div>
           </div>
@@ -750,45 +719,6 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                     </div>
                   </div>
 
-                  {/* Overall Room Photos - OPTIONAL */}
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Notable Items Photos *</h3>
-
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
-                      <div className="flex items-start gap-2">
-                        <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm text-blue-800 font-medium mb-1">
-                            Required: Take 2 photos of things that stand out in this room
-                          </p>
-                          <p className="text-xs text-blue-700">
-                            Examples: Pre-existing damage, very dirty areas, scratched doors, cracked tiles, stains, marks
-                          </p>
-                          <p className="text-xs text-blue-700 mt-1">
-                            <strong>Purpose:</strong> Liability protection for adjacent rooms - documents condition before work begins
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {user && (
-                      <UniversalPhotoCapture
-                        jobId={job.jobId}
-                        location={selectedRoom.id}
-                        category="assessment"
-                        userId={user.uid}
-                        onPhotosUploaded={(urls) => {
-                          updateSelectedRoom({
-                            overallPhotos: [...selectedRoom.overallPhotos, ...urls],
-                          });
-                        }}
-                        uploadedCount={selectedRoom.overallPhotos.length}
-                        label={`${selectedRoom.name} Notable Items`}
-                        minimumPhotos={2}
-                      />
-                    )}
-                  </div>
-
                   {/* Pre-existing Damage Section - REQUIRED */}
                   <div className="border-t pt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Pre-existing Damage *</h3>
@@ -873,31 +803,6 @@ export const UnaffectedAreaBaselineStep: React.FC<UnaffectedAreaBaselineStepProp
                 </div>
               )}
 
-              {activeTab === 'moisture' && (
-                <div>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-6">
-                    <div className="flex items-start gap-2">
-                      <Info className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-gray-700 font-medium mb-1">
-                          Moisture Readings (Optional)
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Optional: Record normal moisture levels in similar materials as affected areas.
-                          These readings can establish your "dry standard" per IICRC S500, but are not required for completion.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <MoistureTabContent
-                    job={job}
-                    roomId={selectedRoom.id}
-                    roomName={selectedRoom.name}
-                    moistureTracking={moistureTracking}
-                    onUpdate={setMoistureTracking}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </div>
