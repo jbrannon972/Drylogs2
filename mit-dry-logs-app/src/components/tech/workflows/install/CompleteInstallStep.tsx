@@ -164,41 +164,6 @@ export const CompleteInstallStep: React.FC<CompleteInstallStepProps> = ({ job, o
             </div>
           )}
 
-          {/* Job Details */}
-          <div className="bg-white rounded-lg p-3 border border-gray-200">
-            <p className="text-xs text-gray-500 uppercase font-medium mb-2">Job Details</p>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Job ID:</span>
-                <span className="font-medium text-gray-900">{job.jobId || 'Not set'}</span>
-              </div>
-              {job.claimNumber && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Claim #:</span>
-                  <span className="font-medium text-gray-900">{job.claimNumber}</span>
-                </div>
-              )}
-              {job.insuranceCompany && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Insurance:</span>
-                  <span className="font-medium text-gray-900">{job.insuranceCompany}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-gray-600">Job Type:</span>
-                <span className="font-medium text-gray-900">{job.jobType || 'Water Damage'}</span>
-              </div>
-              {job.dateOfLoss && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Date of Loss:</span>
-                  <span className="font-medium text-gray-900">
-                    {new Date(job.dateOfLoss).toLocaleDateString()}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
           {/* Cause of Loss Summary */}
           <div className="bg-white rounded-lg p-3 border border-gray-200">
             <p className="text-xs text-gray-500 uppercase font-medium mb-2">Loss Information</p>
