@@ -162,6 +162,14 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
     setChambers(finalChambers);
   };
 
+  const unassignRoom = (roomId: string) => {
+    // Remove room from all chambers (for baseline rooms only)
+    setChambers(chambers.map(c => ({
+      ...c,
+      assignedRooms: c.assignedRooms.filter(rid => rid !== roomId),
+    })));
+  };
+
   const toggleContainment = (chamberId: string) => {
     setChambers(chambers.map(c =>
       c.chamberId === chamberId
@@ -577,7 +585,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
                             value={chamber.chamberId}
                             onChange={(e) => {
                               if (e.target.value === 'unassign') {
-                                removeRoomFromChamber(room.id, chamber.chamberId);
+                                unassignRoom(room.id);
                               } else {
                                 assignRoomToChamber(room.id, e.target.value);
                               }
