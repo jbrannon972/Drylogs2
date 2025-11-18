@@ -179,7 +179,7 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
   };
 
   const calculateChamberCubicFootage = (chamber: DryingChamber): number => {
-    return chamber.assignedRooms.reduce((total, roomId) => {
+    const roomsTotal = chamber.assignedRooms.reduce((total, roomId) => {
       const room = rooms.find(r => r.id === roomId);
       if (!room) return total;
 
@@ -188,6 +188,10 @@ export const DefineChambersStep: React.FC<DefineChambersStepProps> = ({ job, onN
       const offsets = room.offsetsCubicFt || 0;
       return total + baseCubicFt + insets - offsets;
     }, 0);
+
+    // Subtract space reduction from containment barriers
+    const spaceReduction = chamber.containmentBarrier?.spaceReductionCuFt || 0;
+    return Math.max(0, roomsTotal - spaceReduction);
   };
 
   // Auto-save chambers and calculate overall damage class when data changes
